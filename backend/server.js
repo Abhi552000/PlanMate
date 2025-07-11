@@ -8,8 +8,10 @@ import taskRouter from "./routes/taskRoute.js";
 const app = express();
 const port = process.env.PORT || 4000;
 
-const allowedOrigins = ["http://localhost:5173","https://task-flow-opal-eight.vercel.app"];
-
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://plan-mate-eight.vercel.app/",
+];
 
 // MIDDLEWARE
 app.use(cors({ origin: allowedOrigins, credentials: true }));
