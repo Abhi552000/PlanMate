@@ -10,7 +10,7 @@ const port = process.env.PORT || 4000;
 
 const allowedOrigins = [
   "http://localhost:5173",
-  "https://plan-mate-eight.vercel.app/",
+  "https://plan-mate-eight.vercel.app",
 ];
 
 // MIDDLEWARE
