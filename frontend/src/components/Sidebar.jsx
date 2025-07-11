@@ -70,7 +70,7 @@ flex items-center justify-center text-white font-bold shadow-md"
             </div>
             <div>
               <h2 className=" text-lg font-bold text-gray-800">
-                Hey, {username}
+                Hey, {username?.split(" ")[0]}
               </h2>
               <p className=" text-xs text-sky-500 font-medium flex items-center gap-1">
                 <Sparkles className=" w-3 h-3" />
