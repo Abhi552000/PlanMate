@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import Navbar from "./Navbar";
 import Sidebar from "./Sidebar";
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import { Circle, Clock, TrendingUp, Zap } from "lucide-react";
 import axiosInstance from "../config";
 
@@ -9,9 +9,16 @@ const Layout = ({ user, onLogout }) => {
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [viewMode, setViewMode] = useState("kanban");
+  const location = useLocation();
+  const isDashboard = location.pathname === "/";
 
-  const fetchTasks = useCallback(async () => {
-    setLoading(true);
+  const fetchTasks = useCallback(async (silent = true) => {
+    if (user?.role === "system_admin") {
+      setTasks([]);
+      return;
+    }
+    if (!silent) setLoading(true);
     setError(null);
     try {
       const token = localStorage.getItem("token");
@@ -30,12 +37,12 @@ const Layout = ({ user, onLogout }) => {
       setError(err.message || "Could not load tasks.");
       if (err?.response?.status === 401) onLogout();
     } finally {
-      setLoading(false);
+      if (!silent) setLoading(false);
     }
   }, [onLogout]);
 
   useEffect(() => {
-    fetchTasks();
+    fetchTasks(false);
   }, [fetchTasks]);
 
   const stats = useMemo(() => {
@@ -61,7 +68,7 @@ const Layout = ({ user, onLogout }) => {
   }, [tasks]);
 
   const StatCard = ({ title, value, icon }) => (
-    <div className=" p-2 sm:p-3 rounded-xl bg-white shadow-sm border border-sky-100 hover:shadow-md transition-all duration-300 hover:border-sky-300 group">
+    <div className=" p-2 sm:p-3 rounded-xl bg-white dark:bg-gray-900 shadow-sm border border-sky-100 dark:border-gray-800 hover:shadow-md transition-all duration-300 hover:border-sky-300 group">
       <div className="flex items-center gap-2 ">
         <div className=" p-1.5 rounded-lg bg-gradient-to-br from-cyan-500/10 group-hover:from-cyan-500/20 group-hover:to-sky-500/20 ">
           {icon}
@@ -70,29 +77,29 @@ const Layout = ({ user, onLogout }) => {
           <p className=" text-lg sm:text-xl font-bold bg-gradient-to-r from-cyan-500 to-sky-600 bg-clip-text text-transparent">
             {value}
           </p>
-          <p className="text-xs text-gray-500 font-medium">{title}</p>
+          <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">{title}</p>
         </div>
       </div>
     </div>
   );
 
   // Loading
-  if (loading)
+  if (loading && tasks.length === 0)
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex items-center justify-center">
         <div className=" animate-spin rounded-full h-12 w-12 border-t-2 border-sky-500" />
       </div>
     );
 
   // Error
-  if (error)
+  if (error && tasks.length === 0)
     return (
-      <div className="min-h-screen bg-gray-50 p-6 flex items-center justify-center">
-        <div className=" bg-red-50 text-red-600 p-4 rounded-xl border border-red-100 max-w-md">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-950 p-6 flex items-center justify-center">
+        <div className=" bg-red-50 dark:bg-red-950/20 text-red-600 dark:text-red-400 p-4 rounded-xl border border-red-100 dark:border-red-900/50 max-w-md">
           <p className=" font-medium mb-2">Error loading tasks</p>
           <p className=" text-sm">{error}</p>
           <button
-            onClick={fetchTasks}
+            onClick={() => fetchTasks(false)}
             className=" mt-4 py-2 px-4 bg-red-100 text-red-700 rounded-lg text-sm font-medium hover:bg-red-200 transition-colors"
           >
             Try Again
@@ -103,19 +110,33 @@ const Layout = ({ user, onLogout }) => {
 
   console.log("stats", stats);
 
+  const showSidebar = isDashboard && viewMode !== "kanban";
+
   return (
-    <div className=" min-h-screen bg-gray-50">
+    <div className=" min-h-screen bg-gray-50 dark:bg-gray-950 transition-colors duration-300">
       <Navbar user={user} onLogout={onLogout} />
       <Sidebar user={user} tasks={tasks} />
 
-      <div className=" ml-0 xl:ml-64 lg:ml-64 md:ml-16 pt-16 p-3 sm:p-4 md:p-4 transition-all duration-300">
-        <div className=" grid grid-cols-1 xl:grid-cols-3 gap-4 sm:gap-6">
-          <div className=" xl:col-span-2 space-y-3 sm:space-y-4">
-            <Outlet context={{ tasks, refreshTasks: fetchTasks }} />
+      <div className=" ml-0 md:ml-64 pt-16 p-2 sm:p-4 md:p-6 max-w-7xl mx-auto transition-all duration-300 text-gray-900 dark:text-gray-100">
+        {error && (
+          <div className=" mb-4 bg-red-50 text-red-600 p-3 rounded-lg border border-red-100 flex justify-between items-center text-sm animate-fadeIn">
+            <span>Failed to sync tasks: {error}</span>
+            <button
+              onClick={() => fetchTasks(true)}
+              className=" underline text-red-700 hover:text-red-900 font-medium"
+            >
+              Retry
+            </button>
           </div>
-          <div className="xl:col-span-1 space-y-4 sm:space-y-6">
-            <div className=" bg-white rounded-xl p-4 sm:p-5 shadow-sm border border-sky-100">
-              <h3 className=" text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-gray-800 flex items-center gap-2">
+        )}
+        <div className={showSidebar ? "grid grid-cols-1 xl:grid-cols-3 gap-4 sm:gap-6" : "space-y-4"}>
+          <div className={showSidebar ? "xl:col-span-2 space-y-3 sm:space-y-4" : "space-y-3 sm:space-y-4 w-full"}>
+            <Outlet context={{ tasks, refreshTasks: fetchTasks, viewMode, setViewMode }} />
+          </div>
+          {showSidebar && (
+            <div className="xl:col-span-1 space-y-4 sm:space-y-6">
+            <div className=" bg-white dark:bg-gray-900 rounded-xl p-4 sm:p-5 shadow-sm border border-sky-100 dark:border-gray-800">
+              <h3 className=" text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-gray-800 dark:text-gray-200 flex items-center gap-2">
                 <TrendingUp className=" w-4 h-4 sm:w-5 sm:h-5 text-sky-500" />
                 Task Statistics
               </h3>
@@ -172,12 +193,12 @@ const Layout = ({ user, onLogout }) => {
                 </div>
               </div>
             </div>
-            <div className=" bg-white rounded-xl p-4 sm:p-Z5 shadow-sm border border-sky-100">
+            <div className=" bg-white rounded-xl p-4 sm:p-5 shadow-sm border border-sky-100">
               <h3 className=" text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-gray-800 flex items-center gap-2">
                 <Clock className=" w-4 h-4 sm:w-5 sm:h-5 text-sky-500" />
                 Recent Activity
               </h3>
-              <div className=" space-y-2 sm:space-x-3">
+              <div className=" space-y-2">
                 {tasks.slice(0, 3).map((task) => (
                   <div
                     key={task._id || task.id}
@@ -219,10 +240,11 @@ const Layout = ({ user, onLogout }) => {
               </div>
             </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
-  );
+  </div>
+);
 };
 
 export default Layout;

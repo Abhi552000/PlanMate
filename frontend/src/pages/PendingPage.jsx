@@ -38,17 +38,17 @@ const PendingPage = () => {
     <div className={layoutClasses.container}>
       <div className={layoutClasses.headerWrapper}>
         <div>
-          <h1 className=" text-2xl md:text-3xl font-bold text-gray-800 flex items-center gap-2">
+          <h1 className=" text-2xl md:text-3xl font-bold text-gray-800 dark:text-gray-200 flex items-center gap-2">
             <ListCheck className=" text-sky-500" /> Pending Task
           </h1>
-          <p className=" text-sm text-gray-500 mt-1 ml-7">
+          <p className=" text-sm text-gray-500 dark:text-gray-400 mt-1 ml-7">
             {sortedPendingTasks.length} task
             {sortedPendingTasks.length !== 1 && "s "}
             needing your attension
           </p>
         </div>
         <div className={layoutClasses.sortBox}>
-          <div className=" flex items-center gap-2 text-gray-700 font-medium">
+          <div className=" flex items-center gap-2 text-gray-700 dark:text-gray-300 font-medium">
             <Filter className=" w-4 h-4 text-sky-500" />
             <span className=" text-sm">Sort by:</span>
           </div>
@@ -77,14 +77,14 @@ const PendingPage = () => {
         </div>
       </div>
       <div className={layoutClasses.addBox} onClick={() => setShowModal(true)}>
-        <div className=" flex items-center justify-center gap-3 text-gray-500 transition-colors group-hover:text-sky-600">
+        <div className=" flex items-center justify-center gap-3 text-gray-500 dark:text-gray-400 transition-colors group-hover:text-sky-600 dark:group-hover:text-sky-400">
           <div
-            className=" w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-sm 
+            className=" w-8 h-8 rounded-full bg-white dark:bg-gray-800 flex items-center justify-center shadow-sm 
  group-hover:shadow-md transition-all duration-200"
           >
             <Plus className="text-sky-500" size={18} />
           </div>
-          <span className=" font-medium">Add New Task</span>
+          <span className=" font-medium text-gray-600 dark:text-gray-300">Add New Task</span>
         </div>
       </div>
       <div className=" space-y-4">
@@ -94,10 +94,10 @@ const PendingPage = () => {
               <div className={layoutClasses.emptyIconBg}>
                 <Clock className=" w-8 h-8 text-sky-500" />
               </div>
-              <h3 className=" text-lg font-semibold text-gray-800 mb-2">
+              <h3 className=" text-lg font-semibold text-gray-800 dark:text-gray-200 mb-2">
                 All caught up!
               </h3>
-              <p className=" text-sm text-gray-500 mb-4">
+              <p className=" text-sm text-gray-500 dark:text-gray-400 mb-4">
                 No pending tasks - great work!
               </p>
               <button

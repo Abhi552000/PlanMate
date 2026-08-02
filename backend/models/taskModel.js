@@ -19,13 +19,99 @@ const taskSchema = new mongoose.Schema({
   },
   owner: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
+    ref: "user",
     required: true,
+  },
+  assignee: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "user",
+    default: null,
+  },
+  key: {
+    type: String,
+  },
+  organization: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "organization",
   },
   completed: {
     type: Boolean,
     default: false,
   },
+  status: {
+    type: String,
+    enum: ["To Do", "In Progress", "Done"],
+    default: "To Do",
+  },
+  issueType: {
+    type: String,
+    enum: ["Story", "Task", "Bug", "Epic"],
+    default: "Task",
+  },
+  storyPoints: {
+    type: Number,
+    default: 1,
+  },
+  subtasks: [
+    {
+      title: {
+        type: String,
+        required: true,
+      },
+      description: {
+        type: String,
+        default: "",
+      },
+      completed: {
+        type: Boolean,
+        default: false,
+      },
+      status: {
+        type: String,
+        enum: ["To Do", "In Progress", "Done"],
+        default: "To Do",
+      },
+      priority: {
+        type: String,
+        default: "Low",
+      },
+      dueDate: {
+        type: Date,
+      },
+      storyPoints: {
+        type: Number,
+        default: 0,
+      },
+      issueType: {
+        type: String,
+        default: "Sub-task",
+      },
+    },
+  ],
+  history: [
+    {
+      field: {
+        type: String,
+        required: true,
+      },
+      oldValue: {
+        type: String,
+        default: "",
+      },
+      newValue: {
+        type: String,
+        default: "",
+      },
+      updatedBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "user",
+      },
+      updatedAt: {
+        type: Date,
+        default: Date.now,
+      },
+    },
+  ],
   createdAt: {
     type: Date,
     default: Date.now,

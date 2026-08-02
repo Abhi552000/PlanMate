@@ -8,6 +8,10 @@ import Dashboard from "./pages/Dashboard";
 import PendingPage from "./pages/PendingPage";
 import CompletePage from "./pages/CompletePage";
 import Profile from "./pages/Profile";
+import TaskDetailPage from "./pages/TaskDetailPage";
+import OrganizationAdmin from "./pages/OrganizationAdmin";
+import SystemAdminDashboard from "./pages/SystemAdminDashboard";
+import WorkspaceSettings from "./pages/WorkspaceSettings";
 
 const App = () => {
   const navigate = useNavigate();
@@ -29,12 +33,17 @@ const App = () => {
     const user = {
       email: data.email,
       name: data.name || "User",
+      role: data.role || "member",
+      organization: data.organization || null,
       avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(
         data.name || "User"
       )}&background=random`,
     };
     setCurrentUser(user);
-    navigate("/", { replace: true });
+    
+    // Redirect role-specific routes immediately
+    const targetPath = user.role === "system_admin" ? "/system-admin" : "/";
+    navigate(targetPath, { replace: true });
   };
 
   const handleLogout = () => {
@@ -43,11 +52,22 @@ const App = () => {
     navigate("/login", { replace: true });
   };
 
-  const ProtectedLayout = () => (
-    <Layout user={currentUser} onLogout={handleLogout}>
-      <Outlet />
-    </Layout>
-  );
+  const ProtectedLayout = () => {
+    if (currentUser?.role === "system_admin") {
+      return <Navigate to="/system-admin" replace />;
+    }
+    return (
+      <Layout user={currentUser} onLogout={handleLogout}>
+        <Outlet />
+      </Layout>
+    );
+  };
+
+  const SystemAdminLayout = () => {
+    if (!currentUser) return <Navigate to="/login" replace />;
+    if (currentUser.role !== "system_admin") return <Navigate to="/" replace />;
+    return <Outlet />;
+  };
 
   return (
     <Routes>
@@ -82,6 +102,9 @@ const App = () => {
         <Route path="/" element={<Dashboard />} />
         <Route path="/pending" element={<PendingPage />} />
         <Route path="/complete" element={<CompletePage />} />
+        <Route path="/task/:id" element={<TaskDetailPage />} />
+        <Route path="/organization" element={<OrganizationAdmin />} />
+        <Route path="/workspace-settings" element={<WorkspaceSettings />} />
         <Route
           path="/profile"
           element={
@@ -92,6 +115,10 @@ const App = () => {
             />
           }
         />
+      </Route>
+
+      <Route element={<SystemAdminLayout />}>
+        <Route path="/system-admin" element={<SystemAdminDashboard onLogout={handleLogout} user={currentUser} />} />
       </Route>
 
       <Route

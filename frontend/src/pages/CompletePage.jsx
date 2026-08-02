@@ -79,7 +79,7 @@ const CompletePage = () => {
             <div className="relative md:hidden w-36" ref={dropdownRef}>
               <button
                 onClick={() => setDropdownOpen((prev) => !prev)}
-                className="w-full px-2 py-1 border border-sky-100 rounded-lg text-xs text-gray-700 flex justify-between items-center"
+                className="w-full px-2 py-1 border border-sky-100 dark:border-gray-800 rounded-lg text-xs text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-900 flex justify-between items-center"
               >
                 <span>
                   {SORT_OPTIONS.find((opt) => opt.id === sortBy)?.label}
@@ -87,7 +87,7 @@ const CompletePage = () => {
                 <ChevronDown className="w-4 h-4" />
               </button>
               {dropdownOpen && (
-                <ul className="absolute top-full mt-1 left-0 w-full bg-white border border-sky-100 rounded-lg shadow-md z-50">
+                <ul className="absolute top-full mt-1 left-0 w-full bg-white dark:bg-gray-900 border border-sky-100 dark:border-gray-800 rounded-lg shadow-md z-50">
                   {SORT_OPTIONS.map((opt) => (
                     <li
                       key={opt.id}
@@ -95,10 +95,10 @@ const CompletePage = () => {
                         setSortBy(opt.id);
                         setDropdownOpen(false);
                       }}
-                      className={`px-4 py-2 text-xs cursor-pointer hover:bg-sky-50 ${
+                      className={`px-4 py-2 text-xs cursor-pointer hover:bg-sky-50 dark:hover:bg-gray-800 ${
                         sortBy === opt.id
-                          ? "bg-sky-100 text-sky-700 font-medium"
-                          : ""
+                          ? "bg-sky-100 dark:bg-sky-900 text-sky-700 dark:text-sky-300 font-medium"
+                          : "text-gray-700 dark:text-gray-300"
                       }`}
                     >
                       {opt.label}

@@ -1,1 +1,73 @@
 @import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+/* Inter font */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+/* Design tokens */
+:root {
+  --color-bg-primary: hsl(210, 40%, 98%);
+  --color-bg-surface: hsl(0, 0%, 100%);
+  --color-accent: hsl(190, 80%, 50%);
+  --color-accent-hover: hsl(190, 80%, 45%);
+  --color-text-primary: hsl(210, 10%, 10%);
+  --color-bg-primary-dark: hsl(210, 30%, 12%);
+  --color-bg-surface-dark: hsl(0, 0%, 8%);
+  --color-text-primary-dark: hsl(210, 10%, 90%);
+}
+
+html {
+  font-family: 'Inter', sans-serif;
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+}
+
+html.dark {
+  background-color: var(--color-bg-primary-dark);
+  color: var(--color-text-primary-dark);
+}
+
+/* Global Dark Mode Overrides to ensure high contrast and readability */
+html.dark .text-gray-800,
+html.dark .text-gray-900,
+html.dark .text-slate-800,
+html.dark .text-slate-900 {
+  color: hsl(210, 10%, 95%) !important;
+}
+
+html.dark .text-gray-700,
+html.dark .text-slate-700 {
+  color: hsl(210, 10%, 85%) !important;
+}
+
+html.dark .text-gray-600,
+html.dark .text-slate-600 {
+  color: hsl(210, 10%, 75%) !important;
+}
+
+html.dark .text-gray-500,
+html.dark .text-slate-500 {
+  color: hsl(210, 10%, 65%) !important;
+}
+
+html.dark .text-gray-400,
+html.dark .text-slate-400 {
+  color: hsl(210, 10%, 50%) !important;
+}
+
+html.dark .bg-white {
+  background-color: hsl(210, 30%, 12%) !important;
+}
+
+html.dark .border-sky-50,
+html.dark .border-sky-100,
+html.dark .border-sky-200,
+html.dark .border-gray-50,
+html.dark .border-gray-100,
+html.dark .border-gray-200 {
+  border-color: hsl(210, 20%, 20%) !important;
+}
+
+/* Animation utilities */
+@import "./assets/animations.css";
+
