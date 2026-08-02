@@ -35,7 +35,8 @@ const Login = ({ onSubmit, onSwitchMode }) => {
           if (data.success) {
             onSubmit?.({ token, userId, ...data.user });
             toast.success("Session restored. Redirecting...");
-            navigate("/");
+            const targetPath = data.user.role === "system_admin" ? "/system-admin" : "/";
+            navigate(targetPath);
           } else {
             localStorage.clear();
           }
@@ -67,7 +68,8 @@ const Login = ({ onSubmit, onSwitchMode }) => {
       setFormData(INITIAL_FORM);
       onSubmit?.({ token: data.token, userId: data.user.id, ...data.user });
       toast.success("Login successfull Redirecting...");
-      setTimeout(() => navigate("/", 1000));
+      const targetPath = data.user.role === "system_admin" ? "/system-admin" : "/";
+      setTimeout(() => navigate(targetPath), 1000);
     } catch (err) {
       console.log("err", err);
       const msg =
@@ -147,14 +149,14 @@ const Login = ({ onSubmit, onSwitchMode }) => {
           )}
         </button>
       </form>
-      <p className=" text-center text-sm text-gray-600 mt-6">
+      <p className=" text-center text-xs text-gray-500 mt-6 font-medium">
         Don't have an account?{" "}
         <button
           type="button"
           onClick={handleSwitchMode}
-          className=" text-sky-600 hover:text-sky-700 hover:underline font-medium transition-colors"
+          className=" text-sky-600 hover:text-sky-700 hover:underline font-bold transition-colors cursor-pointer"
         >
-          Sign Up
+          Request Access
         </button>
       </p>
     </div>

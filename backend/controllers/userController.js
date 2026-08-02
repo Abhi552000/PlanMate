@@ -1,5 +1,6 @@
 import validator from "validator";
 import User from "../models/userModel.js";
+import Organization from "../models/organizationModel.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
@@ -11,7 +12,7 @@ const createToken = (userId) =>
 
 // REGISTER FUNCTION
 export async function registerUser(req, res) {
-  const { name, email, password } = req.body;
+  const { name, email, password, organization } = req.body;
 
   if (!name || !email || !password) {
     return res
@@ -36,13 +37,58 @@ export async function registerUser(req, res) {
     }
 
     const hashed = await bcrypt.hash(password, 10);
-    const user = await User.create({ name, email, password: hashed });
+
+    // If joining an existing organization via dropdown self-signup
+    if (organization) {
+      const orgExists = await Organization.findById(organization);
+      if (!orgExists) {
+        return res.status(400).json({ success: false, message: "Selected organization not found" });
+      }
+
+      await User.create({
+        name,
+        email,
+        password: hashed,
+        organization: orgExists._id,
+        role: "member",
+        status: "pending"
+      });
+
+      return res.status(201).json({
+        success: true,
+        message: "Registration successful! Your request is pending approval by your organization administrator."
+      });
+    }
+
+    // Default auto-create organization for org admin signup (fallback)
+    const user = await User.create({ 
+      name, 
+      email, 
+      password: hashed,
+      role: "org_admin",
+      status: "active"
+    });
+    
     const token = createToken(user._id);
+
+    const org = await Organization.create({
+      name: `${name}'s Organization`,
+      admin: user._id
+    });
+
+    user.organization = org._id;
+    await user.save();
 
     res.status(201).json({
       success: true,
       token,
-      user: { id: user._id, name: user.name, email: user.email },
+      user: { 
+        id: user._id, 
+        name: user.name, 
+        email: user.email, 
+        role: user.role, 
+        organization: org 
+      },
     });
   } catch (err) {
     console.log(err);
@@ -60,11 +106,29 @@ export async function loginUser(req, res) {
   }
 
   try {
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email }).populate("organization");
     if (!user) {
       return res
         .status(401)
         .json({ success: false, message: "Invalid credentials." });
+    }
+    if (user.organization && user.organization.isActive === false) {
+      return res.status(403).json({
+        success: false,
+        message: `Your organization is inactive: ${user.organization.remark || "Deactivated by System Admin"}. Please contact your administrator.`
+      });
+    }
+    if (user.status === "pending") {
+      return res.status(403).json({
+        success: false,
+        message: "Your registration request is pending approval by your organization administrator. Please contact your administrator for access."
+      });
+    }
+    if (user.status === "rejected") {
+      return res.status(403).json({
+        success: false,
+        message: "Your access request has been rejected by your organization administrator."
+      });
     }
     const match = await bcrypt.compare(password, user.password);
     if (!match) {
@@ -74,9 +138,16 @@ export async function loginUser(req, res) {
     }
     const token = createToken(user._id);
     res.json({
+      success: true,
       message: true,
       token,
-      user: { id: user._id, name: user.name, email: user.email },
+      user: { 
+        id: user._id, 
+        name: user.name, 
+        email: user.email, 
+        role: user.role || "member",
+        organization: user.organization || null
+      },
     });
   } catch (err) {
     console.log(err);
@@ -87,11 +158,19 @@ export async function loginUser(req, res) {
 // GET CURRENT USER
 export async function getCurrentUser(req, res) {
   try {
-    const user = await User.findById(req.user.id).select("name email");
+    const user = await User.findById(req.user.id)
+      .select("name email role organization")
+      .populate("organization");
     if (!user) {
       return res
         .status(400)
         .json({ success: false, message: "User not found" });
+    }
+    if (user.organization && user.organization.isActive === false) {
+      return res.status(403).json({
+        success: false,
+        message: `Your organization is inactive: ${user.organization.remark || "Deactivated by System Admin"}. Please contact your administrator.`
+      });
     }
     res.json({ success: true, user });
   } catch (err) {

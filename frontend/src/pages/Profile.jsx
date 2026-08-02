@@ -62,7 +62,7 @@ const Profile = ({ setCurrentUser, onLogout }) => {
         toast.success("Profile Updated");
       } else toast.error(data.message);
     } catch (err) {
-      toast.err(err.response?.data?.message || "Profile update failed");
+      toast.error(err.response?.data?.message || "Profile update failed");
     }
   };
 
@@ -88,7 +88,7 @@ const Profile = ({ setCurrentUser, onLogout }) => {
 
   return (
     <div className=" min-h-screen bg-gray-50">
-      <ToastContainer position="top-cente" autoClose={3000} />
+      <ToastContainer position="top-center" autoClose={3000} />
       <div className=" max-w-4xl mx-auto p-6">
         <button onClick={() => navigate(-1)} className={BACK_BUTTON}>
           <ChevronLeft className=" w-5 h-5 mr-1" />
