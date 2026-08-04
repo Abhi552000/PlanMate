@@ -1,29 +1,24 @@
 import { Eye, EyeOff, Lock, LogIn, Mail } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { toast, ToastContainer } from "react-toastify";
-import { BUTTON_CLASSES, INPUTWRAPPER } from "../assets/dummy";
-import axiosInstance from "../config";
+import { toast } from "react-toastify";
+import { authService } from "../services/authService";
+import { Input } from "./ui/Input";
+import { Button } from "./ui/Button";
 
 const INITIAL_FORM = { email: "", password: "" };
 
-const Login = ({ onSubmit, onSwitchMode }) => {
+interface LoginProps {
+  onSubmit: (user: any) => void;
+  onSwitchMode: () => void;
+}
+
+export const Login: React.FC<LoginProps> = ({ onSubmit, onSwitchMode }) => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState(INITIAL_FORM);
-
-  const fields = [
-    { name: "email", type: "email", placeholder: "Email", icon: Mail },
-    {
-      name: "password",
-      type: showPassword ? "text" : "password",
-      placeholder: "Password",
-      icon: Lock,
-      isPassword: true,
-    },
-  ];
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -31,7 +26,7 @@ const Login = ({ onSubmit, onSwitchMode }) => {
     if (token) {
       (async () => {
         try {
-          const { data } = await axiosInstance.get("/api/user/me");
+          const data = await authService.getMe();
           if (data.success) {
             onSubmit?.({ token, userId, ...data.user });
             toast.success("Session restored. Redirecting...");
@@ -52,7 +47,7 @@ const Login = ({ onSubmit, onSwitchMode }) => {
     onSwitchMode?.();
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!rememberMe) {
       toast.error('You must enable "Remember Me" to login');
@@ -60,7 +55,7 @@ const Login = ({ onSubmit, onSwitchMode }) => {
     }
     setLoading(true);
     try {
-      const { data } = await axiosInstance.post("/api/user/login", formData);
+      const data = await authService.login(formData);
       if (!data.token) throw new Error(data.message || "Login Failed");
 
       localStorage.setItem("token", data.token);
@@ -70,7 +65,7 @@ const Login = ({ onSubmit, onSwitchMode }) => {
       toast.success("Login successfull Redirecting...");
       const targetPath = data.user.role === "system_admin" ? "/system-admin" : "/";
       setTimeout(() => navigate(targetPath), 1000);
-    } catch (err) {
+    } catch (err: any) {
       console.log("err", err);
       const msg =
         err?.response?.data?.message || err?.message || "Login failed";
@@ -82,7 +77,6 @@ const Login = ({ onSubmit, onSwitchMode }) => {
 
   return (
     <div className=" max-w-md w-full bg-white shadow-lg border border-sky-100 rounded-xl p-8">
-      <ToastContainer position="top-center" autoClose={3000} hideProgressBar />
       <div className=" mb-6 text-center">
         <div className=" w-16 h-16 bg-gradient-to-br from-cyan-500 to-sky-600 rounded-full mx-auto flex items-center justify-center mb-4">
           <LogIn className=" w-8 h-8 text-white" />
@@ -93,34 +87,35 @@ const Login = ({ onSubmit, onSwitchMode }) => {
         </p>
       </div>
       <form onSubmit={handleSubmit} className=" space-y-4">
-        {fields.map(({ name, type, placeholder, icon: Icon, isPassword }) => (
-          <div key={name} className={INPUTWRAPPER}>
-            <Icon className=" text-sky-500 w-5 h-5 mr-2" />
-            <input
-              type={type}
-              placeholder={placeholder}
-              value={formData[name]}
-              onChange={(e) =>
-                setFormData({ ...formData, [name]: e.target.value })
-              }
-              className=" w-full focus:outline-none text-sm text-gray-700"
-              required
-            />
-            {isPassword && (
-              <button
-                type="button"
-                onClick={() => setShowPassword((prev) => !prev)}
-                className=" ml-2 text-gray-500 hover:text-sky-500 transition-colors"
-              >
-                {showPassword ? (
-                  <EyeOff className=" w-5 h-5" />
-                ) : (
-                  <Eye className=" w-5 h-5" />
-                )}
-              </button>
+        <Input
+          type="email"
+          placeholder="Email"
+          value={formData.email}
+          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+          icon={<Mail className="w-5 h-5" />}
+          required
+        />
+        <div className="relative">
+          <Input
+            type={showPassword ? "text" : "password"}
+            placeholder="Password"
+            value={formData.password}
+            onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+            icon={<Lock className="w-5 h-5" />}
+            required
+          />
+          <button
+            type="button"
+            onClick={() => setShowPassword((prev) => !prev)}
+            className="absolute right-3 top-[13px] text-gray-500 hover:text-sky-500 transition-colors cursor-pointer"
+          >
+            {showPassword ? (
+              <EyeOff className=" w-5 h-5" />
+            ) : (
+              <Eye className=" w-5 h-5" />
             )}
-          </div>
-        ))}
+          </button>
+        </div>
 
         <div className=" flex items-center">
           <input
@@ -128,26 +123,19 @@ const Login = ({ onSubmit, onSwitchMode }) => {
             id="rememberMe"
             checked={rememberMe}
             onChange={() => setRememberMe(!rememberMe)}
-            className=" h-4 w-4 text-sky-500 focus:ring-sky-400 border-gray-300 rounded "
+            className=" h-4 w-4 text-sky-500 focus:ring-sky-400 border-gray-300 rounded cursor-pointer"
             required
           />
           <label
             htmlFor="rememberMe"
-            className=" ml-2 block text-sm text-gray-700"
+            className=" ml-2 block text-sm text-gray-700 cursor-pointer select-none"
           >
             Remember Me
           </label>
         </div>
-        <button type="submit" className={BUTTON_CLASSES} disabled={loading}>
-          {loading ? (
-            "Logging in..."
-          ) : (
-            <>
-              <LogIn className=" w-4 h-4" />
-              Login In
-            </>
-          )}
-        </button>
+        <Button type="submit" className="w-full" loading={loading} icon={<LogIn className="w-4 h-4" />}>
+          Login In
+        </Button>
       </form>
       <p className=" text-center text-xs text-gray-500 mt-6 font-medium">
         Don't have an account?{" "}

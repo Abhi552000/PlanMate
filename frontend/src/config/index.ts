@@ -1,6 +1,6 @@
-import axios from "axios";
+import axios, { InternalAxiosRequestConfig, AxiosResponse } from "axios";
 
-const baseURL = import.meta.env.VITE_ENDPOINT_HTTPS || "http://localhost:4000";
+const baseURL = ((import.meta as any).env?.VITE_ENDPOINT_HTTPS as string) || "http://localhost:4000";
 
 const axiosInstance = axios.create({
   baseURL,
@@ -11,19 +11,19 @@ const axiosInstance = axios.create({
 });
 
 axiosInstance.interceptors.request.use(
-  (config) => {
+  (config: InternalAxiosRequestConfig) => {
     const token = localStorage.getItem("token");
     if (token) {
       config.headers["Authorization"] = `Bearer ${token}`;
     }
     return config;
   },
-  (error) => Promise.reject(error)
+  (error: any) => Promise.reject(error)
 );
 
 axiosInstance.interceptors.response.use(
-  (response) => response,
-  (error) => {
+  (response: AxiosResponse) => response,
+  (error: any) => {
     const originalRequest = error.config;
 
     const isAuthRoute =

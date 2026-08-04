@@ -4,17 +4,15 @@ import {
   BookOpen, 
   CheckSquare, 
   Award, 
-  Calendar, 
-  User, 
   ArrowRight, 
   ArrowLeft, 
-  Trash2, 
   Edit 
 } from "lucide-react";
-import axiosInstance from "../config";
+import { taskService } from "../services/taskService";
 import { useNavigate } from "react-router-dom";
+import { ITask } from "../types";
 
-const getIssueTypeIcon = (type) => {
+const getIssueTypeIcon = (type: string) => {
   switch (type?.toLowerCase()) {
     case "bug":
       return <Bug className="w-4 h-4 text-red-500 fill-red-50" />;
@@ -27,7 +25,7 @@ const getIssueTypeIcon = (type) => {
   }
 };
 
-const getIssueTypeLeftBorder = (type) => {
+const getIssueTypeLeftBorder = (type: string) => {
   switch (type?.toLowerCase()) {
     case "bug":
       return "border-l-4 border-l-red-500 border-y-sky-100 dark:border-y-gray-800 border-r-sky-100 dark:border-r-gray-800";
@@ -40,7 +38,7 @@ const getIssueTypeLeftBorder = (type) => {
   }
 };
 
-const getPriorityStyle = (priority) => {
+const getPriorityStyle = (priority: string) => {
   switch (priority?.toLowerCase()) {
     case "high":
       return "text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/20 border-red-100 dark:border-red-900/50";
@@ -51,13 +49,20 @@ const getPriorityStyle = (priority) => {
   }
 };
 
-const KanbanBoard = ({ tasks, onRefresh, onEdit, onLogout }) => {
+interface KanbanBoardProps {
+  tasks: ITask[];
+  onRefresh?: () => void;
+  onEdit?: (task: ITask) => void;
+  onLogout?: () => void;
+  columns?: string[];
+}
+
+const KanbanBoard: React.FC<KanbanBoardProps> = ({ tasks, onRefresh, onEdit, onLogout, columns = ["To Do", "In Progress", "Done"] }) => {
   const navigate = useNavigate();
-  const columns = ["To Do", "In Progress", "Done"];
-  const [activeOverColumn, setActiveOverColumn] = React.useState(null);
+  const [activeOverColumn, setActiveOverColumn] = React.useState<string | null>(null);
 
   // Group tasks by status
-  const groupedTasks = columns.reduce((acc, col) => {
+  const groupedTasks = columns.reduce<Record<string, ITask[]>>((acc, col) => {
     acc[col] = tasks.filter((t) => {
       const status = t.status || (t.completed ? "Done" : "To Do");
       return status === col;
@@ -65,70 +70,63 @@ const KanbanBoard = ({ tasks, onRefresh, onEdit, onLogout }) => {
     return acc;
   }, {});
 
-  const handleStatusTransition = async (taskId, newStatus) => {
+  const handleStatusTransition = async (taskId: string, newStatus: string) => {
     try {
-      await axiosInstance.put(`/api/tasks/${taskId}/gp`, {
+      await taskService.updateTask(taskId, {
         status: newStatus,
         completed: newStatus === "Done" ? "Yes" : "No"
       });
       onRefresh?.();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error moving task:", error);
       if (error.response?.status === 401) onLogout?.();
     }
   };
 
-  const handleDelete = async (taskId) => {
-    try {
-      await axiosInstance.delete(`/api/tasks/${taskId}/gp`);
-      onRefresh?.();
-    } catch (error) {
-      console.error("Error deleting task:", error);
-      if (error.response?.status === 401) onLogout?.();
-    }
-  };
-
-  const handleDragStart = (e, taskId) => {
+  const handleDragStart = (e: React.DragEvent, taskId: string) => {
     e.dataTransfer.setData("text/plain", taskId);
     e.dataTransfer.effectAllowed = "move";
   };
 
-  const handleDragOver = (e, col) => {
+  const handleDragOver = (e: React.DragEvent, col: string) => {
     e.preventDefault();
   };
 
-  const handleDragEnter = (e, col) => {
+  const handleDragEnter = (e: React.DragEvent, col: string) => {
     e.preventDefault();
     setActiveOverColumn(col);
   };
 
-  const handleDragLeave = (e) => {
+  const handleDragLeave = (e: React.DragEvent) => {
     e.preventDefault();
   };
 
-  const handleDrop = async (e, col) => {
+  const handleDrop = async (e: React.DragEvent, col: string) => {
     e.preventDefault();
     const taskId = e.dataTransfer.getData("text/plain");
     setActiveOverColumn(null);
     if (!taskId) return;
 
     try {
-      await axiosInstance.put(`/api/tasks/${taskId}/gp`, {
+      await taskService.updateTask(taskId, {
         status: col,
         completed: col === "Done" ? "Yes" : "No"
       });
       onRefresh?.();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error updating status on drop:", error);
       if (error.response?.status === 401) onLogout?.();
     }
   };
 
   return (
-    <div className="flex flex-row overflow-x-auto gap-4 md:gap-6 pt-4 pb-4 md:grid md:grid-cols-3 md:items-start select-none max-w-full">
+    <div 
+      style={{ gridTemplateColumns: `repeat(${columns.length}, minmax(0, 1fr))` }}
+      className="flex flex-row overflow-x-auto gap-4 md:gap-6 pt-4 pb-4 md:grid md:items-start select-none max-w-full"
+    >
       {columns.map((col) => {
         const colTasks = groupedTasks[col] || [];
-        const totalPoints = colTasks.reduce((sum, t) => sum + (t.storyPoints || 0), 0);
+        const totalPoints = colTasks.length; // Count of tasks in this column
 
         return (
           <div 
@@ -146,25 +144,19 @@ const KanbanBoard = ({ tasks, onRefresh, onEdit, onLogout }) => {
             {/* Column Header */}
             <div className="flex items-center justify-between mb-4 pb-2 border-b border-sky-100/50 dark:border-gray-800">
               <div className="flex items-center gap-2">
-                <span className="font-bold text-gray-700 dark:text-gray-355 text-sm tracking-wide uppercase">
+                <span className="font-bold text-gray-700 dark:text-gray-300 text-sm tracking-wide uppercase">
                   {col}
                 </span>
                 <span className="bg-sky-100/80 dark:bg-sky-950/50 text-sky-700 dark:text-sky-400 px-2 py-0.5 rounded-full text-xs font-semibold">
                   {colTasks.length}
                 </span>
               </div>
-              {totalPoints > 0 && (
-                <span className="text-xs text-gray-500 dark:text-gray-400 bg-gray-200/60 dark:bg-gray-800 px-2 py-0.5 rounded font-medium">
-                  {totalPoints} SP
-                </span>
-              )}
             </div>
 
             {/* Column Cards */}
             <div className="space-y-3 flex-1 overflow-y-auto max-h-[600px] pr-1">
               {colTasks.map((task) => {
-                const sp = task.storyPoints !== undefined ? task.storyPoints : 1;
-                const type = task.issueType || "Task";
+                const type = "Task";
                 
                 return (
                   <div 
@@ -172,24 +164,25 @@ const KanbanBoard = ({ tasks, onRefresh, onEdit, onLogout }) => {
                     draggable
                     onDragStart={(e) => handleDragStart(e, task._id)}
                     onClick={(e) => {
-                      if (e.target.closest("button") || e.target.closest("select")) return;
+                      const target = e.target as HTMLElement;
+                      if (target.closest("button") || target.closest("select")) return;
                       navigate(`/task/${task._id}`);
                     }}
                     className={`bg-white dark:bg-gray-950 border rounded-lg p-3.5 shadow-sm hover:shadow-md transition-all duration-200 flex flex-col justify-between gap-3 group cursor-grab active:cursor-grabbing ${getIssueTypeLeftBorder(type)}`}
                   >
                     <div>
-                       {/* Top Row: Type & Actions */}
+                      {/* Top Row: Type & Actions */}
                       <div className="flex items-center justify-between mb-1.5">
                         <div className="flex items-center gap-1.5">
                           {getIssueTypeIcon(type)}
-                          <span className="text-[10px] font-black tracking-wider uppercase text-sky-700 bg-sky-100/50 px-1.5 py-0.5 rounded border border-sky-200">
+                          <span className="text-[10px] font-black tracking-wider uppercase text-sky-700 bg-sky-100/50 px-1.5 py-0.5 rounded border border-sky-200 dark:border-gray-800">
                             {task.key || `PM-${task._id ? task._id.slice(-4).toUpperCase() : "TASK"}`}
                           </span>
                         </div>
                         <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                           <button 
                             onClick={() => navigate(`/task/${task._id}`)}
-                            className="p-1 text-gray-400 hover:text-sky-600 hover:bg-sky-50 rounded transition-colors"
+                            className="p-1 text-gray-400 hover:text-sky-600 dark:hover:text-sky-400 hover:bg-sky-50 dark:hover:bg-gray-800 rounded transition-colors cursor-pointer"
                             title="Open Issue"
                           >
                             <Edit className="w-3.5 h-3.5" />
@@ -201,7 +194,7 @@ const KanbanBoard = ({ tasks, onRefresh, onEdit, onLogout }) => {
                       <h4 className="text-sm font-semibold text-gray-800 dark:text-gray-200 leading-tight">
                         {task.title}
                       </h4>
- 
+  
                       {/* Description */}
                       {task.description && (
                         <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 line-clamp-2">
@@ -218,18 +211,15 @@ const KanbanBoard = ({ tasks, onRefresh, onEdit, onLogout }) => {
                           {task.priority || "Low"}
                         </span>
                         
-                        {/* Story Points */}
-                        <span className="text-[10px] font-bold bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 px-1.5 py-0.5 rounded" title="Story Points">
-                          {sp} SP
-                        </span>
- 
                         {/* Assignee Avatar */}
                         {task.assignee && (
                           <div 
-                            className="w-5 h-5 rounded-full bg-sky-100 dark:bg-sky-950 text-sky-700 dark:text-sky-400 flex items-center justify-center font-extrabold text-[8px] border border-sky-200 dark:border-sky-850 uppercase shrink-0" 
-                            title={`Assigned to: ${task.assignee.name} (${task.assignee.email})`}
+                            className="w-5 h-5 rounded-full bg-sky-100 dark:bg-sky-950 text-sky-700 dark:text-sky-400 flex items-center justify-center font-extrabold text-[8px] border border-sky-200 dark:border-gray-800 uppercase shrink-0" 
+                            title={`Assigned to: ${typeof task.assignee === 'object' ? task.assignee.name : 'Team Member'}`}
                           >
-                            {task.assignee.name.split(/\s+/).map(n => n[0]).join("").toUpperCase().slice(0, 2)}
+                            {typeof task.assignee === 'object' && task.assignee.name
+                              ? task.assignee.name.split(/\s+/).map(n => n[0]).join("").toUpperCase().slice(0, 2)
+                              : "U"}
                           </div>
                         )}
                       </div>
@@ -242,7 +232,7 @@ const KanbanBoard = ({ tasks, onRefresh, onEdit, onLogout }) => {
                               const prevIdx = columns.indexOf(col) - 1;
                               handleStatusTransition(task._id, columns[prevIdx]);
                             }}
-                            className="p-1 bg-sky-50 hover:bg-sky-100 text-sky-600 rounded transition-colors"
+                            className="p-1 bg-sky-50 dark:bg-sky-950 hover:bg-sky-100 dark:hover:bg-sky-900 text-sky-600 rounded transition-colors cursor-pointer"
                             title="Move Left"
                           >
                             <ArrowLeft className="w-3 h-3" />
@@ -254,7 +244,7 @@ const KanbanBoard = ({ tasks, onRefresh, onEdit, onLogout }) => {
                               const nextIdx = columns.indexOf(col) + 1;
                               handleStatusTransition(task._id, columns[nextIdx]);
                             }}
-                            className="p-1 bg-sky-50 hover:bg-sky-100 text-sky-600 rounded transition-colors"
+                            className="p-1 bg-sky-50 dark:bg-sky-950 hover:bg-sky-100 dark:hover:bg-sky-900 text-sky-600 rounded transition-colors cursor-pointer"
                             title="Move Right"
                           >
                             <ArrowRight className="w-3 h-3" />

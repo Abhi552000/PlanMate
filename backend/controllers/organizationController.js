@@ -324,15 +324,34 @@ export const getOrganizationUsers = async (req, res) => {
     if (!req.user.organization) {
       return res.status(404).json({ success: false, message: "User has no organization context" });
     }
-    const users = await User.find({ organization: req.user.organization }).select("name email role status createdAt");
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 5;
+    const skip = (page - 1) * limit;
+
+    const totalCount = await User.countDocuments({ organization: req.user.organization });
+    const users = await User.find({ organization: req.user.organization })
+      .select("name email role status createdAt")
+      .skip(skip)
+      .limit(limit);
+
     const usersWithStats = await Promise.all(users.map(async (u) => {
-      const solvedTasks = await Task.countDocuments({ owner: u._id, status: "Done" });
+      const solvedTasks = await Task.countDocuments({ assignee: u._id, status: "Done" });
       return {
         ...u.toObject(),
         solvedTasks
       };
     }));
-    res.json({ success: true, users: usersWithStats });
+
+    res.json({
+      success: true,
+      users: usersWithStats,
+      pagination: {
+        totalCount,
+        totalPages: Math.ceil(totalCount / limit),
+        currentPage: page,
+        limit
+      }
+    });
   } catch (error) {
     console.error("Get organization users error:", error);
     res.status(500).json({ success: false, message: "Server error fetching organization users" });
@@ -365,5 +384,101 @@ export const updateUserStatus = async (req, res) => {
   } catch (error) {
     console.error("Status update error:", error);
     res.status(500).json({ success: false, message: "Server error updating status" });
+  }
+};
+
+// Add a custom status to organization (Org Admin only)
+export const addCustomStatus = async (req, res) => {
+  const { status } = req.body;
+
+  if (req.user.role !== "org_admin") {
+    return res.status(403).json({ success: false, message: "Only organization admins can add statuses" });
+  }
+
+  if (!status || !status.trim()) {
+    return res.status(400).json({ success: false, message: "Status name is required" });
+  }
+
+  const trimmedStatus = status.trim();
+
+  try {
+    const org = await Organization.findById(req.user.organization);
+    if (!org) {
+      return res.status(404).json({ success: false, message: "Organization not found" });
+    }
+
+    // Initialize statuses if not present
+    if (!org.statuses || org.statuses.length === 0) {
+      org.statuses = ["To Do", "In Progress", "Done"];
+    }
+
+    // Check for duplicate status (case-insensitive)
+    const exists = org.statuses.some(s => s.toLowerCase() === trimmedStatus.toLowerCase());
+    if (exists) {
+      return res.status(400).json({ success: false, message: `Status "${trimmedStatus}" already exists` });
+    }
+
+    org.statuses.push(trimmedStatus);
+    await org.save();
+
+    res.json({ success: true, message: "Status added successfully", statuses: org.statuses });
+  } catch (error) {
+    console.error("Add custom status error:", error);
+    res.status(500).json({ success: false, message: "Server error adding custom status" });
+  }
+};
+
+// Delete a custom status from organization (Org Admin only)
+export const deleteCustomStatus = async (req, res) => {
+  const { statusName } = req.params;
+
+  if (req.user.role !== "org_admin") {
+    return res.status(403).json({ success: false, message: "Only organization admins can delete statuses" });
+  }
+
+  try {
+    const org = await Organization.findById(req.user.organization);
+    if (!org) {
+      return res.status(404).json({ success: false, message: "Organization not found" });
+    }
+
+    // Initialize statuses if not present
+    if (!org.statuses || org.statuses.length === 0) {
+      org.statuses = ["To Do", "In Progress", "Done"];
+    }
+
+    // Enforce that we don't delete if there is only 1 status left
+    if (org.statuses.length <= 1) {
+      return res.status(400).json({ success: false, message: "Organization must have at least one status" });
+    }
+
+    // Check if status exists in org
+    const index = org.statuses.findIndex(s => s.toLowerCase() === statusName.toLowerCase());
+    if (index === -1) {
+      return res.status(404).json({ success: false, message: "Status not found in organization" });
+    }
+
+    // CRITICAL INTEGRITY CHECK: Check if any tasks in this organization use this status
+    const matchingStatusName = org.statuses[index];
+    const taskCount = await Task.countDocuments({
+      organization: req.user.organization,
+      status: matchingStatusName
+    });
+
+    if (taskCount > 0) {
+      return res.status(400).json({ 
+        success: false, 
+        message: `Cannot delete status "${matchingStatusName}" because it is currently assigned to ${taskCount} task(s)` 
+      });
+    }
+
+    // Filter out the status
+    org.statuses.splice(index, 1);
+    await org.save();
+
+    res.json({ success: true, message: "Status deleted successfully", statuses: org.statuses });
+  } catch (error) {
+    console.error("Delete custom status error:", error);
+    res.status(500).json({ success: false, message: "Server error deleting custom status" });
   }
 };

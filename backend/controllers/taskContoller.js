@@ -84,15 +84,102 @@ export const createTask = async (req, res) => {
 // GET ALL TASK FOR LOGGED - IN USER'S ORGANIZATION
 export const getTasks = async (req, res) => {
   try {
-    const query = req.user.organization
+    const { page, limit, status, priority, assignee, search, timeframe, completed, sortBy } = req.query;
+    
+    let query = req.user.organization
       ? { organization: req.user.organization }
       : { owner: req.user.id };
+
+    // Apply status filter
+    if (status && status !== "all") {
+      query.status = status;
+    }
+
+    // Apply priority filter
+    if (priority && priority !== "all") {
+      query.priority = priority.charAt(0).toUpperCase() + priority.slice(1);
+    }
+
+    // Apply assignee filter
+    if (assignee && assignee !== "all") {
+      if (assignee === "unassigned") {
+        query.assignee = null;
+      } else {
+        query.assignee = assignee;
+      }
+    }
+
+    // Apply completed filter
+    if (completed !== undefined) {
+      query.completed = completed === "true";
+    }
+
+    // Apply global text search
+    if (search && search.trim()) {
+      query.$or = [
+        { title: { $regex: search, $options: "i" } },
+        { description: { $regex: search, $options: "i" } },
+        { key: { $regex: search, $options: "i" } },
+      ];
+    }
+
+    // Apply timeframe filter
+    if (timeframe && timeframe !== "all") {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const tomorrow = new Date(today);
+      tomorrow.setDate(today.getDate() + 1);
+
+      const nextWeek = new Date(today);
+      nextWeek.setDate(today.getDate() + 7);
+
+      if (timeframe === "today") {
+        query.dueDate = { $gte: today, $lt: tomorrow };
+      } else if (timeframe === "week") {
+        query.dueDate = { $gte: today, $lte: nextWeek };
+      }
+    }
+
+    // Apply sorting
+    let sortQuery = { createdAt: -1 };
+    if (sortBy === "oldest") {
+      sortQuery = { createdAt: 1 };
+    } else if (sortBy === "priority") {
+      sortQuery = { priority: 1, createdAt: -1 };
+    }
+
+    // Paginated tasks query
+    if (page && limit) {
+      const p = parseInt(page) || 1;
+      const l = parseInt(limit) || 10;
+      const skip = (p - 1) * l;
+
+      const totalCount = await Task.countDocuments(query);
+      const tasks = await Task.find(query)
+        .populate("owner", "name email")
+        .populate("assignee", "name email")
+        .sort(sortQuery)
+        .skip(skip)
+        .limit(l);
+
+      return res.json({
+        success: true,
+        tasks,
+        pagination: {
+          totalCount,
+          totalPages: Math.ceil(totalCount / l),
+          currentPage: p,
+          limit: l,
+        },
+      });
+    }
+
+    // Default: fetch all tasks
     const tasks = await Task.find(query)
       .populate("owner", "name email")
       .populate("assignee", "name email")
-      .sort({
-        createdAt: -1,
-      });
+      .sort(sortQuery);
+
     res.json({ success: true, tasks });
   } catch (error) {
     res.status(400).json({ success: false, message: error.message });

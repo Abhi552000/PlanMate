@@ -4,12 +4,17 @@ import {
   menuItems,
   SIDEBAR_CLASSES,
 } from "../assets/dummy";
-import { Menu, Sparkles, X, Users, Building } from "lucide-react";
+import { Menu, Sparkles, X, Users, Building, Zap } from "lucide-react";
 import { NavLink } from "react-router-dom";
+import { IUser, ITask } from "../types";
 
-const Sidebar = ({ user, tasks }) => {
+interface SidebarProps {
+  user: IUser | null;
+  tasks?: ITask[];
+}
+
+const Sidebar: React.FC<SidebarProps> = ({ user, tasks }) => {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [showModal, setShowModal] = useState(false);
 
   const username = user?.name || "user";
   const initial = username.charAt(0).toUpperCase();
@@ -139,27 +144,8 @@ const Sidebar = ({ user, tasks }) => {
     <>
       {/* DESKTOP SIDEBAR */}
       <div className={SIDEBAR_CLASSES.desktop}>
-        <div className=" p-5 border-b border-sky-100 dark:border-gray-800 lg:block hidden">
-          <div className=" flex items-center gap-3">
-            <div
-              className=" w-10 h-10 rounded-full bg-gradient-to-br from-cyan-500 to-sky-600 
-flex items-center justify-center text-white font-bold shadow-md"
-            >
-              {initial}
-            </div>
-            <div>
-              <h2 className=" text-lg font-bold text-gray-800 dark:text-gray-200">
-                Hey, {username?.split(" ")[0]}
-              </h2>
-              <p className=" text-xs text-sky-500 font-medium flex items-center gap-1">
-                <Sparkles className=" w-3 h-3" />
-                Let’s get things done!
-              </p>
-            </div>
-          </div>
-        </div>
 
-        <div className=" p-4 space-y-6 overflow-y-auto flex-1">
+        <div className=" px-4 py-8 space-y-6 overflow-y-auto flex-1">
           {renderMenuItems()}
         </div>
       </div>
@@ -185,33 +171,17 @@ flex items-center justify-center text-white font-bold shadow-md"
             className={SIDEBAR_CLASSES.mobileDrawer}
             onClick={(e) => e.stopPropagation()}
           >
-            <div className=" flex justify-between items-center mb-4 border-b pb-2">
+            <div className=" flex justify-between items-center mb-4 border-b border-sky-100 dark:border-gray-800 pb-3">
               <h2 className=" text-lg font-bold text-sky-600">Menu</h2>
               <button
-                className=" text-gray-700 hover:text-sky-600"
+                className=" text-gray-700 dark:text-gray-300 hover:text-sky-600 p-1 rounded-lg transition-colors cursor-pointer"
                 onClick={() => setMobileOpen(false)}
               >
                 <X className=" w-5 h-5" />
               </button>
             </div>
 
-            <div className=" flex items-center gap-3 mb-6 mt-16">
-              <div
-                className=" w-10 h-10 rounded-full bg-gradient-to-br from-cyan-500 to-sky-600 
-flex items-center justify-center text-white font-bold shadow-md"
-              >
-                {initial}
-              </div>
-              <div>
-                <h2 className=" text-lg font-bold text-gray-800">
-                  Hey, {username}
-                </h2>
-                <p className=" text-xs text-sky-500 font-medium flex items-center gap-1">
-                  <Sparkles className=" w-3 h-3" />
-                  Let’s get things done!
-                </p>
-              </div>
-            </div>
+
             {renderMenuItems(true)}
           </div>
         </div>
