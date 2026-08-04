@@ -1,0 +1,27 @@
+export const API_ROUTES = {
+  AUTH: {
+    LOGIN: "/api/user/login",
+    REGISTER: "/api/user/register",
+    ME: "/api/user/me",
+    PROFILE: "/api/user/profile",
+    PASSWORD: "/api/user/password",
+  },
+  ORGANIZATION: {
+    BASE: "/api/organization",
+    MEMBERS: "/api/organization/members",
+    USERS: "/api/organization/users",
+    STATUSES: "/api/organization/statuses",
+    ALL: "/api/organization/all",
+    ONBOARD: "/api/organization/onboard",
+    PUBLIC_LIST: "/api/organization/public-list",
+    ADMIN_BY_ID: (id: string) => `/api/organization/${id}/admin`,
+    STATUS_BY_ID: (id: string) => `/api/organization/${id}/status`,
+    DELETE_BY_ID: (id: string) => `/api/organization/${id}`,
+    STATUS_DELETE: (statusName: string) => `/api/organization/statuses/${encodeURIComponent(statusName)}`,
+    USER_STATUS_UPDATE: (userId: string) => `/api/organization/users/${userId}/status`,
+  },
+  TASKS: {
+    BASE: "/api/tasks/gp",
+    BY_ID: (id: string) => `/api/tasks/${id}/gp`,
+  },
+};

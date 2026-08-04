@@ -12,6 +12,8 @@ import {
   getPublicOrganizations,
   getOrganizationUsers,
   updateUserStatus,
+  addCustomStatus,
+  deleteCustomStatus,
 } from "../controllers/organizationController.js";
 import authMiddleware from "../middleware/auth.js";
 
@@ -36,5 +38,9 @@ orgRouter.get("/users", authMiddleware, getOrganizationUsers);
 orgRouter.put("/users/:userId/status", authMiddleware, updateUserStatus);
 orgRouter.post("/members", authMiddleware, addOrganizationMember);
 orgRouter.get("/members", authMiddleware, getOrganizationMembers);
+
+// Scoped custom statuses
+orgRouter.post("/statuses", authMiddleware, addCustomStatus);
+orgRouter.delete("/statuses/:statusName", authMiddleware, deleteCustomStatus);
 
 export default orgRouter;

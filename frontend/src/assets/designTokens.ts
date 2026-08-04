@@ -1,4 +1,4 @@
-// designTokens.js – centralised design system for PlanMate
+// designTokens.ts – centralised design system for PlanMate
 export const colors = {
   // Light mode
   bgPrimary: "hsl(210, 40%, 98%)",

@@ -1,3 +1,4 @@
+import React from "react";
 import {
   User,
   Mail,
@@ -11,52 +12,13 @@ import {
   SortAsc,
   Award,
   Edit2,
-  Trash2,
-  MoreVertical,
-  Clock,
-  Calendar,
 } from "lucide-react";
 
-// BACKEND TEST
-// DUMMY DATA
-const backendDummy = [
-  {
-    title: "Buy groceries",
-    description: "Milk, bread, eggs, and spinach",
-    priority: "Low",
-    dueDate: "2025-05-02T18:00:00.000Z",
-    completed: "No",
-  },
-  {
-    title: "Book dentist appointment",
-    description: "Routine check-up and cleaning",
-    priority: "Medium",
-    dueDate: "2025-05-10T10:00:00.000Z",
-    completed: true,
-  },
-  {
-    title: "Book dentist appointment",
-    description: "Routine check-up and cleaning",
-    priority: "Medium",
-    dueDate: "2025-05-10T10:00:00.000Z",
-    completed: true,
-  },
-  {
-    title: "Pay utility bills",
-    description: "Electricity and water bills for April",
-    priority: "High",
-    dueDate: "2025-04-28T12:00:00.000Z",
-    completed: "Yes",
-  },
-];
-
-// FRONTEND DUMMY DATA
-
-// assets/formConstants.js
+// FRONTEND CONSTANTS
 export const baseControlClasses =
   "w-full px-4 py-2.5 border border-sky-100 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 text-sm dark:border-gray-600 dark:bg-gray-800/50 dark:text-gray-200";
 
-export const priorityStyles = {
+export const priorityStyles: Record<string, string> = {
   Low: "bg-green-100 text-green-700 border-green-200",
   Medium: "bg-sky-100 text-sky-700 border-sky-200",
   High: "bg-cyan-100 text-cyan-700 border-cyan-200",
@@ -66,10 +28,10 @@ export const priorityStyles = {
 export const DEFAULT_TASK = {
   title: "",
   description: "",
-  priority: "Low",
+  priority: "Low" as "Low" | "Medium" | "High",
   dueDate: "",
   completed: "No",
-  id: null,
+  id: null as string | null,
 };
 
 // LOGIN CSS
@@ -104,21 +66,11 @@ export const securityFields = [
 // SIDEBAR
 export const menuItems = [
   { text: "Dashboard", path: "/", icon: <Home className="w-5 h-5" /> },
-  {
-    text: "Pending Tasks",
-    path: "/pending",
-    icon: <ListChecks className="w-5 h-5" />,
-  },
-  {
-    text: "Completed Tasks",
-    path: "/complete",
-    icon: <CheckCircle2 className="w-5 h-5" />,
-  },
 ];
 
 export const SIDEBAR_CLASSES = {
   desktop:
-    "hidden md:flex flex-col fixed h-full w-20 lg:w-64 bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm border-r border-sky-100 dark:border-gray-800 shadow-sm z-20 transition-all duration-300",
+    "hidden md:flex flex-col fixed top-16 left-0 h-[calc(100vh-4rem)] w-20 lg:w-56 bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm border-r border-sky-100 dark:border-gray-800 shadow-sm z-20 transition-all duration-300",
   mobileButton:
     "absolute md:hidden top-25 left-5 z-50 bg-sky-600 text-white p-2 rounded-full shadow-lg hover:bg-sky-700 transition",
   mobileDrawerBackdrop: "fixed inset-0 bg-black/40 backdrop-blur-sm",
@@ -133,15 +85,6 @@ export const LINK_CLASSES = {
   inactive: "hover:bg-sky-50/50 dark:hover:bg-sky-950/20 text-gray-600 dark:text-gray-400 hover:text-sky-700 dark:hover:text-sky-300",
   icon: "transition-transform duration-300 group-hover:scale-110 text-sky-500",
   text: "text-sm font-medium ml-2",
-};
-
-export const PRODUCTIVITY_CARD = {
-  container: "bg-sky-50/50 dark:bg-sky-950/10 rounded-xl p-3 border border-sky-100 dark:border-sky-900/50",
-  header: "flex items-center justify-between mb-2",
-  label: "text-xs font-semibold text-sky-700 dark:text-sky-400",
-  badge: "text-xs bg-sky-200 text-sky-700 px-2 py-0.5 rounded-full",
-  barBg: "w-full h-2 bg-sky-200 dark:bg-sky-900 rounded-full overflow-hidden",
-  barFg: "h-full bg-gradient-to-r from-cyan-500 to-sky-600 animate-pulse",
 };
 
 export const TIP_CARD = {
@@ -169,8 +112,8 @@ export const MESSAGE_ERROR =
   "bg-red-50 text-red-600 p-3 rounded-lg text-sm mb-4 border border-red-100";
 
 // TASK ITEM
-export const getPriorityColor = (priority) => {
-  const colors = {
+export const getPriorityColor = (priority: string) => {
+  const colors: Record<string, string> = {
     low: "border-green-500 bg-green-50/50 text-green-700",
     medium: "border-sky-500 bg-sky-50/50 text-sky-600",
     high: "border-cyan-800 bg-cyan-50/50 text-cyan-800",
@@ -181,8 +124,8 @@ export const getPriorityColor = (priority) => {
   );
 };
 
-export const getPriorityBadgeColor = (priority) => {
-  const colors = {
+export const getPriorityBadgeColor = (priority: string) => {
+  const colors: Record<string, string> = {
     low: "bg-green-100 text-green-900",
     medium: "bg-sky-100 text-sky-900",
     high: "bg-cyan-300 text-cyan-900",
@@ -246,7 +189,7 @@ export const STATS = [
 
 // Filter options
 export const FILTER_OPTIONS = ["all", "today", "week", "high", "medium", "low"];
-export const FILTER_LABELS = {
+export const FILTER_LABELS: Record<string, string> = {
   all: "All Tasks",
   today: "Today's Tasks",
   week: "This Week",
@@ -285,8 +228,8 @@ export const SORT_OPTIONS = [
 
 // CSS class groups
 export const CT_CLASSES = {
-    page: "p-4 md:p-6 min-h-screen",
-    header:
+  page: "p-4 md:p-6 min-h-screen",
+  header:
     "flex flex-col md:flex-row justify-between items-start md:items-center mb-6 md:mb-8 gap-3 md:gap-4",
   titleWrapper: "flex-1 min-w-0",
   title:
@@ -322,7 +265,7 @@ export const layoutClasses = {
   select:
     "px-3 py-2 border border-sky-100 dark:border-gray-800 bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 md:hidden text-sm",
   tabWrapper: "hidden md:flex space-x-1 bg-sky-50 dark:bg-gray-800 p-1 rounded-lg ml-3",
-  tabButton: (active) =>
+  tabButton: (active: boolean) =>
     `px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 flex items-center gap-1.5 ${
       active
         ? "bg-white dark:bg-gray-750 text-sky-700 dark:text-sky-300 shadow-sm border border-sky-100 dark:border-gray-650"
@@ -351,7 +294,7 @@ export const MENU_OPTIONS = [
 // CSS class groups for TaskItem
 export const TI_CLASSES = {
   wrapper:
-    "group p-4 sm:p-5 rounded-xl shadow-sm bg-white dark:bg-gray-900 border-l-4 hover:shadow-md transition-all duration-300 border border-sky-100 dark:border-gray-800 text-gray-800 dark:text-gray-200",
+    "group p-4 sm:p-5 rounded-xl shadow-sm bg-white dark:bg-gray-900 border-l-4 hover:shadow-md transition-all duration-300 border border-sky-100 dark:border-gray-800 text-gray-850 dark:text-gray-200",
   leftContainer: "flex items-start gap-2 sm:gap-3 flex-1 min-w-0",
   completeBtn:
     "mt-0.5 sm:mt-1 p-1 sm:p-1.5 rounded-full hover:bg-sky-100 dark:hover:bg-sky-950 transition-colors duration-300",

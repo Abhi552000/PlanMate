@@ -6,22 +6,26 @@ import {
   Lock, 
   Plus, 
   ShieldAlert, 
-  Calendar,
-  Search,
-  Edit,
-  Trash2,
-  X,
-  Save,
-  LogOut,
-  Power,
-  AlertTriangle,
-  Copy,
+  Search, 
+  Edit, 
+  Trash2, 
+  X, 
+  Save, 
+  LogOut, 
+  Power, 
+  Copy, 
   Check
 } from "lucide-react";
-import axiosInstance from "../config";
+import { orgService } from "../services/orgService";
+import { IUser } from "../types";
 
-const SystemAdminDashboard = ({ onLogout, user }) => {
-  const [organizations, setOrganizations] = useState([]);
+interface SystemAdminDashboardProps {
+  onLogout: () => void;
+  user: IUser | null;
+}
+
+const SystemAdminDashboard: React.FC<SystemAdminDashboardProps> = ({ onLogout, user }) => {
+  const [organizations, setOrganizations] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   
   // Onboard Modal states
@@ -32,11 +36,11 @@ const SystemAdminDashboard = ({ onLogout, user }) => {
     adminEmail: "",
     adminPassword: ""
   });
-  const [onboardedResult, setOnboardedResult] = useState(null); // Will store { email, password }
+  const [onboardedResult, setOnboardedResult] = useState<any | null>(null); // Will store { email, password }
   const [copied, setCopied] = useState(false);
 
   // Edit Modal State
-  const [editingOrg, setEditingOrg] = useState(null);
+  const [editingOrg, setEditingOrg] = useState<any | null>(null);
   const [editForm, setEditForm] = useState({
     orgName: "",
     adminName: "",
@@ -45,20 +49,20 @@ const SystemAdminDashboard = ({ onLogout, user }) => {
   });
 
   // Deactivate Modal State
-  const [deactivatingOrg, setDeactivatingOrg] = useState(null);
+  const [deactivatingOrg, setDeactivatingOrg] = useState<any | null>(null);
   const [deactivateRemark, setDeactivateRemark] = useState("");
 
   const [searchQuery, setSearchQuery] = useState("");
   const [onboarding, setOnboarding] = useState(false);
   const [updating, setUpdating] = useState(false);
   const [togglingStatus, setTogglingStatus] = useState(false);
-  const [error, setError] = useState(null);
-  const [success, setSuccess] = useState(null);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
 
   const fetchOrganizations = async () => {
     setLoading(true);
     try {
-      const { data } = await axiosInstance.get("/api/organization/all");
+      const data = await orgService.getSystemAdminOrgs();
       if (data?.success && data?.organizations) {
         setOrganizations(data.organizations);
       }
@@ -74,9 +78,9 @@ const SystemAdminDashboard = ({ onLogout, user }) => {
     fetchOrganizations();
   }, []);
 
-  const handleOnboardSubmit = async (e) => {
+  const handleOnboardSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const { orgName, adminName, adminEmail, adminPassword } = newOrg;
+    const { orgName, adminName, adminEmail } = newOrg;
     if (!orgName || !adminName || !adminEmail) {
       setError("Please fill in organization name, admin name, and admin email.");
       return;
@@ -87,7 +91,7 @@ const SystemAdminDashboard = ({ onLogout, user }) => {
     setOnboardedResult(null);
 
     try {
-      const { data } = await axiosInstance.post("/api/organization/onboard", newOrg);
+      const data = await orgService.onboardOrg(newOrg);
       if (data?.success) {
         setOnboardedResult({
           orgName: orgName,
@@ -97,14 +101,14 @@ const SystemAdminDashboard = ({ onLogout, user }) => {
         setNewOrg({ orgName: "", adminName: "", adminEmail: "", adminPassword: "" });
         await fetchOrganizations();
       }
-    } catch (err) {
+    } catch (err: any) {
       setError(err?.response?.data?.message || "Failed to onboard organization.");
     } finally {
       setOnboarding(false);
     }
   };
 
-  const handleEditClick = (org) => {
+  const handleEditClick = (org: any) => {
     setEditingOrg(org);
     setEditForm({
       orgName: org.name || "",
@@ -116,7 +120,7 @@ const SystemAdminDashboard = ({ onLogout, user }) => {
     setSuccess(null);
   };
 
-  const handleUpdate = async (e) => {
+  const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingOrg) return;
     setUpdating(true);
@@ -124,20 +128,20 @@ const SystemAdminDashboard = ({ onLogout, user }) => {
     setSuccess(null);
 
     try {
-      const { data } = await axiosInstance.put(`/api/organization/${editingOrg._id}/admin`, editForm);
+      const data = await orgService.updateOrgAdmin(editingOrg._id, editForm);
       if (data?.success) {
         setSuccess(`Successfully updated organization details!`);
         setEditingOrg(null);
         await fetchOrganizations();
       }
-    } catch (err) {
+    } catch (err: any) {
       setError(err?.response?.data?.message || "Failed to update organization.");
     } finally {
       setUpdating(false);
     }
   };
 
-  const handleToggleActive = async (org) => {
+  const handleToggleActive = async (org: any) => {
     setError(null);
     setSuccess(null);
 
@@ -149,7 +153,7 @@ const SystemAdminDashboard = ({ onLogout, user }) => {
 
     setTogglingStatus(true);
     try {
-      const { data } = await axiosInstance.put(`/api/organization/${org._id}/status`, {
+      const data = await orgService.updateOrgStatus(org._id, {
         isActive: true,
         remark: ""
       });
@@ -157,14 +161,14 @@ const SystemAdminDashboard = ({ onLogout, user }) => {
         setSuccess(`Successfully activated organization "${org.name}".`);
         await fetchOrganizations();
       }
-    } catch (err) {
+    } catch (err: any) {
       setError(err?.response?.data?.message || "Failed to activate organization.");
     } finally {
       setTogglingStatus(false);
     }
   };
 
-  const submitDeactivation = async (e) => {
+  const submitDeactivation = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!deactivatingOrg) return;
     setTogglingStatus(true);
@@ -172,7 +176,7 @@ const SystemAdminDashboard = ({ onLogout, user }) => {
     setSuccess(null);
 
     try {
-      const { data } = await axiosInstance.put(`/api/organization/${deactivatingOrg._id}/status`, {
+      const data = await orgService.updateOrgStatus(deactivatingOrg._id, {
         isActive: false,
         remark: deactivateRemark.trim() || "Deactivated by System Admin"
       });
@@ -181,14 +185,14 @@ const SystemAdminDashboard = ({ onLogout, user }) => {
         setDeactivatingOrg(null);
         await fetchOrganizations();
       }
-    } catch (err) {
+    } catch (err: any) {
       setError(err?.response?.data?.message || "Failed to deactivate organization.");
     } finally {
       setTogglingStatus(false);
     }
   };
 
-  const handleDelete = async (org) => {
+  const handleDelete = async (org: any) => {
     if (!window.confirm(`WARNING: Are you sure you want to delete organization "${org.name}"?\n\nThis will PERMANENTLY delete all users and tasks associated with it. This action cannot be undone.`)) {
       return;
     }
@@ -196,12 +200,12 @@ const SystemAdminDashboard = ({ onLogout, user }) => {
     setError(null);
     setSuccess(null);
     try {
-      const { data } = await axiosInstance.delete(`/api/organization/${org._id}`);
+      const data = await orgService.deleteOrg(org._id);
       if (data?.success) {
         setSuccess(`Successfully deleted organization "${org.name}".`);
         await fetchOrganizations();
       }
-    } catch (err) {
+    } catch (err: any) {
       setError(err?.response?.data?.message || "Failed to delete organization.");
     }
   };
@@ -220,17 +224,17 @@ const SystemAdminDashboard = ({ onLogout, user }) => {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col font-sans">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex flex-col font-sans">
       {/* System Admin Standalone Header */}
-      <header className="bg-white border-b border-sky-100 shadow-sm sticky top-0 z-30">
+      <header className="bg-white dark:bg-gray-900 border-b border-sky-100 dark:border-gray-800 shadow-sm sticky top-0 z-30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-cyan-500 to-sky-600 flex items-center justify-center text-white font-black tracking-wider shadow-md text-sm">
               PM
             </div>
             <div>
-              <span className="font-extrabold text-gray-800 tracking-tight text-base sm:text-lg">PlanMate</span>
-              <span className="text-[10px] font-bold text-sky-600 border border-sky-100 px-1.5 py-0.5 rounded ml-2 uppercase tracking-wide bg-sky-50/50">
+              <span className="font-extrabold text-gray-800 dark:text-gray-200 tracking-tight text-base sm:text-lg">PlanMate</span>
+              <span className="text-[10px] font-bold text-sky-600 border border-sky-100 dark:border-gray-800 px-1.5 py-0.5 rounded ml-2 uppercase tracking-wide bg-sky-50/50 dark:bg-sky-950/20">
                 System Admin Site
               </span>
             </div>
@@ -238,8 +242,8 @@ const SystemAdminDashboard = ({ onLogout, user }) => {
 
           <div className="flex items-center gap-4">
             <div className="text-right hidden sm:block">
-              <p className="text-xs font-bold text-gray-700">{user?.name || "System Administrator"}</p>
-              <p className="text-[10px] text-gray-400 font-semibold">{user?.email}</p>
+              <p className="text-xs font-bold text-gray-700 dark:text-gray-250">{user?.name || "System Administrator"}</p>
+              <p className="text-[10px] text-gray-400 dark:text-gray-500 font-semibold">{user?.email}</p>
             </div>
             <button
               onClick={onLogout}
@@ -254,13 +258,13 @@ const SystemAdminDashboard = ({ onLogout, user }) => {
       {/* Main Container */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full space-y-6">
         {/* Banner with Button */}
-        <div className="bg-white p-6 rounded-2xl border border-sky-100/50 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="bg-white dark:bg-gray-900 p-6 rounded-2xl border border-sky-100/50 dark:border-gray-800 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="p-2.5 bg-gradient-to-br from-cyan-500 to-sky-600 rounded-xl text-white shadow-md">
               <ShieldAlert className="w-6 h-6" />
             </div>
             <div>
-              <h2 className="text-lg font-bold text-gray-800">
+              <h2 className="text-lg font-bold text-gray-800 dark:text-gray-200">
                 System Administration Dashboard
               </h2>
               <p className="text-xs font-semibold text-gray-400">
@@ -283,31 +287,31 @@ const SystemAdminDashboard = ({ onLogout, user }) => {
         </div>
 
         {error && (
-          <div className="text-sm text-red-600 bg-red-50 p-4 rounded-xl border border-red-100 animate-fadeIn">
+          <div className="text-sm text-red-600 bg-red-50 dark:bg-red-950/20 p-4 rounded-xl border border-red-100 dark:border-red-900/50 animate-fadeIn">
             {error}
           </div>
         )}
         {success && (
-          <div className="text-sm text-green-700 bg-green-50 p-4 rounded-xl border border-green-100 font-medium animate-fadeIn">
+          <div className="text-sm text-green-700 bg-green-50 dark:bg-green-950/20 p-4 rounded-xl border border-green-100 dark:border-green-900/50 font-medium animate-fadeIn">
             {success}
           </div>
         )}
 
         {/* Full Width Table list */}
-        <div className="bg-white rounded-2xl border border-sky-100/50 shadow-sm overflow-hidden">
-          <div className="p-5 border-b border-sky-50 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-gray-50/50">
-            <h3 className="text-sm font-bold text-gray-800 flex items-center gap-2">
+        <div className="bg-white dark:bg-gray-900 rounded-2xl border border-sky-100/50 dark:border-gray-800 shadow-sm overflow-hidden">
+          <div className="p-5 border-b border-sky-50 dark:border-gray-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-gray-50/50 dark:bg-gray-900/50">
+            <h3 className="text-sm font-bold text-gray-800 dark:text-gray-200 flex items-center gap-2">
               <Building className="w-4.5 h-4.5 text-sky-500" /> Active Organizations ({organizations.length})
             </h3>
             
-            <div className="flex items-center border border-sky-100 rounded-lg px-2.5 py-1 bg-white focus-within:ring-1 focus-within:ring-sky-500 focus-within:border-sky-500 transition-all text-xs max-w-xs w-full">
+            <div className="flex items-center border border-sky-100 dark:border-gray-800 rounded-lg px-2.5 py-1 bg-white dark:bg-gray-950 focus-within:ring-1 focus-within:ring-sky-500 focus-within:border-sky-500 transition-all text-xs max-w-xs w-full">
               <Search className="w-3.5 h-3.5 text-gray-400 mr-1.5 shrink-0" />
               <input
                 type="text"
                 placeholder="Search by name, email..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="focus:outline-none text-gray-700 bg-transparent py-0.5 w-full font-medium"
+                className="focus:outline-none text-gray-700 dark:text-gray-300 bg-transparent py-0.5 w-full font-medium"
               />
             </div>
           </div>
@@ -315,7 +319,7 @@ const SystemAdminDashboard = ({ onLogout, user }) => {
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="border-b border-sky-50/70 text-[10px] font-bold text-gray-400 uppercase bg-gray-50/30">
+                <tr className="border-b border-sky-50/70 dark:border-gray-800 text-[10px] font-bold text-gray-400 dark:text-gray-300 uppercase bg-gray-50/30 dark:bg-gray-950/20">
                   <th className="px-6 py-4">Organization Name</th>
                   <th className="px-6 py-4">Admin Representative</th>
                   <th className="px-6 py-4">Admin Email</th>
@@ -324,21 +328,21 @@ const SystemAdminDashboard = ({ onLogout, user }) => {
                   <th className="px-6 py-4 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-sky-50/45 text-sm">
+              <tbody className="divide-y divide-sky-50/45 dark:divide-gray-800 text-sm">
                 {filteredOrgs.map((org) => (
                   <tr 
                     key={org._id} 
-                    className={`hover:bg-sky-50/20 transition-all ${
+                    className={`hover:bg-sky-50/20 dark:hover:bg-gray-800/20 transition-all ${
                       !org.isActive ? "bg-red-50/[0.07]" : ""
                     }`}
                   >
-                    <td className="px-6 py-4 font-bold text-gray-800">
+                    <td className="px-6 py-4 font-bold text-gray-800 dark:text-gray-250">
                       {org.name}
                     </td>
-                    <td className="px-6 py-4 font-medium text-gray-600">
+                    <td className="px-6 py-4 font-medium text-gray-600 dark:text-gray-300">
                       {org.admin?.name || "N/A"}
                     </td>
-                    <td className="px-6 py-4 text-xs font-semibold text-gray-500">
+                    <td className="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400">
                       {org.admin?.email || "N/A"}
                     </td>
                     <td className="px-6 py-4">
@@ -359,7 +363,7 @@ const SystemAdminDashboard = ({ onLogout, user }) => {
                         </div>
                       )}
                     </td>
-                    <td className="px-6 py-4 text-xs text-gray-400 font-semibold">
+                    <td className="px-6 py-4 text-xs text-gray-400 dark:text-gray-500 font-semibold">
                       {org.createdAt ? new Date(org.createdAt).toLocaleDateString() : "N/A"}
                     </td>
                     <td className="px-6 py-4 text-right">
@@ -397,7 +401,7 @@ const SystemAdminDashboard = ({ onLogout, user }) => {
 
                 {filteredOrgs.length === 0 && (
                   <tr>
-                    <td colSpan="6" className="text-center py-16 text-xs text-gray-400 font-semibold bg-gray-50/10">
+                    <td colSpan={6} className="text-center py-16 text-xs text-gray-400 font-semibold bg-gray-50/10">
                       No organizations found matching search
                     </td>
                   </tr>
@@ -411,9 +415,9 @@ const SystemAdminDashboard = ({ onLogout, user }) => {
       {/* Onboarding Form Modal */}
       {showOnboardModal && (
         <div className="fixed inset-0 bg-black/45 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-xl border border-sky-100 max-w-md w-full p-6 space-y-4 animate-scaleUp">
-            <div className="flex items-center justify-between border-b border-sky-50 pb-3">
-              <h3 className="font-bold text-gray-800 text-base flex items-center gap-1.5">
+          <div className="bg-white dark:bg-gray-900 border border-sky-100 dark:border-gray-800 rounded-2xl shadow-xl max-w-md w-full p-6 space-y-4 animate-scaleUp">
+            <div className="flex items-center justify-between border-b border-sky-50 dark:border-gray-800 pb-3">
+              <h3 className="font-bold text-gray-800 dark:text-gray-200 text-base flex items-center gap-1.5">
                 <Building className="w-5 h-5 text-sky-500" /> Onboard Organization
               </h3>
               <button 
@@ -421,7 +425,7 @@ const SystemAdminDashboard = ({ onLogout, user }) => {
                   setShowOnboardModal(false);
                   setOnboardedResult(null);
                 }}
-                className="text-gray-400 hover:text-gray-600 p-1 hover:bg-sky-50 rounded-lg transition-colors"
+                className="text-gray-400 hover:text-gray-600 p-1 hover:bg-sky-50 rounded-lg transition-colors cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -433,18 +437,18 @@ const SystemAdminDashboard = ({ onLogout, user }) => {
                   <Check className="w-6 h-6 text-green-600" />
                 </div>
                 <div className="space-y-1">
-                  <h4 className="font-bold text-gray-800 text-sm">Onboarding Complete!</h4>
+                  <h4 className="font-bold text-gray-800 dark:text-gray-250 text-sm">Onboarding Complete!</h4>
                   <p className="text-xs text-gray-400 font-medium">Successfully created tenant site for {onboardedResult.orgName}</p>
                 </div>
 
-                <div className="bg-sky-50/40 p-4 rounded-xl border border-sky-100/50 text-left text-xs space-y-2.5">
+                <div className="bg-sky-50/40 dark:bg-sky-950/20 p-4 rounded-xl border border-sky-100/50 dark:border-gray-800 text-left text-xs space-y-2.5">
                   <div>
-                    <span className="block font-bold text-gray-400 uppercase tracking-wider text-[9px]">Admin Email</span>
-                    <span className="font-bold text-gray-700">{onboardedResult.email}</span>
+                    <span className="block font-bold text-gray-405 uppercase tracking-wider text-[9px]">Admin Email</span>
+                    <span className="font-bold text-gray-700 dark:text-gray-300">{onboardedResult.email}</span>
                   </div>
                   <div>
-                    <span className="block font-bold text-gray-400 uppercase tracking-wider text-[9px]">Generated Temporary Password</span>
-                    <div className="flex items-center justify-between bg-white p-2 rounded border border-sky-100 mt-1 select-all font-mono font-bold text-gray-800">
+                    <span className="block font-bold text-gray-405 uppercase tracking-wider text-[9px]">Generated Temporary Password</span>
+                    <div className="flex items-center justify-between bg-white dark:bg-gray-900 p-2 rounded border border-sky-100 dark:border-gray-800 mt-1 select-all font-mono font-bold text-gray-800 dark:text-gray-200">
                       <span>{onboardedResult.password}</span>
                       <button
                         onClick={handleCopyPassword}
@@ -475,13 +479,13 @@ const SystemAdminDashboard = ({ onLogout, user }) => {
                   <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1">
                     Organization Name
                   </label>
-                  <div className="flex items-center border border-sky-100 rounded-lg px-3 py-2 bg-white focus-within:ring-2 focus-within:ring-sky-500 focus-within:border-sky-500 transition-all duration-200">
+                  <div className="flex items-center border border-sky-100 dark:border-gray-800 rounded-lg px-3 py-2 bg-white dark:bg-gray-950 focus-within:ring-2 focus-within:ring-sky-500 focus-within:border-sky-500 transition-all duration-200">
                     <Building className="w-4 h-4 text-sky-500 mr-2 shrink-0" />
                     <input
                       type="text"
                       value={newOrg.orgName}
                       onChange={(e) => setNewOrg(prev => ({ ...prev, orgName: e.target.value }))}
-                      className="w-full focus:outline-none text-sm text-gray-800 font-semibold bg-transparent"
+                      className="w-full focus:outline-none text-sm text-gray-800 dark:text-gray-250 font-semibold bg-transparent"
                       placeholder="e.g. Pepsi, TCS, Apple"
                       required
                     />
@@ -489,16 +493,16 @@ const SystemAdminDashboard = ({ onLogout, user }) => {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-gray-405 mb-1">
                     Admin Full Name
                   </label>
-                  <div className="flex items-center border border-sky-100 rounded-lg px-3 py-2 bg-white focus-within:ring-2 focus-within:ring-sky-500 focus-within:border-sky-500 transition-all duration-200">
+                  <div className="flex items-center border border-sky-100 dark:border-gray-800 rounded-lg px-3 py-2 bg-white dark:bg-gray-950 focus-within:ring-2 focus-within:ring-sky-500 focus-within:border-sky-500 transition-all duration-200">
                     <User className="w-4.5 h-4.5 text-sky-500 mr-2 shrink-0" />
                     <input
                       type="text"
                       value={newOrg.adminName}
                       onChange={(e) => setNewOrg(prev => ({ ...prev, adminName: e.target.value }))}
-                      className="w-full focus:outline-none text-sm text-gray-800 font-semibold bg-transparent"
+                      className="w-full focus:outline-none text-sm text-gray-808 dark:text-gray-250 font-semibold bg-transparent"
                       placeholder="e.g. John Doe"
                       required
                     />
@@ -506,16 +510,16 @@ const SystemAdminDashboard = ({ onLogout, user }) => {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-gray-405 mb-1">
                     Admin Email Address
                   </label>
-                  <div className="flex items-center border border-sky-100 rounded-lg px-3 py-2 bg-white focus-within:ring-2 focus-within:ring-sky-500 focus-within:border-sky-500 transition-all duration-200">
+                  <div className="flex items-center border border-sky-100 dark:border-gray-800 rounded-lg px-3 py-2 bg-white dark:bg-gray-950 focus-within:ring-2 focus-within:ring-sky-500 focus-within:border-sky-500 transition-all duration-200">
                     <Mail className="w-4 h-4 text-sky-500 mr-2 shrink-0" />
                     <input
                       type="email"
                       value={newOrg.adminEmail}
                       onChange={(e) => setNewOrg(prev => ({ ...prev, adminEmail: e.target.value }))}
-                      className="w-full focus:outline-none text-sm text-gray-800 font-semibold bg-transparent"
+                      className="w-full focus:outline-none text-sm text-gray-800 dark:text-gray-250 font-semibold bg-transparent"
                       placeholder="e.g. admin@tcs.com"
                       required
                     />
@@ -523,30 +527,30 @@ const SystemAdminDashboard = ({ onLogout, user }) => {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-gray-405 mb-1">
                     Custom Password (Optional)
                   </label>
-                  <div className="flex items-center border border-sky-100 rounded-lg px-3 py-2 bg-white focus-within:ring-2 focus-within:ring-sky-500 focus-within:border-sky-500 transition-all duration-200">
+                  <div className="flex items-center border border-sky-100 dark:border-gray-800 rounded-lg px-3 py-2 bg-white dark:bg-gray-950 focus-within:ring-2 focus-within:ring-sky-500 focus-within:border-sky-500 transition-all duration-200">
                     <Lock className="w-4 h-4 text-sky-500 mr-2 shrink-0" />
                     <input
                       type="password"
                       value={newOrg.adminPassword}
                       onChange={(e) => setNewOrg(prev => ({ ...prev, adminPassword: e.target.value }))}
-                      className="w-full focus:outline-none text-sm text-gray-800 font-semibold bg-transparent"
+                      className="w-full focus:outline-none text-sm text-gray-800 dark:text-gray-250 font-semibold bg-transparent"
                       placeholder="Leave blank to generate randomly"
                     />
                   </div>
-                  <p className="text-[10px] text-gray-400 mt-1 font-semibold">If left empty, a secure password will be generated automatically for the new administrator.</p>
+                  <p className="text-[10px] text-gray-400 mt-1 font-semibold">If left empty, a secure password will be generated automatically.</p>
                 </div>
 
-                <div className="flex justify-end gap-2.5 pt-3 border-t border-sky-50 mt-4">
+                <div className="flex justify-end gap-2.5 pt-3 border-t border-sky-50 dark:border-gray-800 mt-4">
                   <button
                     type="button"
                     onClick={() => {
                       setShowOnboardModal(false);
                       setNewOrg({ orgName: "", adminName: "", adminEmail: "", adminPassword: "" });
                     }}
-                    className="px-4 py-2 border border-sky-200 text-gray-600 hover:bg-sky-50 font-bold rounded-lg text-xs transition-colors cursor-pointer bg-white"
+                    className="px-4 py-2 border border-sky-200 dark:border-gray-800 text-gray-600 dark:text-gray-300 hover:bg-sky-50 dark:hover:bg-gray-800 font-bold rounded-lg text-xs transition-colors cursor-pointer bg-white dark:bg-gray-900"
                   >
                     Cancel
                   </button>
@@ -567,14 +571,14 @@ const SystemAdminDashboard = ({ onLogout, user }) => {
       {/* Edit Organization Modal */}
       {editingOrg && (
         <div className="fixed inset-0 bg-black/45 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-xl border border-sky-100 max-w-md w-full p-6 space-y-4 animate-scaleUp">
-            <div className="flex items-center justify-between border-b border-sky-50 pb-3">
-              <h3 className="font-bold text-gray-800 text-base flex items-center gap-1.5">
+          <div className="bg-white dark:bg-gray-900 border border-sky-100 dark:border-gray-800 rounded-2xl shadow-xl max-w-md w-full p-6 space-y-4 animate-scaleUp">
+            <div className="flex items-center justify-between border-b border-sky-50 dark:border-gray-800 pb-3">
+              <h3 className="font-bold text-gray-800 dark:text-gray-200 text-base flex items-center gap-1.5">
                 <Building className="w-5 h-5 text-sky-500" /> Edit {editingOrg.name}
               </h3>
               <button 
                 onClick={() => setEditingOrg(null)}
-                className="text-gray-400 hover:text-gray-600 p-1 hover:bg-sky-50 rounded-lg transition-colors"
+                className="text-gray-400 hover:text-gray-600 p-1 hover:bg-sky-50 dark:hover:bg-gray-800 rounded-lg transition-colors cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -585,13 +589,13 @@ const SystemAdminDashboard = ({ onLogout, user }) => {
                 <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1">
                   Organization Name
                 </label>
-                <div className="flex items-center border border-sky-100 rounded-lg px-3 py-2 bg-white focus-within:ring-2 focus-within:ring-sky-500 focus-within:border-sky-500 transition-all duration-200">
+                <div className="flex items-center border border-sky-100 dark:border-gray-800 rounded-lg px-3 py-2 bg-white dark:bg-gray-950 focus-within:ring-2 focus-within:ring-sky-500 focus-within:border-sky-500 transition-all duration-200">
                   <Building className="w-4 h-4 text-sky-500 mr-2 shrink-0" />
                   <input
                     type="text"
                     value={editForm.orgName}
                     onChange={(e) => setEditForm(prev => ({ ...prev, orgName: e.target.value }))}
-                    className="w-full focus:outline-none text-sm text-gray-800 font-semibold bg-transparent"
+                    className="w-full focus:outline-none text-sm text-gray-800 dark:text-gray-250 font-semibold bg-transparent"
                     placeholder="Organization Name"
                     required
                   />
@@ -602,13 +606,13 @@ const SystemAdminDashboard = ({ onLogout, user }) => {
                 <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1">
                   Admin Name
                 </label>
-                <div className="flex items-center border border-sky-100 rounded-lg px-3 py-2 bg-white focus-within:ring-2 focus-within:ring-sky-500 focus-within:border-sky-500 transition-all duration-200">
+                <div className="flex items-center border border-sky-100 dark:border-gray-800 rounded-lg px-3 py-2 bg-white dark:bg-gray-950 focus-within:ring-2 focus-within:ring-sky-500 focus-within:border-sky-500 transition-all duration-200">
                   <User className="w-4 h-4 text-sky-500 mr-2 shrink-0" />
                   <input
                     type="text"
                     value={editForm.adminName}
                     onChange={(e) => setEditForm(prev => ({ ...prev, adminName: e.target.value }))}
-                    className="w-full focus:outline-none text-sm text-gray-800 font-semibold bg-transparent"
+                    className="w-full focus:outline-none text-sm text-gray-808 dark:text-gray-250 font-semibold bg-transparent"
                     placeholder="Admin Name"
                     required
                   />
@@ -619,13 +623,13 @@ const SystemAdminDashboard = ({ onLogout, user }) => {
                 <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1">
                   Admin Email
                 </label>
-                <div className="flex items-center border border-sky-100 rounded-lg px-3 py-2 bg-white focus-within:ring-2 focus-within:ring-sky-500 focus-within:border-sky-500 transition-all duration-200">
+                <div className="flex items-center border border-sky-100 dark:border-gray-800 rounded-lg px-3 py-2 bg-white dark:bg-gray-950 focus-within:ring-2 focus-within:ring-sky-500 focus-within:border-sky-500 transition-all duration-200">
                   <Mail className="w-4 h-4 text-sky-500 mr-2 shrink-0" />
                   <input
                     type="email"
                     value={editForm.adminEmail}
                     onChange={(e) => setEditForm(prev => ({ ...prev, adminEmail: e.target.value }))}
-                    className="w-full focus:outline-none text-sm text-gray-800 font-semibold bg-transparent"
+                    className="w-full focus:outline-none text-sm text-gray-800 dark:text-gray-250 font-semibold bg-transparent"
                     placeholder="Admin Email"
                     required
                   />
@@ -633,27 +637,27 @@ const SystemAdminDashboard = ({ onLogout, user }) => {
               </div>
 
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1">
+                <label className="block text-xs font-bold uppercase tracking-wider text-gray-404 mb-1">
                   New Admin Password
                 </label>
-                <div className="flex items-center border border-sky-100 rounded-lg px-3 py-2 bg-white focus-within:ring-2 focus-within:ring-sky-500 focus-within:border-sky-500 transition-all duration-200">
+                <div className="flex items-center border border-sky-100 dark:border-gray-800 rounded-lg px-3 py-2 bg-white dark:bg-gray-950 focus-within:ring-2 focus-within:ring-sky-500 focus-within:border-sky-500 transition-all duration-200">
                   <Lock className="w-4 h-4 text-sky-500 mr-2 shrink-0" />
                   <input
                     type="password"
                     value={editForm.adminPassword}
                     onChange={(e) => setEditForm(prev => ({ ...prev, adminPassword: e.target.value }))}
-                    className="w-full focus:outline-none text-sm text-gray-800 font-semibold bg-transparent"
+                    className="w-full focus:outline-none text-sm text-gray-808 dark:text-gray-250 font-semibold bg-transparent"
                     placeholder="Leave blank to keep current"
                   />
                 </div>
                 <p className="text-[10px] text-gray-400 mt-1 font-medium">Leave password empty unless updating it.</p>
               </div>
 
-              <div className="flex justify-end gap-2.5 pt-3 border-t border-sky-50 mt-4">
+              <div className="flex justify-end gap-2.5 pt-3 border-t border-sky-50 dark:border-gray-800 mt-4">
                 <button
                   type="button"
                   onClick={() => setEditingOrg(null)}
-                  className="px-4 py-2 border border-sky-200 text-gray-600 hover:bg-sky-50 font-bold rounded-lg text-xs transition-colors cursor-pointer bg-white"
+                  className="px-4 py-2 border border-sky-200 dark:border-gray-800 text-gray-600 dark:text-gray-300 hover:bg-sky-50 dark:hover:bg-gray-800 font-bold rounded-lg text-xs transition-colors cursor-pointer bg-white dark:bg-gray-900"
                 >
                   Cancel
                 </button>
@@ -673,14 +677,14 @@ const SystemAdminDashboard = ({ onLogout, user }) => {
       {/* Deactivate Status/Remark Modal */}
       {deactivatingOrg && (
         <div className="fixed inset-0 bg-black/45 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-xl border border-sky-100 max-w-md w-full p-6 space-y-4 animate-scaleUp">
-            <div className="flex items-center justify-between border-b border-sky-50 pb-3">
-              <h3 className="font-bold text-gray-800 text-base flex items-center gap-1.5">
+          <div className="bg-white dark:bg-gray-900 border border-sky-100 dark:border-gray-800 rounded-2xl shadow-xl max-w-md w-full p-6 space-y-4 animate-scaleUp">
+            <div className="flex items-center justify-between border-b border-sky-50 dark:border-gray-800 pb-3">
+              <h3 className="font-bold text-gray-800 dark:text-gray-200 text-base flex items-center gap-1.5">
                 <Power className="w-5 h-5 text-red-500" /> Deactivate {deactivatingOrg.name}
               </h3>
               <button 
                 onClick={() => setDeactivatingOrg(null)}
-                className="text-gray-400 hover:text-gray-600 p-1 hover:bg-sky-50 rounded-lg transition-colors"
+                className="text-gray-400 hover:text-gray-600 p-1 hover:bg-sky-50 dark:hover:bg-gray-800 rounded-lg transition-colors cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -692,20 +696,20 @@ const SystemAdminDashboard = ({ onLogout, user }) => {
                   Reason for Deactivation (Remark)
                 </label>
                 <textarea
-                  rows="3"
+                  rows={3}
                   value={deactivateRemark}
                   onChange={(e) => setDeactivateRemark(e.target.value)}
-                  className="w-full px-3.5 py-2.5 border border-sky-100 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200 text-gray-700"
+                  className="w-full px-3.5 py-2.5 border border-sky-100 dark:border-gray-800 rounded-lg text-sm bg-white dark:bg-gray-950 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200 text-gray-700 dark:text-gray-300"
                   placeholder="e.g. Payment pending, License expired, Contract ended"
                   required
                 />
               </div>
 
-              <div className="flex justify-end gap-2.5 pt-3 border-t border-sky-50 mt-4">
+              <div className="flex justify-end gap-2.5 pt-3 border-t border-sky-50 dark:border-gray-800 mt-4">
                 <button
                   type="button"
                   onClick={() => setDeactivatingOrg(null)}
-                  className="px-4 py-2 border border-sky-200 text-gray-600 hover:bg-sky-50 font-bold rounded-lg text-xs transition-colors cursor-pointer bg-white"
+                  className="px-4 py-2 border border-sky-200 dark:border-gray-800 text-gray-600 dark:text-gray-300 hover:bg-sky-50 dark:hover:bg-gray-800 font-bold rounded-lg text-xs transition-colors cursor-pointer bg-white dark:bg-gray-900"
                 >
                   Cancel
                 </button>

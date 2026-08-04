@@ -30,6 +30,10 @@ const organizationSchema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
+  statuses: {
+    type: [String],
+    default: ["To Do", "In Progress", "Done"],
+  },
 });
 
 const organizationModel =

@@ -3,9 +3,6 @@ import {
   Building,
   Users,
   UserPlus,
-  Save,
-  ArrowLeft,
-  Shield,
   User,
   Mail,
   Lock,
@@ -19,11 +16,22 @@ import {
   ClipboardList,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import axiosInstance from "../config";
+import { toast } from "react-toastify";
+import { orgService } from "../services/orgService";
+import { Input } from "../components/ui/Input";
+import { Button } from "../components/ui/Button";
+import { IUser } from "../types";
+
+interface ExtendedUser extends IUser {
+  solvedTasks?: number;
+  createdAt?: string;
+  solvedTasksCount?: number;
+  solvedTasksCountDetail?: any;
+}
 
 const OrganizationAdmin = () => {
   const navigate = useNavigate();
-  const [currentUser, setCurrentUser] = useState(() => {
+  const [currentUser] = useState<IUser | null>(() => {
     const stored = localStorage.getItem("currentUser");
     return stored ? JSON.parse(stored) : null;
   });
@@ -34,7 +42,11 @@ const OrganizationAdmin = () => {
     name: "",
     description: "",
   });
-  const [teamUsers, setTeamUsers] = useState([]);
+  const [teamUsers, setTeamUsers] = useState<any[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
+  const ITEMS_PER_PAGE = 5;
 
   // Member invite inputs
   const [newMember, setNewMember] = useState({
@@ -44,20 +56,17 @@ const OrganizationAdmin = () => {
   });
 
   // Details Modal State
-  const [inspectingUser, setInspectingUser] = useState(null);
+  const [inspectingUser, setInspectingUser] = useState<any | null>(null);
 
   const [loading, setLoading] = useState(true);
-  const [savingOrg, setSavingOrg] = useState(false);
   const [addingMember, setAddingMember] = useState(false);
   const [togglingStatus, setTogglingStatus] = useState(false);
-  const [error, setError] = useState(null);
-  const [successMsg, setSuccessMsg] = useState(null);
   const [showOnboardModal, setShowOnboardModal] = useState(false);
 
   // Fetch organization branding details
   const fetchOrgDetails = async () => {
     try {
-      const { data } = await axiosInstance.get("/api/organization");
+      const data = await orgService.getOrgDetails();
       if (data?.success && data?.organization) {
         setOrgData({
           name: data.organization.name || "",
@@ -70,11 +79,18 @@ const OrganizationAdmin = () => {
   };
 
   // Fetch organization users list (including solved ticket stats)
-  const fetchTeamUsers = async () => {
+  const fetchTeamUsers = async (page = 1) => {
     try {
-      const { data } = await axiosInstance.get("/api/organization/users");
+      const params = new URLSearchParams({
+        page: page.toString(),
+        limit: ITEMS_PER_PAGE.toString(),
+      });
+      const data = await orgService.getOrgUsers(params);
       if (data?.success && data?.users) {
         setTeamUsers(data.users);
+        setCurrentPage(data.pagination.currentPage);
+        setTotalPages(data.pagination.totalPages);
+        setTotalCount(data.pagination.totalCount);
       }
     } catch (err) {
       console.error("Error fetching organization users:", err);
@@ -88,100 +104,50 @@ const OrganizationAdmin = () => {
         return;
       }
       setLoading(true);
-      setError(null);
       await Promise.all([fetchOrgDetails(), fetchTeamUsers()]);
       setLoading(false);
     };
     loadAll();
   }, [isOrgAdmin, navigate]);
 
-  const handleOrgChange = (e) => {
-    const { name, value } = e.target;
-    setOrgData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleUpdateOrg = async (e) => {
-    e.preventDefault();
-    if (!orgData.name.trim()) return;
-    setSavingOrg(true);
-    setError(null);
-    setSuccessMsg(null);
-    try {
-      const { data } = await axiosInstance.put("/api/organization", {
-        name: orgData.name.trim(),
-        description: orgData.description.trim(),
-      });
-      if (data?.success) {
-        setSuccessMsg("Organization details updated successfully!");
-        if (currentUser) {
-          const updatedUser = {
-            ...currentUser,
-            organization: {
-              ...currentUser.organization,
-              name: orgData.name.trim(),
-            },
-          };
-          localStorage.setItem("currentUser", JSON.stringify(updatedUser));
-          setCurrentUser(updatedUser);
-        }
-      }
-    } catch (err) {
-      setError(err?.response?.data?.message || "Failed to update organization");
-    } finally {
-      setSavingOrg(false);
-    }
-  };
-
-  const handleAddMember = async (e) => {
+  const handleAddMember = async (e: React.FormEvent) => {
     e.preventDefault();
     const { name, email, password } = newMember;
     if (!name || !email || !password) {
-      setError("Please fill all member onboarding fields");
+      toast.error("Please fill all member onboarding fields");
       return;
     }
     setAddingMember(true);
-    setError(null);
-    setSuccessMsg(null);
     try {
-      const { data } = await axiosInstance.post(
-        "/api/organization/members",
-        newMember
-      );
+      const data = await orgService.addOrgMember(newMember);
       if (data?.success) {
-        setSuccessMsg(`Member ${name} onboarded successfully!`);
+        toast.success(`Member ${name} onboarded successfully!`);
         setNewMember({ name: "", email: "", password: "" });
         setShowOnboardModal(false);
         await fetchTeamUsers();
       }
-    } catch (err) {
-      setError(err?.response?.data?.message || "Failed to add member");
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message || "Failed to add member");
     } finally {
       setAddingMember(false);
     }
   };
 
-  const handleUpdateUserStatus = async (targetUser, newStatus) => {
+  const handleUpdateUserStatus = async (targetUser: any, newStatus: string) => {
     setTogglingStatus(true);
-    setError(null);
-    setSuccessMsg(null);
     try {
-      const { data } = await axiosInstance.put(
-        `/api/organization/users/${targetUser._id}/status`,
-        {
-          status: newStatus,
-        }
-      );
+      const data = await orgService.updateUserStatus(targetUser._id, newStatus);
       if (data?.success) {
-        setSuccessMsg(
+        toast.success(
           `Access request for ${targetUser.name} is now updated to ${newStatus}.`
         );
         await fetchTeamUsers();
         if (inspectingUser && inspectingUser._id === targetUser._id) {
-          setInspectingUser((prev) => ({ ...prev, status: newStatus }));
+          setInspectingUser((prev: any) => ({ ...prev, status: newStatus }));
         }
       }
-    } catch (err) {
-      setError(err?.response?.data?.message || "Failed to update user status");
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message || "Failed to update user status");
     } finally {
       setTogglingStatus(false);
     }
@@ -199,7 +165,7 @@ const OrganizationAdmin = () => {
   }
 
   return (
-    <div className="max-w-7xl mx-auto p-4 sm:p-6 space-y-6">
+    <div className="max-w-7xl mx-auto p-4 sm:p-6 space-y-6 font-sans">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-sky-100/50 pb-4">
         <div className="flex items-center gap-3">
@@ -207,12 +173,11 @@ const OrganizationAdmin = () => {
             <Building className="w-6 h-6" />
           </div>
           <div>
-            <h1 className="text-xl font-bold text-gray-800">
+            <h1 className="text-xl font-bold text-gray-800 dark:text-gray-250">
               {orgData.name || "Manage Team Workspace"}
             </h1>
             <p className="text-xs font-semibold text-gray-400">
-              Approve pending access requests, monitor tickets, and manage
-              branding.
+              Approve pending access requests, monitor tickets, and manage team members.
             </p>
           </div>
         </div>
@@ -226,30 +191,19 @@ const OrganizationAdmin = () => {
         </div>
       </div>
 
-      {error && (
-        <div className="text-sm text-red-650 bg-red-50 dark:bg-red-950/20 p-4 rounded-xl border border-red-100 dark:border-red-900/50 animate-fadeIn">
-          {error}
-        </div>
-      )}
-      {successMsg && (
-        <div className="text-sm text-green-705 bg-green-50 dark:bg-green-950/20 p-4 rounded-xl border border-green-100 dark:border-green-900/50 font-medium animate-fadeIn">
-          {successMsg}
-        </div>
-      )}
 
       {/* Full-Width User Management Table */}
       <div className="bg-white dark:bg-gray-900 rounded-2xl border border-sky-100/50 dark:border-gray-800 shadow-sm overflow-hidden">
-        <div className="p-5 border-b border-sky-50 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/50">
+        <div className="p-5 border-b border-sky-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/50">
           <h3 className="text-sm font-bold text-gray-800 dark:text-gray-200 flex items-center gap-2">
-            <Users className="w-4.5 h-4.5 text-sky-500" /> User Access &
-            Approval Management
+            <Users className="w-4.5 h-4.5 text-sky-500" /> User Access & Approval Management
           </h3>
         </div>
 
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="border-b border-sky-50/70 dark:border-gray-800 text-[10px] font-bold text-gray-550 dark:text-gray-300 uppercase bg-gray-50/30 dark:bg-gray-950/20">
+              <tr className="border-b border-sky-50/70 dark:border-gray-800 text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase bg-gray-50/30 dark:bg-gray-950/20">
                 <th className="px-6 py-4">User Name</th>
                 <th className="px-6 py-4">Email</th>
                 <th className="px-6 py-4">Role</th>
@@ -270,15 +224,15 @@ const OrganizationAdmin = () => {
                       : ""
                   }`}
                 >
-                  <td className="px-6 py-4 font-bold text-gray-800">
+                  <td className="px-6 py-4 font-bold text-gray-800 dark:text-gray-200">
                     <div className="flex items-center gap-2.5">
-                      <div className="w-8 h-8 rounded-full bg-sky-100 text-sky-700 flex items-center justify-center font-bold text-xs">
+                      <div className="w-8 h-8 rounded-full bg-sky-100 dark:bg-sky-950 text-sky-700 dark:text-sky-300 flex items-center justify-center font-bold text-xs">
                         {member.name.charAt(0).toUpperCase()}
                       </div>
                       <span>{member.name}</span>
                     </div>
                   </td>
-                  <td className="px-6 py-4 font-semibold text-gray-500 text-xs">
+                  <td className="px-6 py-4 font-semibold text-gray-500 text-xs dark:text-gray-400">
                     {member.email}
                   </td>
                   <td className="px-6 py-4">
@@ -292,7 +246,7 @@ const OrganizationAdmin = () => {
                       </span>
                     )}
                   </td>
-                  <td className="px-6 py-4 text-xs text-gray-700 font-bold">
+                  <td className="px-6 py-4 text-xs text-gray-700 dark:text-gray-300 font-bold">
                     {member.solvedTasks || 0} Solved
                   </td>
                   <td className="px-6 py-4">
@@ -383,14 +337,54 @@ const OrganizationAdmin = () => {
             </tbody>
           </table>
         </div>
+
+        {/* Pagination Controls */}
+        {totalCount > ITEMS_PER_PAGE && (
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-6 py-4 border-t border-sky-100 dark:border-gray-800 bg-gray-50/20 dark:bg-gray-950/20 text-xs">
+            <span className="font-semibold text-gray-550 dark:text-gray-400">
+              Showing {(currentPage - 1) * ITEMS_PER_PAGE + 1} to{" "}
+              {Math.min(currentPage * ITEMS_PER_PAGE, totalCount)} of{" "}
+              {totalCount} users
+            </span>
+            <div className="flex items-center gap-1.5">
+              <button
+                disabled={currentPage === 1}
+                onClick={() => fetchTeamUsers(currentPage - 1)}
+                className="px-3 py-1.5 rounded-lg border border-sky-100 dark:border-gray-800 bg-white dark:bg-gray-900 text-gray-650 dark:text-gray-300 font-bold hover:bg-sky-50 dark:hover:bg-gray-850 disabled:opacity-50 disabled:pointer-events-none transition-colors cursor-pointer"
+              >
+                Previous
+              </button>
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
+                <button
+                  key={pageNum}
+                  onClick={() => fetchTeamUsers(pageNum)}
+                  className={`w-8 h-8 rounded-lg border font-bold flex items-center justify-center transition-colors cursor-pointer ${
+                    currentPage === pageNum
+                      ? "bg-sky-500 border-sky-500 text-white shadow-sm"
+                      : "border-sky-100 dark:border-gray-800 bg-white dark:bg-gray-900 text-gray-650 dark:text-gray-300 hover:bg-sky-50 dark:hover:bg-gray-850"
+                  }`}
+                >
+                  {pageNum}
+                </button>
+              ))}
+              <button
+                disabled={currentPage === totalPages}
+                onClick={() => fetchTeamUsers(currentPage + 1)}
+                className="px-3 py-1.5 rounded-lg border border-sky-100 dark:border-gray-800 bg-white dark:bg-gray-900 text-gray-650 dark:text-gray-300 font-bold hover:bg-sky-50 dark:hover:bg-gray-850 disabled:opacity-50 disabled:pointer-events-none transition-colors cursor-pointer"
+              >
+                Next
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* View Details Inspect Modal */}
       {inspectingUser && (
         <div className="fixed inset-0 bg-black/45 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-xl border border-sky-100 max-w-md w-full p-6 space-y-4 animate-scaleUp">
-            <div className="flex items-center justify-between border-b border-sky-50 pb-3">
-              <h3 className="font-bold text-gray-800 text-base flex items-center gap-1.5">
+          <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-xl border border-sky-100 dark:border-gray-800 max-w-md w-full p-6 space-y-4 animate-scaleUp">
+            <div className="flex items-center justify-between border-b border-sky-50 dark:border-gray-850 pb-3">
+              <h3 className="font-bold text-gray-805 dark:text-gray-200 text-base flex items-center gap-1.5">
                 <User className="w-5 h-5 text-sky-500" /> Member Details
               </h3>
               <button
@@ -407,7 +401,7 @@ const OrganizationAdmin = () => {
                   {inspectingUser.name.charAt(0).toUpperCase()}
                 </div>
                 <div>
-                  <h4 className="font-bold text-gray-800 text-base">
+                  <h4 className="font-bold text-gray-800 dark:text-gray-250 text-base">
                     {inspectingUser.name}
                   </h4>
                   <span className="text-[10px] bg-sky-100 text-sky-700 px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">
@@ -421,7 +415,7 @@ const OrganizationAdmin = () => {
                   <span className="block font-bold text-gray-400 uppercase tracking-wider text-[9px]">
                     Email Address
                   </span>
-                  <span className="text-gray-700 truncate block">
+                  <span className="text-gray-700 dark:text-gray-300 truncate block">
                     {inspectingUser.email}
                   </span>
                 </div>
@@ -449,7 +443,7 @@ const OrganizationAdmin = () => {
                   <span className="block font-bold text-gray-400 uppercase tracking-wider text-[9px]">
                     Member Since
                   </span>
-                  <span className="text-gray-700 flex items-center gap-1">
+                  <span className="text-gray-700 dark:text-gray-300 flex items-center gap-1">
                     <Calendar className="w-3.5 h-3.5 text-sky-400" />
                     {inspectingUser.createdAt
                       ? new Date(inspectingUser.createdAt).toLocaleDateString()
@@ -460,7 +454,7 @@ const OrganizationAdmin = () => {
                   <span className="block font-bold text-gray-400 uppercase tracking-wider text-[9px]">
                     Tickets Resolved
                   </span>
-                  <span className="text-gray-700 flex items-center gap-1 font-bold">
+                  <span className="text-gray-700 dark:text-gray-300 flex items-center gap-1 font-bold">
                     <ClipboardList className="w-3.5 h-3.5 text-sky-400" />
                     {inspectingUser.solvedTasks || 0} Tasks
                   </span>
@@ -469,14 +463,14 @@ const OrganizationAdmin = () => {
 
               {/* Approval controls inside details modal */}
               {inspectingUser.email !== currentUser?.email && (
-                <div className="pt-4 border-t border-sky-50 flex items-center justify-end gap-2">
+                <div className="pt-4 border-t border-sky-50 dark:border-gray-800 flex items-center justify-end gap-2">
                   {inspectingUser.status === "pending" && (
                     <>
                       <button
                         onClick={() =>
                           handleUpdateUserStatus(inspectingUser, "rejected")
                         }
-                        className="px-4 py-2 border border-red-200 text-red-600 hover:bg-red-50 font-bold rounded-lg text-xs transition-colors cursor-pointer bg-white"
+                        className="px-4 py-2 border border-red-200 text-red-600 hover:bg-red-50 font-bold rounded-lg text-xs transition-colors cursor-pointer bg-white dark:bg-gray-900"
                       >
                         Reject Access
                       </button>
@@ -525,8 +519,7 @@ const OrganizationAdmin = () => {
           <div className="bg-white dark:bg-gray-900 border border-sky-100 dark:border-gray-800 w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden p-6 space-y-4">
             <div className="flex justify-between items-center border-b border-sky-50 dark:border-gray-800 pb-3">
               <h3 className="text-sm font-bold text-gray-850 dark:text-gray-200 flex items-center gap-2">
-                <UserPlus className="w-4.5 h-4.5 text-sky-500" /> Onboard Team
-                Member
+                <UserPlus className="w-4.5 h-4.5 text-sky-500" /> Onboard Team Member
               </h3>
               <button
                 onClick={() => setShowOnboardModal(false)}
@@ -537,88 +530,66 @@ const OrganizationAdmin = () => {
             </div>
 
             <form onSubmit={handleAddMember} className="space-y-4">
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1">
-                  Full Name
-                </label>
-                <div className="flex items-center border border-sky-100 dark:border-gray-800 rounded-lg px-3 py-2.5 bg-white dark:bg-gray-950 focus-within:ring-2 focus-within:ring-sky-500 focus-within:border-sky-500 transition-all duration-200">
-                  <User className="w-4 h-4 text-sky-500 mr-2 shrink-0" />
-                  <input
-                    type="text"
-                    value={newMember.name}
-                    onChange={(e) =>
-                      setNewMember((prev) => ({
-                        ...prev,
-                        name: e.target.value,
-                      }))
-                    }
-                    className="w-full focus:outline-none text-xs text-gray-850 dark:text-gray-200 font-semibold bg-transparent"
-                    placeholder="John Doe"
-                    required
-                  />
-                </div>
-              </div>
+              <Input
+                label="Full Name"
+                type="text"
+                value={newMember.name}
+                onChange={(e) =>
+                  setNewMember((prev) => ({
+                    ...prev,
+                    name: e.target.value,
+                  }))
+                }
+                icon={<User className="w-4 h-4 text-sky-500" />}
+                placeholder="John Doe"
+                required
+              />
 
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1">
-                  Email Address
-                </label>
-                <div className="flex items-center border border-sky-100 dark:border-gray-800 rounded-lg px-3 py-2.5 bg-white dark:bg-gray-950 focus-within:ring-2 focus-within:ring-sky-500 focus-within:border-sky-500 transition-all duration-200">
-                  <Mail className="w-4 h-4 text-sky-500 mr-2 shrink-0" />
-                  <input
-                    type="email"
-                    value={newMember.email}
-                    onChange={(e) =>
-                      setNewMember((prev) => ({
-                        ...prev,
-                        email: e.target.value,
-                      }))
-                    }
-                    className="w-full focus:outline-none text-xs text-gray-855 dark:text-gray-200 font-semibold bg-transparent"
-                    placeholder="john@tcs.com"
-                    required
-                  />
-                </div>
-              </div>
+              <Input
+                label="Email Address"
+                type="email"
+                value={newMember.email}
+                onChange={(e) =>
+                  setNewMember((prev) => ({
+                    ...prev,
+                    email: e.target.value,
+                  }))
+                }
+                icon={<Mail className="w-4 h-4 text-sky-500" />}
+                placeholder="john@tcs.com"
+                required
+              />
 
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1">
-                  Password
-                </label>
-                <div className="flex items-center border border-sky-100 dark:border-gray-800 rounded-lg px-3 py-2.5 bg-white dark:bg-gray-950 focus-within:ring-2 focus-within:ring-sky-500 focus-within:border-sky-500 transition-all duration-200">
-                  <Lock className="w-4 h-4 text-sky-500 mr-2 shrink-0" />
-                  <input
-                    type="password"
-                    value={newMember.password}
-                    onChange={(e) =>
-                      setNewMember((prev) => ({
-                        ...prev,
-                        password: e.target.value,
-                      }))
-                    }
-                    className="w-full focus:outline-none text-xs text-gray-850 dark:text-gray-200 font-semibold bg-transparent"
-                    placeholder="At least 8 characters"
-                    required
-                  />
-                </div>
-              </div>
+              <Input
+                label="Password"
+                type="password"
+                value={newMember.password}
+                onChange={(e) =>
+                  setNewMember((prev) => ({
+                    ...prev,
+                    password: e.target.value,
+                  }))
+                }
+                icon={<Lock className="w-4 h-4 text-sky-500" />}
+                placeholder="At least 8 characters"
+                required
+              />
 
               <div className="flex justify-end gap-3 pt-3 border-t border-sky-50 dark:border-gray-800">
-                <button
+                <Button
                   type="button"
+                  variant="outline"
                   onClick={() => setShowOnboardModal(false)}
-                  className="px-5 py-2.5 border border-sky-200 dark:border-gray-800 text-gray-650 dark:text-gray-300 hover:bg-sky-50 dark:hover:bg-gray-800 font-bold rounded-lg text-sm transition-colors cursor-pointer bg-white dark:bg-gray-900"
                 >
                   Cancel
-                </button>
-                <button
+                </Button>
+                <Button
                   type="submit"
-                  disabled={addingMember}
-                  className="bg-gradient-to-r from-cyan-500 to-sky-600 text-white font-bold py-2.5 px-6 rounded-lg flex items-center justify-center gap-2 hover:shadow-md transition-all duration-200 cursor-pointer text-sm"
+                  loading={addingMember}
+                  icon={<Plus className="w-4.5 h-4.5" />}
                 >
-                  <Plus className="w-4.5 h-4.5" />{" "}
-                  {addingMember ? "Onboarding..." : "Onboard Member"}
-                </button>
+                  Onboard Member
+                </Button>
               </div>
             </form>
           </div>

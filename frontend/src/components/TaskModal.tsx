@@ -14,34 +14,44 @@ import {
   X,
   BookOpen,
   User,
-  Trash2,
 } from "lucide-react";
-import axiosInstance from "../config";
+import { taskService } from "../services/taskService";
+import { orgService } from "../services/orgService";
+import { toast } from "react-toastify";
+import { ITask, IUser, ISubtask } from "../types";
 
-const TaskModal = ({ isOpen, onClose, taskToEdit, onSave, onLogout }) => {
-  const [taskData, setTaskData] = useState({ 
+interface TaskModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  taskToEdit?: ITask | null;
+  onSave?: (savedTask: ITask) => void;
+  onLogout?: () => void;
+  statuses?: string[];
+}
+
+const TaskModal: React.FC<TaskModalProps> = ({ isOpen, onClose, taskToEdit, onSave, onLogout, statuses = ["To Do", "In Progress", "Done"] }) => {
+  const [taskData, setTaskData] = useState<any>({ 
     ...DEFAULT_TASK, 
-    subtasks: [],
+    subtasks: [] as ISubtask[],
     status: "To Do",
     issueType: "Task",
     storyPoints: 1,
     assignee: "",
     key: ""
   });
-  const [members, setMembers] = useState([]);
+  const [members, setMembers] = useState<IUser[]>([]);
   const [newSubtaskTitle, setNewSubtaskTitle] = useState("");
-  const [editingSubtaskIdx, setEditingSubtaskIdx] = useState(null);
+  const [editingSubtaskIdx, setEditingSubtaskIdx] = useState<number | null>(null);
   const [editingSubtaskVal, setEditingSubtaskVal] = useState("");
-  const [parentTask, setParentTask] = useState(null);
+  const [parentTask, setParentTask] = useState<any | null>(null);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
   const today = new Date().toISOString().split("T")[0];
 
   useEffect(() => {
     if (!isOpen) return;
     const fetchMembers = async () => {
       try {
-        const { data } = await axiosInstance.get("/api/organization/members");
+        const data = await orgService.getOrgMembers();
         if (data?.success && data?.members) {
           setMembers(data.members);
         }
@@ -65,14 +75,14 @@ const TaskModal = ({ isOpen, onClose, taskToEdit, onSave, onLogout }) => {
         title: taskToEdit.title || "",
         description: taskToEdit.description || "",
         priority: taskToEdit.priority || "Low",
-        dueDate: taskToEdit.dueDate?.split("T")[0] || "",
+        dueDate: typeof taskToEdit.dueDate === "string" ? taskToEdit.dueDate.split("T")[0] : "",
         completed: normalized,
         id: taskToEdit._id,
         subtasks: taskToEdit.subtasks || [],
         status: taskToEdit.status || "To Do",
-        issueType: taskToEdit.issueType || "Task",
+        issueType: "Task",
         storyPoints: taskToEdit.storyPoints !== undefined ? taskToEdit.storyPoints : 1,
-        assignee: taskToEdit.assignee?._id || taskToEdit.assignee || "",
+        assignee: typeof taskToEdit.assignee === "object" && taskToEdit.assignee ? taskToEdit.assignee._id : taskToEdit.assignee || "",
         key: taskToEdit.key || ""
       });
     } else {
@@ -86,7 +96,6 @@ const TaskModal = ({ isOpen, onClose, taskToEdit, onSave, onLogout }) => {
         key: ""
       });
     }
-    setError(null);
     setNewSubtaskTitle("");
   }, [isOpen, taskToEdit]);
 
@@ -94,27 +103,26 @@ const TaskModal = ({ isOpen, onClose, taskToEdit, onSave, onLogout }) => {
     if (!newSubtaskTitle.trim()) return;
     const newSubtask = { 
       title: newSubtaskTitle.trim(), 
-      status: "To Do",
       completed: false 
     };
-    setTaskData((prev) => ({
+    setTaskData((prev: any) => ({
       ...prev,
       subtasks: [...(prev.subtasks || []), newSubtask],
     }));
     setNewSubtaskTitle("");
   };
 
-  const handleOpenSubtaskDetail = (subtask, index) => {
+  const handleOpenSubtaskDetail = (subtask: any, index: number) => {
     setParentTask({ ...taskData, editingSubtaskIndex: index });
     setTaskData({
       id: subtask._id || `subtask-${index}`,
       title: subtask.title || "",
       description: subtask.description || "",
       priority: subtask.priority || "Low",
-      dueDate: subtask.dueDate ? subtask.dueDate.split("T")[0] : "",
+      dueDate: typeof subtask.dueDate === "string" ? subtask.dueDate.split("T")[0] : "",
       completed: subtask.completed ? "Yes" : "No",
       status: subtask.status || "To Do",
-      issueType: subtask.issueType || "Sub-task",
+      issueType: "Sub-task",
       storyPoints: subtask.storyPoints !== undefined ? subtask.storyPoints : 0,
       subtasks: []
     });
@@ -140,22 +148,13 @@ const TaskModal = ({ isOpen, onClose, taskToEdit, onSave, onLogout }) => {
     setParentTask(null);
   };
 
-  const handleChange = useCallback((e) => {
+  const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setTaskData((prev) => ({ ...prev, [name]: value }));
-  }, []);
-
-  const getHeaders = useCallback(() => {
-    const token = localStorage.getItem("token");
-    if (!token) throw new Error("No auth Token Found");
-    return {
-      "content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    };
+    setTaskData((prev: any) => ({ ...prev, [name]: value }));
   }, []);
 
   const handleSubmit = useCallback(
-    async (e) => {
+    async (e: React.FormEvent) => {
       e.preventDefault();
       
       let finalTaskData = taskData;
@@ -178,28 +177,27 @@ const TaskModal = ({ isOpen, onClose, taskToEdit, onSave, onLogout }) => {
       }
 
       if (finalTaskData.dueDate && finalTaskData.dueDate < today) {
-        setError("Due date cannot be in the past");
+        toast.error("Due date cannot be in the past");
         return;
       }
 
       setLoading(true);
-      setError(null);
 
       try {
         const isEdit = Boolean(finalTaskData.id);
-        const url = isEdit ? `/api/tasks/${finalTaskData.id}/gp` : `/api/tasks/gp`;
-        const method = isEdit ? "put" : "post";
+        const saved = isEdit 
+          ? await taskService.updateTask(finalTaskData.id, finalTaskData) 
+          : await taskService.createTask(finalTaskData);
 
-        const { data: saved } = await axiosInstance[method](url, finalTaskData);
-
+        toast.success(isEdit ? "Task updated successfully!" : "Task created successfully!");
         onSave?.(saved);
         onClose();
         setParentTask(null);
-      } catch (err) {
+      } catch (err: any) {
         if (err?.status === 401) return onLogout?.();
         const msg =
-          err?.data?.message || err?.message || "An unexpected error occurred";
-        setError(msg);
+          err?.response?.data?.message || err?.message || "An unexpected error occurred";
+        toast.error(msg);
         console.error(err);
       } finally {
         setLoading(false);
@@ -221,7 +219,7 @@ const TaskModal = ({ isOpen, onClose, taskToEdit, onSave, onLogout }) => {
           <button 
             type="button"
             onClick={handleBackToParent}
-            className="text-xs font-bold text-sky-600 hover:text-sky-800 mb-3 flex items-center gap-1.5 bg-sky-50 hover:bg-sky-100/70 px-2.5 py-1.5 rounded-lg transition-colors cursor-pointer w-fit"
+            className="text-xs font-bold text-sky-600 hover:text-sky-850 mb-3 flex items-center gap-1.5 bg-sky-50 hover:bg-sky-100/70 px-2.5 py-1.5 rounded-lg transition-colors cursor-pointer w-fit"
           >
             ← Parent Issue: {parentTask.title}
           </button>
@@ -233,7 +231,7 @@ const TaskModal = ({ isOpen, onClose, taskToEdit, onSave, onLogout }) => {
                 {taskData.key}
               </span>
             )}
-            <h2 className=" text-2xl font-bold text-gray-800 flex items-center gap-2">
+            <h2 className=" text-2xl font-bold text-gray-800 dark:text-gray-250 flex items-center gap-2">
               {parentTask ? (
                 <>
                   <BookOpen className=" text-sky-500 w-6 h-6" />
@@ -252,17 +250,12 @@ const TaskModal = ({ isOpen, onClose, taskToEdit, onSave, onLogout }) => {
               onClose();
               setParentTask(null);
             }}
-            className=" p-2 hover:bg-sky-50 rounded-lg transition-colors text-gray-400 hover:text-sky-700"
+            className=" p-2 hover:bg-sky-50 rounded-lg transition-colors text-gray-400 hover:text-sky-700 cursor-pointer"
           >
             <X className=" w-5 h-5" />
           </button>
         </div>
         <form onSubmit={handleSubmit} className=" space-y-5">
-          {error && (
-            <div className=" text-sm text-red-600 bg-red-50 p-3 rounded-lg border border-red-100">
-              {error}
-            </div>
-          )}
           
           <div className="grid grid-cols-1 gap-4 md:grid-cols-12">
             {/* Left side: Main text fields and subtasks */}
@@ -278,18 +271,18 @@ const TaskModal = ({ isOpen, onClose, taskToEdit, onSave, onLogout }) => {
                     required
                     value={taskData.title}
                     onChange={handleChange}
-                    className=" w-full focus:outline-none text-sm text-gray-800 font-medium"
+                    className=" w-full focus:outline-none text-sm text-gray-805 font-medium bg-transparent"
                     placeholder="Provide a brief summary of the issue"
                   />
                 </div>
               </div>
 
               <div>
-                <label className=" flex items-center gap-1 text-sm font-semibold text-gray-700 mb-1">
+                <label className=" flex items-center gap-1 text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">
                   <AlignLeft className=" w-4 h-4 text-sky-500" /> Description
                 </label>
                 <textarea
-                  rows="5"
+                  rows={5}
                   name="description"
                   value={taskData.description}
                   onChange={handleChange}
@@ -300,13 +293,13 @@ const TaskModal = ({ isOpen, onClose, taskToEdit, onSave, onLogout }) => {
 
               {parentTask === null && (
                 <div>
-                  <label className=" flex items-center gap-1 text-sm font-semibold text-gray-700 mb-2">
+                  <label className=" flex items-center gap-1 text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                     <CheckCircle className=" w-4 h-4 text-sky-500" /> Subtasks Checklist
                   </label>
                   
                   {/* Scrollable subtasks container */}
                   <div className=" space-y-2 max-h-48 overflow-y-auto pr-1">
-                    {(taskData.subtasks || []).map((st, index) => {
+                    {(taskData.subtasks || []).map((st: any, index: number) => {
                       const currentStatus = st.status || (st.completed ? "Done" : "To Do");
                       
                       return (
@@ -321,7 +314,7 @@ const TaskModal = ({ isOpen, onClose, taskToEdit, onSave, onLogout }) => {
                                   if (editingSubtaskVal.trim()) {
                                     const updated = [...taskData.subtasks];
                                     updated[index].title = editingSubtaskVal.trim();
-                                    setTaskData(prev => ({ ...prev, subtasks: updated }));
+                                    setTaskData((prev: any) => ({ ...prev, subtasks: updated }));
                                   }
                                   setEditingSubtaskIdx(null);
                                 }}
@@ -331,12 +324,12 @@ const TaskModal = ({ isOpen, onClose, taskToEdit, onSave, onLogout }) => {
                                     if (editingSubtaskVal.trim()) {
                                       const updated = [...taskData.subtasks];
                                       updated[index].title = editingSubtaskVal.trim();
-                                      setTaskData(prev => ({ ...prev, subtasks: updated }));
+                                      setTaskData((prev: any) => ({ ...prev, subtasks: updated }));
                                     }
                                     setEditingSubtaskIdx(null);
                                   }
                                 }}
-                                className="flex-1 px-2 py-0.5 border border-sky-100 rounded text-xs focus:ring-1 focus:ring-sky-500 focus:outline-none text-gray-800"
+                                className="flex-1 px-2 py-0.5 border border-sky-100 rounded text-xs focus:ring-1 focus:ring-sky-500 focus:outline-none text-gray-850 bg-white"
                                 autoFocus
                               />
                             ) : (
@@ -345,7 +338,7 @@ const TaskModal = ({ isOpen, onClose, taskToEdit, onSave, onLogout }) => {
                                   setEditingSubtaskIdx(index);
                                   setEditingSubtaskVal(st.title);
                                 }}
-                                className={`truncate text-gray-700 font-medium cursor-pointer hover:bg-sky-50 px-1 rounded flex-1 ${currentStatus === "Done" ? 'line-through text-gray-400' : ''}`}
+                                className={`truncate text-gray-700 dark:text-gray-300 font-medium cursor-pointer hover:bg-sky-50 dark:hover:bg-gray-800 px-1 rounded flex-1 ${currentStatus === "Done" ? 'line-through text-gray-400' : ''}`}
                                 title="Click to edit summary"
                               >
                                 {st.title}
@@ -357,7 +350,7 @@ const TaskModal = ({ isOpen, onClose, taskToEdit, onSave, onLogout }) => {
                             <button
                               type="button"
                               onClick={() => handleOpenSubtaskDetail(st, index)}
-                              className="text-sky-600 hover:text-sky-800 p-1 hover:bg-sky-50 rounded transition-colors text-[10px] font-bold shrink-0"
+                              className="text-sky-600 hover:text-sky-800 p-1 hover:bg-sky-50 rounded transition-colors text-[10px] font-bold shrink-0 cursor-pointer"
                               title="Open Sub-task Details"
                             >
                               Open Details
@@ -369,8 +362,8 @@ const TaskModal = ({ isOpen, onClose, taskToEdit, onSave, onLogout }) => {
                                 const newStatus = e.target.value;
                                 const updated = [...taskData.subtasks];
                                 updated[index].status = newStatus;
-                                updated[index].completed = newStatus === "Done";
-                                setTaskData(prev => ({ ...prev, subtasks: updated }));
+                                updated[index].completed = newStatus.toLowerCase() === "done";
+                                setTaskData((prev: any) => ({ ...prev, subtasks: updated }));
                               }}
                               className={`px-1.5 py-0.5 bg-white border border-sky-100 rounded text-[10px] font-bold cursor-pointer focus:outline-none ${
                                 currentStatus === "Done" ? "text-green-700 bg-green-50" :
@@ -378,18 +371,18 @@ const TaskModal = ({ isOpen, onClose, taskToEdit, onSave, onLogout }) => {
                                 "text-sky-700 bg-sky-50"
                               }`}
                             >
-                              <option value="To Do">To Do</option>
-                              <option value="In Progress">In Progress</option>
-                              <option value="Done">Done</option>
+                              {statuses.map(s => (
+                                <option key={s} value={s}>{s}</option>
+                              ))}
                             </select>
 
                             <button
                               type="button"
                               onClick={() => {
-                                const updated = taskData.subtasks.filter((_, i) => i !== index);
-                                setTaskData(prev => ({ ...prev, subtasks: updated }));
+                                const updated = taskData.subtasks.filter((_: any, i: number) => i !== index);
+                                setTaskData((prev: any) => ({ ...prev, subtasks: updated }));
                               }}
-                              className="text-red-500 hover:text-red-700 p-1 hover:bg-red-50 rounded transition-colors"
+                              className="text-red-500 hover:text-red-700 p-1 hover:bg-red-50 rounded transition-colors cursor-pointer"
                             >
                               <X className="w-3.5 h-3.5" />
                             </button>
@@ -406,7 +399,7 @@ const TaskModal = ({ isOpen, onClose, taskToEdit, onSave, onLogout }) => {
                       placeholder="Add a new checklist item..."
                       value={newSubtaskTitle}
                       onChange={(e) => setNewSubtaskTitle(e.target.value)}
-                      className="flex-1 px-3 py-2 border border-sky-100 rounded-lg text-xs focus:ring-2 focus:ring-sky-500 focus:outline-none"
+                      className="flex-1 px-3 py-2 border border-sky-100 dark:border-gray-700 rounded-lg text-xs focus:ring-2 focus:ring-sky-500 focus:outline-none bg-white dark:bg-gray-900"
                       onKeyDown={(e) => {
                         if (e.key === 'Enter') {
                           e.preventDefault();
@@ -424,7 +417,8 @@ const TaskModal = ({ isOpen, onClose, taskToEdit, onSave, onLogout }) => {
                   </div>
                 </div>
               )}
-            </div>            {/* Right side: Jira metadata layout */}
+            </div>
+            {/* Right side: Jira metadata layout */}
             <div className="md:col-span-5 mt-4 md:mt-0 space-y-4 bg-sky-50/20 p-4 rounded-xl border border-sky-100/50 self-start">
               
               <div>
@@ -436,17 +430,17 @@ const TaskModal = ({ isOpen, onClose, taskToEdit, onSave, onLogout }) => {
                   value={taskData.status || "To Do"}
                   onChange={(e) => {
                     const newStatus = e.target.value;
-                    setTaskData((prev) => ({
+                    setTaskData((prev: any) => ({
                       ...prev,
                       status: newStatus,
-                      completed: newStatus === "Done" ? "Yes" : "No",
+                      completed: newStatus.toLowerCase() === "done" ? "Yes" : "No",
                     }));
                   }}
                   className={`${baseControlClasses} font-semibold`}
                 >
-                  <option value="To Do">To Do</option>
-                  <option value="In Progress">In Progress</option>
-                  <option value="Done">Done</option>
+                  {statuses.map(s => (
+                    <option key={s} value={s}>{s}</option>
+                  ))}
                 </select>
               </div>
 
@@ -478,7 +472,7 @@ const TaskModal = ({ isOpen, onClose, taskToEdit, onSave, onLogout }) => {
                   value={taskData.priority}
                   onChange={handleChange}
                   className={`${baseControlClasses} ${
-                    priorityStyles[taskData.priority]
+                    priorityStyles[taskData.priority] || ""
                   } font-semibold`}
                 >
                   <option>Low</option>
@@ -487,40 +481,40 @@ const TaskModal = ({ isOpen, onClose, taskToEdit, onSave, onLogout }) => {
                 </select>
               </div>
 
-                {/* Assignee selection (always visible) */}
-                <div className="flex flex-col gap-2">
-                  <label className="flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-gray-500 mb-1">
-                    <User className="w-3.5 h-3.5 text-sky-500" /> Assignee
-                  </label>
-                  <div className="flex items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const cur = JSON.parse(localStorage.getItem("currentUser") || "{}");
-                        const userMember = members.find(m => m.email === cur.email);
-                        if (userMember) {
-                          setTaskData(prev => ({ ...prev, assignee: userMember._id }));
-                        }
-                      }}
-                      className="text-[10px] text-sky-600 hover:text-sky-700 hover:underline font-bold transition-all cursor-pointer"
-                    >
-                      Assign to me
-                    </button>
-                    <select
-                      name="assignee"
-                      value={taskData.assignee || ""}
-                      onChange={handleChange}
-                      className={`${baseControlClasses} font-semibold`}
-                    >
-                      <option value="">Unassigned</option>
-                      {members.map(member => (
-                        <option key={member._id} value={member._id}>
-                          {member.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+              {/* Assignee selection (always visible) */}
+              <div className="flex flex-col gap-2">
+                <label className="flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-gray-500 mb-1">
+                  <User className="w-3.5 h-3.5 text-sky-500" /> Assignee
+                </label>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const cur = JSON.parse(localStorage.getItem("currentUser") || "{}");
+                      const userMember = members.find(m => m.email === cur.email);
+                      if (userMember) {
+                        setTaskData((prev: any) => ({ ...prev, assignee: userMember._id }));
+                      }
+                    }}
+                    className="text-[10px] text-sky-600 hover:text-sky-700 hover:underline font-bold transition-all cursor-pointer"
+                  >
+                    Assign to me
+                  </button>
+                  <select
+                    name="assignee"
+                    value={taskData.assignee || ""}
+                    onChange={handleChange}
+                    className={`${baseControlClasses} font-semibold`}
+                  >
+                    <option value="">Unassigned</option>
+                    {members.map(member => (
+                      <option key={member._id} value={member._id}>
+                        {member.name}
+                      </option>
+                    ))}
+                  </select>
                 </div>
+              </div>
 
               <div>
                 <label className=" flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-gray-500 mb-1">
@@ -563,7 +557,7 @@ const TaskModal = ({ isOpen, onClose, taskToEdit, onSave, onLogout }) => {
                 onClose();
                 setParentTask(null);
               }}
-              className="w-full sm:w-auto px-5 py-2.5 border border-sky-200 dark:border-gray-800 text-gray-650 dark:text-gray-300 hover:bg-sky-50 dark:hover:bg-gray-800 font-bold rounded-lg text-sm transition-colors cursor-pointer bg-white dark:bg-gray-900"
+              className="w-full sm:w-auto px-5 py-2.5 border border-sky-200 dark:border-gray-800 text-gray-600 dark:text-gray-300 hover:bg-sky-50 dark:hover:bg-gray-800 font-bold rounded-lg text-sm transition-colors cursor-pointer bg-white dark:bg-gray-900"
             >
               Cancel
             </button>
