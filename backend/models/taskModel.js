@@ -112,6 +112,37 @@ const taskSchema = new mongoose.Schema({
       },
     },
   ],
+  comments: [
+    {
+      text: {
+        type: String,
+        required: true,
+      },
+      user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "user",
+        required: true,
+      },
+      createdAt: {
+        type: Date,
+        default: Date.now,
+      },
+    },
+  ],
+  links: [
+    {
+      linkType: {
+        type: String,
+        enum: ["blocks", "blocked by", "relates to"],
+        required: true,
+      },
+      targetTask: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Task",
+        required: true,
+      },
+    },
+  ],
   createdAt: {
     type: Date,
     default: Date.now,

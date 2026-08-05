@@ -6,7 +6,7 @@ import Notification from "../models/notificationModel.js";
 // CREATE A NEW TASK
 export const createTask = async (req, res) => {
   try {
-    const { title, description, priority, dueDate, completed, status, issueType, storyPoints, subtasks, assignee } = req.body;
+    const { title, description, priority, dueDate, completed, status, issueType, storyPoints, subtasks, assignee, links } = req.body;
     
     let finalCompleted = completed === "Yes" || completed === true;
     let finalStatus = status || "To Do";
@@ -53,6 +53,7 @@ export const createTask = async (req, res) => {
       assignee: assignee || null,
       key: generatedKey || undefined,
       organization: req.user.organization || null,
+      links: links || [],
     });
 
     const saved = await task.save();
@@ -158,6 +159,7 @@ export const getTasks = async (req, res) => {
       const tasks = await Task.find(query)
         .populate("owner", "name email")
         .populate("assignee", "name email")
+        .populate("links.targetTask", "title key status priority completed")
         .sort(sortQuery)
         .skip(skip)
         .limit(l);
@@ -178,6 +180,7 @@ export const getTasks = async (req, res) => {
     const tasks = await Task.find(query)
       .populate("owner", "name email")
       .populate("assignee", "name email")
+      .populate("links.targetTask", "title key status priority completed")
       .sort(sortQuery);
 
     res.json({ success: true, tasks });
@@ -195,7 +198,9 @@ export const getTaskById = async (req, res) => {
     const task = await Task.findOne({ _id: req.params.id, ...query })
       .populate("owner", "name email")
       .populate("assignee", "name email")
-      .populate("history.updatedBy", "name email");
+      .populate("history.updatedBy", "name email")
+      .populate("comments.user", "name email avatar")
+      .populate("links.targetTask", "title key status priority completed");
     if (!task)
       return res.status(404).json({
         success: false,
@@ -332,7 +337,9 @@ export const updateTask = async (req, res) => {
     const updated = await Task.findById(task._id)
       .populate("owner", "name email")
       .populate("assignee", "name email")
-      .populate("history.updatedBy", "name email");
+      .populate("history.updatedBy", "name email")
+      .populate("comments.user", "name email avatar")
+      .populate("links.targetTask", "title key status priority completed");
 
     res.json({ success: true, task: updated });
   } catch (error) {
@@ -356,6 +363,174 @@ export const deleteTask = async (req, res) => {
         .status(404)
         .json({ success: false, message: "Task not found or not in your organization" });
     res.json({ success: true, message: "Task deleted" });
+  } catch (error) {
+    res.status(400).json({ success: false, message: error.message });
+  }
+};
+
+// ADD TASK COMMENT
+export const addTaskComment = async (req, res) => {
+  try {
+    const { text } = req.body;
+    if (!text || !text.trim()) {
+      return res.status(400).json({ success: false, message: "Comment text is required" });
+    }
+    const query = req.user.organization
+      ? { organization: req.user.organization }
+      : { owner: req.user.id };
+
+    const task = await Task.findOne({ _id: req.params.id, ...query });
+    if (!task) {
+      return res.status(404).json({ success: false, message: "Task not found" });
+    }
+
+    task.comments.push({
+      text: text.trim(),
+      user: req.user.id,
+      createdAt: new Date(),
+    });
+
+    await task.save();
+
+    const populatedTask = await Task.findById(task._id)
+      .populate("owner", "name email")
+      .populate("assignee", "name email")
+      .populate("history.updatedBy", "name email")
+      .populate("comments.user", "name email avatar")
+      .populate("links.targetTask", "title key status priority completed");
+
+    res.json({ success: true, task: populatedTask });
+  } catch (error) {
+    res.status(400).json({ success: false, message: error.message });
+  }
+};
+
+// DELETE TASK COMMENT
+export const deleteTaskComment = async (req, res) => {
+  try {
+    const query = req.user.organization
+      ? { organization: req.user.organization }
+      : { owner: req.user.id };
+
+    const task = await Task.findOne({ _id: req.params.id, ...query });
+    if (!task) {
+      return res.status(404).json({ success: false, message: "Task not found" });
+    }
+
+    const comment = task.comments.id(req.params.commentId);
+    if (!comment) {
+      return res.status(404).json({ success: false, message: "Comment not found" });
+    }
+
+    // Check permissions: author, org admin, or system admin
+    if (comment.user.toString() !== req.user.id && req.user.role !== "org_admin" && req.user.role !== "system_admin") {
+      return res.status(403).json({ success: false, message: "Unauthorized to delete this comment" });
+    }
+
+    comment.deleteOne();
+    await task.save();
+
+    const populatedTask = await Task.findById(task._id)
+      .populate("owner", "name email")
+      .populate("assignee", "name email")
+      .populate("history.updatedBy", "name email")
+      .populate("comments.user", "name email avatar")
+      .populate("links.targetTask", "title key status priority completed");
+
+    res.json({ success: true, task: populatedTask });
+  } catch (error) {
+    res.status(400).json({ success: false, message: error.message });
+  }
+};
+
+// GET TASK ANALYTICS
+export const getTaskAnalytics = async (req, res) => {
+  try {
+    const query = req.user.organization
+      ? { organization: req.user.organization }
+      : { owner: req.user.id };
+
+    const tasks = await Task.find(query);
+
+    // 1. Weekly Velocity Calculation (Last 4 Weeks)
+    const weeks = [];
+    for (let i = 3; i >= 0; i--) {
+      const end = new Date();
+      end.setDate(end.getDate() - i * 7);
+      const start = new Date();
+      start.setDate(start.getDate() - (i + 1) * 7);
+      
+      let weekPoints = 0;
+      let weekCount = 0;
+
+      tasks.forEach((t) => {
+        if (t.completed) {
+          let completionDate = t.updatedAt || t.createdAt;
+          const statusHistory = t.history.filter(h => h.field === "status" && h.newValue === "Done");
+          if (statusHistory.length > 0) {
+            completionDate = statusHistory[statusHistory.length - 1].updatedAt;
+          }
+          const cTime = new Date(completionDate).getTime();
+          if (cTime >= start.getTime() && cTime <= end.getTime()) {
+            weekPoints += t.storyPoints || 0;
+            weekCount += 1;
+          }
+        }
+      });
+
+      weeks.push({
+        label: `Week -${i}`,
+        points: weekPoints,
+        count: weekCount
+      });
+    }
+
+    // 2. Burndown Curve (Last 15 Days)
+    const burndown = [];
+    const totalStoryPoints = tasks.reduce((sum, t) => sum + (t.storyPoints || 0), 0);
+
+    for (let i = 14; i >= 0; i--) {
+      const date = new Date();
+      date.setDate(date.getDate() - i);
+      const dayEnd = new Date(date.setHours(23, 59, 59, 999));
+
+      let resolvedBeforeDay = 0;
+      tasks.forEach((t) => {
+        if (t.completed) {
+          let completionDate = t.updatedAt || t.createdAt;
+          const statusHistory = t.history.filter(h => h.field === "status" && h.newValue === "Done");
+          if (statusHistory.length > 0) {
+            completionDate = statusHistory[statusHistory.length - 1].updatedAt;
+          }
+          if (new Date(completionDate) <= dayEnd) {
+            resolvedBeforeDay += t.storyPoints || 0;
+          }
+        }
+      });
+
+      burndown.push({
+        day: date.toLocaleDateString("en-US", { month: "short", day: "numeric" }),
+        ideal: Math.max(0, Math.round(totalStoryPoints - (totalStoryPoints / 14) * (14 - i))),
+        remaining: Math.max(0, totalStoryPoints - resolvedBeforeDay),
+      });
+    }
+
+    // 3. Priority breakdown
+    const priorityBreakdown = { High: 0, Medium: 0, Low: 0 };
+    tasks.forEach((t) => {
+      if (t.priority && priorityBreakdown[t.priority] !== undefined) {
+        priorityBreakdown[t.priority] += 1;
+      }
+    });
+
+    res.json({
+      success: true,
+      analytics: {
+        weeks,
+        burndown,
+        priorityBreakdown
+      }
+    });
   } catch (error) {
     res.status(400).json({ success: false, message: error.message });
   }

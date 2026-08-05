@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { taskService } from "../services/taskService";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import { ITask } from "../types";
 
 const getIssueTypeIcon = (type: string) => {
@@ -71,6 +72,26 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ tasks, onRefresh, onEdit, onL
   }, {});
 
   const handleStatusTransition = async (taskId: string, newStatus: string) => {
+    const task = tasks.find((t) => t._id === taskId);
+    const blockedByLinks = task?.links?.filter((l) => l.linkType === "blocked by") || [];
+    const activeBlocks = blockedByLinks.filter((l) => {
+      const target = l.targetTask;
+      if (!target) return false;
+      const isTargetDone =
+        target.completed === true ||
+        target.completed === "Yes" ||
+        target.status?.toLowerCase() === "done";
+      return !isTargetDone;
+    });
+
+    if (activeBlocks.length > 0) {
+      const blockTitles = activeBlocks
+        .map((l) => (l.targetTask?.key ? `[${l.targetTask.key}]` : l.targetTask?.title || "another task"))
+        .join(", ");
+      toast.error(`Cannot move task. It is blocked by: ${blockTitles}`);
+      return;
+    }
+
     try {
       await taskService.updateTask(taskId, {
         status: newStatus,
@@ -106,6 +127,26 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ tasks, onRefresh, onEdit, onL
     const taskId = e.dataTransfer.getData("text/plain");
     setActiveOverColumn(null);
     if (!taskId) return;
+
+    const task = tasks.find((t) => t._id === taskId);
+    const blockedByLinks = task?.links?.filter((l) => l.linkType === "blocked by") || [];
+    const activeBlocks = blockedByLinks.filter((l) => {
+      const target = l.targetTask;
+      if (!target) return false;
+      const isTargetDone =
+        target.completed === true ||
+        target.completed === "Yes" ||
+        target.status?.toLowerCase() === "done";
+      return !isTargetDone;
+    });
+
+    if (activeBlocks.length > 0) {
+      const blockTitles = activeBlocks
+        .map((l) => (l.targetTask?.key ? `[${l.targetTask.key}]` : l.targetTask?.title || "another task"))
+        .join(", ");
+      toast.error(`Cannot move task. It is blocked by: ${blockTitles}`);
+      return;
+    }
 
     try {
       await taskService.updateTask(taskId, {
