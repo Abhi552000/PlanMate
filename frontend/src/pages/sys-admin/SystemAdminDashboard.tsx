@@ -217,17 +217,17 @@ const SystemAdminDashboard: React.FC<SystemAdminDashboardProps> = ({ onLogout, u
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-955 flex flex-col font-sans">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex flex-col font-sans">
       <SysAdminHeader user={user} onLogout={onLogout} />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full space-y-6">
-        <div className="bg-white dark:bg-gray-900 p-6 rounded-2xl border border-sky-101/50 dark:border-gray-800 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="bg-white dark:bg-gray-900 p-6 rounded-2xl border border-sky-100/50 dark:border-gray-800 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="p-2.5 bg-gradient-to-br from-cyan-500 to-sky-600 rounded-xl text-white shadow-md">
               <ShieldAlert className="w-6 h-6" />
             </div>
             <div>
-              <h2 className="text-lg font-bold text-gray-850 dark:text-gray-200">
+              <h2 className="text-lg font-bold text-gray-800 dark:text-gray-200">
                 System Administration Dashboard
               </h2>
               <p className="text-xs font-semibold text-gray-400">
@@ -250,10 +250,10 @@ const SystemAdminDashboard: React.FC<SystemAdminDashboardProps> = ({ onLogout, u
         </div>
 
         {error && (
-          <div className="text-sm text-red-606 bg-red-50 dark:bg-red-955/20 p-4 rounded-xl border border-red-100 dark:border-red-900/50 animate-fadeIn font-semibold">{error}</div>
+          <div className="text-sm text-red-600 bg-red-50 dark:bg-red-950/20 p-4 rounded-xl border border-red-100 dark:border-red-900/50 animate-fadeIn font-semibold">{error}</div>
         )}
         {success && (
-          <div className="text-sm text-green-708 bg-green-50 dark:bg-green-955/20 p-4 rounded-xl border border-green-100 dark:border-green-900/50 font-bold animate-fadeIn">{success}</div>
+          <div className="text-sm text-green-700 bg-green-50 dark:bg-green-950/20 p-4 rounded-xl border border-green-100 dark:border-green-900/50 font-bold animate-fadeIn">{success}</div>
         )}
 
         <OrgListTable

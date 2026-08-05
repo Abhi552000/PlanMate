@@ -22,10 +22,10 @@ export const DeactivateOrgModal: React.FC<DeactivateOrgModalProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black/45 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-white dark:bg-gray-900 border border-sky-101 dark:border-gray-800 rounded-2xl shadow-xl max-w-md w-full p-6 space-y-4 animate-scaleUp">
+      <div className="bg-white dark:bg-gray-900 border border-sky-100 dark:border-gray-800 rounded-2xl shadow-xl max-w-md w-full p-6 space-y-4 animate-scaleUp">
         <div className="flex items-center justify-between border-b border-sky-50 dark:border-gray-800 pb-3">
           <h3 className="font-bold text-gray-800 dark:text-gray-200 text-base flex items-center gap-1.5">
-            <Power className="w-5 h-5 text-red-505" /> Deactivate {deactivatingOrg.name}
+            <Power className="w-5 h-5 text-red-500" /> Deactivate {deactivatingOrg.name}
           </h3>
           <button 
             onClick={onClose}
@@ -44,7 +44,7 @@ export const DeactivateOrgModal: React.FC<DeactivateOrgModalProps> = ({
               rows={3}
               value={deactivateRemark}
               onChange={(e) => setDeactivateRemark(e.target.value)}
-              className="w-full px-3.5 py-2.5 border border-sky-101 dark:border-gray-800 rounded-lg text-sm bg-white dark:bg-gray-955 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200 text-gray-700 dark:text-gray-300 font-medium"
+              className="w-full px-3.5 py-2.5 border border-sky-100 dark:border-gray-800 rounded-lg text-sm bg-white dark:bg-gray-950 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200 text-gray-700 dark:text-gray-300 font-medium"
               placeholder="e.g. Payment pending, License expired, Contract ended"
               required
             />

@@ -31,7 +31,7 @@ export const FilterSelect: React.FC<FilterSelectProps> = ({ label, value, option
       <button
         type="button"
         onClick={() => setIsOpen((prev) => !prev)}
-        className="px-3 py-2 bg-gray-50/50 dark:bg-gray-955 border border-sky-105 dark:border-gray-800 text-gray-700 dark:text-gray-300 rounded-xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-sky-500 flex items-center gap-1.5 cursor-pointer transition-all duration-200"
+        className="px-3 py-2 bg-gray-50/50 dark:bg-gray-950 border border-sky-100 dark:border-gray-800 text-gray-700 dark:text-gray-300 rounded-xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-sky-500 flex items-center gap-1.5 cursor-pointer transition-all duration-200"
       >
         <span>{label}: {activeOption?.label || value}</span>
         <ChevronDown className={`w-3.5 h-3.5 text-gray-400 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} />
@@ -54,7 +54,7 @@ export const FilterSelect: React.FC<FilterSelectProps> = ({ label, value, option
               }`}
             >
               <span>{opt.label}</span>
-              {opt.value === value && <Check className="w-3.5 h-3.5 text-sky-505" />}
+              {opt.value === value && <Check className="w-3.5 h-3.5 text-sky-500" />}
             </button>
           ))}
         </div>

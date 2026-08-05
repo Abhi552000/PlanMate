@@ -9,12 +9,12 @@ export const ActivityTimelineSection: React.FC<ActivityTimelineSectionProps> = (
   if (!history || history.length === 0) return null;
 
   return (
-    <div className="border-t border-sky-101/50 dark:border-gray-800 pt-5 mt-5">
+    <div className="border-t border-sky-100/50 dark:border-gray-800 pt-5 mt-5">
       <label className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-gray-400 mb-4">
-        <Activity className="w-4 h-4 text-sky-505" /> Activity Timeline
+        <Activity className="w-4 h-4 text-sky-500" /> Activity Timeline
       </label>
       
-      <div className="relative pl-6 border-l border-sky-101 dark:border-gray-800 space-y-5 ml-2">
+      <div className="relative pl-6 border-l border-sky-100 dark:border-gray-800 space-y-5 ml-2">
         {history.map((item, idx) => (
           <div key={idx} className="relative text-xs">
             {/* Timeline bullet indicator */}
@@ -26,15 +26,15 @@ export const ActivityTimelineSection: React.FC<ActivityTimelineSectionProps> = (
                   {item.updatedBy?.name || "Someone"}
                 </span>
                 <span>updated the</span>
-                <span className="font-bold text-sky-600 dark:text-sky-400 uppercase tracking-wider text-[10px] bg-sky-50 dark:bg-sky-955/20 px-1.5 py-0.5 rounded border border-sky-101 dark:border-sky-900/50">
+                <span className="font-bold text-sky-600 dark:text-sky-400 uppercase tracking-wider text-[10px] bg-sky-50 dark:bg-sky-950/20 px-1.5 py-0.5 rounded border border-sky-100 dark:border-sky-900/50">
                   {item.field}
                 </span>
               </div>
               
-              <div className="text-[11px] text-gray-500 dark:text-gray-400 flex items-center gap-1.5 bg-gray-50/50 dark:bg-gray-900/50 p-2 rounded-lg border border-sky-101/30 dark:border-gray-850 w-fit font-medium">
+              <div className="text-[11px] text-gray-500 dark:text-gray-400 flex items-center gap-1.5 bg-gray-50/50 dark:bg-gray-900/50 p-2 rounded-lg border border-sky-100/30 dark:border-gray-850 w-fit font-medium">
                 <span className="line-through text-red-606 dark:text-red-400">{item.oldValue || "None"}</span>
                 <span className="text-gray-400">→</span>
-                <span className="font-bold text-green-708 dark:text-green-400">{item.newValue || "None"}</span>
+                <span className="font-bold text-green-700 dark:text-green-400">{item.newValue || "None"}</span>
               </div>
               
               {item.updatedAt && (

@@ -3,7 +3,6 @@ import { WRAPPER } from "../../assets/dummy";
 import { useOutletContext } from "react-router-dom";
 import TaskModal from "../../components/TaskModal";
 import KanbanBoard from "../../components/KanbanBoard";
-import { AnalyticsDashboard } from "../../components/AnalyticsDashboard";
 import { DashboardHeader } from "./components/DashboardHeader";
 import { DashboardFilters } from "./components/DashboardFilters";
 import { ListModeView } from "./components/ListModeView";
@@ -188,9 +187,7 @@ const Dashboard = () => {
         />
 
         <div>
-          {viewMode === "analytics" ? (
-            <AnalyticsDashboard />
-          ) : viewMode === "kanban" ? (
+          {viewMode === "kanban" ? (
             <KanbanBoard
               tasks={filterTasks}
               onRefresh={refreshTasks}
@@ -209,6 +206,7 @@ const Dashboard = () => {
               totalTasksCount={totalTasksCount}
               loadingList={loadingList}
               selectedStatus={selectedStatus}
+              statuses={statuses}
               onAddTask={() => {
                 setSelectedTask(null);
                 setShowModal(true);
@@ -233,6 +231,7 @@ const Dashboard = () => {
             if (viewMode === "list") fetchPaginatedListTasks(1, false);
           }}
           taskToEdit={selectedTask}
+          statuses={statuses}
         />
       )}
     </div>

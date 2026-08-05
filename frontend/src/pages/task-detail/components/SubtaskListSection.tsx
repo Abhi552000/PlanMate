@@ -43,7 +43,7 @@ export const SubtaskListSection: React.FC<SubtaskListSectionProps> = ({
           const subtaskKey = `${projectKey}-${index + 1}`;
 
           return (
-            <div key={index} className="flex items-center justify-between gap-3 bg-sky-50/20 dark:bg-sky-955/10 hover:bg-sky-50/40 p-2.5 rounded-xl border border-sky-100/40 dark:border-gray-800 text-xs transition-colors">
+            <div key={index} className="flex items-center justify-between gap-3 bg-sky-50/20 dark:bg-sky-950/10 hover:bg-sky-50/40 p-2.5 rounded-xl border border-sky-100/40 dark:border-gray-800 text-xs transition-colors">
               <div className="flex items-center gap-2 flex-1 min-w-0">
                 <span className="text-[10px] font-bold text-gray-405 select-all shrink-0">
                   {subtaskKey}

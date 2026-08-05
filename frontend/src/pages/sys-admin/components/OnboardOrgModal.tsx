@@ -28,10 +28,10 @@ export const OnboardOrgModal: React.FC<OnboardOrgModalProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black/45 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-white dark:bg-gray-900 border border-sky-101 dark:border-gray-800 rounded-2xl shadow-xl max-w-md w-full p-6 space-y-4 animate-scaleUp">
+      <div className="bg-white dark:bg-gray-900 border border-sky-100 dark:border-gray-800 rounded-2xl shadow-xl max-w-md w-full p-6 space-y-4 animate-scaleUp">
         <div className="flex items-center justify-between border-b border-sky-50 dark:border-gray-800 pb-3">
           <h3 className="font-bold text-gray-800 dark:text-gray-200 text-base flex items-center gap-1.5">
-            <Building className="w-5 h-5 text-sky-505" /> Onboard Organization
+            <Building className="w-5 h-5 text-sky-500" /> Onboard Organization
           </h3>
           <button 
             onClick={onClose}
@@ -44,28 +44,28 @@ export const OnboardOrgModal: React.FC<OnboardOrgModalProps> = ({
         {onboardedResult ? (
           <div className="space-y-4 py-2 text-center">
             <div className="w-12 h-12 bg-green-50 rounded-full flex items-center justify-center mx-auto border border-green-200">
-              <Check className="w-6 h-6 text-green-606" />
+              <Check className="w-6 h-6 text-green-600" />
             </div>
             <div className="space-y-1">
-              <h4 className="font-bold text-gray-808 dark:text-gray-250 text-sm">Onboarding Complete!</h4>
+              <h4 className="font-bold text-gray-800 dark:text-gray-250 text-sm">Onboarding Complete!</h4>
               <p className="text-xs text-gray-405 font-medium">Successfully created tenant site for {onboardedResult.orgName}</p>
             </div>
 
-            <div className="bg-sky-50/40 dark:bg-sky-955/20 p-4 rounded-xl border border-sky-101/50 dark:border-gray-800 text-left text-xs space-y-2.5">
+            <div className="bg-sky-50/40 dark:bg-sky-950/20 p-4 rounded-xl border border-sky-100/50 dark:border-gray-800 text-left text-xs space-y-2.5">
               <div>
                 <span className="block font-bold text-gray-405 uppercase tracking-wider text-[9px]">Admin Email</span>
                 <span className="font-bold text-gray-700 dark:text-gray-300">{onboardedResult.email}</span>
               </div>
               <div>
                 <span className="block font-bold text-gray-405 uppercase tracking-wider text-[9px]">Generated Temporary Password</span>
-                <div className="flex items-center justify-between bg-white dark:bg-gray-900 p-2 rounded border border-sky-101 dark:border-gray-800 mt-1 select-all font-mono font-bold text-gray-808 dark:text-gray-200">
+                <div className="flex items-center justify-between bg-white dark:bg-gray-900 p-2 rounded border border-sky-100 dark:border-gray-800 mt-1 select-all font-mono font-bold text-gray-800 dark:text-gray-200">
                   <span>{onboardedResult.password}</span>
                   <button
                     onClick={onCopyPassword}
-                    className="text-sky-606 hover:text-sky-700 p-1 hover:bg-sky-50 rounded transition-colors cursor-pointer"
+                    className="text-sky-600 hover:text-sky-700 p-1 hover:bg-sky-50 rounded transition-colors cursor-pointer"
                     title="Copy Password"
                   >
-                    {copied ? <span className="text-[10px] text-green-606 font-bold">Copied!</span> : <Copy className="w-3.5 h-3.5" />}
+                    {copied ? <span className="text-[10px] text-green-600 font-bold">Copied!</span> : <Copy className="w-3.5 h-3.5" />}
                   </button>
                 </div>
               </div>
@@ -86,13 +86,13 @@ export const OnboardOrgModal: React.FC<OnboardOrgModalProps> = ({
               <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1">
                 Organization Name
               </label>
-              <div className="flex items-center border border-sky-101 dark:border-gray-800 rounded-lg px-3 py-2 bg-white dark:bg-gray-950 focus-within:ring-2 focus-within:ring-sky-500 focus-within:border-sky-500 transition-all duration-200">
+              <div className="flex items-center border border-sky-100 dark:border-gray-800 rounded-lg px-3 py-2 bg-white dark:bg-gray-950 focus-within:ring-2 focus-within:ring-sky-500 focus-within:border-sky-500 transition-all duration-200">
                 <Building className="w-4 h-4 text-sky-500 mr-2 shrink-0" />
                 <input
                   type="text"
                   value={newOrg.orgName}
                   onChange={(e) => setNewOrg((prev: any) => ({ ...prev, orgName: e.target.value }))}
-                  className="w-full focus:outline-none text-sm text-gray-800 dark:text-gray-255 font-semibold bg-transparent"
+                  className="w-full focus:outline-none text-sm text-gray-800 dark:text-gray-250 font-semibold bg-transparent"
                   placeholder="e.g. Pepsi, TCS, Apple"
                   required
                 />
@@ -100,16 +100,16 @@ export const OnboardOrgModal: React.FC<OnboardOrgModalProps> = ({
             </div>
 
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-gray-405 mb-1">
+              <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1">
                 Admin Full Name
               </label>
-              <div className="flex items-center border border-sky-101 dark:border-gray-800 rounded-lg px-3 py-2 bg-white dark:bg-gray-950 focus-within:ring-2 focus-within:ring-sky-500 focus-within:border-sky-500 transition-all duration-200">
+              <div className="flex items-center border border-sky-100 dark:border-gray-800 rounded-lg px-3 py-2 bg-white dark:bg-gray-950 focus-within:ring-2 focus-within:ring-sky-500 focus-within:border-sky-500 transition-all duration-200">
                 <User className="w-4.5 h-4.5 text-sky-500 mr-2 shrink-0" />
                 <input
                   type="text"
                   value={newOrg.adminName}
                   onChange={(e) => setNewOrg((prev: any) => ({ ...prev, adminName: e.target.value }))}
-                  className="w-full focus:outline-none text-sm text-gray-808 dark:text-gray-255 font-semibold bg-transparent"
+                  className="w-full focus:outline-none text-sm text-gray-800 dark:text-gray-250 font-semibold bg-transparent"
                   placeholder="e.g. John Doe"
                   required
                 />
@@ -117,16 +117,16 @@ export const OnboardOrgModal: React.FC<OnboardOrgModalProps> = ({
             </div>
 
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-gray-405 mb-1">
+              <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1">
                 Admin Email Address
               </label>
-              <div className="flex items-center border border-sky-101 dark:border-gray-800 rounded-lg px-3 py-2 bg-white dark:bg-gray-955 focus-within:ring-2 focus-within:ring-sky-500 focus-within:border-sky-500 transition-all duration-200">
+              <div className="flex items-center border border-sky-100 dark:border-gray-800 rounded-lg px-3 py-2 bg-white dark:bg-gray-950 focus-within:ring-2 focus-within:ring-sky-500 focus-within:border-sky-500 transition-all duration-200">
                 <Mail className="w-4 h-4 text-sky-500 mr-2 shrink-0" />
                 <input
                   type="email"
                   value={newOrg.adminEmail}
                   onChange={(e) => setNewOrg((prev: any) => ({ ...prev, adminEmail: e.target.value }))}
-                  className="w-full focus:outline-none text-sm text-gray-808 dark:text-gray-255 font-semibold bg-transparent"
+                  className="w-full focus:outline-none text-sm text-gray-800 dark:text-gray-250 font-semibold bg-transparent"
                   placeholder="e.g. admin@tcs.com"
                   required
                 />
@@ -134,16 +134,16 @@ export const OnboardOrgModal: React.FC<OnboardOrgModalProps> = ({
             </div>
 
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-gray-405 mb-1">
+              <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1">
                 Custom Password (Optional)
               </label>
-              <div className="flex items-center border border-sky-101 dark:border-gray-800 rounded-lg px-3 py-2 bg-white dark:bg-gray-955 focus-within:ring-2 focus-within:ring-sky-500 focus-within:border-sky-500 transition-all duration-200">
+              <div className="flex items-center border border-sky-100 dark:border-gray-800 rounded-lg px-3 py-2 bg-white dark:bg-gray-950 focus-within:ring-2 focus-within:ring-sky-500 focus-within:border-sky-500 transition-all duration-200">
                 <Lock className="w-4 h-4 text-sky-500 mr-2 shrink-0" />
                 <input
                   type="password"
                   value={newOrg.adminPassword}
                   onChange={(e) => setNewOrg((prev: any) => ({ ...prev, adminPassword: e.target.value }))}
-                  className="w-full focus:outline-none text-sm text-gray-808 dark:text-gray-255 font-semibold bg-transparent"
+                  className="w-full focus:outline-none text-sm text-gray-800 dark:text-gray-250 font-semibold bg-transparent"
                   placeholder="Leave blank to generate randomly"
                 />
               </div>

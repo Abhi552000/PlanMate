@@ -66,10 +66,10 @@ export const DashboardFilters: React.FC<DashboardFiltersProps> = ({
             placeholder="Search issues (title, desc, key)..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-8 py-2 bg-gray-50/50 dark:bg-gray-95 border border-sky-105 dark:border-gray-800 text-gray-805 dark:text-gray-205 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-sky-505 focus:border-sky-505 text-sm transition-all"
+            className="w-full pl-10 pr-8 py-2 bg-gray-50/50 dark:bg-gray-950 border border-sky-100 dark:border-gray-800 text-gray-800 dark:text-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 text-sm transition-all"
           />
           <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400">
-            <Search className="w-4 h-4 text-sky-505" />
+            <Search className="w-4 h-4 text-sky-500" />
           </div>
           {searchQuery && (
             <button
@@ -170,18 +170,6 @@ export const DashboardFilters: React.FC<DashboardFiltersProps> = ({
           >
             <LayoutGrid className="w-3.5 h-3.5" />
             Board
-          </button>
-          <button
-            onClick={() => setViewMode("analytics")}
-            className={`px-3 py-1.5 rounded-md text-xs font-semibold flex items-center gap-1.5 transition-all duration-200 cursor-pointer ${
-              viewMode === "analytics"
-                ? "bg-white dark:bg-gray-700 text-sky-700 dark:text-sky-300 shadow-sm border border-sky-100 dark:border-gray-600 font-bold"
-                : "text-gray-600 dark:text-gray-400 hover:text-sky-700 dark:hover:text-sky-300"
-            }`}
-            title="Analytics Metrics"
-          >
-            <BarChart2 className="w-3.5 h-3.5" />
-            Analytics
           </button>
         </div>
       </div>
