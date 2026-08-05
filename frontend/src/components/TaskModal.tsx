@@ -1,24 +1,15 @@
 import React, { useCallback, useEffect, useState } from "react";
-import {
-  baseControlClasses,
-  DEFAULT_TASK,
-  priorityStyles,
-} from "../assets/dummy";
-import {
-  AlignLeft,
-  Calendar,
-  CheckCircle,
-  Flag,
-  PlusCircle,
-  Save,
-  X,
-  BookOpen,
-  User,
-} from "lucide-react";
+import { baseControlClasses, DEFAULT_TASK } from "../assets/dummy";
+import { PlusCircle, Save, X, BookOpen } from "lucide-react";
 import { taskService } from "../services/taskService";
 import { orgService } from "../services/orgService";
 import { toast } from "react-toastify";
 import { ITask, IUser, ISubtask } from "../types";
+
+// Sub-components
+import { TaskFormGeneral } from "./task-modal/TaskFormGeneral";
+import { TaskFormMeta } from "./task-modal/TaskFormMeta";
+import { TaskFormSubtasks } from "./task-modal/TaskFormSubtasks";
 
 interface TaskModalProps {
   isOpen: boolean;
@@ -101,13 +92,13 @@ const TaskModal: React.FC<TaskModalProps> = ({ isOpen, onClose, taskToEdit, onSa
 
   const handleAddSubtask = () => {
     if (!newSubtaskTitle.trim()) return;
-    const newSubtask = { 
+    const newSub = { 
       title: newSubtaskTitle.trim(), 
       completed: false 
     };
     setTaskData((prev: any) => ({
       ...prev,
-      subtasks: [...(prev.subtasks || []), newSubtask],
+      subtasks: [...(prev.subtasks || []), newSub],
     }));
     setNewSubtaskTitle("");
   };
@@ -231,16 +222,16 @@ const TaskModal: React.FC<TaskModalProps> = ({ isOpen, onClose, taskToEdit, onSa
                 {taskData.key}
               </span>
             )}
-            <h2 className=" text-2xl font-bold text-gray-800 dark:text-gray-250 flex items-center gap-2">
+            <h2 className=" text-2xl font-bold text-gray-800 dark:text-gray-255 flex items-center gap-2">
               {parentTask ? (
                 <>
-                  <BookOpen className=" text-sky-500 w-6 h-6" />
+                  <BookOpen className=" text-sky-505 w-6 h-6" />
                   Sub-task Detail
                 </>
               ) : taskData.id ? (
-                <Save className=" text-sky-500 w-6 h-6" />
+                <Save className=" text-sky-505 w-6 h-6" />
               ) : (
-                <PlusCircle className="text-sky-500 w-6 h-6" />
+                <PlusCircle className="text-sky-505 w-6 h-6" />
               )}
               {!parentTask && (taskData.id ? "Edit Issue" : "Create New Issue")}
             </h2>
@@ -260,293 +251,40 @@ const TaskModal: React.FC<TaskModalProps> = ({ isOpen, onClose, taskToEdit, onSa
           <div className="grid grid-cols-1 gap-4 md:grid-cols-12">
             {/* Left side: Main text fields and subtasks */}
             <div className="md:col-span-7 space-y-4">
-              <div>
-                <label className=" block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">
-                  Summary
-                </label>
-                <div className=" flex items-center border border-sky-100 rounded-lg px-3 py-2 bg-white focus-within:ring-2 focus-within:ring-sky-500 focus-within:border-sky-500 transition-all duration-200">
-                  <input
-                    type="text"
-                    name="title"
-                    required
-                    value={taskData.title}
-                    onChange={handleChange}
-                    className=" w-full focus:outline-none text-sm text-gray-805 font-medium bg-transparent"
-                    placeholder="Provide a brief summary of the issue"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className=" flex items-center gap-1 text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">
-                  <AlignLeft className=" w-4 h-4 text-sky-500" /> Description
-                </label>
-                <textarea
-                  rows={5}
-                  name="description"
-                  value={taskData.description}
-                  onChange={handleChange}
-                  className={`${baseControlClasses} resize-none text-gray-800`}
-                  placeholder="Add details about this issue..."
-                />
-              </div>
+              <TaskFormGeneral
+                title={taskData.title}
+                description={taskData.description}
+                onChange={handleChange}
+                baseControlClasses={baseControlClasses}
+              />
 
               {parentTask === null && (
-                <div>
-                  <label className=" flex items-center gap-1 text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                    <CheckCircle className=" w-4 h-4 text-sky-500" /> Subtasks Checklist
-                  </label>
-                  
-                  {/* Scrollable subtasks container */}
-                  <div className=" space-y-2 max-h-48 overflow-y-auto pr-1">
-                    {(taskData.subtasks || []).map((st: any, index: number) => {
-                      const currentStatus = st.status || (st.completed ? "Done" : "To Do");
-                      
-                      return (
-                        <div key={index} className="flex items-center justify-between gap-3 bg-sky-50/30 p-2.5 rounded-lg border border-sky-100/50 text-xs">
-                          <div className="flex items-center gap-2 flex-1 min-w-0">
-                            {editingSubtaskIdx === index ? (
-                              <input
-                                type="text"
-                                value={editingSubtaskVal}
-                                onChange={(e) => setEditingSubtaskVal(e.target.value)}
-                                onBlur={() => {
-                                  if (editingSubtaskVal.trim()) {
-                                    const updated = [...taskData.subtasks];
-                                    updated[index].title = editingSubtaskVal.trim();
-                                    setTaskData((prev: any) => ({ ...prev, subtasks: updated }));
-                                  }
-                                  setEditingSubtaskIdx(null);
-                                }}
-                                onKeyDown={(e) => {
-                                  if (e.key === 'Enter') {
-                                    e.preventDefault();
-                                    if (editingSubtaskVal.trim()) {
-                                      const updated = [...taskData.subtasks];
-                                      updated[index].title = editingSubtaskVal.trim();
-                                      setTaskData((prev: any) => ({ ...prev, subtasks: updated }));
-                                    }
-                                    setEditingSubtaskIdx(null);
-                                  }
-                                }}
-                                className="flex-1 px-2 py-0.5 border border-sky-100 rounded text-xs focus:ring-1 focus:ring-sky-500 focus:outline-none text-gray-850 bg-white"
-                                autoFocus
-                              />
-                            ) : (
-                              <span 
-                                onClick={() => {
-                                  setEditingSubtaskIdx(index);
-                                  setEditingSubtaskVal(st.title);
-                                }}
-                                className={`truncate text-gray-700 dark:text-gray-300 font-medium cursor-pointer hover:bg-sky-50 dark:hover:bg-gray-800 px-1 rounded flex-1 ${currentStatus === "Done" ? 'line-through text-gray-400' : ''}`}
-                                title="Click to edit summary"
-                              >
-                                {st.title}
-                              </span>
-                            )}
-                          </div>
-                          
-                          <div className="flex items-center gap-2">
-                            <button
-                              type="button"
-                              onClick={() => handleOpenSubtaskDetail(st, index)}
-                              className="text-sky-600 hover:text-sky-800 p-1 hover:bg-sky-50 rounded transition-colors text-[10px] font-bold shrink-0 cursor-pointer"
-                              title="Open Sub-task Details"
-                            >
-                              Open Details
-                            </button>
-
-                            <select
-                              value={currentStatus}
-                              onChange={(e) => {
-                                const newStatus = e.target.value;
-                                const updated = [...taskData.subtasks];
-                                updated[index].status = newStatus;
-                                updated[index].completed = newStatus.toLowerCase() === "done";
-                                setTaskData((prev: any) => ({ ...prev, subtasks: updated }));
-                              }}
-                              className={`px-1.5 py-0.5 bg-white border border-sky-100 rounded text-[10px] font-bold cursor-pointer focus:outline-none ${
-                                currentStatus === "Done" ? "text-green-700 bg-green-50" :
-                                currentStatus === "In Progress" ? "text-amber-700 bg-amber-50" :
-                                "text-sky-700 bg-sky-50"
-                              }`}
-                            >
-                              {statuses.map(s => (
-                                <option key={s} value={s}>{s}</option>
-                              ))}
-                            </select>
-
-                            <button
-                              type="button"
-                              onClick={() => {
-                                const updated = taskData.subtasks.filter((_: any, i: number) => i !== index);
-                                setTaskData((prev: any) => ({ ...prev, subtasks: updated }));
-                              }}
-                              className="text-red-500 hover:text-red-700 p-1 hover:bg-red-50 rounded transition-colors cursor-pointer"
-                            >
-                              <X className="w-3.5 h-3.5" />
-                            </button>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-
-                  {/* Subtask addition form row */}
-                  <div className="flex gap-2 mt-2">
-                    <input
-                      type="text"
-                      placeholder="Add a new checklist item..."
-                      value={newSubtaskTitle}
-                      onChange={(e) => setNewSubtaskTitle(e.target.value)}
-                      className="flex-1 px-3 py-2 border border-sky-100 dark:border-gray-700 rounded-lg text-xs focus:ring-2 focus:ring-sky-500 focus:outline-none bg-white dark:bg-gray-900"
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') {
-                          e.preventDefault();
-                          handleAddSubtask();
-                        }
-                      }}
-                    />
-                    <button
-                      type="button"
-                      onClick={handleAddSubtask}
-                      className="w-full sm:w-auto px-4 py-2 bg-sky-100 hover:bg-sky-200 text-sky-700 rounded-lg text-xs font-bold transition-colors cursor-pointer"
-                    >
-                      Add
-                    </button>
-                  </div>
-                </div>
+                <TaskFormSubtasks
+                  subtasks={taskData.subtasks || []}
+                  setTaskData={setTaskData}
+                  newSubtaskTitle={newSubtaskTitle}
+                  setNewSubtaskTitle={setNewSubtaskTitle}
+                  editingSubtaskIdx={editingSubtaskIdx}
+                  setEditingSubtaskIdx={setEditingSubtaskIdx}
+                  editingSubtaskVal={editingSubtaskVal}
+                  setEditingSubtaskVal={setEditingSubtaskVal}
+                  statuses={statuses}
+                  onOpenSubtaskDetail={handleOpenSubtaskDetail}
+                  onAddSubtask={handleAddSubtask}
+                />
               )}
             </div>
             {/* Right side: Jira metadata layout */}
-            <div className="md:col-span-5 mt-4 md:mt-0 space-y-4 bg-sky-50/20 p-4 rounded-xl border border-sky-100/50 self-start">
-              
-              <div>
-                <label className=" flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-gray-500 mb-1">
-                  <CheckCircle className=" w-3.5 h-3.5 text-sky-500" /> Status
-                </label>
-                <select
-                  name="status"
-                  value={taskData.status || "To Do"}
-                  onChange={(e) => {
-                    const newStatus = e.target.value;
-                    setTaskData((prev: any) => ({
-                      ...prev,
-                      status: newStatus,
-                      completed: newStatus.toLowerCase() === "done" ? "Yes" : "No",
-                    }));
-                  }}
-                  className={`${baseControlClasses} font-semibold`}
-                >
-                  {statuses.map(s => (
-                    <option key={s} value={s}>{s}</option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label className=" flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-gray-500 mb-1">
-                  <AlignLeft className=" w-3.5 h-3.5 text-sky-500" /> Issue Type
-                </label>
-                <select
-                  name="issueType"
-                  value={taskData.issueType || (parentTask ? "Sub-task" : "Task")}
-                  onChange={handleChange}
-                  disabled={parentTask !== null}
-                  className={`${baseControlClasses} font-semibold disabled:bg-gray-50 disabled:text-gray-400`}
-                >
-                  <option value="Task">Task</option>
-                  <option value="Story">Story</option>
-                  <option value="Bug">Bug</option>
-                  <option value="Epic">Epic</option>
-                  {parentTask !== null && <option value="Sub-task">Sub-task</option>}
-                </select>
-              </div>
-
-              <div>
-                <label className=" flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-gray-500 mb-1">
-                  <Flag className=" w-3.5 h-3.5 text-sky-500" /> Priority
-                </label>
-                <select
-                  name="priority"
-                  value={taskData.priority}
-                  onChange={handleChange}
-                  className={`${baseControlClasses} ${
-                    priorityStyles[taskData.priority] || ""
-                  } font-semibold`}
-                >
-                  <option>Low</option>
-                  <option>Medium</option>
-                  <option>High</option>
-                </select>
-              </div>
-
-              {/* Assignee selection (always visible) */}
-              <div className="flex flex-col gap-2">
-                <label className="flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-gray-500 mb-1">
-                  <User className="w-3.5 h-3.5 text-sky-500" /> Assignee
-                </label>
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const cur = JSON.parse(localStorage.getItem("currentUser") || "{}");
-                      const userMember = members.find(m => m.email === cur.email);
-                      if (userMember) {
-                        setTaskData((prev: any) => ({ ...prev, assignee: userMember._id }));
-                      }
-                    }}
-                    className="text-[10px] text-sky-600 hover:text-sky-700 hover:underline font-bold transition-all cursor-pointer"
-                  >
-                    Assign to me
-                  </button>
-                  <select
-                    name="assignee"
-                    value={taskData.assignee || ""}
-                    onChange={handleChange}
-                    className={`${baseControlClasses} font-semibold`}
-                  >
-                    <option value="">Unassigned</option>
-                    {members.map(member => (
-                      <option key={member._id} value={member._id}>
-                        {member.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              <div>
-                <label className=" flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-gray-500 mb-1">
-                  <Calendar className=" w-3.5 h-3.5 text-sky-500" /> Due Date
-                </label>
-                <input
-                  type="date"
-                  name="dueDate"
-                  required
-                  min={today}
-                  value={taskData.dueDate}
-                  onChange={handleChange}
-                  className={baseControlClasses}
-                />
-              </div>
-
-              <div>
-                <label className=" flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-gray-500 mb-1">
-                  <Flag className=" w-3.5 h-3.5 text-sky-500" /> Story Points
-                </label>
-                <input
-                  type="number"
-                  name="storyPoints"
-                  min="0"
-                  max="100"
-                  value={taskData.storyPoints !== undefined ? taskData.storyPoints : 1}
-                  onChange={handleChange}
-                  className={baseControlClasses}
-                  required
-                />
-              </div>
-            </div>
+            <TaskFormMeta
+              taskData={taskData}
+              setTaskData={setTaskData}
+              statuses={statuses}
+              members={members}
+              parentTask={parentTask}
+              today={today}
+              baseControlClasses={baseControlClasses}
+              handleChange={handleChange}
+            />
           </div>
 
           {/* Form Actions footer */}

@@ -25,6 +25,19 @@ export interface ISubtask {
   issueType?: string;
 }
 
+export interface ITaskComment {
+  _id: string;
+  text: string;
+  user: IUser;
+  createdAt: string | Date;
+}
+
+export interface ITaskLink {
+  _id?: string;
+  linkType: "blocks" | "blocked by" | "relates to";
+  targetTask: ITask | string | any;
+}
+
 export interface ITask {
   _id: string;
   id?: string;
@@ -44,6 +57,8 @@ export interface ITask {
   updatedAt?: string | Date;
   storyPoints?: number;
   issueType?: string;
+  comments?: ITaskComment[];
+  links?: ITaskLink[];
 }
 
 export interface INotification {

@@ -3,6 +3,7 @@ import { Building, Settings, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { orgService } from "../services/orgService";
+import { ROUTES } from "../constants/routeConstant";
 import { Input } from "../components/ui/Input";
 import { Button } from "../components/ui/Button";
 import { IUser } from "../types";
@@ -82,7 +83,7 @@ const WorkspaceSettings = () => {
 
   useEffect(() => {
     if (!isOrgAdmin) {
-      navigate("/");
+      navigate(ROUTES.DASHBOARD);
       return;
     }
     const load = async () => {
@@ -135,7 +136,7 @@ const WorkspaceSettings = () => {
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-4 sm:p-6 space-y-6 font-sans">
+    <div className="w-full space-y-6 font-sans">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-sky-100/50 dark:border-gray-800 pb-4">
         <div className="flex items-center gap-3">
@@ -155,12 +156,22 @@ const WorkspaceSettings = () => {
       </div>
 
       {/* Settings Form */}
-      <div className="bg-white dark:bg-gray-900 p-5 sm:p-6 rounded-2xl border border-sky-100/50 dark:border-gray-800 shadow-sm space-y-4">
-        <h3 className="text-sm font-bold text-gray-800 dark:text-gray-250 flex items-center gap-2 border-b border-sky-100 dark:border-gray-800 pb-3">
-          <Building className="w-4.5 h-4.5 text-sky-500" /> Workspace Branding
-        </h3>
-
+      <div className="bg-white dark:bg-gray-900 p-5 sm:p-6 rounded-2xl border border-sky-100/50 dark:border-gray-800 shadow-sm">
         <form onSubmit={handleUpdateOrg} className="space-y-4">
+          <div className="flex items-center justify-between border-b border-sky-100 dark:border-gray-800 pb-3 mb-4">
+            <h3 className="text-sm font-bold text-gray-800 dark:text-gray-250 flex items-center gap-2">
+              <Building className="w-4.5 h-4.5 text-sky-500" /> Workspace Branding
+            </h3>
+            <Button
+              type="submit"
+              loading={savingOrg}
+              icon={<Building className="w-4.5 h-4.5" />}
+              size="sm"
+            >
+              Save Settings
+            </Button>
+          </div>
+
           <Input
             label="Workspace Name"
             type="text"
@@ -184,16 +195,6 @@ const WorkspaceSettings = () => {
               placeholder="Define the scope, goals and branding guidelines of this workspace..."
             />
           </div>
-
-          <div className="pt-2">
-            <Button
-              type="submit"
-              loading={savingOrg}
-              icon={<Building className="w-4.5 h-4.5" />}
-            >
-              Save Workspace Settings
-            </Button>
-          </div>
         </form>
       </div>
 
@@ -203,7 +204,7 @@ const WorkspaceSettings = () => {
           <Settings className="w-4.5 h-4.5 text-sky-500" /> Custom Task Statuses
         </h3>
 
-        <form onSubmit={handleAddStatus} className="flex gap-2">
+        <form onSubmit={handleAddStatus} className="flex items-center gap-2">
           <Input
             type="text"
             placeholder="Add new status (e.g. Ready for QA)"
@@ -217,8 +218,7 @@ const WorkspaceSettings = () => {
             disabled={!newStatus.trim()}
             loading={addingStatus}
             variant="secondary"
-            size="sm"
-            className="h-[42px] mt-7"
+            className="h-[44px]"
           >
             Add Status
           </Button>

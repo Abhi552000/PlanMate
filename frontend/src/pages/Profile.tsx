@@ -91,9 +91,8 @@ const Profile: React.FC<ProfileProps> = ({ setCurrentUser, onLogout }) => {
   };
 
   return (
-    <div className=" min-h-screen bg-gray-50 dark:bg-gray-950 font-sans">
-      <div className=" max-w-4xl mx-auto p-6">
-        <button onClick={() => navigate(-1)} className={BACK_BUTTON}>
+    <div className="w-full space-y-6 font-sans">
+      <button onClick={() => navigate(-1)} className={BACK_BUTTON}>
           <ChevronLeft className=" w-5 h-5 mr-1" />
           Back to Dashboard
         </button>
@@ -115,13 +114,19 @@ const Profile: React.FC<ProfileProps> = ({ setCurrentUser, onLogout }) => {
         </div>
         <div className=" grid md:grid-cols-2 gap-8">
           <section className={`${SECTION_WRAPPER} dark:bg-gray-900 dark:border-gray-800`}>
-            <div className=" flex items-center gap-2 mb-6">
-              <UserCircle className=" text-sky-500 w-5 h-5" />
-              <h2 className=" text-xl font-semibold text-gray-800 dark:text-gray-250">
-                Personal Information
-              </h2>
-            </div>
             <form onSubmit={saveProfile} className=" space-y-4">
+              <div className="flex items-center justify-between border-b border-sky-100 dark:border-gray-800 pb-3 mb-4">
+                <div className="flex items-center gap-2">
+                  <UserCircle className=" text-sky-500 w-5 h-5" />
+                  <h2 className=" text-xl font-semibold text-gray-850 dark:text-gray-250">
+                    Personal Information
+                  </h2>
+                </div>
+                <Button type="submit" size="sm" icon={<Save className="w-4 h-4" />}>
+                  Save
+                </Button>
+              </div>
+
               {personalFields.map(({ name, type, placeholder, icon: Icon }) => (
                 <Input
                   key={name}
@@ -135,17 +140,22 @@ const Profile: React.FC<ProfileProps> = ({ setCurrentUser, onLogout }) => {
                   required
                 />
               ))}
-              <Button type="submit" className="w-full" icon={<Save className="w-4 h-4" />}>
-                Save Changes
-              </Button>
             </form>
           </section>
           <section className={`${SECTION_WRAPPER} dark:bg-gray-900 dark:border-gray-800`}>
-            <div className=" flex items-center gap-2 mb-6">
-              <Shield className=" text-sky-500 w-5 h-5" />
-              <h2 className=" text-xl font-semibold text-gray-800 dark:text-gray-250">Security</h2>
-            </div>
             <form onSubmit={changePassword} className=" space-y-4">
+              <div className="flex items-center justify-between border-b border-sky-100 dark:border-gray-800 pb-3 mb-4">
+                <div className="flex items-center gap-2">
+                  <Shield className=" text-sky-500 w-5 h-5" />
+                  <h2 className=" text-xl font-semibold text-gray-850 dark:text-gray-250">
+                    Security
+                  </h2>
+                </div>
+                <Button type="submit" size="sm" icon={<Shield className="w-4 h-4" />}>
+                  Save
+                </Button>
+              </div>
+
               {securityFields.map(({ name, placeholder }) => (
                 <Input
                   key={name}
@@ -159,9 +169,6 @@ const Profile: React.FC<ProfileProps> = ({ setCurrentUser, onLogout }) => {
                   required
                 />
               ))}
-              <Button type="submit" className="w-full" icon={<Shield className="w-4 h-4" />}>
-                Change Password
-              </Button>
 
               <div className=" mt-8 pt-6 border-t border-sky-100 dark:border-gray-800">
                 <h3 className=" text-red-650 font-semibold mb-4 flex items-center gap-2">
@@ -175,7 +182,6 @@ const Profile: React.FC<ProfileProps> = ({ setCurrentUser, onLogout }) => {
           </section>
         </div>
       </div>
-    </div>
   );
 };
 

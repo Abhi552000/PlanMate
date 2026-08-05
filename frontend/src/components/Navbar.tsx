@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ChevronDown, LogOut, Settings, Zap, Bell, CheckCheck } from "lucide-react";
 import axiosInstance from "../config";
+import { ROUTES } from "../constants/routeConstant";
 import { IUser, INotification } from "../types";
 
 interface NavbarProps {
@@ -98,7 +99,7 @@ const Navbar: React.FC<NavbarProps> = ({ user = {}, onLogout }) => {
         <div
           className=" flex items-center gap-2 cursor-pointer group"
           onClick={() => {
-            navigate("/");
+            navigate(ROUTES.DASHBOARD);
           }}
         >
           {/* LOGO */}
@@ -140,7 +141,7 @@ const Navbar: React.FC<NavbarProps> = ({ user = {}, onLogout }) => {
 
           <button
             className="p-2 text-gray-600 dark:text-gray-400 hover:text-sky-500 dark:hover:text-sky-400 transition-colors duration-300 hover:bg-sky-50 dark:hover:bg-gray-800 rounded-full cursor-pointer"
-            onClick={() => navigate("/profile")}
+            onClick={() => navigate(ROUTES.PROFILE)}
           >
             <Settings className="w-5 h-5" />
           </button>
@@ -242,7 +243,7 @@ const Navbar: React.FC<NavbarProps> = ({ user = {}, onLogout }) => {
                   <button
                     onClick={() => {
                       setMenuOpen(false);
-                      navigate("/profile");
+                      navigate(ROUTES.PROFILE);
                     }}
                     className="w-full px-4 py-2.5 text-left hover:bg-sky-50 dark:hover:bg-gray-800 text-sm text-gray-700 dark:text-gray-300 transition-colors flex items-center gap-2 group"
                   >

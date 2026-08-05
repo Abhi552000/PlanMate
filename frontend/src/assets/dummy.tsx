@@ -135,7 +135,7 @@ export const getPriorityBadgeColor = (priority: string) => {
 
 // DASHBOARD
 // UI Constants
-export const WRAPPER = "p-4 md:p-6 min-h-screen";
+export const WRAPPER = "w-full space-y-6";
 export const HEADER =
   "flex flex-col md:flex-row justify-between items-start md:items-center mb-4 md:mb-6 gap-3";
 export const ADD_BUTTON =

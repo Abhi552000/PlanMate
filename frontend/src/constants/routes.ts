@@ -23,5 +23,8 @@ export const API_ROUTES = {
   TASKS: {
     BASE: "/api/tasks/gp",
     BY_ID: (id: string) => `/api/tasks/${id}/gp`,
+    ANALYTICS: "/api/tasks/gp/analytics",
+    ADD_COMMENT: (id: string) => `/api/tasks/${id}/comments`,
+    DELETE_COMMENT: (id: string, commentId: string) => `/api/tasks/${id}/comments/${commentId}`,
   },
 };

@@ -23,4 +23,16 @@ export const taskService = {
     const { data } = await axiosInstance.delete(API_ROUTES.TASKS.BY_ID(id));
     return data;
   },
+  getAnalytics: async () => {
+    const { data } = await axiosInstance.get(API_ROUTES.TASKS.ANALYTICS);
+    return data;
+  },
+  addComment: async (id: string, text: string) => {
+    const { data } = await axiosInstance.post(API_ROUTES.TASKS.ADD_COMMENT(id), { text });
+    return data;
+  },
+  deleteComment: async (id: string, commentId: string) => {
+    const { data } = await axiosInstance.delete(API_ROUTES.TASKS.DELETE_COMMENT(id, commentId));
+    return data;
+  },
 };
