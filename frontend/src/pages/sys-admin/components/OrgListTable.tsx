@@ -27,13 +27,13 @@ export const OrgListTable: React.FC<OrgListTableProps> = ({
   );
 
   return (
-    <div className="bg-white dark:bg-gray-900 rounded-2xl border border-sky-101/50 dark:border-gray-800 shadow-sm overflow-hidden">
+    <div className="bg-white dark:bg-gray-900 rounded-2xl border border-sky-100/50 dark:border-gray-800 shadow-sm overflow-hidden">
       <div className="p-5 border-b border-sky-50 dark:border-gray-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-gray-50/50 dark:bg-gray-900/50">
         <h3 className="text-sm font-bold text-gray-800 dark:text-gray-200 flex items-center gap-2">
-          <Building className="w-4.5 h-4.5 text-sky-500" /> Active Organizations ({organizations.length})
+          <Building className="w-4.5 h-4.5 text-sky-505" /> Active Organizations ({organizations.length})
         </h3>
         
-        <div className="flex items-center border border-sky-101 dark:border-gray-800 rounded-lg px-2.5 py-1 bg-white dark:bg-gray-955 focus-within:ring-1 focus-within:ring-sky-500 focus-within:border-sky-500 transition-all text-xs max-w-xs w-full">
+        <div className="flex items-center border border-sky-100 dark:border-gray-800 rounded-lg px-2.5 py-1 bg-white dark:bg-gray-950 focus-within:ring-1 focus-within:ring-sky-500 focus-within:border-sky-500 transition-all text-xs max-w-xs w-full">
           <Search className="w-3.5 h-3.5 text-gray-400 mr-1.5 shrink-0" />
           <input
             type="text"
@@ -48,7 +48,7 @@ export const OrgListTable: React.FC<OrgListTableProps> = ({
       <div className="overflow-x-auto">
         <table className="w-full text-left border-collapse">
           <thead>
-            <tr className="border-b border-sky-50/70 dark:border-gray-800 text-[10px] font-bold text-gray-400 dark:text-gray-300 uppercase bg-gray-50/30 dark:bg-gray-955/20">
+            <tr className="border-b border-sky-50/70 dark:border-gray-800 text-[10px] font-bold text-gray-400 dark:text-gray-300 uppercase bg-gray-50/30 dark:bg-gray-950/20">
               <th className="px-6 py-4">Organization Name</th>
               <th className="px-6 py-4">Admin Representative</th>
               <th className="px-6 py-4">Admin Email</th>
@@ -65,7 +65,7 @@ export const OrgListTable: React.FC<OrgListTableProps> = ({
                   !org.isActive ? "bg-red-50/[0.07]" : ""
                 }`}
               >
-                <td className="px-6 py-4 font-bold text-gray-800 dark:text-gray-250">
+                <td className="px-6 py-4 font-bold text-gray-800 dark:text-gray-200">
                   {org.name}
                 </td>
                 <td className="px-6 py-4 font-medium text-gray-600 dark:text-gray-300">
@@ -92,7 +92,7 @@ export const OrgListTable: React.FC<OrgListTableProps> = ({
                     </div>
                   )}
                 </td>
-                <td className="px-6 py-4 text-xs text-gray-405 dark:text-gray-500 font-semibold">
+                <td className="px-6 py-4 text-xs text-gray-400 dark:text-gray-500 font-semibold">
                   {org.createdAt ? new Date(org.createdAt).toLocaleDateString() : "N/A"}
                 </td>
                 <td className="px-6 py-4 text-right">
@@ -102,7 +102,7 @@ export const OrgListTable: React.FC<OrgListTableProps> = ({
                       disabled={togglingStatus}
                       className={`p-1.5 rounded-lg border transition-colors cursor-pointer ${
                         org.isActive 
-                          ? "text-green-600 hover:text-red-650 hover:bg-red-55 border-transparent hover:border-red-100" 
+                          ? "text-green-600 hover:text-red-600 hover:bg-red-50 border-transparent hover:border-red-100" 
                           : "text-red-500 hover:text-green-600 hover:bg-green-50 border-transparent hover:border-green-100"
                       }`}
                       title={org.isActive ? "Deactivate Organization" : "Activate Organization"}
@@ -118,7 +118,7 @@ export const OrgListTable: React.FC<OrgListTableProps> = ({
                     </button>
                     <button
                       onClick={() => onDeleteClick(org)}
-                      className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-55 rounded-lg transition-colors border border-transparent hover:border-red-100 cursor-pointer"
+                      className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors border border-transparent hover:border-red-100 cursor-pointer"
                       title="Delete Instance"
                     >
                       <Trash2 className="w-4 h-4" />
@@ -130,7 +130,7 @@ export const OrgListTable: React.FC<OrgListTableProps> = ({
 
             {filteredOrgs.length === 0 && (
               <tr>
-                <td colSpan={6} className="text-center py-16 text-xs text-gray-405 font-semibold bg-gray-55/10">
+                <td colSpan={6} className="text-center py-16 text-xs text-gray-400 font-semibold bg-gray-50/10">
                   No organizations found matching search
                 </td>
               </tr>

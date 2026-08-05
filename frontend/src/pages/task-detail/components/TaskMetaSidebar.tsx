@@ -26,11 +26,11 @@ interface TaskMetaSidebarProps {
 const getPriorityStyle = (priority: string) => {
   switch (priority?.toLowerCase()) {
     case "high":
-      return "text-red-606 bg-red-50 border-red-100";
+      return "text-red-600 bg-red-50 border-red-100";
     case "medium":
-      return "text-amber-606 bg-amber-50 border-amber-100";
+      return "text-amber-600 bg-amber-50 border-amber-100";
     default:
-      return "text-green-606 bg-green-50 border-green-100";
+      return "text-green-600 bg-green-50 border-green-100";
   }
 };
 
@@ -55,14 +55,14 @@ export const TaskMetaSidebar: React.FC<TaskMetaSidebarProps> = ({
   createdAt,
 }) => {
   return (
-    <div className="lg:col-span-4 space-y-4 bg-white dark:bg-gray-900 p-5 sm:p-6 rounded-2xl border border-sky-101/50 dark:border-gray-800 shadow-sm self-start">
-      <h3 className="text-xs font-bold uppercase tracking-wider text-gray-400 border-b border-sky-101/50 dark:border-gray-800 pb-2">
+    <div className="lg:col-span-4 space-y-4 bg-white dark:bg-gray-900 p-5 sm:p-6 rounded-2xl border border-sky-100/50 dark:border-gray-800 shadow-sm self-start">
+      <h3 className="text-xs font-bold uppercase tracking-wider text-gray-400 border-b border-sky-100/50 dark:border-gray-800 pb-2">
         Details
       </h3>
 
       <div>
         <label className="flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-gray-500 mb-1">
-          <CheckCircle className="w-3.5 h-3.5 text-sky-505" /> Status
+          <CheckCircle className="w-3.5 h-3.5 text-sky-500" /> Status
         </label>
         <select
           name="status"
@@ -85,7 +85,7 @@ export const TaskMetaSidebar: React.FC<TaskMetaSidebarProps> = ({
 
       <div>
         <label className="flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-gray-500 mb-1">
-          <AlignLeft className="w-3.5 h-3.5 text-sky-505" /> Issue Type
+          <AlignLeft className="w-3.5 h-3.5 text-sky-500" /> Issue Type
         </label>
         <select
           name="issueType"
@@ -104,7 +104,7 @@ export const TaskMetaSidebar: React.FC<TaskMetaSidebarProps> = ({
 
       <div>
         <label className="flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-gray-500 mb-1">
-          <Flag className="w-3.5 h-3.5 text-sky-505" /> Priority
+          <Flag className="w-3.5 h-3.5 text-sky-500" /> Priority
         </label>
         <select
           name="priority"
@@ -124,7 +124,7 @@ export const TaskMetaSidebar: React.FC<TaskMetaSidebarProps> = ({
       {!isEditingSubtask && (
         <div className="flex flex-col gap-1.5">
           <label className="flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-gray-500 mb-1">
-            <User className="w-3.5 h-3.5 text-sky-505" /> Assignee
+            <User className="w-3.5 h-3.5 text-sky-500" /> Assignee
           </label>
           <div className="flex items-center gap-2">
             <button
@@ -159,7 +159,7 @@ export const TaskMetaSidebar: React.FC<TaskMetaSidebarProps> = ({
 
       <div>
         <label className="flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-gray-500 mb-1">
-          <Calendar className="w-3.5 h-3.5 text-sky-505" /> Due Date
+          <Calendar className="w-3.5 h-3.5 text-sky-500" /> Due Date
         </label>
         <input
           type="date"
@@ -174,7 +174,7 @@ export const TaskMetaSidebar: React.FC<TaskMetaSidebarProps> = ({
 
       <div>
         <label className="flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-gray-500 mb-1">
-          <Flag className="w-3.5 h-3.5 text-sky-505" /> Story Points
+          <Flag className="w-3.5 h-3.5 text-sky-500" /> Story Points
         </label>
         <input
           type="number"
@@ -190,9 +190,9 @@ export const TaskMetaSidebar: React.FC<TaskMetaSidebarProps> = ({
 
       {/* Issue Linking Section (Only parent task) */}
       {!isEditingSubtask && (
-        <div className="border-t border-sky-101/50 dark:border-gray-800 pt-4 mt-4 space-y-3">
+        <div className="border-t border-sky-100/50 dark:border-gray-800 pt-4 mt-4 space-y-3">
           <label className="flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-gray-500 mb-1">
-            <LinkIcon className="w-3.5 h-3.5 text-sky-505" /> Issue Linking
+            <LinkIcon className="w-3.5 h-3.5 text-sky-500" /> Issue Linking
           </label>
 
           {/* Add Link Form */}
@@ -235,7 +235,7 @@ export const TaskMetaSidebar: React.FC<TaskMetaSidebarProps> = ({
               const isTargetDone = target.completed === true || target.completed === "Yes" || target.status?.toLowerCase() === "done";
               
               return (
-                <div key={link._id} className="flex items-center justify-between gap-2 p-2 bg-sky-50/20 dark:bg-sky-955/10 rounded-xl border border-sky-101/30 dark:border-gray-850 text-xs">
+                <div key={link._id} className="flex items-center justify-between gap-2 p-2 bg-sky-50/20 dark:bg-sky-950/10 rounded-xl border border-sky-100/30 dark:border-gray-800 text-xs">
                   <div className="min-w-0">
                     <div className="flex items-center gap-1.5 flex-wrap">
                       <span className="text-[10px] font-bold text-sky-600 dark:text-sky-400 capitalize">
@@ -271,7 +271,7 @@ export const TaskMetaSidebar: React.FC<TaskMetaSidebarProps> = ({
       )}
 
       {/* Creation Timestamp info */}
-      <div className="border-t border-sky-101/50 dark:border-gray-800 pt-4 mt-6 space-y-2 text-xs text-gray-450 font-medium">
+      <div className="border-t border-sky-100/50 dark:border-gray-800 pt-4 mt-6 space-y-2 text-xs text-gray-450 font-medium">
         {createdAt && (
           <div className="flex items-center gap-1.5">
             <Clock className="w-3.5 h-3.5 text-gray-300" />

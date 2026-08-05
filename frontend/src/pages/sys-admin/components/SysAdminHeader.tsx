@@ -16,7 +16,7 @@ export const SysAdminHeader: React.FC<SysAdminHeaderProps> = ({ user, onLogout }
           </div>
           <div>
             <span className="font-extrabold text-gray-800 dark:text-gray-200 tracking-tight text-base sm:text-lg">PlanMate</span>
-            <span className="text-[10px] font-bold text-sky-600 border border-sky-101 dark:border-gray-800 px-1.5 py-0.5 rounded ml-2 uppercase tracking-wide bg-sky-50/50 dark:bg-sky-950/20">
+            <span className="text-[10px] font-bold text-sky-600 border border-sky-100 dark:border-gray-800 px-1.5 py-0.5 rounded ml-2 uppercase tracking-wide bg-sky-50/50 dark:bg-sky-950/20">
               System Admin Site
             </span>
           </div>

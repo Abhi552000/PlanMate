@@ -22,6 +22,7 @@ interface TaskItemProps {
   onRefresh?: () => void;
   onLogout?: () => void;
   showCompleteCheckbox?: boolean;
+  statuses?: string[];
 }
 
 const TaskItem: React.FC<TaskItemProps> = ({
@@ -29,6 +30,7 @@ const TaskItem: React.FC<TaskItemProps> = ({
   onRefresh,
   onLogout,
   showCompleteCheckbox = true,
+  statuses = ["To Do", "In Progress", "Done"],
 }) => {
   const navigate = useNavigate();
   const [showMenu, setShowMenu] = useState(false);
@@ -142,7 +144,7 @@ const TaskItem: React.FC<TaskItemProps> = ({
               try {
                 await axiosInstance.put(`/api/tasks/${task._id}/gp`, {
                   status: newStatus,
-                  completed: newStatus === "Done" ? "Yes" : "No"
+                  completed: newStatus.toLowerCase() === "done" ? "Yes" : "No"
                 });
                 onRefresh?.();
               } catch (error) {
@@ -150,14 +152,14 @@ const TaskItem: React.FC<TaskItemProps> = ({
               }
             }}
             className={`px-2 py-1 rounded text-xs font-bold border border-sky-100 dark:border-gray-800 cursor-pointer focus:outline-none bg-white dark:bg-gray-900 ${
-              task.status === "Done" || task.completed ? "text-green-700 bg-green-50 dark:bg-green-950/20" :
+              (task.status || "").toLowerCase() === "done" || task.completed ? "text-green-700 bg-green-50 dark:bg-green-950/20" :
               task.status === "In Progress" ? "text-amber-700 bg-amber-50 dark:bg-amber-950/20" :
               "text-sky-700 bg-sky-50 dark:bg-sky-950/20"
             }`}
           >
-            <option value="To Do">To Do</option>
-            <option value="In Progress">In Progress</option>
-            <option value="Done">Done</option>
+            {statuses.map(s => (
+              <option key={s} value={s}>{s}</option>
+            ))}
           </select>
 
           <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded border uppercase tracking-wider ${getPriorityStyle(task.priority)}`}>

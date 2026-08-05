@@ -10,12 +10,10 @@ export const createTask = async (req, res) => {
     
     let finalCompleted = completed === "Yes" || completed === true;
     let finalStatus = status || "To Do";
-    if (status === "Done") {
-      finalCompleted = true;
-    } else if (status === "To Do" || status === "In Progress") {
-      finalCompleted = false;
-    } else if (finalCompleted) {
-      finalStatus = "Done";
+    if (status) {
+      finalCompleted = status.toLowerCase() === "done";
+    } else if (completed !== undefined) {
+      finalStatus = finalCompleted ? "Done" : "To Do";
     }
 
     let generatedKey = "";
@@ -218,21 +216,12 @@ export const updateTask = async (req, res) => {
     const data = { ...req.body };
     
     if (data.status !== undefined || data.completed !== undefined) {
-      let isCompletedVal = data.completed;
-      if (isCompletedVal !== undefined) {
-        isCompletedVal = isCompletedVal === "Yes" || isCompletedVal === true;
-      }
-
-      if (data.status === "Done") {
-        data.completed = true;
-      } else if (data.status === "To Do" || data.status === "In Progress") {
-        data.completed = false;
-      } else if (isCompletedVal === true) {
-        data.status = "Done";
-        data.completed = true;
-      } else if (isCompletedVal === false) {
-        data.completed = false;
-        data.status = "To Do";
+      if (data.status !== undefined) {
+        data.completed = data.status.toLowerCase() === "done";
+      } else if (data.completed !== undefined) {
+        const isCompletedVal = data.completed === "Yes" || data.completed === true;
+        data.completed = isCompletedVal;
+        data.status = isCompletedVal ? "Done" : "To Do";
       }
     }
 

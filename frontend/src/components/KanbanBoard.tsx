@@ -267,25 +267,25 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ tasks, onRefresh, onEdit, onL
 
                       {/* Column transition controls */}
                       <div className="flex items-center gap-1">
-                        {col !== "To Do" && (
+                        {columns.indexOf(col) > 0 && (
                           <button 
                             onClick={() => {
                               const prevIdx = columns.indexOf(col) - 1;
                               handleStatusTransition(task._id, columns[prevIdx]);
                             }}
-                            className="p-1 bg-sky-50 dark:bg-sky-950 hover:bg-sky-100 dark:hover:bg-sky-900 text-sky-600 rounded transition-colors cursor-pointer"
+                            className="p-1 bg-sky-50 dark:bg-sky-955 hover:bg-sky-100 dark:hover:bg-sky-900 text-sky-600 rounded transition-colors cursor-pointer"
                             title="Move Left"
                           >
                             <ArrowLeft className="w-3 h-3" />
                           </button>
                         )}
-                        {col !== "Done" && (
+                        {columns.indexOf(col) < columns.length - 1 && (
                           <button 
                             onClick={() => {
                               const nextIdx = columns.indexOf(col) + 1;
                               handleStatusTransition(task._id, columns[nextIdx]);
                             }}
-                            className="p-1 bg-sky-50 dark:bg-sky-950 hover:bg-sky-100 dark:hover:bg-sky-900 text-sky-600 rounded transition-colors cursor-pointer"
+                            className="p-1 bg-sky-50 dark:bg-sky-955 hover:bg-sky-100 dark:hover:bg-sky-900 text-sky-600 rounded transition-colors cursor-pointer"
                             title="Move Right"
                           >
                             <ArrowRight className="w-3 h-3" />

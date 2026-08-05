@@ -24,9 +24,9 @@ export const CommentsSection: React.FC<CommentsSectionProps> = ({
   onDeleteComment,
 }) => {
   return (
-    <div className="border-t border-sky-101/50 dark:border-gray-800 pt-5 mt-5">
+    <div className="border-t border-sky-100/50 dark:border-gray-800 pt-5 mt-5">
       <label className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-gray-400 mb-4">
-        <MessageSquare className="w-4 h-4 text-sky-505" /> Discussion Comments
+        <MessageSquare className="w-4 h-4 text-sky-500" /> Discussion Comments
       </label>
 
       {/* Comment Input */}
@@ -36,7 +36,7 @@ export const CommentsSection: React.FC<CommentsSectionProps> = ({
           placeholder="Write a comment..."
           value={commentText}
           onChange={(e) => setCommentText(e.target.value)}
-          className="flex-1 px-3 py-2 border border-sky-101 dark:border-gray-800 rounded-lg text-xs focus:ring-2 focus:ring-sky-500 focus:outline-none bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 font-medium"
+          className="flex-1 px-3 py-2 border border-sky-100 dark:border-gray-800 rounded-lg text-xs focus:ring-2 focus:ring-sky-500 focus:outline-none bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 font-medium"
           required
         />
         <Button type="submit" size="sm" loading={addingComment}>
@@ -47,13 +47,13 @@ export const CommentsSection: React.FC<CommentsSectionProps> = ({
       {/* Comments list */}
       <div className="space-y-3.5">
         {comments.map((comment) => (
-          <div key={comment._id} className="flex items-start gap-2.5 bg-gray-50/50 dark:bg-gray-950/20 p-3 rounded-xl border border-sky-101/30 dark:border-gray-850">
+          <div key={comment._id} className="flex items-start gap-2.5 bg-gray-50/50 dark:bg-gray-950/20 p-3 rounded-xl border border-sky-100/30 dark:border-gray-800">
             <div className="w-7 h-7 rounded-full bg-gradient-to-br from-cyan-500 to-sky-600 flex items-center justify-center text-white text-[10px] font-bold shadow-sm">
               {comment.user?.name ? comment.user.name[0].toUpperCase() : "U"}
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center justify-between gap-2">
-                <span className="text-xs font-bold text-gray-850 dark:text-gray-250">
+                <span className="text-xs font-bold text-gray-800 dark:text-gray-250">
                   {comment.user?.name || "Unknown User"}
                 </span>
                 <div className="flex items-center gap-2">
@@ -73,7 +73,7 @@ export const CommentsSection: React.FC<CommentsSectionProps> = ({
                   )}
                 </div>
               </div>
-              <p className="text-xs text-gray-655 dark:text-gray-400 mt-1 font-medium leading-relaxed whitespace-pre-wrap">
+              <p className="text-xs text-gray-600 dark:text-gray-400 mt-1 font-medium leading-relaxed whitespace-pre-wrap">
                 {comment.text}
               </p>
             </div>

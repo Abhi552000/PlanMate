@@ -466,9 +466,9 @@ export const deleteCustomStatus = async (req, res) => {
     });
 
     if (taskCount > 0) {
-      return res.status(400).json({ 
-        success: false, 
-        message: `Cannot delete status "${matchingStatusName}" because it is currently assigned to ${taskCount} task(s)` 
+      return res.status(400).json({
+        success: false,
+        message: `Cannot delete status "${matchingStatusName}" because it is currently assigned to ${taskCount} task(s)`
       });
     }
 

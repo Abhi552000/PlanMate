@@ -11,6 +11,7 @@ interface ListModeViewProps {
   totalTasksCount: number;
   loadingList: boolean;
   selectedStatus: string;
+  statuses: string[];
   onAddTask: () => void;
   onRefresh: () => void;
   onLoadMore: (page: number) => void;
@@ -23,6 +24,7 @@ export const ListModeView: React.FC<ListModeViewProps> = ({
   totalTasksCount,
   loadingList,
   selectedStatus,
+  statuses,
   onAddTask,
   onRefresh,
   onLoadMore,
@@ -53,6 +55,7 @@ export const ListModeView: React.FC<ListModeViewProps> = ({
           task={task}
           onRefresh={onRefresh}
           showCompleteCheckbox
+          statuses={statuses}
         />
       ))}
       {currentPage < totalPages && (
