@@ -10,6 +10,7 @@ import { OrgAdminHeader } from "./components/OrgAdminHeader";
 import { OrgMembersTable } from "./components/OrgMembersTable";
 import { OnboardMemberModal } from "./components/OnboardMemberModal";
 import { InspectingUserModal } from "./components/InspectingUserModal";
+import { AccessRemarkModal } from "./components/AccessRemarkModal";
 
 const ITEMS_PER_PAGE = 5;
 
@@ -40,6 +41,11 @@ const OrganizationAdmin = () => {
 
   // Details Modal State
   const [inspectingUser, setInspectingUser] = useState<any | null>(null);
+
+  // Status Remark Modal State
+  const [remarkModalOpen, setRemarkModalOpen] = useState(false);
+  const [selectedUserForStatusChange, setSelectedUserForStatusChange] = useState<any | null>(null);
+  const [pendingNewStatus, setPendingNewStatus] = useState<string | null>(null);
 
   const [loading, setLoading] = useState(true);
   const [addingMember, setAddingMember] = useState(false);
@@ -116,24 +122,34 @@ const OrganizationAdmin = () => {
     }
   };
 
-  const handleUpdateUserStatus = async (targetUser: any, newStatus: string) => {
+  const handleUpdateUserStatus = async (targetUser: any, newStatus: string, remark?: string) => {
     setTogglingStatus(true);
     try {
-      const data = await orgService.updateUserStatus(targetUser._id, newStatus);
+      const data = await orgService.updateUserStatus(targetUser._id, newStatus, remark);
       if (data?.success) {
         toast.success(
           `Access request for ${targetUser.name} is now updated to ${newStatus}.`
         );
         await fetchTeamUsers();
         if (inspectingUser && inspectingUser._id === targetUser._id) {
-          setInspectingUser((prev: any) => ({ ...prev, status: newStatus }));
+          setInspectingUser((prev: any) => ({ ...prev, status: newStatus, statusRemark: remark || "" }));
         }
+        setRemarkModalOpen(false);
+        setSelectedUserForStatusChange(null);
+        setPendingNewStatus(null);
       }
     } catch (err: any) {
       toast.error(err?.response?.data?.message || "Failed to update user status");
     } finally {
       setTogglingStatus(false);
     }
+  };
+
+  const handleUpdateUserStatusClick = (targetUser: any, actionType: "activate" | "deactivate") => {
+    setSelectedUserForStatusChange(targetUser);
+    const targetStatus = actionType === "activate" ? "active" : "rejected";
+    setPendingNewStatus(targetStatus);
+    setRemarkModalOpen(true);
   };
 
   if (loading) {
@@ -163,14 +179,12 @@ const OrganizationAdmin = () => {
         togglingStatus={togglingStatus}
         onPageChange={fetchTeamUsers}
         onInspectUser={setInspectingUser}
-        onUpdateUserStatus={handleUpdateUserStatus}
+        onUpdateUserStatusClick={handleUpdateUserStatusClick}
       />
 
       <InspectingUserModal
         inspectingUser={inspectingUser}
         onClose={() => setInspectingUser(null)}
-        currentUser={currentUser}
-        onUpdateUserStatus={handleUpdateUserStatus}
       />
 
       <OnboardMemberModal
@@ -181,6 +195,25 @@ const OrganizationAdmin = () => {
         addingMember={addingMember}
         onAddMember={handleAddMember}
       />
+
+      {remarkModalOpen && selectedUserForStatusChange && pendingNewStatus && (
+        <AccessRemarkModal
+          isOpen={remarkModalOpen}
+          onClose={() => {
+            setRemarkModalOpen(false);
+            setSelectedUserForStatusChange(null);
+            setPendingNewStatus(null);
+          }}
+          onConfirm={(remark) => handleUpdateUserStatus(selectedUserForStatusChange, pendingNewStatus, remark)}
+          title={pendingNewStatus === "active" ? "Approve & Grant Workspace Access" : "Revoke / Deactivate Access"}
+          description={
+            pendingNewStatus === "active"
+              ? `Are you sure you want to approve access for ${selectedUserForStatusChange.name}? Please provide a brief note or remark for this approval.`
+              : `Are you sure you want to revoke / deactivate workspace access for ${selectedUserForStatusChange.name}? Please enter the reason for this deactivation.`
+          }
+          loading={togglingStatus}
+        />
+      )}
     </div>
   );
 };

@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo, useState, useEffect } from "react";
 import { WRAPPER } from "../../assets/dummy";
-import { useOutletContext } from "react-router-dom";
+import { useOutletContext, useSearchParams } from "react-router-dom";
 import TaskModal from "../../components/TaskModal";
 import KanbanBoard from "../../components/KanbanBoard";
 import { DashboardHeader } from "./components/DashboardHeader";
@@ -19,6 +19,7 @@ interface DashboardContext {
 
 const Dashboard = () => {
   const { tasks, refreshTasks, viewMode, setViewMode } = useOutletContext<DashboardContext>();
+  const [searchParams] = useSearchParams();
   const [showModal, setShowModal] = useState(false);
   const [selectedTask, setSelectedTask] = useState<ITask | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
@@ -26,6 +27,18 @@ const Dashboard = () => {
   const [selectedPriority, setSelectedPriority] = useState("all");
   const [selectedStatus, setSelectedStatus] = useState("all");
   const [selectedTimeframe, setSelectedTimeframe] = useState("all");
+
+  useEffect(() => {
+    const assigneeParam = searchParams.get("assignee");
+    const statusParam = searchParams.get("status");
+    if (assigneeParam) {
+      setSelectedAssignee(assigneeParam);
+    }
+    if (statusParam) {
+      setSelectedStatus(statusParam);
+    }
+  }, [searchParams]);
+
   const [members, setMembers] = useState<IUser[]>([]);
   const [paginatedTasks, setPaginatedTasks] = useState<ITask[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -121,7 +134,13 @@ const Dashboard = () => {
       // 3. Priority
       if (selectedPriority !== "all" && task.priority !== selectedPriority) return false;
       // 4. Status
-      if (selectedStatus !== "all" && task.status !== selectedStatus) return false;
+      if (selectedStatus !== "all") {
+        if (selectedStatus === "pending") {
+          if (task.status === "Done") return false;
+        } else {
+          if (task.status !== selectedStatus) return false;
+        }
+      }
       // 5. Timeframe
       if (selectedTimeframe !== "all" && task.dueDate) {
         const due = new Date(task.dueDate);

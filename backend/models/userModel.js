@@ -28,7 +28,7 @@ const userSchema = new mongoose.Schema({
     enum: ["active", "pending", "rejected"],
     default: "active",
   },
-});
+}, { timestamps: true });
 
 const userModal = mongoose.models.user || mongoose.model("user", userSchema);
 

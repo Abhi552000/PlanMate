@@ -28,7 +28,10 @@ interface ProfileProps {
 
 const Profile: React.FC<ProfileProps> = ({ setCurrentUser, onLogout }) => {
   const navigate = useNavigate();
-  const [profile, setProfile] = useState<Record<string, string>>({ name: "", email: "" });
+  const [profile, setProfile] = useState<Record<string, string>>({
+    name: "",
+    email: "",
+  });
   const [password, setPassword] = useState<Record<string, string>>({
     current: "",
     new: "",
@@ -38,7 +41,8 @@ const Profile: React.FC<ProfileProps> = ({ setCurrentUser, onLogout }) => {
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) return;
-    authService.getMe()
+    authService
+      .getMe()
       .then((data) => {
         if (data.success)
           setProfile({ name: data.user.name, email: data.user.email });
@@ -93,95 +97,110 @@ const Profile: React.FC<ProfileProps> = ({ setCurrentUser, onLogout }) => {
   return (
     <div className="w-full space-y-6 font-sans">
       <button onClick={() => navigate(-1)} className={BACK_BUTTON}>
-          <ChevronLeft className=" w-5 h-5 mr-1" />
-          Back to Dashboard
-        </button>
-        <div className=" flex items-center gap-4 mb-8">
-          <div
-            className=" w-16 h-16 rounded-full bg-gradient-to-br from-cyan-500 to-sky-600
+        <ChevronLeft className=" w-5 h-5 mr-1" />
+        Back to Dashboard
+      </button>
+      <div className=" flex items-center gap-4 mb-8">
+        <div
+          className=" w-16 h-16 rounded-full bg-gradient-to-br from-cyan-500 to-sky-600
  flex items-center justify-center text-white text-2xl font-bold shadow-md"
-          >
-            {profile.name ? profile.name[0].toUpperCase() : "U"}
-          </div>
-          <div>
-            <h1 className=" text-3xl font-bold text-gray-800 dark:text-gray-200">
-              Account Settings
-            </h1>
-            <p className=" text-gray-500 dark:text-gray-400 text-sm">
-              Manage your profile and security settings
-            </p>
-          </div>
+        >
+          {profile.name ? profile.name[0].toUpperCase() : "U"}
         </div>
-        <div className=" grid md:grid-cols-2 gap-8">
-          <section className={`${SECTION_WRAPPER} dark:bg-gray-900 dark:border-gray-800`}>
-            <form onSubmit={saveProfile} className=" space-y-4">
-              <div className="flex items-center justify-between border-b border-sky-100 dark:border-gray-800 pb-3 mb-4">
-                <div className="flex items-center gap-2">
-                  <UserCircle className=" text-sky-500 w-5 h-5" />
-                  <h2 className=" text-xl font-semibold text-gray-850 dark:text-gray-250">
-                    Personal Information
-                  </h2>
-                </div>
-                <Button type="submit" size="sm" icon={<Save className="w-4 h-4" />}>
-                  Save
-                </Button>
-              </div>
-
-              {personalFields.map(({ name, type, placeholder, icon: Icon }) => (
-                <Input
-                  key={name}
-                  type={type}
-                  placeholder={placeholder}
-                  value={profile[name] || ""}
-                  onChange={(e) =>
-                    setProfile({ ...profile, [name]: e.target.value })
-                  }
-                  icon={<Icon className="w-5 h-5 text-sky-500" />}
-                  required
-                />
-              ))}
-            </form>
-          </section>
-          <section className={`${SECTION_WRAPPER} dark:bg-gray-900 dark:border-gray-800`}>
-            <form onSubmit={changePassword} className=" space-y-4">
-              <div className="flex items-center justify-between border-b border-sky-100 dark:border-gray-800 pb-3 mb-4">
-                <div className="flex items-center gap-2">
-                  <Shield className=" text-sky-500 w-5 h-5" />
-                  <h2 className=" text-xl font-semibold text-gray-850 dark:text-gray-250">
-                    Security
-                  </h2>
-                </div>
-                <Button type="submit" size="sm" icon={<Shield className="w-4 h-4" />}>
-                  Save
-                </Button>
-              </div>
-
-              {securityFields.map(({ name, placeholder }) => (
-                <Input
-                  key={name}
-                  type="password"
-                  placeholder={placeholder}
-                  value={password[name] || ""}
-                  onChange={(e) =>
-                    setPassword({ ...password, [name]: e.target.value })
-                  }
-                  icon={<Lock className="w-5 h-5 text-sky-500" />}
-                  required
-                />
-              ))}
-
-              <div className=" mt-8 pt-6 border-t border-sky-100 dark:border-gray-800">
-                <h3 className=" text-red-650 font-semibold mb-4 flex items-center gap-2">
-                  <LogOut className=" w-4 h-4 text-red-500" /> Danger Zone
-                </h3>
-                <Button type="button" variant="danger" className="w-full" onClick={onLogout}>
-                  Logout
-                </Button>
-              </div>
-            </form>
-          </section>
+        <div>
+          <h1 className=" text-3xl font-bold text-gray-800 dark:text-gray-200">
+            Account Settings
+          </h1>
+          <p className=" text-gray-500 dark:text-gray-400 text-sm">
+            Manage your profile and security settings
+          </p>
         </div>
       </div>
+      <div className=" grid md:grid-cols-2 gap-8">
+        <section
+          className={`${SECTION_WRAPPER} dark:bg-gray-900 dark:border-gray-800`}
+        >
+          <form onSubmit={saveProfile} className=" space-y-4">
+            <div className="flex items-center justify-between border-b border-sky-100 dark:border-gray-800 pb-3 mb-4">
+              <div className="flex items-center gap-2">
+                <UserCircle className=" text-sky-500 w-5 h-5" />
+                <h2 className=" text-xl font-semibold text-gray-850 dark:text-gray-250">
+                  Personal Information
+                </h2>
+              </div>
+              <Button
+                type="submit"
+                size="sm"
+                icon={<Save className="w-4 h-4" />}
+              >
+                Save
+              </Button>
+            </div>
+
+            {personalFields.map(({ name, type, placeholder, icon: Icon }) => (
+              <Input
+                key={name}
+                type={type}
+                placeholder={placeholder}
+                value={profile[name] || ""}
+                onChange={(e) =>
+                  setProfile({ ...profile, [name]: e.target.value })
+                }
+                icon={<Icon className="w-5 h-5 text-sky-500" />}
+                required
+                disabled={name === "email"}
+              />
+            ))}
+          </form>
+        </section>
+        <section
+          className={`${SECTION_WRAPPER} dark:bg-gray-900 dark:border-gray-800`}
+        >
+          <form onSubmit={changePassword} className=" space-y-4">
+            <div className="flex items-center justify-between border-b border-sky-100 dark:border-gray-800 pb-3 mb-4">
+              <div className="flex items-center gap-2">
+                <Shield className=" text-sky-500 w-5 h-5" />
+                <h2 className=" text-xl font-semibold text-gray-850 dark:text-gray-250">
+                  Security
+                </h2>
+              </div>
+              <Button
+                type="submit"
+                size="sm"
+                icon={<Shield className="w-4 h-4" />}
+              >
+                Save
+              </Button>
+            </div>
+
+            {securityFields.map(({ name, placeholder }) => (
+              <Input
+                key={name}
+                type="password"
+                placeholder={placeholder}
+                value={password[name] || ""}
+                onChange={(e) =>
+                  setPassword({ ...password, [name]: e.target.value })
+                }
+                icon={<Lock className="w-5 h-5 text-sky-500" />}
+                required
+              />
+            ))}
+
+            <div className=" mt-8 pt-6 border-t border-sky-100 dark:border-gray-800">
+              <Button
+                type="button"
+                variant="danger"
+                className="w-full"
+                onClick={onLogout}
+              >
+                Logout
+              </Button>
+            </div>
+          </form>
+        </section>
+      </div>
+    </div>
   );
 };
 

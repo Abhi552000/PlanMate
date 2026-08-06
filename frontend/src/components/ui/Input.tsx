@@ -21,7 +21,11 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
           </label>
         )}
         <div
-          className={`flex items-center border border-sky-100 dark:border-gray-700 rounded-lg px-3 py-2.5 focus-within:ring-2 focus-within:ring-sky-500 focus-within:border-sky-500 bg-white dark:bg-gray-800/50 transition-all duration-200 ${
+          className={`flex items-center border border-sky-100 dark:border-gray-700 rounded-lg px-3 py-2.5 bg-white dark:bg-gray-800/50 transition-all duration-200 ${
+            props.disabled
+              ? "opacity-60 bg-gray-50 dark:bg-gray-850/50 cursor-not-allowed select-none"
+              : "focus-within:ring-2 focus-within:ring-sky-500 focus-within:border-sky-500"
+          } ${
             error ? "border-red-500 focus-within:ring-red-500" : ""
           }`}
         >

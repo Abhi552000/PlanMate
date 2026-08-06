@@ -3,6 +3,7 @@ import { Building, Settings, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { orgService } from "../services/orgService";
+import { taskService } from "../services/taskService";
 import { ROUTES } from "../constants/routeConstant";
 import { Input } from "../components/ui/Input";
 import { Button } from "../components/ui/Button";
@@ -26,6 +27,9 @@ const WorkspaceSettings = () => {
   const [newStatus, setNewStatus] = useState("");
   const [addingStatus, setAddingStatus] = useState(false);
   const [deletingStatus, setDeletingStatus] = useState<string | null>(null);
+  const [statusToDelete, setStatusToDelete] = useState<string | null>(null);
+  const [tasksCountForStatus, setTasksCountForStatus] = useState<number | null>(null);
+  const [isCheckingTasks, setIsCheckingTasks] = useState(false);
 
   const [loading, setLoading] = useState(true);
   const [savingOrg, setSavingOrg] = useState(false);
@@ -65,13 +69,34 @@ const WorkspaceSettings = () => {
     }
   };
 
-  const handleDeleteStatus = async (statusToDelete: string) => {
-    setDeletingStatus(statusToDelete);
+  const handleOpenDeleteModal = async (statusName: string) => {
+    setStatusToDelete(statusName);
+    setIsCheckingTasks(true);
+    setTasksCountForStatus(null);
     try {
-      const data = await orgService.deleteCustomStatus(statusToDelete);
+      const data = await taskService.getTasks();
+      if (data?.success && data?.tasks) {
+        const count = data.tasks.filter((t: any) => t.status === statusName).length;
+        setTasksCountForStatus(count);
+      } else {
+        setTasksCountForStatus(0);
+      }
+    } catch (err) {
+      console.error("Error checking status task counts:", err);
+      setTasksCountForStatus(0);
+    } finally {
+      setIsCheckingTasks(false);
+    }
+  };
+
+  const handleDeleteStatus = async (statusToDeleteName: string) => {
+    setDeletingStatus(statusToDeleteName);
+    try {
+      const data = await orgService.deleteCustomStatus(statusToDeleteName);
       if (data?.success) {
         setStatuses(data.statuses);
         toast.success("Custom status deleted successfully!");
+        setStatusToDelete(null);
       }
     } catch (err: any) {
       console.error(err);
@@ -237,9 +262,8 @@ const WorkspaceSettings = () => {
                 <span>{status}</span>
                 <button
                   type="button"
-                  disabled={deletingStatus === status}
-                  onClick={() => handleDeleteStatus(status)}
-                  className="text-red-400 hover:text-red-650 transition-colors p-0.5 rounded cursor-pointer disabled:opacity-50"
+                  onClick={() => handleOpenDeleteModal(status)}
+                  className="text-red-400 hover:text-red-650 transition-colors p-0.5 rounded cursor-pointer"
                   title={`Delete status "${status}"`}
                 >
                   <X className="w-3.5 h-3.5" />
@@ -249,6 +273,56 @@ const WorkspaceSettings = () => {
           </div>
         </div>
       </div>
+
+      {statusToDelete && (
+        <div className="fixed inset-0 bg-black/45 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-xl border border-sky-100 dark:border-gray-800 max-w-sm w-full p-6 space-y-4 animate-scaleUp animate-duration-150">
+            <h3 className="font-bold text-gray-850 dark:text-gray-150 text-base">
+              Confirm Status Deletion
+            </h3>
+
+            {isCheckingTasks ? (
+              <div className="flex flex-col items-center justify-center py-4 space-y-2">
+                <div className="w-6 h-6 border-2 border-sky-200 border-t-sky-600 rounded-full animate-spin"></div>
+                <p className="text-xs text-gray-400 font-semibold">Checking workspace tasks...</p>
+              </div>
+            ) : tasksCountForStatus !== null && tasksCountForStatus > 0 ? (
+              <div className="space-y-3">
+                <div className="bg-red-50/50 dark:bg-red-950/15 border border-red-100 dark:border-red-900/50 p-3 rounded-xl text-xs text-red-700 dark:text-red-400 font-semibold leading-relaxed">
+                  ⚠️ Cannot delete status <strong>"{statusToDelete}"</strong> because it is currently assigned to <strong>{tasksCountForStatus} task(s)</strong> in this workspace. You must move or reassign these tasks before you can remove this status.
+                </div>
+              </div>
+            ) : (
+              <p className="text-xs text-gray-550 dark:text-gray-400 leading-normal">
+                Are you sure you want to delete the status <strong>"{statusToDelete}"</strong>? Tasks currently in this status will fall back to their default workflow. This action cannot be undone.
+              </p>
+            )}
+
+            <div className="flex justify-end gap-2 pt-2 border-t border-sky-50 dark:border-gray-800">
+              <button
+                type="button"
+                onClick={() => {
+                  setStatusToDelete(null);
+                  setTasksCountForStatus(null);
+                }}
+                className="px-4 py-2 border border-sky-200 dark:border-gray-800 text-gray-650 dark:text-gray-300 hover:bg-sky-50 dark:hover:bg-gray-800 font-bold rounded-lg text-xs transition-colors cursor-pointer bg-white dark:bg-gray-900"
+              >
+                {tasksCountForStatus !== null && tasksCountForStatus > 0 ? "Close" : "Cancel"}
+              </button>
+              {!(tasksCountForStatus !== null && tasksCountForStatus > 0) && (
+                <button
+                  type="button"
+                  disabled={deletingStatus !== null || isCheckingTasks}
+                  onClick={() => handleDeleteStatus(statusToDelete)}
+                  className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg text-xs hover:shadow-md transition-all duration-200 cursor-pointer disabled:opacity-50"
+                >
+                  {deletingStatus ? "Deleting..." : "Confirm Delete"}
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

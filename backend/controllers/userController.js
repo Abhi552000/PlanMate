@@ -181,24 +181,17 @@ export async function getCurrentUser(req, res) {
 
 // UPDATE USER PROFILE
 export async function updateProfile(req, res) {
-  const { name, email } = req.body;
-  if (!name || !email || !validator.isEmail(email)) {
+  const { name } = req.body;
+  if (!name) {
     return res
       .status(400)
-      .json({ success: false, message: "valid name and email required" });
+      .json({ success: false, message: "valid name required" });
   }
 
   try {
-    const exists = await User.findOne({ email, _id: { $ne: req.user.id } });
-    if (exists) {
-      return res.status(400).json({
-        success: false,
-        message: "Email already in use by another account.",
-      });
-    }
     const user = await User.findByIdAndUpdate(
       req.user.id,
-      { name, email },
+      { name },
       { new: true, runValidators: true, select: "name email" }
     );
     res.json({ success: true, user });

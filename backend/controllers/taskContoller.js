@@ -91,7 +91,11 @@ export const getTasks = async (req, res) => {
 
     // Apply status filter
     if (status && status !== "all") {
-      query.status = status;
+      if (status === "pending") {
+        query.status = { $ne: "Done" };
+      } else {
+        query.status = status;
+      }
     }
 
     // Apply priority filter

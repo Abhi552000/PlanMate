@@ -238,25 +238,25 @@ const Navbar: React.FC<NavbarProps> = ({ user = {}, onLogout }) => {
             </button>
 
             {menuOpen && (
-              <ul className="absolute top-14 right-0 w-56 bg-white dark:bg-gray-900 rounded-2xl shadow-xl border border-sky-100 dark:border-gray-800 z-50 overflow-hidden animate-fadeIn">
-                <li className="p-2">
+              <ul className="absolute top-14 right-0 w-48 bg-white dark:bg-gray-900 rounded-xl shadow-xl border border-sky-100 dark:border-gray-800 z-50 p-1 animate-fadeIn">
+                <li>
                   <button
                     onClick={() => {
                       setMenuOpen(false);
                       navigate(ROUTES.PROFILE);
                     }}
-                    className="w-full px-4 py-2.5 text-left hover:bg-sky-50 dark:hover:bg-gray-800 text-sm text-gray-700 dark:text-gray-300 transition-colors flex items-center gap-2 group"
+                    className="w-full px-3 py-2 text-left rounded-lg hover:bg-sky-50 dark:hover:bg-gray-800 text-xs font-bold text-gray-700 dark:text-gray-300 flex items-center gap-2 group cursor-pointer"
                   >
-                    <Settings className="w-4 h-4 text-gray-750 dark:text-gray-300" />
+                    <Settings className="w-3.5 h-3.5 text-gray-405 group-hover:text-sky-500 transition-colors" />
                     Profile Setting
                   </button>
                 </li>
-                <li className="p-2">
+                <li>
                   <button
                     onClick={handleLogout}
-                    className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm hover:bg-red-50 dark:hover:bg-red-950/35 text-red-600 dark:text-red-400"
+                    className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-xs font-bold hover:bg-red-50 dark:hover:bg-red-950/35 text-red-600 dark:text-red-400 cursor-pointer"
                   >
-                    <LogOut className="w-4 h-4" />
+                    <LogOut className="w-3.5 h-3.5" />
                     Logout
                   </button>
                 </li>

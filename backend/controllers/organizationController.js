@@ -330,15 +330,19 @@ export const getOrganizationUsers = async (req, res) => {
 
     const totalCount = await User.countDocuments({ organization: req.user.organization });
     const users = await User.find({ organization: req.user.organization })
-      .select("name email role status createdAt")
+      .select("name email role status statusRemark createdAt")
       .skip(skip)
       .limit(limit);
 
     const usersWithStats = await Promise.all(users.map(async (u) => {
       const solvedTasks = await Task.countDocuments({ assignee: u._id, status: "Done" });
+      const todoTasks = await Task.countDocuments({ assignee: u._id, status: "To Do" });
+      const pendingTasks = await Task.countDocuments({ assignee: u._id, status: { $ne: "Done" } });
       return {
         ...u.toObject(),
-        solvedTasks
+        solvedTasks,
+        todoTasks,
+        pendingTasks
       };
     }));
 
@@ -361,7 +365,7 @@ export const getOrganizationUsers = async (req, res) => {
 // Update user approval status (Org Admin only)
 export const updateUserStatus = async (req, res) => {
   const { userId } = req.params;
-  const { status } = req.body;
+  const { status, remark } = req.body;
 
   if (req.user.role !== "org_admin") {
     return res.status(403).json({ success: false, message: "Only organization admins can manage users status" });
@@ -378,6 +382,7 @@ export const updateUserStatus = async (req, res) => {
     }
 
     userToUpdate.status = status;
+    userToUpdate.statusRemark = remark || "";
     await userToUpdate.save();
 
     res.json({ success: true, message: `User status successfully updated to ${status}` });
