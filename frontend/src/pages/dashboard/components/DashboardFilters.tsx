@@ -113,6 +113,7 @@ export const DashboardFilters: React.FC<DashboardFiltersProps> = ({
           onChange={setSelectedStatus}
           options={[
             { label: "All", value: "all" },
+            { label: "Pending (Unresolved)", value: "pending" },
             ...statuses.map((status) => ({ label: status, value: status })),
           ]}
         />
