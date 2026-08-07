@@ -1,9 +1,9 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import Navbar from "./Navbar";
 import Sidebar from "./Sidebar";
 import { Outlet, useLocation } from "react-router-dom";
-import { Circle, Clock, TrendingUp, Zap } from "lucide-react";
-import axiosInstance from "../config";
+import { useAppDispatch, useAppSelector } from "../store";
+import { fetchTasks } from "../store/slices/taskSlice";
 import { IUser, ITask } from "../types";
 
 interface LayoutProps {
@@ -12,44 +12,22 @@ interface LayoutProps {
 }
 
 const Layout: React.FC<LayoutProps> = ({ user, onLogout }) => {
-  const [tasks, setTasks] = useState<ITask[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const dispatch = useAppDispatch();
+  const tasks = useAppSelector((state) => state.tasks.tasks);
+  const loading = useAppSelector((state) => state.tasks.loading);
+  const error = useAppSelector((state) => state.tasks.error);
   const [viewMode, setViewMode] = useState("kanban");
   const location = useLocation();
   const isDashboard = location.pathname === "/";
 
-  const fetchTasks = useCallback(async (silent = true) => {
-    if (user?.role === "system_admin") {
-      setTasks([]);
-      return;
-    }
-    if (!silent) setLoading(true);
-    setError(null);
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) throw new Error("No auth token found");
-      const { data } = await axiosInstance.get("/api/tasks/gp");
-      const arr = Array.isArray(data)
-        ? data
-        : Array.isArray(data?.tasks)
-        ? data.tasks
-        : Array.isArray(data?.data)
-        ? data.data
-        : [];
-      setTasks(arr);
-    } catch (err: any) {
-      console.log("err", err);
-      setError(err.message || "Could not load tasks.");
-      if (err?.response?.status === 401) onLogout();
-    } finally {
-      if (!silent) setLoading(false);
-    }
-  }, [onLogout, user?.role]);
+  const fetchTasksData = useCallback(async (silent = true) => {
+    if (user?.role === "system_admin") return;
+    dispatch(fetchTasks());
+  }, [dispatch, user?.role]);
 
   useEffect(() => {
-    fetchTasks(false);
-  }, [fetchTasks]);
+    fetchTasksData(false);
+  }, [fetchTasksData]);
 
 
 
@@ -69,7 +47,7 @@ const Layout: React.FC<LayoutProps> = ({ user, onLogout }) => {
           <p className=" font-medium mb-2">Error loading tasks</p>
           <p className=" text-sm">{error}</p>
           <button
-            onClick={() => fetchTasks(false)}
+            onClick={() => fetchTasksData(false)}
             className=" mt-4 py-2 px-4 bg-red-100 text-red-700 rounded-lg text-sm font-medium hover:bg-red-200 transition-colors"
           >
             Try Again
@@ -91,7 +69,7 @@ const Layout: React.FC<LayoutProps> = ({ user, onLogout }) => {
           <div className=" mb-4 bg-red-50 text-red-600 p-3 rounded-lg border border-red-100 flex justify-between items-center text-sm animate-fadeIn">
             <span>Failed to sync tasks: {error}</span>
             <button
-              onClick={() => fetchTasks(true)}
+              onClick={() => fetchTasksData(true)}
               className=" underline text-red-700 hover:text-red-900 font-medium"
             >
               Retry
@@ -99,7 +77,7 @@ const Layout: React.FC<LayoutProps> = ({ user, onLogout }) => {
           </div>
         )}
         <div className="w-full">
-          <Outlet context={{ tasks, refreshTasks: fetchTasks, viewMode, setViewMode }} />
+          <Outlet context={{ tasks, refreshTasks: fetchTasksData, viewMode, setViewMode }} />
         </div>
       </div>
     </div>

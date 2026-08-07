@@ -59,6 +59,8 @@ export interface ITask {
   issueType?: string;
   comments?: ITaskComment[];
   links?: ITaskLink[];
+  sprint?: any;
+  epic?: any;
 }
 
 export interface INotification {

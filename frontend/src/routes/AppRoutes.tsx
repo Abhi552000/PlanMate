@@ -8,6 +8,8 @@ import TaskDetailPage from "../pages/task-detail/TaskDetailPage";
 import OrganizationAdmin from "../pages/org-admin/OrganizationAdmin";
 import SystemAdminDashboard from "../pages/sys-admin/SystemAdminDashboard";
 import WorkspaceSettings from "../pages/WorkspaceSettings";
+import Backlog from "../pages/dashboard/Backlog";
+import ActiveSprint from "../pages/dashboard/ActiveSprint";
 
 import { PublicRoute } from "./PublicRoute";
 import { ProtectedRoute } from "./ProtectedRoute";
@@ -53,6 +55,8 @@ export const AppRoutes: React.FC = () => {
         <Route path={ROUTES.TASK_DETAIL} element={<TaskDetailPage />} />
         <Route path={ROUTES.ORGANIZATION} element={<OrganizationAdmin />} />
         <Route path={ROUTES.WORKSPACE_SETTINGS} element={<WorkspaceSettings />} />
+        <Route path={ROUTES.BACKLOG} element={<Backlog />} />
+        <Route path={ROUTES.ACTIVE_SPRINT} element={<ActiveSprint />} />
         <Route
           path={ROUTES.PROFILE}
           element={

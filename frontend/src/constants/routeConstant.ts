@@ -7,4 +7,6 @@ export const ROUTES = {
   WORKSPACE_SETTINGS: "/workspace-settings",
   PROFILE: "/profile",
   SYSTEM_ADMIN: "/system-admin",
+  BACKLOG: "/backlog",
+  ACTIVE_SPRINT: "/active-sprint",
 };

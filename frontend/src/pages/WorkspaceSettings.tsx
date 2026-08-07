@@ -113,8 +113,13 @@ const WorkspaceSettings = () => {
     }
     const load = async () => {
       setLoading(true);
-      await fetchOrgDetails();
-      setLoading(false);
+      try {
+        await fetchOrgDetails();
+      } catch (err) {
+        console.error("Error loading settings:", err);
+      } finally {
+        setLoading(false);
+      }
     };
     load();
   }, [isOrgAdmin, navigate]);

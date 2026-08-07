@@ -66,6 +66,8 @@ export const securityFields = [
 // SIDEBAR
 export const menuItems = [
   { text: "Dashboard", path: "/", icon: <Home className="w-5 h-5" /> },
+  { text: "Backlog", path: "/backlog", icon: <ListChecks className="w-5 h-5" /> },
+  { text: "Active Sprint", path: "/active-sprint", icon: <Flame className="w-5 h-5" /> },
 ];
 
 export const SIDEBAR_CLASSES = {

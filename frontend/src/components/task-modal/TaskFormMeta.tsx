@@ -1,5 +1,5 @@
 import React from "react";
-import { CheckCircle, AlignLeft, Flag, User, Calendar } from "lucide-react";
+import { CheckCircle, AlignLeft, Flag, User, Calendar, Layers } from "lucide-react";
 import { priorityStyles } from "../../assets/dummy";
 
 interface TaskFormMetaProps {
@@ -7,6 +7,8 @@ interface TaskFormMetaProps {
   setTaskData: React.Dispatch<React.SetStateAction<any>>;
   statuses: string[];
   members: any[];
+  sprints?: any[];
+  epics?: any[];
   parentTask: any;
   today: string;
   baseControlClasses: string;
@@ -18,6 +20,8 @@ export const TaskFormMeta: React.FC<TaskFormMetaProps> = ({
   setTaskData,
   statuses,
   members,
+  sprints = [],
+  epics = [],
   parentTask,
   today,
   baseControlClasses,
@@ -134,6 +138,48 @@ export const TaskFormMeta: React.FC<TaskFormMetaProps> = ({
           className={baseControlClasses}
         />
       </div>
+
+      {parentTask === null && (
+        <>
+          <div>
+            <label className="flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-gray-500 mb-1">
+              <Layers className="w-3.5 h-3.5 text-sky-500" /> Epic Link
+            </label>
+            <select
+              name="epic"
+              value={taskData.epic || ""}
+              onChange={handleChange}
+              className={`${baseControlClasses} font-semibold`}
+            >
+              <option value="">No Epic</option>
+              {epics.map((epic: any) => (
+                <option key={epic._id} value={epic._id}>
+                  {epic.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-gray-500 mb-1">
+              <Calendar className="w-3.5 h-3.5 text-sky-500" /> Sprint
+            </label>
+            <select
+              name="sprint"
+              value={taskData.sprint || ""}
+              onChange={handleChange}
+              className={`${baseControlClasses} font-semibold`}
+            >
+              <option value="">Backlog</option>
+              {sprints.map((sprint: any) => (
+                <option key={sprint._id} value={sprint._id}>
+                  {sprint.name} ({sprint.status})
+                </option>
+              ))}
+            </select>
+          </div>
+        </>
+      )}
 
       <div>
         <label className=" flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-gray-500 mb-1">

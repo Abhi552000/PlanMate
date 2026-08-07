@@ -334,17 +334,49 @@ export const getOrganizationUsers = async (req, res) => {
       .skip(skip)
       .limit(limit);
 
-    const usersWithStats = await Promise.all(users.map(async (u) => {
-      const solvedTasks = await Task.countDocuments({ assignee: u._id, status: "Done" });
-      const todoTasks = await Task.countDocuments({ assignee: u._id, status: "To Do" });
-      const pendingTasks = await Task.countDocuments({ assignee: u._id, status: { $ne: "Done" } });
+    const userIds = users.map(u => u._id);
+    const stats = await Task.aggregate([
+      {
+        $match: {
+          assignee: { $in: userIds }
+        }
+      },
+      {
+        $group: {
+          _id: { assignee: "$assignee", status: "$status" },
+          count: { $sum: 1 }
+        }
+      }
+    ]);
+
+    const statsMap = {};
+    stats.forEach(item => {
+      if (!item._id.assignee) return;
+      const assigneeId = item._id.assignee.toString();
+      const status = item._id.status;
+      if (!statsMap[assigneeId]) {
+        statsMap[assigneeId] = { solved: 0, todo: 0, pending: 0 };
+      }
+      if (status === "Done") {
+        statsMap[assigneeId].solved += item.count;
+      } else {
+        statsMap[assigneeId].pending += item.count;
+        if (status === "To Do") {
+          statsMap[assigneeId].todo += item.count;
+        }
+      }
+    });
+
+    const usersWithStats = users.map(u => {
+      const uId = u._id.toString();
+      const uStats = statsMap[uId] || { solved: 0, todo: 0, pending: 0 };
       return {
         ...u.toObject(),
-        solvedTasks,
-        todoTasks,
-        pendingTasks
+        solvedTasks: uStats.solved,
+        todoTasks: uStats.todo,
+        pendingTasks: uStats.pending
       };
-    }));
+    });
 
     res.json({
       success: true,

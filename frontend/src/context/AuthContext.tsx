@@ -1,9 +1,11 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useContext } from "react";
+import { useAppDispatch, useAppSelector } from "../store";
+import { loginSuccess, logoutSuccess } from "../store/slices/authSlice";
 import { IUser } from "../types";
 
 interface AuthContextType {
   currentUser: IUser | null;
-  setCurrentUser: React.Dispatch<React.SetStateAction<IUser | null>>;
+  setCurrentUser: (updater: any) => void;
   login: (data: any, navigate: (path: string, options?: any) => void) => void;
   logout: (navigate: (path: string, options?: any) => void) => void;
 }
@@ -11,18 +13,17 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [currentUser, setCurrentUser] = useState<IUser | null>(() => {
-    const stored = localStorage.getItem("currentUser");
-    return stored ? JSON.parse(stored) : null;
-  });
+  const dispatch = useAppDispatch();
+  const currentUser = useAppSelector((state) => state.auth.currentUser);
 
-  useEffect(() => {
-    if (currentUser) {
-      localStorage.setItem("currentUser", JSON.stringify(currentUser));
+  const setCurrentUser = (updater: any) => {
+    if (typeof updater === "function") {
+      const updatedUser = updater(currentUser);
+      dispatch(loginSuccess(updatedUser));
     } else {
-      localStorage.removeItem("currentUser");
+      dispatch(loginSuccess(updater));
     }
-  }, [currentUser]);
+  };
 
   const login = (data: any, navigate: (path: string, options?: any) => void) => {
     const user: IUser = {
@@ -36,14 +37,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         data.name || "User"
       )}&background=random`,
     };
-    setCurrentUser(user);
+    dispatch(loginSuccess(user));
     const targetPath = user.role === "system_admin" ? "/system-admin" : "/";
     navigate(targetPath, { replace: true });
   };
 
   const logout = (navigate: (path: string, options?: any) => void) => {
-    localStorage.removeItem("token");
-    setCurrentUser(null);
+    dispatch(logoutSuccess());
     navigate("/login", { replace: true });
   };
 
