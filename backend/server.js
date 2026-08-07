@@ -6,6 +6,8 @@ import userRouter from "./routes/userRoute.js";
 import taskRouter from "./routes/taskRoute.js";
 import orgRouter from "./routes/organizationRoute.js";
 import notificationRouter from "./routes/notificationRoute.js";
+import sprintRouter from "./routes/sprintRoute.js";
+import epicRouter from "./routes/epicRoute.js";
 
 const app = express();
 const port = process.env.PORT || 4000;
@@ -28,6 +30,8 @@ app.use("/api/user", userRouter);
 app.use("/api/tasks", taskRouter);
 app.use("/api/organization", orgRouter);
 app.use("/api/notifications", notificationRouter);
+app.use("/api/sprints", sprintRouter);
+app.use("/api/epics", epicRouter);
 
 app.get("/", (req, res) => {
   res.send("API WORKING");

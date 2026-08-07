@@ -93,8 +93,13 @@ const OrganizationAdmin = () => {
         return;
       }
       setLoading(true);
-      await Promise.all([fetchOrgDetails(), fetchTeamUsers()]);
-      setLoading(false);
+      try {
+        await Promise.all([fetchOrgDetails(), fetchTeamUsers()]);
+      } catch (err) {
+        console.error("Error loading roster:", err);
+      } finally {
+        setLoading(false);
+      }
     };
     loadAll();
   }, [isOrgAdmin, navigate]);

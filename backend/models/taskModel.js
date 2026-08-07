@@ -34,6 +34,16 @@ const taskSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "organization",
   },
+  sprint: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "sprint",
+    default: null,
+  },
+  epic: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "epic",
+    default: null,
+  },
   completed: {
     type: Boolean,
     default: false,
@@ -146,6 +156,10 @@ const taskSchema = new mongoose.Schema({
     default: Date.now,
   },
 });
+
+taskSchema.index({ organization: 1 });
+taskSchema.index({ assignee: 1 });
+taskSchema.index({ status: 1 });
 
 const Task = mongoose.models.Task || mongoose.model("Task", taskSchema);
 export default Task;

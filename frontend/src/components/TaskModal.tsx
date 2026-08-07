@@ -3,6 +3,7 @@ import { baseControlClasses, DEFAULT_TASK } from "../assets/dummy";
 import { PlusCircle, Save, X, BookOpen } from "lucide-react";
 import { taskService } from "../services/taskService";
 import { orgService } from "../services/orgService";
+import { backlogService } from "../services/backlogService";
 import { toast } from "react-toastify";
 import { ITask, IUser, ISubtask } from "../types";
 
@@ -31,6 +32,8 @@ const TaskModal: React.FC<TaskModalProps> = ({ isOpen, onClose, taskToEdit, onSa
     key: ""
   });
   const [members, setMembers] = useState<IUser[]>([]);
+  const [sprints, setSprints] = useState<any[]>([]);
+  const [epics, setEpics] = useState<any[]>([]);
   const [newSubtaskTitle, setNewSubtaskTitle] = useState("");
   const [editingSubtaskIdx, setEditingSubtaskIdx] = useState<number | null>(null);
   const [editingSubtaskVal, setEditingSubtaskVal] = useState("");
@@ -40,17 +43,25 @@ const TaskModal: React.FC<TaskModalProps> = ({ isOpen, onClose, taskToEdit, onSa
 
   useEffect(() => {
     if (!isOpen) return;
-    const fetchMembers = async () => {
+    const fetchMembersAndAgile = async () => {
       try {
-        const data = await orgService.getOrgMembers();
-        if (data?.success && data?.members) {
-          setMembers(data.members);
+        const memberData = await orgService.getOrgMembers();
+        if (memberData?.success && memberData?.members) {
+          setMembers(memberData.members);
+        }
+        const sprintData = await backlogService.getSprints();
+        if (sprintData?.success && sprintData?.sprints) {
+          setSprints(sprintData.sprints);
+        }
+        const epicData = await backlogService.getEpics();
+        if (epicData?.success && epicData?.epics) {
+          setEpics(epicData.epics);
         }
       } catch (err) {
-        console.error("Error fetching members inside TaskModal:", err);
+        console.error("Error fetching dependencies inside TaskModal:", err);
       }
     };
-    fetchMembers();
+    fetchMembersAndAgile();
   }, [isOpen]);
 
   useEffect(() => {
@@ -71,10 +82,12 @@ const TaskModal: React.FC<TaskModalProps> = ({ isOpen, onClose, taskToEdit, onSa
         id: taskToEdit._id,
         subtasks: taskToEdit.subtasks || [],
         status: taskToEdit.status || "To Do",
-        issueType: "Task",
+        issueType: taskToEdit.issueType || "Task",
         storyPoints: taskToEdit.storyPoints !== undefined ? taskToEdit.storyPoints : 1,
-        assignee: typeof taskToEdit.assignee === "object" && taskToEdit.assignee ? taskToEdit.assignee._id : taskToEdit.assignee || "",
-        key: taskToEdit.key || ""
+        assignee: typeof taskToEdit.assignee === "object" && taskToEdit.assignee ? (taskToEdit.assignee as any)._id : taskToEdit.assignee || "",
+        key: taskToEdit.key || "",
+        sprint: typeof taskToEdit.sprint === "object" && taskToEdit.sprint ? (taskToEdit.sprint as any)._id : taskToEdit.sprint || "",
+        epic: typeof taskToEdit.epic === "object" && taskToEdit.epic ? (taskToEdit.epic as any)._id : taskToEdit.epic || "",
       });
     } else {
       setTaskData({ 
@@ -84,7 +97,9 @@ const TaskModal: React.FC<TaskModalProps> = ({ isOpen, onClose, taskToEdit, onSa
         issueType: "Task",
         storyPoints: 1,
         assignee: "",
-        key: ""
+        key: "",
+        sprint: "",
+        epic: ""
       });
     }
     setNewSubtaskTitle("");
@@ -280,6 +295,8 @@ const TaskModal: React.FC<TaskModalProps> = ({ isOpen, onClose, taskToEdit, onSa
               setTaskData={setTaskData}
               statuses={statuses}
               members={members}
+              sprints={sprints}
+              epics={epics}
               parentTask={parentTask}
               today={today}
               baseControlClasses={baseControlClasses}
