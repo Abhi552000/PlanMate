@@ -4,7 +4,7 @@ import { getPriorityColor, MENU_OPTIONS } from "../assets/dummy";
 import { Calendar, CheckCircle2, MoreVertical, Bug, BookOpen, CheckSquare, Award } from "lucide-react";
 import { format, isToday } from "date-fns";
 import axiosInstance from "../config";
-import { ITask } from "../types";
+import { ITask, TaskItemProps } from "../types";
 
 const getPriorityStyle = (priority: string) => {
   switch (priority?.toLowerCase()) {
@@ -16,14 +16,6 @@ const getPriorityStyle = (priority: string) => {
       return "text-green-600 bg-green-50 border-green-100";
   }
 };
-
-interface TaskItemProps {
-  task: ITask;
-  onRefresh?: () => void;
-  onLogout?: () => void;
-  showCompleteCheckbox?: boolean;
-  statuses?: string[];
-}
 
 const TaskItem: React.FC<TaskItemProps> = ({
   task,

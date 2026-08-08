@@ -1,39 +1,41 @@
 import axiosInstance from "../config";
+import { API_ROUTES } from "../constants/routes";
+import { ISprint, IEpic } from "../types";
 
 export const backlogService = {
   // SPRINTS
-  getSprints: async () => {
-    const { data } = await axiosInstance.get("/api/sprints");
+  getSprints: async (): Promise<{ success: boolean; sprints: ISprint[]; backlogTasks: any[] }> => {
+    const { data } = await axiosInstance.get(API_ROUTES.SPRINTS.BASE);
     return data;
   },
-  createSprint: async (sprintData: { name: string; startDate?: string; endDate?: string; goal?: string }) => {
-    const { data } = await axiosInstance.post("/api/sprints", sprintData);
-    return data;
+  createSprint: async (sprintData: { name: string; startDate?: string; endDate?: string; goal?: string }): Promise<ISprint> => {
+    const { data } = await axiosInstance.post(API_ROUTES.SPRINTS.BASE, sprintData);
+    return data.sprint;
   },
-  updateSprint: async (id: string, sprintData: { name?: string; startDate?: string; endDate?: string; goal?: string; status?: "planned" | "active" | "completed" }) => {
-    const { data } = await axiosInstance.put(`/api/sprints/${id}`, sprintData);
-    return data;
+  updateSprint: async (id: string, sprintData: { name?: string; startDate?: string; endDate?: string; goal?: string; status?: "planned" | "active" | "completed" | "closed" }): Promise<ISprint> => {
+    const { data } = await axiosInstance.put(API_ROUTES.SPRINTS.BY_ID(id), sprintData);
+    return data.sprint;
   },
-  deleteSprint: async (id: string) => {
-    const { data } = await axiosInstance.delete(`/api/sprints/${id}`);
-    return data;
+  deleteSprint: async (id: string): Promise<string> => {
+    await axiosInstance.delete(API_ROUTES.SPRINTS.BY_ID(id));
+    return id;
   },
 
   // EPICS
-  getEpics: async () => {
-    const { data } = await axiosInstance.get("/api/epics");
+  getEpics: async (): Promise<{ success: boolean; epics: IEpic[] }> => {
+    const { data } = await axiosInstance.get(API_ROUTES.EPICS.BASE);
     return data;
   },
-  createEpic: async (epicData: { name: string; color?: string; description?: string }) => {
-    const { data } = await axiosInstance.post("/api/epics", epicData);
-    return data;
+  createEpic: async (epicData: { name: string; color?: string; description?: string }): Promise<IEpic> => {
+    const { data } = await axiosInstance.post(API_ROUTES.EPICS.BASE, epicData);
+    return data.epic;
   },
-  updateEpic: async (id: string, epicData: { name?: string; color?: string; description?: string }) => {
-    const { data } = await axiosInstance.put(`/api/epics/${id}`, epicData);
-    return data;
+  updateEpic: async (id: string, epicData: { name?: string; color?: string; description?: string }): Promise<IEpic> => {
+    const { data } = await axiosInstance.put(API_ROUTES.EPICS.BY_ID(id), epicData);
+    return data.epic;
   },
-  deleteEpic: async (id: string) => {
-    const { data } = await axiosInstance.delete(`/api/epics/${id}`);
-    return data;
+  deleteEpic: async (id: string): Promise<string> => {
+    await axiosInstance.delete(API_ROUTES.EPICS.BY_ID(id));
+    return id;
   },
 };

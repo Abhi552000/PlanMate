@@ -1,11 +1,6 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
-import axiosInstance from "../../config";
-
-interface EpicState {
-  epics: any[];
-  loading: boolean;
-  error: string | null;
-}
+import { backlogService } from "../../services/backlogService";
+import { EpicState } from "../../types";
 
 const initialState: EpicState = {
   epics: [],
@@ -16,10 +11,10 @@ const initialState: EpicState = {
 // Async Thunks
 export const fetchEpics = createAsyncThunk("epics/fetchEpics", async (_, { rejectWithValue }) => {
   try {
-    const { data } = await axiosInstance.get("/api/epics");
+    const data = await backlogService.getEpics();
     return data.epics || [];
   } catch (err: any) {
-    return rejectWithValue(err.response?.data?.message || "Failed to fetch epics.");
+    return rejectWithValue(err.response?.data?.message || err.message || "Failed to fetch epics.");
   }
 });
 
@@ -27,20 +22,20 @@ export const createEpic = createAsyncThunk(
   "epics/createEpic",
   async (epicData: { name: string; color?: string; description?: string }, { rejectWithValue }) => {
     try {
-      const { data } = await axiosInstance.post("/api/epics", epicData);
-      return data.epic;
+      const epic = await backlogService.createEpic(epicData);
+      return epic;
     } catch (err: any) {
-      return rejectWithValue(err.response?.data?.message || "Failed to create epic.");
+      return rejectWithValue(err.response?.data?.message || err.message || "Failed to create epic.");
     }
   }
 );
 
 export const deleteEpic = createAsyncThunk("epics/deleteEpic", async (id: string, { rejectWithValue }) => {
   try {
-    await axiosInstance.delete(`/api/epics/${id}`);
-    return id;
+    const deletedId = await backlogService.deleteEpic(id);
+    return deletedId;
   } catch (err: any) {
-    return rejectWithValue(err.response?.data?.message || "Failed to delete epic.");
+    return rejectWithValue(err.response?.data?.message || err.message || "Failed to delete epic.");
   }
 });
 

@@ -13,7 +13,7 @@ const sprintSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ["planned", "active", "completed"],
+    enum: ["planned", "active", "completed", "closed"],
     default: "planned",
   },
   goal: {

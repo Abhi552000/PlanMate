@@ -1,14 +1,6 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
-import axiosInstance from "../../config";
-import { ITask } from "../../types";
-
-interface SprintState {
-  sprints: any[];
-  backlogTasks: ITask[];
-  activeSprint: any | null;
-  loading: boolean;
-  error: string | null;
-}
+import { ITask, SprintState } from "../../types";
+import { backlogService } from "../../services/backlogService";
 
 const initialState: SprintState = {
   sprints: [],
@@ -21,10 +13,10 @@ const initialState: SprintState = {
 // Async Thunks
 export const fetchSprints = createAsyncThunk("sprints/fetchSprints", async (_, { rejectWithValue }) => {
   try {
-    const { data } = await axiosInstance.get("/api/sprints");
+    const data = await backlogService.getSprints();
     return data;
   } catch (err: any) {
-    return rejectWithValue(err.response?.data?.message || "Failed to fetch sprints.");
+    return rejectWithValue(err.response?.data?.message || err.message || "Failed to fetch sprints.");
   }
 });
 
@@ -32,10 +24,10 @@ export const createSprint = createAsyncThunk(
   "sprints/createSprint",
   async (sprintData: { name: string; startDate?: string; endDate?: string; goal?: string }, { rejectWithValue }) => {
     try {
-      const { data } = await axiosInstance.post("/api/sprints", sprintData);
-      return data.sprint;
+      const sprint = await backlogService.createSprint(sprintData);
+      return sprint;
     } catch (err: any) {
-      return rejectWithValue(err.response?.data?.message || "Failed to create sprint.");
+      return rejectWithValue(err.response?.data?.message || err.message || "Failed to create sprint.");
     }
   }
 );
@@ -43,24 +35,24 @@ export const createSprint = createAsyncThunk(
 export const updateSprint = createAsyncThunk(
   "sprints/updateSprint",
   async (
-    { id, sprintData }: { id: string; sprintData: { name?: string; startDate?: string; endDate?: string; goal?: string; status?: "planned" | "active" | "completed" } },
+    { id, sprintData }: { id: string; sprintData: { name?: string; startDate?: string; endDate?: string; goal?: string; status?: "planned" | "active" | "completed" | "closed" } },
     { rejectWithValue }
   ) => {
     try {
-      const { data } = await axiosInstance.put(`/api/sprints/${id}`, sprintData);
-      return data.sprint;
+      const sprint = await backlogService.updateSprint(id, sprintData);
+      return sprint;
     } catch (err: any) {
-      return rejectWithValue(err.response?.data?.message || "Failed to update sprint.");
+      return rejectWithValue(err.response?.data?.message || err.message || "Failed to update sprint.");
     }
   }
 );
 
 export const deleteSprint = createAsyncThunk("sprints/deleteSprint", async (id: string, { rejectWithValue }) => {
   try {
-    await axiosInstance.delete(`/api/sprints/${id}`);
-    return id;
+    const deletedId = await backlogService.deleteSprint(id);
+    return deletedId;
   } catch (err: any) {
-    return rejectWithValue(err.response?.data?.message || "Failed to delete sprint.");
+    return rejectWithValue(err.response?.data?.message || err.message || "Failed to delete sprint.");
   }
 });
 
@@ -98,7 +90,7 @@ const sprintSlice = createSlice({
         }
         if (updated.status === "active") {
           state.activeSprint = state.sprints.find((s) => s._id === updated._id) || null;
-        } else if (updated.status === "completed") {
+        } else if (updated.status === "completed" || updated.status === "closed") {
           if (state.activeSprint?._id === updated._id) {
             state.activeSprint = null;
           }

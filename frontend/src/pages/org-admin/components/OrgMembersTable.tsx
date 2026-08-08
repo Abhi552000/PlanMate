@@ -1,17 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Users, Eye, Power, RotateCcw, MoreVertical, ShieldAlert } from "lucide-react";
-
-interface OrgMembersTableProps {
-  teamUsers: any[];
-  currentUser: any;
-  currentPage: number;
-  totalPages: number;
-  totalCount: number;
-  togglingStatus: boolean;
-  onPageChange: (page: number) => void;
-  onInspectUser: (user: any) => void;
-  onUpdateUserStatusClick: (user: any, actionType: "activate" | "deactivate") => void;
-}
+import { OrgMembersTableProps } from "../../../types";
 
 const ITEMS_PER_PAGE = 5;
 

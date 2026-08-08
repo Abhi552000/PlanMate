@@ -1,16 +1,7 @@
 import React from "react";
 import { ArrowLeft, Save } from "lucide-react";
 import { Button } from "../../../components/ui/Button";
-
-interface TaskDetailsHeaderProps {
-  isEditingSubtask: boolean;
-  projectKey: string;
-  subtaskIndex: number | null;
-  onBackToParent: () => void;
-  onBackToBoard: () => void;
-  onSave: () => void;
-  saving: boolean;
-}
+import { TaskDetailsHeaderProps } from "../../../types";
 
 export const TaskDetailsHeader: React.FC<TaskDetailsHeaderProps> = ({
   isEditingSubtask,

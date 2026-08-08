@@ -1,17 +1,5 @@
 import React from "react";
-
-interface SelectOption {
-  label: string;
-  value: string | number;
-}
-
-interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
-  label?: string;
-  error?: string;
-  options: SelectOption[];
-  icon?: React.ReactNode;
-  wrapperClassName?: string;
-}
+import { SelectOption, SelectProps } from "../../types";
 
 export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
   ({ label, error, options, icon, wrapperClassName = "", className = "", id, ...props }, ref) => {

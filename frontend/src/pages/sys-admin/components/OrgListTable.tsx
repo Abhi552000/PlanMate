@@ -1,15 +1,6 @@
 import React from "react";
 import { Building, Search, Power, Edit, Trash2 } from "lucide-react";
-
-interface OrgListTableProps {
-  organizations: any[];
-  searchQuery: string;
-  setSearchQuery: (val: string) => void;
-  togglingStatus: boolean;
-  onToggleActive: (org: any) => void;
-  onEditClick: (org: any) => void;
-  onDeleteClick: (org: any) => void;
-}
+import { OrgListTableProps } from "../../../types";
 
 export const OrgListTable: React.FC<OrgListTableProps> = ({
   organizations,

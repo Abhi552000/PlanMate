@@ -8,10 +8,7 @@ import { Button } from "./ui/Button";
 
 const INITIAL_FORM = { email: "", password: "" };
 
-interface LoginProps {
-  onSubmit: (user: any) => void;
-  onSwitchMode: () => void;
-}
+import { LoginProps } from "../types";
 
 export const Login: React.FC<LoginProps> = ({ onSubmit, onSwitchMode }) => {
   const navigate = useNavigate();

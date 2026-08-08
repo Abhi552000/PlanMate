@@ -1,14 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ChevronDown, LogOut, Settings, Zap, Bell, CheckCheck } from "lucide-react";
-import axiosInstance from "../config";
 import { ROUTES } from "../constants/routeConstant";
-import { IUser, INotification } from "../types";
-
-interface NavbarProps {
-  user?: Partial<IUser> | null;
-  onLogout: () => void;
-}
+import { IUser, INotification, NavbarProps } from "../types";
+import { notificationService } from "../services/notificationService";
 
 const Navbar: React.FC<NavbarProps> = ({ user = {}, onLogout }) => {
   const menuref = useRef<HTMLDivElement>(null);
@@ -41,7 +36,7 @@ const Navbar: React.FC<NavbarProps> = ({ user = {}, onLogout }) => {
 
   const fetchNotifications = async () => {
     try {
-      const { data } = await axiosInstance.get("/api/notifications");
+      const data = await notificationService.getNotifications();
       if (data?.success && data?.notifications) {
         setNotifications(data.notifications);
       }
@@ -58,7 +53,7 @@ const Navbar: React.FC<NavbarProps> = ({ user = {}, onLogout }) => {
 
   const handleMarkAllRead = async () => {
     try {
-      await axiosInstance.put("/api/notifications/read-all");
+      await notificationService.markAllAsRead();
       setNotifications(prev => prev.map(n => ({ ...n, read: true })));
     } catch (err) {
       console.error("Error marking all read:", err);
@@ -69,7 +64,7 @@ const Navbar: React.FC<NavbarProps> = ({ user = {}, onLogout }) => {
     setNotiOpen(false);
     if (!noti.read) {
       try {
-        await axiosInstance.put(`/api/notifications/${noti._id}/read`);
+        await notificationService.markAsRead(noti._id);
         setNotifications(prev => prev.map(n => n._id === noti._id ? { ...n, read: true } : n));
       } catch (err) {
         console.error("Error marking read:", err);

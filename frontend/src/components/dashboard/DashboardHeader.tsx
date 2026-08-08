@@ -1,14 +1,7 @@
 import React from "react";
 import { Plus, HomeIcon, Inbox, Flame } from "lucide-react";
 import { ADD_BUTTON, HEADER, ICON_WRAPPER, LABEL_CLASS, STAT_CARD, STATS_GRID, VALUE_CLASS } from "../../assets/dummy";
-
-interface DashboardHeaderProps {
-  totalTasks: number;
-  lowPriority: number;
-  mediumPriority: number;
-  highPriority: number;
-  onAddTask: () => void;
-}
+import { DashboardHeaderProps } from "../../types";
 
 const STATS_CONFIG = [
   {

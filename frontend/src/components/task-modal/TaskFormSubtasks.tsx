@@ -1,19 +1,6 @@
 import React from "react";
 import { CheckCircle, X } from "lucide-react";
-
-interface TaskFormSubtasksProps {
-  subtasks: any[];
-  setTaskData: React.Dispatch<React.SetStateAction<any>>;
-  newSubtaskTitle: string;
-  setNewSubtaskTitle: (val: string) => void;
-  editingSubtaskIdx: number | null;
-  setEditingSubtaskIdx: (val: number | null) => void;
-  editingSubtaskVal: string;
-  setEditingSubtaskVal: (val: string) => void;
-  statuses: string[];
-  onOpenSubtaskDetail: (subtask: any, index: number) => void;
-  onAddSubtask: () => void;
-}
+import { TaskFormSubtasksProps } from "../../types";
 
 export const TaskFormSubtasks: React.FC<TaskFormSubtasksProps> = ({
   subtasks,

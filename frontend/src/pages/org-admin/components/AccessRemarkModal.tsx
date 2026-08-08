@@ -1,14 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { X, MessageSquare } from "lucide-react";
-
-interface AccessRemarkModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onConfirm: (remark: string) => void;
-  title: string;
-  description: string;
-  loading?: boolean;
-}
+import { AccessRemarkModalProps } from "../../../types";
 
 export const AccessRemarkModal: React.FC<AccessRemarkModalProps> = ({
   isOpen,

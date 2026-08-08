@@ -1,17 +1,6 @@
 import React from "react";
 import { Building, X, Check, Copy, User, Mail, Lock } from "lucide-react";
-
-interface OnboardOrgModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  newOrg: any;
-  setNewOrg: React.Dispatch<React.SetStateAction<any>>;
-  onboardedResult: any;
-  onboardSubmit: (e: React.FormEvent) => void;
-  onboarding: boolean;
-  copied: boolean;
-  onCopyPassword: () => void;
-}
+import { OnboardOrgModalProps } from "../../../types";
 
 export const OnboardOrgModal: React.FC<OnboardOrgModalProps> = ({
   isOpen,

@@ -1,17 +1,7 @@
 import React from "react";
 import { MessageSquare, Trash } from "lucide-react";
 import { Button } from "../../../components/ui/Button";
-
-interface CommentsSectionProps {
-  comments: any[];
-  commentText: string;
-  setCommentText: (val: string) => void;
-  addingComment: boolean;
-  deletingCommentId: string | null;
-  currentUser: any;
-  onAddComment: (e: React.FormEvent) => void;
-  onDeleteComment: (commentId: string) => void;
-}
+import { CommentsSectionProps } from "../../../types";
 
 export const CommentsSection: React.FC<CommentsSectionProps> = ({
   comments,

@@ -1,12 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { ChevronDown, Check } from "lucide-react";
-
-interface FilterSelectProps {
-  label: string;
-  value: string;
-  options: { label: string; value: string }[];
-  onChange: (val: string) => void;
-}
+import { FilterSelectProps } from "../../../types";
 
 export const FilterSelect: React.FC<FilterSelectProps> = ({ label, value, options, onChange }) => {
   const [isOpen, setIsOpen] = useState(false);

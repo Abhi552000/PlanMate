@@ -1,14 +1,6 @@
 import React from "react";
 import { Power, X } from "lucide-react";
-
-interface DeactivateOrgModalProps {
-  deactivatingOrg: any;
-  onClose: () => void;
-  deactivateRemark: string;
-  setDeactivateRemark: (val: string) => void;
-  togglingStatus: boolean;
-  onSubmit: (e: React.FormEvent) => void;
-}
+import { DeactivateOrgModalProps } from "../../../types";
 
 export const DeactivateOrgModal: React.FC<DeactivateOrgModalProps> = ({
   deactivatingOrg,

@@ -36,11 +36,11 @@ export const orgService = {
     return data;
   },
   getSystemAdminOrgs: async () => {
-    const { data } = await axiosInstance.get("/api/organization/all");
+    const { data } = await axiosInstance.get(API_ROUTES.ORGANIZATION.ALL);
     return data;
   },
   onboardOrg: async (orgData: any) => {
-    const { data } = await axiosInstance.post("/api/organization/onboard", orgData);
+    const { data } = await axiosInstance.post(API_ROUTES.ORGANIZATION.ONBOARD, orgData);
     return data;
   },
   updateOrgAdmin: async (orgId: string, adminData: any) => {

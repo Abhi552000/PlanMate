@@ -1,11 +1,7 @@
 import React from "react";
 import { User, X, Calendar, ClipboardList, CheckCircle2, AlertCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-
-interface InspectingUserModalProps {
-  inspectingUser: any;
-  onClose: () => void;
-}
+import { InspectingUserModalProps } from "../../../types";
 
 export const InspectingUserModal: React.FC<InspectingUserModalProps> = ({
   inspectingUser,

@@ -4,12 +4,7 @@ import Sidebar from "./Sidebar";
 import { Outlet, useLocation } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../store";
 import { fetchTasks } from "../store/slices/taskSlice";
-import { IUser, ITask } from "../types";
-
-interface LayoutProps {
-  user: IUser | null;
-  onLogout: () => void;
-}
+import { IUser, ITask, LayoutProps } from "../types";
 
 const Layout: React.FC<LayoutProps> = ({ user, onLogout }) => {
   const dispatch = useAppDispatch();
@@ -56,14 +51,14 @@ const Layout: React.FC<LayoutProps> = ({ user, onLogout }) => {
       </div>
     );
 
-  const hasSidebar = user?.role === "org_admin";
+  const hasSidebar = user?.role === "org_admin" || user?.role === "member";
 
   return (
     <div className=" min-h-screen bg-gray-50 dark:bg-gray-950 transition-colors duration-300">
       <Navbar user={user || undefined} onLogout={onLogout} />
       {hasSidebar && <Sidebar user={user} tasks={tasks} />}
 
-      <div className={`${hasSidebar ? "ml-0 md:ml-20 lg:ml-56" : "ml-0"} transition-all duration-300 min-h-screen`}>
+      <div className={`${hasSidebar ? "pl-0 md:pl-20 lg:pl-56" : "pl-0"} transition-all duration-300 min-h-screen w-full overflow-x-hidden`}>
         <div className="px-4 sm:px-6 md:px-8 pt-8 pb-6 w-full transition-all duration-300 text-gray-900 dark:text-gray-100">
         {error && (
           <div className=" mb-4 bg-red-50 text-red-600 p-3 rounded-lg border border-red-100 flex justify-between items-center text-sm animate-fadeIn">

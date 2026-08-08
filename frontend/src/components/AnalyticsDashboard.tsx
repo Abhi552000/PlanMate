@@ -14,12 +14,8 @@ import {
   Pie,
   Cell,
 } from "recharts";
-import { ITask } from "../types";
+import { ITask, AnalyticsDashboardProps } from "../types";
 import { CheckCircle2, Award, Calendar, HelpCircle, BarChart3, PieChartIcon, TrendingUp, Sparkles } from "lucide-react";
-
-interface AnalyticsDashboardProps {
-  tasks: ITask[];
-}
 
 export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({ tasks }) => {
   const [activeTooltip, setActiveTooltip] = useState<string | null>(null);

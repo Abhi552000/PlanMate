@@ -1,26 +1,7 @@
 import React from "react";
 import { Search, X, List, LayoutGrid, BarChart2 } from "lucide-react";
 import { FilterSelect } from "./FilterSelect";
-import { IUser } from "../../types";
-
-interface DashboardFiltersProps {
-  searchQuery: string;
-  setSearchQuery: (val: string) => void;
-  selectedAssignee: string;
-  setSelectedAssignee: (val: string) => void;
-  selectedPriority: string;
-  setSelectedPriority: (val: string) => void;
-  selectedStatus: string;
-  setSelectedStatus: (val: string) => void;
-  selectedTimeframe: string;
-  setSelectedTimeframe: (val: string) => void;
-  members: IUser[];
-  statuses: string[];
-  filterTasksCount: number;
-  totalTasksCount: number;
-  viewMode: string;
-  setViewMode: (val: string) => void;
-}
+import { IUser, DashboardFiltersProps } from "../../types";
 
 export const DashboardFilters: React.FC<DashboardFiltersProps> = ({
   searchQuery,

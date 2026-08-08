@@ -2,15 +2,7 @@ import React from "react";
 import { UserPlus, X, User, Mail, Lock, Plus } from "lucide-react";
 import { Input } from "../../../components/ui/Input";
 import { Button } from "../../../components/ui/Button";
-
-interface OnboardMemberModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  newMember: any;
-  setNewMember: React.Dispatch<React.SetStateAction<any>>;
-  addingMember: boolean;
-  onAddMember: (e: React.FormEvent) => void;
-}
+import { OnboardMemberModalProps } from "../../../types";
 
 export const OnboardMemberModal: React.FC<OnboardMemberModalProps> = ({
   isOpen,
