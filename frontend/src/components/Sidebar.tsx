@@ -6,12 +6,7 @@ import {
 } from "../assets/dummy";
 import { Menu, Sparkles, X, Users, Building, Zap } from "lucide-react";
 import { NavLink } from "react-router-dom";
-import { IUser, ITask } from "../types";
-
-interface SidebarProps {
-  user: IUser | null;
-  tasks?: ITask[];
-}
+import { IUser, ITask, SidebarProps } from "../types";
 
 const Sidebar: React.FC<SidebarProps> = ({ user, tasks }) => {
   const [mobileOpen, setMobileOpen] = useState(false);

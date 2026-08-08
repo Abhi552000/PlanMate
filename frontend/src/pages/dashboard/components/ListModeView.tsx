@@ -2,20 +2,7 @@ import React from "react";
 import { CalendarIcon } from "lucide-react";
 import { EMPTY_STATE } from "../../../assets/dummy";
 import TaskItem from "../../../components/TaskItem";
-import { ITask } from "../../../types";
-
-interface ListModeViewProps {
-  paginatedTasks: ITask[];
-  currentPage: number;
-  totalPages: number;
-  totalTasksCount: number;
-  loadingList: boolean;
-  selectedStatus: string;
-  statuses: string[];
-  onAddTask: () => void;
-  onRefresh: () => void;
-  onLoadMore: (page: number) => void;
-}
+import { ITask, ListModeViewProps } from "../../../types";
 
 export const ListModeView: React.FC<ListModeViewProps> = ({
   paginatedTasks,

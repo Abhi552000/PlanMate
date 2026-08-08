@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { ShieldAlert, Plus } from "lucide-react";
 import { orgService } from "../../services/orgService";
-import { IUser } from "../../types";
+import { IUser, SystemAdminDashboardProps } from "../../types";
 
 // Sub-components
 import { SysAdminHeader } from "./components/SysAdminHeader";
@@ -9,11 +9,6 @@ import { OrgListTable } from "./components/OrgListTable";
 import { OnboardOrgModal } from "./components/OnboardOrgModal";
 import { EditOrgModal } from "./components/EditOrgModal";
 import { DeactivateOrgModal } from "./components/DeactivateOrgModal";
-
-interface SystemAdminDashboardProps {
-  onLogout: () => void;
-  user: IUser | null;
-}
 
 const SystemAdminDashboard: React.FC<SystemAdminDashboardProps> = ({ onLogout, user }) => {
   const [organizations, setOrganizations] = useState<any[]>([]);

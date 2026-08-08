@@ -1,10 +1,6 @@
 import React from "react";
 import { Building, UserPlus } from "lucide-react";
-
-interface OrgAdminHeaderProps {
-  orgName: string;
-  onOnboardClick: () => void;
-}
+import { OrgAdminHeaderProps } from "../../../types";
 
 export const OrgAdminHeader: React.FC<OrgAdminHeaderProps> = ({ orgName, onOnboardClick }) => {
   return (

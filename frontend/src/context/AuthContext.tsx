@@ -1,14 +1,7 @@
 import React, { createContext, useContext } from "react";
 import { useAppDispatch, useAppSelector } from "../store";
 import { loginSuccess, logoutSuccess } from "../store/slices/authSlice";
-import { IUser } from "../types";
-
-interface AuthContextType {
-  currentUser: IUser | null;
-  setCurrentUser: (updater: any) => void;
-  login: (data: any, navigate: (path: string, options?: any) => void) => void;
-  logout: (navigate: (path: string, options?: any) => void) => void;
-}
+import { IUser, AuthContextType } from "../types";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 

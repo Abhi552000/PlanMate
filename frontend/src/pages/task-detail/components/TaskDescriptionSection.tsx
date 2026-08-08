@@ -1,12 +1,6 @@
 import React from "react";
 import { AlignLeft } from "lucide-react";
-
-interface TaskDescriptionSectionProps {
-  title: string;
-  description: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
-  baseControlClasses: string;
-}
+import { TaskDescriptionSectionProps } from "../../../types";
 
 export const TaskDescriptionSection: React.FC<TaskDescriptionSectionProps> = ({
   title,

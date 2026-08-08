@@ -11,7 +11,7 @@ import {
 import { taskService } from "../services/taskService";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { ITask } from "../types";
+import { ITask, KanbanBoardProps } from "../types";
 
 const getIssueTypeIcon = (type: string) => {
   switch (type?.toLowerCase()) {
@@ -50,13 +50,7 @@ const getPriorityStyle = (priority: string) => {
   }
 };
 
-interface KanbanBoardProps {
-  tasks: ITask[];
-  onRefresh?: () => void;
-  onEdit?: (task: ITask) => void;
-  onLogout?: () => void;
-  columns?: string[];
-}
+
 
 const KanbanBoard: React.FC<KanbanBoardProps> = ({ tasks, onRefresh, onEdit, onLogout, columns = ["To Do", "In Progress", "Done"] }) => {
   const navigate = useNavigate();

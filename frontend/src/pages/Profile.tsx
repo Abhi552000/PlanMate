@@ -18,13 +18,7 @@ import { useNavigate } from "react-router-dom";
 import { authService } from "../services/authService";
 import { Input } from "../components/ui/Input";
 import { Button } from "../components/ui/Button";
-import { IUser } from "../types";
-
-interface ProfileProps {
-  user: IUser | null;
-  setCurrentUser: React.Dispatch<React.SetStateAction<IUser | null>>;
-  onLogout: () => void;
-}
+import { IUser, ProfileProps } from "../types";
 
 const Profile: React.FC<ProfileProps> = ({ setCurrentUser, onLogout }) => {
   const navigate = useNavigate();

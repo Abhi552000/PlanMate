@@ -1,9 +1,6 @@
 import React from "react";
 import { Activity } from "lucide-react";
-
-interface ActivityTimelineSectionProps {
-  history: any[];
-}
+import { ActivityTimelineSectionProps } from "../../../types";
 
 export const ActivityTimelineSection: React.FC<ActivityTimelineSectionProps> = ({ history }) => {
   if (!history || history.length === 0) return null;

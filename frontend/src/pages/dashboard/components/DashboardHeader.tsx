@@ -1,14 +1,7 @@
 import React from "react";
 import { Plus, HomeIcon, Inbox, Flame } from "lucide-react";
 import { ADD_BUTTON, HEADER, ICON_WRAPPER, LABEL_CLASS, STAT_CARD, STATS_GRID, VALUE_CLASS } from "../../../assets/dummy";
-
-interface DashboardHeaderProps {
-  totalTasks: number;
-  lowPriority: number;
-  mediumPriority: number;
-  highPriority: number;
-  onAddTask: () => void;
-}
+import { DashboardHeaderProps } from "../../../types";
 
 const STATS_CONFIG = [
   {
@@ -64,7 +57,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
       {/* HEADER */}
       <div className={HEADER}>
         <div className=" min-w-0">
-          <h1 className=" text-xl md:text-3xl font-bold text-gray-800 dark:text-gray-200 flex items-center gap-2">
+          <h1 className="text-lg md:text-2xl font-black text-gray-900 dark:text-white tracking-tight flex items-center gap-2">
             <HomeIcon className=" text-sky-500 w-5 h-5 md:w-6 md:h-6 shrink-0" />
             <span className=" truncate">Task Overview</span>
           </h1>

@@ -1,12 +1,6 @@
 import React from "react";
 import { AlignLeft } from "lucide-react";
-
-interface TaskFormGeneralProps {
-  title: string;
-  description: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
-  baseControlClasses: string;
-}
+import { TaskFormGeneralProps } from "../../types";
 
 export const TaskFormGeneral: React.FC<TaskFormGeneralProps> = ({
   title,

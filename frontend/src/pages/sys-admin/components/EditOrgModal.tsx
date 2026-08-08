@@ -1,14 +1,6 @@
 import React from "react";
 import { Building, X, User, Mail, Lock, Save } from "lucide-react";
-
-interface EditOrgModalProps {
-  editingOrg: any;
-  onClose: () => void;
-  editForm: any;
-  setEditForm: React.Dispatch<React.SetStateAction<any>>;
-  updating: boolean;
-  onUpdateSubmit: (e: React.FormEvent) => void;
-}
+import { EditOrgModalProps } from "../../../types";
 
 export const EditOrgModal: React.FC<EditOrgModalProps> = ({
   editingOrg,

@@ -5,23 +5,14 @@ import { taskService } from "../services/taskService";
 import { orgService } from "../services/orgService";
 import { backlogService } from "../services/backlogService";
 import { toast } from "react-toastify";
-import { ITask, IUser, ISubtask } from "../types";
+import { ITask, IUser, ISubtask, TaskModalProps } from "../types";
 
 // Sub-components
 import { TaskFormGeneral } from "./task-modal/TaskFormGeneral";
 import { TaskFormMeta } from "./task-modal/TaskFormMeta";
 import { TaskFormSubtasks } from "./task-modal/TaskFormSubtasks";
 
-interface TaskModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  taskToEdit?: ITask | null;
-  onSave?: (savedTask: ITask) => void;
-  onLogout?: () => void;
-  statuses?: string[];
-}
-
-const TaskModal: React.FC<TaskModalProps> = ({ isOpen, onClose, taskToEdit, onSave, onLogout, statuses = ["To Do", "In Progress", "Done"] }) => {
+const TaskModal: React.FC<TaskModalProps> = ({ isOpen, onClose, taskToEdit, onSave, onLogout, statuses = ["To Do", "In Progress", "Done", "Closed"] }) => {
   const [taskData, setTaskData] = useState<any>({ 
     ...DEFAULT_TASK, 
     subtasks: [] as ISubtask[],

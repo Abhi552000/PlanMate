@@ -1,27 +1,7 @@
 import React from "react";
 import { CheckCircle, AlignLeft, Flag, User, Calendar, Clock, Link as LinkIcon, X } from "lucide-react";
 import { Button } from "../../../components/ui/Button";
-
-interface TaskMetaSidebarProps {
-  taskData: any;
-  setTaskData: React.Dispatch<React.SetStateAction<any>>;
-  statuses: string[];
-  members: any[];
-  isEditingSubtask: boolean;
-  today: string;
-  baseControlClasses: string;
-  handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => void;
-  linkType: "blocks" | "blocked by" | "relates to";
-  setLinkType: (val: "blocks" | "blocked by" | "relates to") => void;
-  targetTaskId: string;
-  setTargetTaskId: (val: string) => void;
-  workspaceTasks: any[];
-  linking: boolean;
-  links: any[];
-  onAddLink: (e: React.FormEvent) => void;
-  onRemoveLink: (linkId: string) => void;
-  createdAt?: string | Date;
-}
+import { TaskMetaSidebarProps } from "../../../types";
 
 const getPriorityStyle = (priority: string) => {
   switch (priority?.toLowerCase()) {

@@ -1,13 +1,6 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
-import axiosInstance from "../../config";
-import { ITask } from "../../types";
-
-interface TaskState {
-  tasks: ITask[];
-  statuses: string[];
-  loading: boolean;
-  error: string | null;
-}
+import { ITask, TaskState } from "../../types";
+import { taskService } from "../../services/taskService";
 
 const initialState: TaskState = {
   tasks: [],
@@ -19,7 +12,7 @@ const initialState: TaskState = {
 // Async Thunks
 export const fetchTasks = createAsyncThunk("tasks/fetchTasks", async (_, { rejectWithValue }) => {
   try {
-    const { data } = await axiosInstance.get("/api/tasks/gp");
+    const data = await taskService.getTasks();
     return Array.isArray(data)
       ? data
       : Array.isArray(data?.tasks)
@@ -28,16 +21,16 @@ export const fetchTasks = createAsyncThunk("tasks/fetchTasks", async (_, { rejec
       ? data.data
       : [];
   } catch (err: any) {
-    return rejectWithValue(err.response?.data?.message || "Could not load tasks.");
+    return rejectWithValue(err.response?.data?.message || err.message || "Could not load tasks.");
   }
 });
 
 export const createTask = createAsyncThunk("tasks/createTask", async (taskData: any, { rejectWithValue }) => {
   try {
-    const { data } = await axiosInstance.post("/api/tasks", taskData);
-    return data;
+    const task = await taskService.createTask(taskData);
+    return task;
   } catch (err: any) {
-    return rejectWithValue(err.response?.data?.message || "Failed to create task.");
+    return rejectWithValue(err.response?.data?.message || err.message || "Failed to create task.");
   }
 });
 
@@ -45,20 +38,20 @@ export const updateTask = createAsyncThunk(
   "tasks/updateTask",
   async ({ id, taskData }: { id: string; taskData: any }, { rejectWithValue }) => {
     try {
-      const { data } = await axiosInstance.put(`/api/tasks/${id}`, taskData);
-      return data;
+      const task = await taskService.updateTask(id, taskData);
+      return task;
     } catch (err: any) {
-      return rejectWithValue(err.response?.data?.message || "Failed to update task.");
+      return rejectWithValue(err.response?.data?.message || err.message || "Failed to update task.");
     }
   }
 );
 
 export const deleteTask = createAsyncThunk("tasks/deleteTask", async (id: string, { rejectWithValue }) => {
   try {
-    await axiosInstance.delete(`/api/tasks/${id}`);
-    return id;
+    const deletedId = await taskService.deleteTask(id);
+    return deletedId._id || id;
   } catch (err: any) {
-    return rejectWithValue(err.response?.data?.message || "Failed to delete task.");
+    return rejectWithValue(err.response?.data?.message || err.message || "Failed to delete task.");
   }
 });
 

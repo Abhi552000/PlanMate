@@ -27,4 +27,17 @@ export const API_ROUTES = {
     ADD_COMMENT: (id: string) => `/api/tasks/${id}/comments`,
     DELETE_COMMENT: (id: string, commentId: string) => `/api/tasks/${id}/comments/${commentId}`,
   },
+  SPRINTS: {
+    BASE: "/api/sprints",
+    BY_ID: (id: string) => `/api/sprints/${id}`,
+  },
+  EPICS: {
+    BASE: "/api/epics",
+    BY_ID: (id: string) => `/api/epics/${id}`,
+  },
+  NOTIFICATIONS: {
+    BASE: "/api/notifications",
+    READ_ALL: "/api/notifications/read-all",
+    READ_BY_ID: (id: string) => `/api/notifications/${id}/read`,
+  },
 };

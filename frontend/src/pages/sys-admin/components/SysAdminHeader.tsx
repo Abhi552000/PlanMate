@@ -1,10 +1,6 @@
 import React from "react";
 import { LogOut } from "lucide-react";
-
-interface SysAdminHeaderProps {
-  user: any;
-  onLogout: () => void;
-}
+import { SysAdminHeaderProps } from "../../../types";
 
 export const SysAdminHeader: React.FC<SysAdminHeaderProps> = ({ user, onLogout }) => {
   return (

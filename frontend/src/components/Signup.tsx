@@ -6,15 +6,7 @@ import { Input } from "./ui/Input";
 import { Select } from "./ui/Select";
 import { Button } from "./ui/Button";
 
-interface Organization {
-  _id: string;
-  name: string;
-}
-
-interface SignupProps {
-  onSubmit: (user: any) => void;
-  onSwitchMode: () => void;
-}
+import { SignupProps, Organization } from "../types";
 
 export const Signup: React.FC<SignupProps> = ({ onSwitchMode }) => {
   const [organizations, setOrganizations] = useState<Organization[]>([]);

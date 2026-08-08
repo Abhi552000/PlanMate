@@ -8,14 +8,7 @@ import { DashboardFilters } from "./components/DashboardFilters";
 import { ListModeView } from "./components/ListModeView";
 import { taskService } from "../../services/taskService";
 import { orgService } from "../../services/orgService";
-import { ITask, IUser } from "../../types";
-
-interface DashboardContext {
-  tasks: ITask[];
-  refreshTasks: (silent?: boolean) => void;
-  viewMode: string;
-  setViewMode: (val: string) => void;
-}
+import { ITask, IUser, DashboardContext } from "../../types";
 
 const Dashboard = () => {
   const { tasks, refreshTasks, viewMode, setViewMode } = useOutletContext<DashboardContext>();

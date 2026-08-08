@@ -1,11 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { IUser } from "../../types";
-
-interface AuthState {
-  currentUser: IUser | null;
-  loading: boolean;
-  error: string | null;
-}
+import { IUser, AuthState } from "../../types";
 
 const getInitialUser = (): IUser | null => {
   const stored = localStorage.getItem("currentUser");

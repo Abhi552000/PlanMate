@@ -255,7 +255,16 @@ export const updateSprint = async (req, res) => {
     if (status === "completed" && sprint.status === "active") {
       // Reassign all incomplete tasks to backlog
       await Task.updateMany(
-        { sprint: id, status: { $ne: "Done" }, organization: orgId },
+        { sprint: id, status: { $nin: ["Done", "Closed"] }, organization: orgId },
+        { $set: { sprint: null } }
+      );
+    }
+
+    // Transitioning to closed (soft delete/close)
+    if (status === "closed") {
+      // Reassign all incomplete tasks to backlog
+      await Task.updateMany(
+        { sprint: id, status: { $nin: ["Done", "Closed"] }, organization: orgId },
         { $set: { sprint: null } }
       );
     }

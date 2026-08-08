@@ -11,7 +11,8 @@ import {
   Sparkles,
   Flame,
   LayoutGrid,
-  Filter
+  Filter,
+  X
 } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "../../store";
 import { fetchSprints, updateSprint } from "../../store/slices/sprintSlice";
@@ -19,6 +20,7 @@ import { fetchEpics } from "../../store/slices/epicSlice";
 import { updateTask } from "../../store/slices/taskSlice";
 import { orgService } from "../../services/orgService";
 import TaskModal from "../../components/TaskModal";
+import { Button } from "../../components/ui/Button";
 import { ITask } from "../../types";
 
 const EPIC_COLORS: Record<string, string> = {
@@ -36,7 +38,9 @@ export const ActiveSprint: React.FC = () => {
   const activeSprint = useAppSelector((state) => state.sprints.activeSprint);
   const epics = useAppSelector((state) => state.epics.epics);
   const loading = useAppSelector((state) => state.sprints.loading || state.epics.loading);
-  const [statuses, setStatuses] = useState<string[]>(["To Do", "In Progress", "Done"]);
+  const [statuses, setStatuses] = useState<string[]>(["To Do", "In Progress", "Done", "Closed"]);
+  const [showConfirmComplete, setShowConfirmComplete] = useState(false);
+  const [completingSprint, setCompletingSprint] = useState(false);
 
   // Grouping & Filters
   const [groupByEpic, setGroupByEpic] = useState(false);
@@ -66,15 +70,23 @@ export const ActiveSprint: React.FC = () => {
   }, [loadData]);
 
   // Complete Sprint
-  const handleCompleteSprint = async () => {
+  const handleCompleteSprint = () => {
     if (!activeSprint) return;
-    if (!window.confirm("Are you sure you want to complete this Sprint? All incomplete tasks will return to the backlog.")) return;
+    setShowConfirmComplete(true);
+  };
+
+  const handleConfirmComplete = async () => {
+    if (!activeSprint) return;
+    setCompletingSprint(true);
     try {
       await dispatch(updateSprint({ id: activeSprint._id, sprintData: { status: "completed" } })).unwrap();
       toast.success("Sprint completed successfully!");
+      setShowConfirmComplete(false);
       loadData();
     } catch (err: any) {
       toast.error(err.message || "Failed to complete sprint.");
+    } finally {
+      setCompletingSprint(false);
     }
   };
 
@@ -270,77 +282,68 @@ export const ActiveSprint: React.FC = () => {
   return (
     <div className="w-full space-y-6">
       {/* Active Sprint Header Info */}
-      <div className="bg-white dark:bg-gray-900 border border-sky-100 dark:border-gray-800 p-4 sm:p-5 rounded-2xl shadow-sm space-y-4">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <div>
-            <div className="flex items-center gap-2">
-              <h1 className="text-2xl font-black text-gray-900 dark:text-white tracking-tight">{activeSprint.name}</h1>
-              <span className="text-[9px] font-black uppercase tracking-wider bg-sky-550 text-white px-2 py-0.5 rounded shadow-sm flex items-center gap-1 animate-pulse">
-                <Flame className="w-3 h-3" /> Active
-              </span>
-            </div>
-            {activeSprint.goal && (
-              <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5 italic">Goal: {activeSprint.goal}</p>
-            )}
-            {remainingDays && (
-              <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-1 flex items-center gap-1">
-                <Clock className="w-3 h-3 text-sky-500" /> {remainingDays}
-              </p>
-            )}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+        <div>
+          <div className="flex items-center gap-2">
+            <h1 className="text-lg md:text-2xl font-black text-gray-900 dark:text-white tracking-tight">{activeSprint.name}</h1>
+            <span className="text-[9px] font-black uppercase tracking-wider bg-sky-600 text-white px-2 py-0.5 rounded shadow-sm flex items-center gap-1 animate-pulse shrink-0">
+              <Flame className="w-3 h-3" /> Active
+            </span>
           </div>
-          <button
-            onClick={handleCompleteSprint}
-            className="flex items-center gap-1 bg-sky-655 hover:bg-sky-750 text-white font-bold py-2 px-4 rounded-xl text-sm shadow-sm transition-all cursor-pointer"
+          {activeSprint.goal && (
+            <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5 italic">Goal: {activeSprint.goal}</p>
+          )}
+          {remainingDays && (
+            <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-1 flex items-center gap-1">
+              <Clock className="w-3 h-3 text-sky-500" /> {remainingDays}
+            </p>
+          )}
+        </div>
+        <Button
+          variant="primary"
+          size="md"
+          onClick={handleCompleteSprint}
+          icon={<CheckCircle className="w-4 h-4" />}
+        >
+          Complete Sprint
+        </Button>
+      </div>
+
+      {/* Dashboard Filters & Grouping Row */}
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
+        {/* Quick Filters */}
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-bold text-gray-400 flex items-center gap-1 mr-1">
+            <Filter className="w-3.5 h-3.5" /> Filters
+          </span>
+          <Button
+            variant={onlyMyIssues ? "primary" : "outline"}
+            size="sm"
+            onClick={() => setOnlyMyIssues(!onlyMyIssues)}
           >
-            <CheckCircle className="w-4 h-4" /> Complete Sprint
-          </button>
+            Only My Issues
+          </Button>
+          <Button
+            variant={highPriorityOnly ? "primary" : "outline"}
+            size="sm"
+            onClick={() => setHighPriorityOnly(!highPriorityOnly)}
+          >
+            High Priority Only
+          </Button>
         </div>
 
-        {/* Dashboard Filters & Grouping Row */}
-        <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-sky-50 dark:border-gray-850">
-          {/* Quick Filters */}
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-bold text-gray-400 flex items-center gap-1 mr-1">
-              <Filter className="w-3.5 h-3.5" /> Filters
-            </span>
-            <button
-              onClick={() => setOnlyMyIssues(!onlyMyIssues)}
-              className={`px-3 py-1 text-xs font-bold border rounded-lg transition-all cursor-pointer ${
-                onlyMyIssues 
-                  ? "bg-sky-500 border-sky-600 text-white shadow-sm" 
-                  : "bg-white border-sky-100 hover:bg-sky-50/50 text-gray-600 dark:bg-gray-950 dark:border-gray-800 dark:text-gray-400"
-              }`}
-            >
-              Only My Issues
-            </button>
-            <button
-              onClick={() => setHighPriorityOnly(!highPriorityOnly)}
-              className={`px-3 py-1 text-xs font-bold border rounded-lg transition-all cursor-pointer ${
-                highPriorityOnly 
-                  ? "bg-sky-500 border-sky-600 text-white shadow-sm" 
-                  : "bg-white border-sky-100 hover:bg-sky-50/50 text-gray-600 dark:bg-gray-950 dark:border-gray-800 dark:text-gray-400"
-              }`}
-            >
-              High Priority Only
-            </button>
-          </div>
-
-          {/* Grouping Dropdown */}
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-bold text-gray-400 flex items-center gap-1">
-              <LayoutGrid className="w-3.5 h-3.5" /> Group by
-            </span>
-            <button
-              onClick={() => setGroupByEpic(!groupByEpic)}
-              className={`px-3 py-1 text-xs font-bold border rounded-lg transition-all cursor-pointer ${
-                groupByEpic 
-                  ? "bg-sky-500 border-sky-600 text-white shadow-sm" 
-                  : "bg-white border-sky-100 hover:bg-sky-50/50 text-gray-600 dark:bg-gray-950 dark:border-gray-800 dark:text-gray-400"
-              }`}
-            >
-              Epic Swimlanes
-            </button>
-          </div>
+        {/* Grouping Dropdown */}
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-bold text-gray-400 flex items-center gap-1">
+            <LayoutGrid className="w-3.5 h-3.5" /> Group by
+          </span>
+          <Button
+            variant={groupByEpic ? "primary" : "outline"}
+            size="sm"
+            onClick={() => setGroupByEpic(!groupByEpic)}
+          >
+            Epic Swimlanes
+          </Button>
         </div>
       </div>
 
@@ -404,6 +407,44 @@ export const ActiveSprint: React.FC = () => {
           taskToEdit={selectedTaskToEdit}
           onSave={() => loadData()}
         />
+      )}
+
+      {/* Confirm Complete Modal */}
+      {showConfirmComplete && (
+        <div className="fixed inset-0 backdrop-blur-sm bg-black/35 z-55 flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-gray-900 border border-sky-100 dark:border-gray-800 rounded-2xl max-w-sm w-full p-6 shadow-2xl animate-fadeIn space-y-4">
+            <div className="flex justify-between items-center border-b border-sky-50 dark:border-gray-850 pb-2">
+              <h3 className="font-extrabold text-gray-900 dark:text-white text-base">Complete Sprint</h3>
+              <button 
+                type="button" 
+                onClick={() => setShowConfirmComplete(false)}
+                className="text-gray-400 hover:text-sky-600 transition-colors p-1"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              Are you sure you want to complete this Sprint? All incomplete tasks will return to the backlog.
+            </p>
+            <div className="flex justify-end gap-2 pt-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowConfirmComplete(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="primary"
+                size="sm"
+                onClick={handleConfirmComplete}
+                loading={completingSprint}
+              >
+                Confirm
+              </Button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

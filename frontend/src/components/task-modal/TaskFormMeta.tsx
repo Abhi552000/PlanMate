@@ -1,19 +1,7 @@
 import React from "react";
 import { CheckCircle, AlignLeft, Flag, User, Calendar, Layers } from "lucide-react";
 import { priorityStyles } from "../../assets/dummy";
-
-interface TaskFormMetaProps {
-  taskData: any;
-  setTaskData: React.Dispatch<React.SetStateAction<any>>;
-  statuses: string[];
-  members: any[];
-  sprints?: any[];
-  epics?: any[];
-  parentTask: any;
-  today: string;
-  baseControlClasses: string;
-  handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => void;
-}
+import { TaskFormMetaProps } from "../../types";
 
 export const TaskFormMeta: React.FC<TaskFormMetaProps> = ({
   taskData,
