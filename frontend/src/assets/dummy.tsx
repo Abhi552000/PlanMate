@@ -17,7 +17,7 @@ import {
 
 // FRONTEND CONSTANTS
 export const baseControlClasses =
-  "w-full px-4 py-2.5 border border-sky-100 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 text-sm dark:border-gray-600 dark:bg-gray-800/50 dark:text-gray-200";
+  "w-full px-3 py-2 border border-sky-100 dark:border-gray-800 rounded-lg text-xs focus:ring-2 focus:ring-sky-500 focus:outline-none bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 font-medium transition-all duration-200";
 
 export const priorityStyles: Record<string, string> = {
   Low: "bg-green-100 text-green-700 border-green-200",
@@ -75,9 +75,9 @@ export const menuItems = [
 
 export const SIDEBAR_CLASSES = {
   desktop:
-    "hidden md:flex flex-col fixed top-16 left-0 h-[calc(100vh-4rem)] w-20 lg:w-56 bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm border-r border-sky-100 dark:border-gray-800 shadow-sm z-20 transition-all duration-300",
+    "hidden md:flex flex-col fixed top-16 left-0 h-[calc(100vh-4rem)] w-20 lg:w-60 bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm border-r border-sky-100 dark:border-gray-800 shadow-sm z-20 transition-all duration-300",
   mobileButton:
-    "absolute md:hidden top-25 left-5 z-50 bg-sky-600 text-white p-2 rounded-full shadow-lg hover:bg-sky-700 transition",
+    "fixed md:hidden top-20 left-4 z-40 bg-sky-600 text-white p-2.5 rounded-full shadow-lg hover:bg-sky-700 transition-all duration-200",
   mobileDrawerBackdrop: "fixed inset-0 bg-black/40 backdrop-blur-sm",
   mobileDrawer:
     "absolute top-0 left-0 w-64 h-full bg-white/90 dark:bg-gray-900/90 backdrop-blur-md border-r border-sky-100 dark:border-gray-800 shadow-lg z-50 p-4 flex flex-col space-y-6",
@@ -89,7 +89,7 @@ export const LINK_CLASSES = {
     "bg-gradient-to-r from-sky-50 to-cyan-50 dark:from-sky-950/20 dark:to-cyan-950/20 border-l-4 border-sky-500 text-sky-700 dark:text-sky-400 font-medium shadow-sm",
   inactive: "hover:bg-sky-50/50 dark:hover:bg-sky-950/20 text-gray-600 dark:text-gray-400 hover:text-sky-700 dark:hover:text-sky-300",
   icon: "transition-transform duration-300 group-hover:scale-110 text-sky-500",
-  text: "text-sm font-medium ml-2",
+  text: "text-sm font-medium ml-2 whitespace-nowrap",
 };
 
 export const TIP_CARD = {
@@ -146,7 +146,7 @@ export const HEADER =
 export const ADD_BUTTON =
   "flex items-center gap-2 cursor-pointer bg-gradient-to-r from-cyan-500 to-sky-600 text-white px-4 py-2 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 w-full md:w-auto justify-center text-sm md:text-base";
 export const STATS_GRID =
-  "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-4 md:mb-6";
+  "grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-4 md:mb-6";
 export const STAT_CARD =
   "p-3 md:p-4 rounded-xl bg-white shadow-sm border border-sky-100 hover:shadow-md transition-all duration-300 min-w-0";
 export const ICON_WRAPPER = "p-1.5 md:p-2 rounded-lg";

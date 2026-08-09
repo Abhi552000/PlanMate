@@ -5,6 +5,46 @@ import Notification from "../models/notificationModel.js";
 import { HttpStatus } from "../constants/httpStatus.js";
 import { MESSAGES } from "../constants/messages.js";
 
+// HELPER TO CREATE NOTIFICATIONS FOR USER MENTIONS
+export const handleMentions = async (text, task, sender, type = "comment") => {
+  if (!text) return;
+  
+  // Pattern to match is @[Name](user:userId)
+  const regex = /@\[[^\]]+\]\(user:([a-f\d]{24})\)/g;
+  const userIds = new Set();
+  let match;
+  while ((match = regex.exec(text)) !== null) {
+    const userId = match[1];
+    // Don't notify the sender themselves
+    if (userId !== sender._id.toString() && userId !== sender.id.toString()) {
+      userIds.add(userId);
+    }
+  }
+
+  for (const userId of userIds) {
+    try {
+      const title = type === "comment" ? "Mentioned in Comment" : "Mentioned in Description";
+      const message = type === "comment"
+        ? `${sender.name} mentioned you in a comment on: "${task.title}" (${
+            task.key || `PM-${task._id.toString().slice(-4).toUpperCase()}`
+          })`
+        : `${sender.name} mentioned you in the description of: "${task.title}" (${
+            task.key || `PM-${task._id.toString().slice(-4).toUpperCase()}`
+          })`;
+
+      await Notification.create({
+        user: userId,
+        title,
+        message,
+        link: `/task/${task._id}`,
+        read: false,
+      });
+    } catch (err) {
+      console.error("Error creating mention notification:", err);
+    }
+  }
+};
+
 // CREATE A NEW TASK
 export const createTask = async (req, res) => {
   try {
@@ -75,6 +115,11 @@ export const createTask = async (req, res) => {
     });
 
     const saved = await task.save();
+
+    // Trigger mention notifications for description
+    if (description) {
+      await handleMentions(description, saved, req.user, "description");
+    }
 
     // Create notification if assigned to someone else
     if (assignee && assignee.toString() !== req.user.id) {
@@ -177,6 +222,9 @@ export const getTasks = async (req, res) => {
         query.dueDate = { $gte: today, $lt: tomorrow };
       } else if (timeframe === "week") {
         query.dueDate = { $gte: today, $lte: nextWeek };
+      } else if (timeframe === "overdue") {
+        query.dueDate = { $lt: today };
+        query.status = { $ne: "Done" };
       }
     }
 
@@ -402,6 +450,11 @@ export const updateTask = async (req, res) => {
 
     await task.save();
 
+    // Trigger mention notifications for description if updated
+    if (data.description !== undefined) {
+      await handleMentions(data.description, task, req.user, "description");
+    }
+
     const updated = await Task.findById(task._id)
       .populate("owner", "name email")
       .populate("assignee", "name email")
@@ -469,6 +522,9 @@ export const addTaskComment = async (req, res) => {
     });
 
     await task.save();
+
+    // Trigger mention notifications for comment
+    await handleMentions(text, task, req.user, "comment");
 
     const populatedTask = await Task.findById(task._id)
       .populate("owner", "name email")
@@ -710,5 +766,160 @@ export const logWork = async (req, res) => {
     res
       .status(HttpStatus.BAD_REQUEST)
       .json({ success: false, message: error.message });
+  }
+};
+
+// LINK AN ISSUE
+export const linkTask = async (req, res) => {
+  try {
+    const { linkType, targetTaskId } = req.body;
+    const taskId = req.params.id;
+
+    if (!linkType || !targetTaskId) {
+      return res.status(HttpStatus.BAD_REQUEST).json({
+        success: false,
+        message: "Link type and target task ID are required.",
+      });
+    }
+
+    const query = req.user.organization
+      ? { organization: req.user.organization }
+      : { owner: req.user.id };
+
+    const sourceTask = await Task.findOne({ _id: taskId, ...query });
+    const targetTask = await Task.findOne({ _id: targetTaskId, ...query });
+
+    if (!sourceTask || !targetTask) {
+      return res.status(HttpStatus.NOT_FOUND).json({
+        success: false,
+        message: "One or both tasks not found.",
+      });
+    }
+
+    // Check if link already exists
+    const linkExists = sourceTask.links.some(
+      (l) => l.targetTask.toString() === targetTaskId && l.linkType === linkType
+    );
+    if (linkExists) {
+      return res.status(HttpStatus.BAD_REQUEST).json({
+        success: false,
+        message: "This issue link already exists.",
+      });
+    }
+
+    // Determine opposite link type
+    let oppositeType = "relates to";
+    if (linkType === "blocks") oppositeType = "blocked by";
+    if (linkType === "blocked by") oppositeType = "blocks";
+
+    // Add source-to-target link
+    sourceTask.links.push({ linkType, targetTask: targetTaskId });
+    // Add target-to-source link
+    targetTask.links.push({ linkType: oppositeType, targetTask: taskId });
+
+    // Track changelog history for both tasks
+    sourceTask.history.push({
+      field: "links",
+      oldValue: "",
+      newValue: `Linked as ${linkType} to ${targetTask.key || targetTask.title}`,
+      updatedBy: req.user.id,
+      updatedAt: new Date(),
+    });
+    targetTask.history.push({
+      field: "links",
+      oldValue: "",
+      newValue: `Linked as ${oppositeType} to ${sourceTask.key || sourceTask.title}`,
+      updatedBy: req.user.id,
+      updatedAt: new Date(),
+    });
+
+    await sourceTask.save();
+    await targetTask.save();
+
+    const updatedTask = await Task.findById(taskId)
+      .populate("owner", "name email")
+      .populate("assignee", "name email")
+      .populate("history.updatedBy", "name email")
+      .populate("comments.user", "name email avatar")
+      .populate("links.targetTask", "title key status priority completed")
+      .populate("workLogs.user", "name email")
+      .lean();
+
+    res.json({ success: true, task: updatedTask });
+  } catch (error) {
+    res.status(HttpStatus.BAD_REQUEST).json({ success: false, message: error.message });
+  }
+};
+
+// UNLINK AN ISSUE
+export const unlinkTask = async (req, res) => {
+  try {
+    const taskId = req.params.id;
+    const linkId = req.params.linkId;
+
+    const query = req.user.organization
+      ? { organization: req.user.organization }
+      : { owner: req.user.id };
+
+    const sourceTask = await Task.findOne({ _id: taskId, ...query });
+    if (!sourceTask) {
+      return res.status(HttpStatus.NOT_FOUND).json({
+        success: false,
+        message: MESSAGES.TASK.NOT_FOUND,
+      });
+    }
+
+    const linkIndex = sourceTask.links.findIndex((l) => l._id.toString() === linkId);
+    if (linkIndex === -1) {
+      return res.status(HttpStatus.NOT_FOUND).json({
+        success: false,
+        message: "Link not found on this task.",
+      });
+    }
+
+    const link = sourceTask.links[linkIndex];
+    const targetTaskId = link.targetTask;
+
+    // Remove source-to-target link
+    sourceTask.links.splice(linkIndex, 1);
+
+    // Find target task and remove the corresponding backlink
+    const targetTask = await Task.findOne({ _id: targetTaskId, ...query });
+    if (targetTask) {
+      targetTask.links = targetTask.links.filter(
+        (l) => l.targetTask.toString() !== taskId
+      );
+      targetTask.history.push({
+        field: "links",
+        oldValue: "",
+        newValue: `Removed link to ${sourceTask.key || sourceTask.title}`,
+        updatedBy: req.user.id,
+        updatedAt: new Date(),
+      });
+      await targetTask.save();
+    }
+
+    sourceTask.history.push({
+      field: "links",
+      oldValue: "",
+      newValue: `Removed link to ${targetTask ? (targetTask.key || targetTask.title) : "deleted task"}`,
+      updatedBy: req.user.id,
+      updatedAt: new Date(),
+    });
+
+    await sourceTask.save();
+
+    const updatedTask = await Task.findById(taskId)
+      .populate("owner", "name email")
+      .populate("assignee", "name email")
+      .populate("history.updatedBy", "name email")
+      .populate("comments.user", "name email avatar")
+      .populate("links.targetTask", "title key status priority completed")
+      .populate("workLogs.user", "name email")
+      .lean();
+
+    res.json({ success: true, task: updatedTask });
+  } catch (error) {
+    res.status(HttpStatus.BAD_REQUEST).json({ success: false, message: error.message });
   }
 };

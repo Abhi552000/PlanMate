@@ -17,6 +17,7 @@ export interface KanbanBoardProps {
 
 export interface AnalyticsDashboardProps {
   tasks: ITask[];
+  onApplyFilters?: (filters: any) => void;
 }
 
 export interface TaskItemProps {

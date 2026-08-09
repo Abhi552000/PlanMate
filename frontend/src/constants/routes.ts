@@ -30,6 +30,8 @@ export const API_ROUTES = {
     DELETE_COMMENT: (id: string, commentId: string) =>
       `/api/tasks/${id}/comments/${commentId}`,
     LOG_WORK: (id: string) => `/api/tasks/${id}/worklogs`,
+    LINK: (id: string) => `/api/tasks/${id}/links`,
+    UNLINK: (id: string, linkId: string) => `/api/tasks/${id}/links/${linkId}`,
   },
   SPRINTS: {
     BASE: "/api/sprints",

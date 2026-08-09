@@ -26,8 +26,8 @@ export interface MetricCardsProps {
     completedPoints: number;
     totalCount: number;
   };
-  activeTooltip: string | null;
-  setActiveTooltip: (val: string | null) => void;
+  activeTooltip?: string | null;
+  setActiveTooltip?: (val: string | null) => void;
 }
 
 export interface ChartsSectionProps {
@@ -40,6 +40,7 @@ export interface ChartsSectionProps {
     pendingCount: number;
   };
   weeklyData: any[];
+  tasks?: any[];
 }
 
 export interface WorkspaceBrandingFormProps {

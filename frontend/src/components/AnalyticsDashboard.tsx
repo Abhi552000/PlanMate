@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { ITask, AnalyticsDashboardProps } from "../types";
-import { HelpCircle, Sparkles } from "lucide-react";
+import { HelpCircle, Info, AlertCircle, Flag, UserX, Briefcase, TrendingUp, ArrowUpRight } from "lucide-react";
 import { MetricCards } from "./analytics/MetricCards";
 import { ChartsSection } from "./analytics/ChartsSection";
 import {
@@ -11,8 +11,8 @@ import {
 
 export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
   tasks,
+  onApplyFilters,
 }) => {
-  const [activeTooltip, setActiveTooltip] = useState<string | null>(null);
 
   // 1. Calculate General Metrics from Filtered Tasks
   const metrics = useMemo(() => {
@@ -28,10 +28,24 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
     );
     const remainingPoints = totalPoints - completedPoints;
 
-    const overdueCount = tasks.filter(
-      (t) =>
-        t.dueDate && new Date(t.dueDate) < new Date() && t.status !== "Done"
-    ).length;
+    const getLocalYYYYMMDD = (d: Date) => {
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, "0");
+      const day = String(d.getDate()).padStart(2, "0");
+      return `${year}-${month}-${day}`;
+    };
+
+    const todayStr = getLocalYYYYMMDD(new Date());
+
+    const overdueCount = tasks.filter((t) => {
+      if (!t.dueDate) return false;
+      const dueStr =
+        typeof t.dueDate === "string"
+          ? t.dueDate.split("T")[0]
+          : getLocalYYYYMMDD(new Date(t.dueDate));
+      const isCompleted = t.status === "Done";
+      return dueStr < todayStr && !isCompleted;
+    }).length;
 
     const completionRate =
       totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
@@ -84,6 +98,22 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
     );
   };
 
+  // Basic Icon mapper
+  const renderInsightIcon = (type: string) => {
+    switch (type) {
+      case "overdue":
+        return <AlertCircle className="w-4 h-4 text-red-500 mt-0.5 shrink-0" />;
+      case "highPriority":
+        return <Flag className="w-4 h-4 text-amber-500 mt-0.5 shrink-0" />;
+      case "unassigned":
+        return <UserX className="w-4 h-4 text-gray-500 mt-0.5 shrink-0" />;
+      case "workload":
+        return <Briefcase className="w-4 h-4 text-sky-500 mt-0.5 shrink-0" />;
+      default:
+        return <TrendingUp className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" />;
+    }
+  };
+
   if (tasks.length === 0) {
     return (
       <div className="text-center p-12 bg-white dark:bg-gray-900 border border-sky-100 dark:border-gray-800 rounded-2xl space-y-3">
@@ -106,7 +136,7 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
           <h2 className="text-lg font-bold text-gray-850 dark:text-gray-200">
             Interactive Analytics
           </h2>
-          <p className="text-xs text-gray-505 dark:text-gray-405 mt-1">
+          <p className="text-xs text-gray-550 dark:text-gray-400 mt-1">
             Analyzing {metrics.totalCount} active tasks matching your current
             dashboard filters.
           </p>
@@ -119,25 +149,32 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
       {/* Visual Analytics Header Cards */}
       <MetricCards
         metrics={metrics}
-        activeTooltip={activeTooltip}
-        setActiveTooltip={setActiveTooltip}
       />
 
       {/* Dynamic Smart Observations */}
-      <div className="bg-gradient-to-r from-sky-50/50 to-indigo-50/20 dark:from-sky-950/10 dark:to-gray-900 border border-sky-100 dark:border-gray-800 p-5 rounded-2xl space-y-3">
-        <div className="flex items-center gap-2 border-b border-sky-100/50 dark:border-gray-800/80 pb-2">
-          <Sparkles className="w-4.5 h-4.5 text-sky-500" />
+      <div className="bg-sky-50/10 dark:bg-gray-900 border border-sky-100 dark:border-gray-800 p-5 rounded-2xl space-y-3">
+        <div className="flex items-center gap-2 border-b border-sky-100/50 dark:border-gray-800/80 pb-2.5">
+          <Info className="w-4 h-4 text-gray-500" />
           <h3 className="text-xs font-black uppercase tracking-wider text-gray-700 dark:text-gray-300">
             Workspace Insights
           </h3>
         </div>
-        <ul className="space-y-2 text-xs text-gray-650 dark:text-gray-300">
+        <ul className="space-y-3.5 pt-1">
           {insights.map((insight, idx) => (
-            <li key={idx} className="flex items-start gap-2 leading-relaxed">
-              <span className="text-sky-505 mt-0.5 font-bold">•</span>
-              <span
-                dangerouslySetInnerHTML={{ __html: formatInsightText(insight) }}
-              />
+            <li
+              key={idx}
+              onClick={() => onApplyFilters?.(insight.filters)}
+              className="flex items-center justify-between text-xs text-gray-600 dark:text-gray-350 hover:text-sky-600 dark:hover:text-sky-400 cursor-pointer transition-colors group py-0.5"
+            >
+              <div className="flex items-start gap-3 leading-relaxed">
+                {renderInsightIcon(insight.type)}
+                <span
+                  dangerouslySetInnerHTML={{ __html: formatInsightText(insight.text) }}
+                />
+              </div>
+              {insight.type !== "progress" && (
+                <ArrowUpRight className="w-3.5 h-3.5 text-sky-500 opacity-0 group-hover:opacity-100 transition-opacity shrink-0 ml-2" />
+              )}
             </li>
           ))}
         </ul>
@@ -149,6 +186,7 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
         priorityBreakdown={priorityBreakdown}
         metrics={metrics}
         weeklyData={weeklyData}
+        tasks={tasks}
       />
     </div>
   );

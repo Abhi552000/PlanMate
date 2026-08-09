@@ -12,9 +12,20 @@ export const ConfirmDeleteStatusModal: React.FC<ConfirmDeleteStatusModalProps> =
 }) => {
   if (!statusToDelete) return null;
 
+  const handleClose = () => {
+    setStatusToDelete(null);
+    setTasksCountForStatus(null);
+  };
+
   return (
-    <div className="fixed inset-0 bg-black/45 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-xl border border-sky-100 dark:border-gray-800 max-w-sm w-full p-6 space-y-4 animate-scaleUp animate-duration-150">
+    <div 
+      className="fixed inset-0 bg-black/45 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+      onClick={handleClose}
+    >
+      <div 
+        className="bg-white dark:bg-gray-900 rounded-2xl shadow-xl border border-sky-100 dark:border-gray-800 max-w-sm w-full p-6 space-y-4 animate-scaleUp animate-duration-150"
+        onClick={(e) => e.stopPropagation()}
+      >
         <h3 className="font-bold text-gray-855 dark:text-gray-150 text-base">
           Confirm Status Deletion
         </h3>

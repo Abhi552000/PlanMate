@@ -15,8 +15,14 @@ export const OnboardMemberModal: React.FC<OnboardMemberModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fadeIn">
-      <div className="bg-white dark:bg-gray-900 border border-sky-100 dark:border-gray-800 w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden p-6 space-y-4">
+    <div 
+      className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fadeIn"
+      onClick={onClose}
+    >
+      <div 
+        className="bg-white dark:bg-gray-900 border border-sky-100 dark:border-gray-800 w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden p-6 space-y-4"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="flex justify-between items-center border-b border-sky-50 dark:border-gray-800 pb-3">
           <h3 className="text-sm font-bold text-gray-850 dark:text-gray-200 flex items-center gap-2">
             <UserPlus className="w-4.5 h-4.5 text-sky-500" /> Onboard Team Member

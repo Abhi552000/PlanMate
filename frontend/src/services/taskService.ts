@@ -39,4 +39,12 @@ export const taskService = {
     const { data } = await axiosInstance.post(API_ROUTES.TASKS.LOG_WORK(id), { hoursSpent, description });
     return data;
   },
+  linkTask: async (id: string, linkType: string, targetTaskId: string) => {
+    const { data } = await axiosInstance.post(API_ROUTES.TASKS.LINK(id), { linkType, targetTaskId });
+    return data;
+  },
+  unlinkTask: async (id: string, linkId: string) => {
+    const { data } = await axiosInstance.delete(API_ROUTES.TASKS.UNLINK(id, linkId));
+    return data;
+  },
 };

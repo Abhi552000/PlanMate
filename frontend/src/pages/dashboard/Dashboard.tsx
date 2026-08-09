@@ -11,6 +11,7 @@ import { orgService } from "../../services/orgService";
 import { ITask, IUser, DashboardContext } from "../../types";
 import { CONSOLE_ERRORS } from "../../constants/messages";
 import { filterDashboardTasks } from "./helpers/dashboardHelpers";
+import { AnalyticsDashboard } from "../../components/AnalyticsDashboard";
 
 const Dashboard = () => {
   const { tasks, refreshTasks, viewMode, setViewMode } = useOutletContext<DashboardContext>();
@@ -170,6 +171,46 @@ const Dashboard = () => {
               }}
               onLogout={refreshTasks}
               columns={statuses}
+            />
+          ) : viewMode === "analytics" ? (
+            <AnalyticsDashboard
+              tasks={filterTasks}
+              onApplyFilters={(filters) => {
+                const nextAssignee = filters.assignee !== undefined ? filters.assignee : selectedAssignee;
+                const nextPriority = filters.priority !== undefined ? filters.priority : selectedPriority;
+                const nextStatus = filters.status !== undefined ? filters.status : selectedStatus;
+                const nextTimeframe = filters.timeframe !== undefined ? filters.timeframe : selectedTimeframe;
+
+                setSearchQuery("");
+                setSelectedAssignee(nextAssignee);
+                setSelectedPriority(nextPriority);
+                setSelectedStatus(nextStatus);
+                setSelectedTimeframe(nextTimeframe);
+
+                setLoadingList(true);
+                const params = new URLSearchParams({
+                  page: "1",
+                  limit: "10",
+                  search: "",
+                  assignee: nextAssignee,
+                  priority: nextPriority,
+                  status: nextStatus,
+                  timeframe: nextTimeframe
+                });
+                taskService.getTasks(params)
+                  .then((data) => {
+                    if (data?.success && data?.tasks) {
+                      setPaginatedTasks(data.tasks);
+                      setCurrentPage(data.pagination.currentPage);
+                      setTotalPages(data.pagination.totalPages);
+                      setTotalTasksCount(data.pagination.totalCount);
+                    }
+                  })
+                  .catch((err) => console.error("Error direct fetching list tasks:", err))
+                  .finally(() => setLoadingList(false));
+
+                setViewMode("list");
+              }}
             />
           ) : (
             <ListModeView

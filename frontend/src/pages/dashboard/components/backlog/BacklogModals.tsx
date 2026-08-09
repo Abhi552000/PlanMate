@@ -44,9 +44,13 @@ export const BacklogModals: React.FC<BacklogModalsProps> = ({
     <>
       {/* Create Sprint Modal */}
       {showCreateSprint && (
-        <div className="fixed inset-0 backdrop-blur-sm bg-black/35 z-55 flex items-center justify-center p-4">
+        <div 
+          className="fixed inset-0 backdrop-blur-sm bg-black/35 z-55 flex items-center justify-center p-4"
+          onClick={() => setShowCreateSprint(false)}
+        >
           <form
             onSubmit={handleCreateSprint}
+            onClick={(e) => e.stopPropagation()}
             className="bg-white dark:bg-gray-900 border border-sky-100 dark:border-gray-800 rounded-2xl max-w-sm w-full p-6 shadow-2xl animate-fadeIn space-y-4"
           >
             <div className="flex justify-between items-center border-b border-sky-50 pb-2">
@@ -98,9 +102,13 @@ export const BacklogModals: React.FC<BacklogModalsProps> = ({
 
       {/* Start Sprint Modal */}
       {showStartSprint && (
-        <div className="fixed inset-0 backdrop-blur-sm bg-black/35 z-55 flex items-center justify-center p-4">
+        <div 
+          className="fixed inset-0 backdrop-blur-sm bg-black/35 z-55 flex items-center justify-center p-4"
+          onClick={() => setShowStartSprint(null)}
+        >
           <form
             onSubmit={handleStartSprint}
+            onClick={(e) => e.stopPropagation()}
             className="bg-white dark:bg-gray-900 border border-sky-100 dark:border-gray-800 rounded-2xl max-w-sm w-full p-6 shadow-2xl animate-fadeIn space-y-4"
           >
             <div className="flex justify-between items-center border-b border-sky-50 pb-2">
@@ -177,9 +185,13 @@ export const BacklogModals: React.FC<BacklogModalsProps> = ({
 
       {/* Create Epic Modal */}
       {showCreateEpic && (
-        <div className="fixed inset-0 backdrop-blur-sm bg-black/35 z-55 flex items-center justify-center p-4">
+        <div 
+          className="fixed inset-0 backdrop-blur-sm bg-black/35 z-55 flex items-center justify-center p-4"
+          onClick={() => setShowCreateEpic(false)}
+        >
           <form
             onSubmit={handleCreateEpic}
+            onClick={(e) => e.stopPropagation()}
             className="bg-white dark:bg-gray-900 border border-sky-100 dark:border-gray-800 rounded-2xl max-w-sm w-full p-6 shadow-2xl animate-fadeIn space-y-4"
           >
             <div className="flex justify-between items-center border-b border-sky-50 pb-2">
@@ -262,8 +274,14 @@ export const BacklogModals: React.FC<BacklogModalsProps> = ({
 
       {/* Confirm Complete Modal */}
       {confirmCompleteSprintId && (
-        <div className="fixed inset-0 backdrop-blur-sm bg-black/35 z-55 flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-gray-900 border border-sky-100 dark:border-gray-800 rounded-2xl max-w-sm w-full p-6 shadow-2xl animate-fadeIn space-y-4">
+        <div 
+          className="fixed inset-0 backdrop-blur-sm bg-black/35 z-55 flex items-center justify-center p-4"
+          onClick={() => setConfirmCompleteSprintId(null)}
+        >
+          <div 
+            className="bg-white dark:bg-gray-900 border border-sky-100 dark:border-gray-800 rounded-2xl max-w-sm w-full p-6 shadow-2xl animate-fadeIn space-y-4"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="flex justify-between items-center border-b border-sky-50 dark:border-gray-850 pb-2">
               <h3 className="font-extrabold text-gray-900 dark:text-white text-base">
                 {ACTIVE_SPRINT_TEXTS.MODAL_COMPLETE_SPRINT_TITLE}
@@ -303,8 +321,14 @@ export const BacklogModals: React.FC<BacklogModalsProps> = ({
 
       {/* Confirm Delete/Close Modal */}
       {confirmDeleteSprintId && (
-        <div className="fixed inset-0 backdrop-blur-sm bg-black/35 z-55 flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-gray-900 border border-sky-100 dark:border-gray-800 rounded-2xl max-w-sm w-full p-6 shadow-2xl animate-fadeIn space-y-4">
+        <div 
+          className="fixed inset-0 backdrop-blur-sm bg-black/35 z-55 flex items-center justify-center p-4"
+          onClick={() => setConfirmDeleteSprintId(null)}
+        >
+          <div 
+            className="bg-white dark:bg-gray-900 border border-sky-100 dark:border-gray-800 rounded-2xl max-w-sm w-full p-6 shadow-2xl animate-fadeIn space-y-4"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="flex justify-between items-center border-b border-sky-50 dark:border-gray-850 pb-2">
               <h3 className="font-extrabold text-gray-900 dark:text-white text-base">
                 {BACKLOG_TEXTS.MODAL_CLOSE_SPRINT_TITLE}

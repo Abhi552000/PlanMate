@@ -1,5 +1,6 @@
 import React from "react";
 import { CheckSquare, User } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { BacklogTaskRowProps } from "../../../../types";
 import { EPIC_COLORS } from "../../../../constants/uiTexts";
 import { getPriorityStyle } from "../../../../utils";
@@ -11,6 +12,7 @@ export const BacklogTaskRow: React.FC<BacklogTaskRowProps> = ({
   onMove,
   sprints,
 }) => {
+  const navigate = useNavigate();
   const isCompleted =
     task.status === "Done" ||
     task.completed === "Yes" ||
@@ -23,7 +25,7 @@ export const BacklogTaskRow: React.FC<BacklogTaskRowProps> = ({
       onClick={(e) => {
         const target = e.target as HTMLElement;
         if (target.closest("button") || target.closest("select")) return;
-        onEdit(task);
+        navigate(`/task/${task._id}`);
       }}
       className={`flex flex-col sm:flex-row sm:items-center justify-between p-2 sm:p-2.5 bg-white dark:bg-gray-900 hover:bg-sky-5/30 dark:hover:bg-gray-800/35 rounded-xl border border-sky-100/70 dark:border-gray-800 shadow-xs transition-all duration-200 cursor-pointer gap-3 border-l-4 ${task.priority === "High"
         ? "border-l-red-500"
