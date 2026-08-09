@@ -1,7 +1,7 @@
 import React from "react";
-import { Search, X, List, LayoutGrid, BarChart2 } from "lucide-react";
+import { Search, X, List, LayoutGrid } from "lucide-react";
 import { FilterSelect } from "./FilterSelect";
-import { IUser, DashboardFiltersProps } from "../../../types";
+import { DashboardFiltersProps } from "../../../types";
 
 export const DashboardFilters: React.FC<DashboardFiltersProps> = ({
   searchQuery,
@@ -70,7 +70,10 @@ export const DashboardFilters: React.FC<DashboardFiltersProps> = ({
           options={[
             { label: "All", value: "all" },
             { label: "Unassigned", value: "unassigned" },
-            ...members.map((member) => ({ label: member.name, value: member._id })),
+            ...members.map((member) => ({
+              label: member.name,
+              value: member._id,
+            })),
           ]}
         />
 

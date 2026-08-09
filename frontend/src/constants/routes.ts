@@ -17,15 +17,19 @@ export const API_ROUTES = {
     ADMIN_BY_ID: (id: string) => `/api/organization/${id}/admin`,
     STATUS_BY_ID: (id: string) => `/api/organization/${id}/status`,
     DELETE_BY_ID: (id: string) => `/api/organization/${id}`,
-    STATUS_DELETE: (statusName: string) => `/api/organization/statuses/${encodeURIComponent(statusName)}`,
-    USER_STATUS_UPDATE: (userId: string) => `/api/organization/users/${userId}/status`,
+    STATUS_DELETE: (statusName: string) =>
+      `/api/organization/statuses/${encodeURIComponent(statusName)}`,
+    USER_STATUS_UPDATE: (userId: string) =>
+      `/api/organization/users/${userId}/status`,
   },
   TASKS: {
     BASE: "/api/tasks/gp",
     BY_ID: (id: string) => `/api/tasks/${id}/gp`,
     ANALYTICS: "/api/tasks/gp/analytics",
     ADD_COMMENT: (id: string) => `/api/tasks/${id}/comments`,
-    DELETE_COMMENT: (id: string, commentId: string) => `/api/tasks/${id}/comments/${commentId}`,
+    DELETE_COMMENT: (id: string, commentId: string) =>
+      `/api/tasks/${id}/comments/${commentId}`,
+    LOG_WORK: (id: string) => `/api/tasks/${id}/worklogs`,
   },
   SPRINTS: {
     BASE: "/api/sprints",

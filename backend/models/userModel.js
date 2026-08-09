@@ -30,6 +30,8 @@ const userSchema = new mongoose.Schema({
   },
 }, { timestamps: true });
 
+userSchema.index({ organization: 1 });
+
 const userModal = mongoose.models.user || mongoose.model("user", userSchema);
 
 export default userModal;

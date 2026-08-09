@@ -1,10 +1,10 @@
 import React, { useCallback, useEffect, useState } from "react";
 import Navbar from "./Navbar";
 import Sidebar from "./Sidebar";
-import { Outlet, useLocation } from "react-router-dom";
+import { Outlet } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../store";
 import { fetchTasks } from "../store/slices/taskSlice";
-import { IUser, ITask, LayoutProps } from "../types";
+import { LayoutProps } from "../types";
 
 const Layout: React.FC<LayoutProps> = ({ user, onLogout }) => {
   const dispatch = useAppDispatch();
@@ -12,19 +12,18 @@ const Layout: React.FC<LayoutProps> = ({ user, onLogout }) => {
   const loading = useAppSelector((state) => state.tasks.loading);
   const error = useAppSelector((state) => state.tasks.error);
   const [viewMode, setViewMode] = useState("kanban");
-  const location = useLocation();
-  const isDashboard = location.pathname === "/";
 
-  const fetchTasksData = useCallback(async (silent = true) => {
-    if (user?.role === "system_admin") return;
-    dispatch(fetchTasks());
-  }, [dispatch, user?.role]);
+  const fetchTasksData = useCallback(
+    async (silent = true) => {
+      if (user?.role === "system_admin") return;
+      dispatch(fetchTasks());
+    },
+    [dispatch, user?.role]
+  );
 
   useEffect(() => {
     fetchTasksData(false);
   }, [fetchTasksData]);
-
-
 
   // Loading
   if (loading && tasks.length === 0)
@@ -58,26 +57,37 @@ const Layout: React.FC<LayoutProps> = ({ user, onLogout }) => {
       <Navbar user={user || undefined} onLogout={onLogout} />
       {hasSidebar && <Sidebar user={user} tasks={tasks} />}
 
-      <div className={`${hasSidebar ? "pl-0 md:pl-20 lg:pl-56" : "pl-0"} transition-all duration-300 min-h-screen w-full overflow-x-hidden`}>
+      <div
+        className={`${
+          hasSidebar ? "pl-0 md:pl-20 lg:pl-56" : "pl-0"
+        } transition-all duration-300 min-h-screen w-full overflow-x-hidden`}
+      >
         <div className="px-4 sm:px-6 md:px-8 pt-8 pb-6 w-full transition-all duration-300 text-gray-900 dark:text-gray-100">
-        {error && (
-          <div className=" mb-4 bg-red-50 text-red-600 p-3 rounded-lg border border-red-100 flex justify-between items-center text-sm animate-fadeIn">
-            <span>Failed to sync tasks: {error}</span>
-            <button
-              onClick={() => fetchTasksData(true)}
-              className=" underline text-red-700 hover:text-red-900 font-medium"
-            >
-              Retry
-            </button>
+          {error && (
+            <div className=" mb-4 bg-red-50 text-red-600 p-3 rounded-lg border border-red-100 flex justify-between items-center text-sm animate-fadeIn">
+              <span>Failed to sync tasks: {error}</span>
+              <button
+                onClick={() => fetchTasksData(true)}
+                className=" underline text-red-700 hover:text-red-900 font-medium"
+              >
+                Retry
+              </button>
+            </div>
+          )}
+          <div className="w-full">
+            <Outlet
+              context={{
+                tasks,
+                refreshTasks: fetchTasksData,
+                viewMode,
+                setViewMode,
+              }}
+            />
           </div>
-        )}
-        <div className="w-full">
-          <Outlet context={{ tasks, refreshTasks: fetchTasksData, viewMode, setViewMode }} />
         </div>
       </div>
     </div>
-  </div>
-);
+  );
 };
 
 export default Layout;

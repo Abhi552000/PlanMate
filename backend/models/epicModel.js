@@ -20,5 +20,7 @@ const epicSchema = new mongoose.Schema({
   },
 }, { timestamps: true });
 
+epicSchema.index({ organization: 1 });
+
 const Epic = mongoose.models.epic || mongoose.model("epic", epicSchema);
 export default Epic;

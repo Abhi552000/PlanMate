@@ -1,12 +1,8 @@
 import React, { useEffect, useState } from "react";
-import {
-  LINK_CLASSES,
-  menuItems,
-  SIDEBAR_CLASSES,
-} from "../assets/dummy";
-import { Menu, Sparkles, X, Users, Building, Zap } from "lucide-react";
+import { LINK_CLASSES, menuItems, SIDEBAR_CLASSES } from "../assets/dummy";
+import { Menu, X, Users, Building } from "lucide-react";
 import { NavLink } from "react-router-dom";
-import { IUser, ITask, SidebarProps } from "../types";
+import { SidebarProps } from "../types";
 
 const Sidebar: React.FC<SidebarProps> = ({ user, tasks }) => {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -139,7 +135,6 @@ const Sidebar: React.FC<SidebarProps> = ({ user, tasks }) => {
     <>
       {/* DESKTOP SIDEBAR */}
       <div className={SIDEBAR_CLASSES.desktop}>
-
         <div className=" px-4 py-8 space-y-6 overflow-y-auto flex-1">
           {renderMenuItems()}
         </div>
@@ -175,7 +170,6 @@ const Sidebar: React.FC<SidebarProps> = ({ user, tasks }) => {
                 <X className=" w-5 h-5" />
               </button>
             </div>
-
 
             {renderMenuItems(true)}
           </div>

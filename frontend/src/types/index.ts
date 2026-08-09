@@ -5,3 +5,4 @@ export * from "./agile";
 export * from "./auth";
 export * from "./ui";
 export * from "./dashboard";
+export * from "./components";

@@ -8,6 +8,7 @@ import orgRouter from "./routes/organizationRoute.js";
 import notificationRouter from "./routes/notificationRoute.js";
 import sprintRouter from "./routes/sprintRoute.js";
 import epicRouter from "./routes/epicRoute.js";
+import { errorHandler } from "./middleware/errorHandler.js";
 
 const app = express();
 const port = process.env.PORT || 4000;
@@ -36,6 +37,9 @@ app.use("/api/epics", epicRouter);
 app.get("/", (req, res) => {
   res.send("API WORKING");
 });
+
+// Centralized Error Handling Middleware (must be registered last)
+app.use(errorHandler);
 
 app.listen(port, () => {
   console.log(`Server started on http://localhost:${port}`);

@@ -61,6 +61,35 @@ const taskSchema = new mongoose.Schema({
     type: Number,
     default: 1,
   },
+  originalEstimate: {
+    type: Number,
+    default: 0,
+  },
+  timeLogged: {
+    type: Number,
+    default: 0,
+  },
+  workLogs: [
+    {
+      hoursSpent: {
+        type: Number,
+        required: true,
+      },
+      description: {
+        type: String,
+        default: "",
+      },
+      user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "user",
+        required: true,
+      },
+      createdAt: {
+        type: Date,
+        default: Date.now,
+      },
+    },
+  ],
   subtasks: [
     {
       title: {

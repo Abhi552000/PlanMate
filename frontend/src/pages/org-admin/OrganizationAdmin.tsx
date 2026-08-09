@@ -4,6 +4,7 @@ import { toast } from "react-toastify";
 import { orgService } from "../../services/orgService";
 import { IUser } from "../../types";
 import { ROUTES } from "../../constants/routeConstant";
+import { TOAST_MESSAGES, CONSOLE_ERRORS } from "../../constants/messages";
 
 // Sub-components
 import { OrgAdminHeader } from "./components/OrgAdminHeader";
@@ -63,7 +64,7 @@ const OrganizationAdmin = () => {
         });
       }
     } catch (err) {
-      console.error("Error fetching org details:", err);
+      console.error(CONSOLE_ERRORS.FETCH_ORG_DETAILS, err);
     }
   };
 
@@ -82,7 +83,7 @@ const OrganizationAdmin = () => {
         setTotalCount(data.pagination.totalCount);
       }
     } catch (err) {
-      console.error("Error fetching organization users:", err);
+      console.error(CONSOLE_ERRORS.FETCH_ORG_USERS, err);
     }
   };
 
@@ -96,7 +97,7 @@ const OrganizationAdmin = () => {
       try {
         await Promise.all([fetchOrgDetails(), fetchTeamUsers()]);
       } catch (err) {
-        console.error("Error loading roster:", err);
+        console.error(CONSOLE_ERRORS.LOAD_ROSTER, err);
       } finally {
         setLoading(false);
       }
@@ -108,20 +109,20 @@ const OrganizationAdmin = () => {
     e.preventDefault();
     const { name, email, password } = newMember;
     if (!name || !email || !password) {
-      toast.error("Please fill all member onboarding fields");
+      toast.error(TOAST_MESSAGES.MEMBER_FIELDS_REQUIRED);
       return;
     }
     setAddingMember(true);
     try {
       const data = await orgService.addOrgMember(newMember);
       if (data?.success) {
-        toast.success(`Member ${name} onboarded successfully!`);
+        toast.success(TOAST_MESSAGES.MEMBER_ONBOARD_SUCCESS(name));
         setNewMember({ name: "", email: "", password: "" });
         setShowOnboardModal(false);
         await fetchTeamUsers();
       }
     } catch (err: any) {
-      toast.error(err?.response?.data?.message || "Failed to add member");
+      toast.error(err?.response?.data?.message || TOAST_MESSAGES.MEMBER_ONBOARD_ERROR);
     } finally {
       setAddingMember(false);
     }
@@ -133,7 +134,7 @@ const OrganizationAdmin = () => {
       const data = await orgService.updateUserStatus(targetUser._id, newStatus, remark);
       if (data?.success) {
         toast.success(
-          `Access request for ${targetUser.name} is now updated to ${newStatus}.`
+          TOAST_MESSAGES.MEMBER_STATUS_GRANT_SUCCESS(targetUser.name, newStatus)
         );
         await fetchTeamUsers();
         if (inspectingUser && inspectingUser._id === targetUser._id) {
@@ -144,7 +145,7 @@ const OrganizationAdmin = () => {
         setPendingNewStatus(null);
       }
     } catch (err: any) {
-      toast.error(err?.response?.data?.message || "Failed to update user status");
+      toast.error(err?.response?.data?.message || TOAST_MESSAGES.MEMBER_STATUS_UPDATE_ERROR);
     } finally {
       setTogglingStatus(false);
     }

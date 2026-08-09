@@ -1,4 +1,6 @@
 import Notification from "../models/notificationModel.js";
+import { HttpStatus } from "../constants/httpStatus.js";
+import { MESSAGES } from "../constants/messages.js";
 
 // GET ALL NOTIFICATIONS FOR USER
 export const getNotifications = async (req, res) => {
@@ -8,7 +10,7 @@ export const getNotifications = async (req, res) => {
       .limit(50);
     res.json({ success: true, notifications });
   } catch (error) {
-    res.status(400).json({ success: false, message: error.message });
+    res.status(HttpStatus.BAD_REQUEST).json({ success: false, message: error.message });
   }
 };
 
@@ -21,11 +23,13 @@ export const markAsRead = async (req, res) => {
       { new: true }
     );
     if (!updated) {
-      return res.status(404).json({ success: false, message: "Notification not found" });
+      return res
+        .status(HttpStatus.NOT_FOUND)
+        .json({ success: false, message: MESSAGES.NOTIFICATION.NOT_FOUND });
     }
     res.json({ success: true, notification: updated });
   } catch (error) {
-    res.status(400).json({ success: false, message: error.message });
+    res.status(HttpStatus.BAD_REQUEST).json({ success: false, message: error.message });
   }
 };
 
@@ -35,6 +39,6 @@ export const markAllAsRead = async (req, res) => {
     await Notification.updateMany({ user: req.user.id, read: false }, { read: true });
     res.json({ success: true, message: "All notifications marked as read" });
   } catch (error) {
-    res.status(400).json({ success: false, message: error.message });
+    res.status(HttpStatus.BAD_REQUEST).json({ success: false, message: error.message });
   }
 };

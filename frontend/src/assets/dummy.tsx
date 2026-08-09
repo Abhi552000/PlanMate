@@ -12,6 +12,7 @@ import {
   SortAsc,
   Award,
   Edit2,
+  Calendar,
 } from "lucide-react";
 
 // FRONTEND CONSTANTS
@@ -32,6 +33,7 @@ export const DEFAULT_TASK = {
   dueDate: "",
   completed: "No",
   id: null as string | null,
+  originalEstimate: 0,
 };
 
 // LOGIN CSS
@@ -68,6 +70,7 @@ export const menuItems = [
   { text: "Dashboard", path: "/", icon: <Home className="w-5 h-5" /> },
   { text: "Backlog", path: "/backlog", icon: <ListChecks className="w-5 h-5" /> },
   { text: "Active Sprint", path: "/active-sprint", icon: <Flame className="w-5 h-5" /> },
+  { text: "Calendar", path: "/calendar", icon: <Calendar className="w-5 h-5" /> },
 ];
 
 export const SIDEBAR_CLASSES = {

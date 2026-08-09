@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Users, Eye, Power, RotateCcw, MoreVertical, ShieldAlert } from "lucide-react";
+import { Users, Eye, Power, RotateCcw, MoreVertical } from "lucide-react";
 import { OrgMembersTableProps } from "../../../types";
 
 const ITEMS_PER_PAGE = 5;

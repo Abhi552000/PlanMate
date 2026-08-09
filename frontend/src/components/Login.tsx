@@ -5,6 +5,8 @@ import { toast } from "react-toastify";
 import { authService } from "../services/authService";
 import { Input } from "./ui/Input";
 import { Button } from "./ui/Button";
+import { TOAST_MESSAGES } from "../constants/messages";
+import { AUTH_TEXTS } from "../constants/uiTexts";
 
 const INITIAL_FORM = { email: "", password: "" };
 
@@ -26,8 +28,9 @@ export const Login: React.FC<LoginProps> = ({ onSubmit, onSwitchMode }) => {
           const data = await authService.getMe();
           if (data.success) {
             onSubmit?.({ token, userId, ...data.user });
-            toast.success("Session restored. Redirecting...");
-            const targetPath = data.user.role === "system_admin" ? "/system-admin" : "/";
+            toast.success(TOAST_MESSAGES.AUTH_SESSION_RESTORED);
+            const targetPath =
+              data.user.role === "system_admin" ? "/system-admin" : "/";
             navigate(targetPath);
           } else {
             localStorage.clear();
@@ -47,25 +50,29 @@ export const Login: React.FC<LoginProps> = ({ onSubmit, onSwitchMode }) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!rememberMe) {
-      toast.error('You must enable "Remember Me" to login');
+      toast.error(TOAST_MESSAGES.AUTH_REMEMBER_ME_REQUIRED);
       return;
     }
     setLoading(true);
     try {
       const data = await authService.login(formData);
-      if (!data.token) throw new Error(data.message || "Login Failed");
+      if (!data.token)
+        throw new Error(data.message || TOAST_MESSAGES.AUTH_LOGIN_FAILED);
 
       localStorage.setItem("token", data.token);
       localStorage.setItem("userId", data.user.id);
       setFormData(INITIAL_FORM);
       onSubmit?.({ token: data.token, userId: data.user.id, ...data.user });
-      toast.success("Login successfull Redirecting...");
-      const targetPath = data.user.role === "system_admin" ? "/system-admin" : "/";
+      toast.success(TOAST_MESSAGES.AUTH_LOGIN_SUCCESS);
+      const targetPath =
+        data.user.role === "system_admin" ? "/system-admin" : "/";
       setTimeout(() => navigate(targetPath), 1000);
     } catch (err: any) {
       console.log("err", err);
       const msg =
-        err?.response?.data?.message || err?.message || "Login failed";
+        err?.response?.data?.message ||
+        err?.message ||
+        TOAST_MESSAGES.AUTH_LOGIN_FAILED;
       toast.error(msg);
     } finally {
       setLoading(false);
@@ -78,15 +85,18 @@ export const Login: React.FC<LoginProps> = ({ onSubmit, onSwitchMode }) => {
         <div className=" w-16 h-16 bg-gradient-to-br from-cyan-500 to-sky-600 rounded-full mx-auto flex items-center justify-center mb-4">
           <LogIn className=" w-8 h-8 text-white" />
         </div>
-        <h2 className=" text-2xl font-bold text-gray-800"> Welcome Back</h2>
+        <h2 className=" text-2xl font-bold text-gray-800">
+          {" "}
+          {AUTH_TEXTS.LOGIN_WELCOME}
+        </h2>
         <p className=" text-gray-500 text-sm mt-1">
-          Sign in to continue to PlanMate
+          {AUTH_TEXTS.LOGIN_SUBTITLE}
         </p>
       </div>
       <form onSubmit={handleSubmit} className=" space-y-4">
         <Input
           type="email"
-          placeholder="Email"
+          placeholder={AUTH_TEXTS.LOGIN_INPUT_EMAIL}
           value={formData.email}
           onChange={(e) => setFormData({ ...formData, email: e.target.value })}
           icon={<Mail className="w-5 h-5" />}
@@ -95,9 +105,11 @@ export const Login: React.FC<LoginProps> = ({ onSubmit, onSwitchMode }) => {
         <div className="relative">
           <Input
             type={showPassword ? "text" : "password"}
-            placeholder="Password"
+            placeholder={AUTH_TEXTS.LOGIN_INPUT_PASSWORD}
             value={formData.password}
-            onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+            onChange={(e) =>
+              setFormData({ ...formData, password: e.target.value })
+            }
             icon={<Lock className="w-5 h-5" />}
             required
           />
@@ -127,21 +139,26 @@ export const Login: React.FC<LoginProps> = ({ onSubmit, onSwitchMode }) => {
             htmlFor="rememberMe"
             className=" ml-2 block text-sm text-gray-700 cursor-pointer select-none"
           >
-            Remember Me
+            {AUTH_TEXTS.LOGIN_REMEMBER_ME}
           </label>
         </div>
-        <Button type="submit" className="w-full" loading={loading} icon={<LogIn className="w-4 h-4" />}>
-          Login In
+        <Button
+          type="submit"
+          className="w-full"
+          loading={loading}
+          icon={<LogIn className="w-4 h-4" />}
+        >
+          {AUTH_TEXTS.LOGIN_BTN}
         </Button>
       </form>
       <p className=" text-center text-xs text-gray-500 mt-6 font-medium">
-        Don't have an account?{" "}
+        {AUTH_TEXTS.LOGIN_NO_ACCOUNT}{" "}
         <button
           type="button"
           onClick={handleSwitchMode}
           className=" text-sky-600 hover:text-sky-700 hover:underline font-bold transition-colors cursor-pointer"
         >
-          Request Access
+          {AUTH_TEXTS.LOGIN_BTN_REQUEST}
         </button>
       </p>
     </div>

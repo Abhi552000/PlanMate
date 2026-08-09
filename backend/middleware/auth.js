@@ -1,5 +1,7 @@
 import jwt from "jsonwebtoken";
 import User from "../models/userModel.js";
+import { HttpStatus } from "../constants/httpStatus.js";
+import { MESSAGES } from "../constants/messages.js";
 
 const JWT_SECRET = process.env.JWT_SECRET || "your_jwt_secret_here";
 
@@ -9,7 +11,7 @@ export default async function authMiddleware(req, res, next) {
 
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
     return res
-      .status(401)
+      .status(HttpStatus.UNAUTHORIZED)
       .json({ success: false, message: "Not Authorized, token missing" });
   }
 
@@ -22,16 +24,16 @@ export default async function authMiddleware(req, res, next) {
 
     if (!user) {
       return res
-        .status(401)
-        .json({ success: false, message: "User not found" });
+        .status(HttpStatus.UNAUTHORIZED)
+        .json({ success: false, message: MESSAGES.AUTH.USER_NOT_FOUND });
     }
 
     req.user = user;
-    next(); // ✅ Proceed to the next middleware or route handler
+    next(); // Proceed to the next middleware or route handler
   } catch (err) {
     console.error("JWT verification failed", err);
     return res
-      .status(401)
+      .status(HttpStatus.UNAUTHORIZED)
       .json({ success: false, message: "Token invalid or expired" });
   }
 }

@@ -9,4 +9,5 @@ export const ROUTES = {
   SYSTEM_ADMIN: "/system-admin",
   BACKLOG: "/backlog",
   ACTIVE_SPRINT: "/active-sprint",
+  CALENDAR: "/calendar",
 };

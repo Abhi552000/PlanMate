@@ -1,10 +1,20 @@
 import React, { useEffect, useState } from "react";
-import { UserPlus, ArrowLeft, Building, User, Mail, Lock, Check } from "lucide-react";
+import {
+  UserPlus,
+  ArrowLeft,
+  Building,
+  User,
+  Mail,
+  Lock,
+  Check,
+} from "lucide-react";
 import { authService } from "../services/authService";
 import { orgService } from "../services/orgService";
 import { Input } from "./ui/Input";
 import { Select } from "./ui/Select";
 import { Button } from "./ui/Button";
+import { TOAST_MESSAGES } from "../constants/messages";
+import { AUTH_TEXTS } from "../constants/uiTexts";
 
 import { SignupProps, Organization } from "../types";
 
@@ -14,7 +24,7 @@ export const Signup: React.FC<SignupProps> = ({ onSwitchMode }) => {
     name: "",
     email: "",
     password: "",
-    organization: ""
+    organization: "",
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -28,7 +38,7 @@ export const Signup: React.FC<SignupProps> = ({ onSwitchMode }) => {
           setOrganizations(data.organizations);
         }
       } catch (err) {
-        console.error("Error fetching organizations list:", err);
+        console.error(TOAST_MESSAGES.AUTH_ORG_LIST_ERROR, err);
       }
     };
     fetchOrgs();
@@ -36,8 +46,13 @@ export const Signup: React.FC<SignupProps> = ({ onSwitchMode }) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.name || !formData.email || !formData.password || !formData.organization) {
-      setError("Please fill in all details, including organization.");
+    if (
+      !formData.name ||
+      !formData.email ||
+      !formData.password ||
+      !formData.organization
+    ) {
+      setError(AUTH_TEXTS.ERROR_FILL_DETAILS);
       return;
     }
     setLoading(true);
@@ -47,11 +62,13 @@ export const Signup: React.FC<SignupProps> = ({ onSwitchMode }) => {
     try {
       const data = await authService.register(formData);
       if (data?.success) {
-        setSuccessMessage(data.message || "Registration request submitted successfully!");
+        setSuccessMessage(data.message || AUTH_TEXTS.SIGNUP_SUCCESS_DEFAULT);
         setFormData({ name: "", email: "", password: "", organization: "" });
       }
     } catch (err: any) {
-      setError(err.response?.data?.message || "Registration failed. Please try again.");
+      setError(
+        err.response?.data?.message || AUTH_TEXTS.ERROR_REGISTRATION_FAILED
+      );
     } finally {
       setLoading(false);
     }
@@ -63,9 +80,11 @@ export const Signup: React.FC<SignupProps> = ({ onSwitchMode }) => {
         <div className=" w-14 h-14 bg-gradient-to-r from-cyan-500 to-sky-600 rounded-full mx-auto flex items-center justify-center mb-3">
           <UserPlus className=" w-7 h-7 text-white" />
         </div>
-        <h2 className=" text-2xl font-bold text-gray-800">Create Account</h2>
+        <h2 className=" text-2xl font-bold text-gray-800">
+          {AUTH_TEXTS.SIGNUP_TITLE}
+        </h2>
         <p className=" text-gray-400 text-xs mt-1">
-          Join your organization's PlanMate workspace
+          {AUTH_TEXTS.SIGNUP_SUBTITLE}
         </p>
       </div>
 
@@ -89,15 +108,15 @@ export const Signup: React.FC<SignupProps> = ({ onSwitchMode }) => {
             className="w-full"
             icon={<ArrowLeft className="w-4 h-4" />}
           >
-            Go to Login
+            {AUTH_TEXTS.SIGNUP_BTN_BACK}
           </Button>
         </div>
       ) : (
         <form onSubmit={handleSubmit} className=" space-y-4">
           <Input
-            label="Full Name"
+            label={AUTH_TEXTS.SIGNUP_INPUT_NAME}
             type="text"
-            placeholder="John Doe"
+            placeholder={AUTH_TEXTS.SIGNUP_PLACEHOLDER_NAME}
             value={formData.name}
             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
             icon={<User className="w-4.5 h-4.5" />}
@@ -105,33 +124,42 @@ export const Signup: React.FC<SignupProps> = ({ onSwitchMode }) => {
           />
 
           <Input
-            label="Email Address"
+            label={AUTH_TEXTS.SIGNUP_INPUT_EMAIL}
             type="email"
-            placeholder="john@example.com"
+            placeholder={AUTH_TEXTS.SIGNUP_PLACEHOLDER_EMAIL}
             value={formData.email}
-            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+            onChange={(e) =>
+              setFormData({ ...formData, email: e.target.value })
+            }
             icon={<Mail className="w-4.5 h-4.5" />}
             required
           />
 
           <Input
-            label="Password"
+            label={AUTH_TEXTS.SIGNUP_INPUT_PASSWORD}
             type="password"
-            placeholder="Minimum 8 characters"
+            placeholder={AUTH_TEXTS.SIGNUP_PLACEHOLDER_PASSWORD}
             value={formData.password}
-            onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+            onChange={(e) =>
+              setFormData({ ...formData, password: e.target.value })
+            }
             icon={<Lock className="w-4.5 h-4.5" />}
             required
           />
 
           <Select
-            label="Select Workspace Organization"
+            label={AUTH_TEXTS.SIGNUP_INPUT_ORG}
             value={formData.organization}
-            onChange={(e) => setFormData({ ...formData, organization: e.target.value })}
+            onChange={(e) =>
+              setFormData({ ...formData, organization: e.target.value })
+            }
             icon={<Building className="w-4.5 h-4.5" />}
             options={[
-              { label: "Choose your company...", value: "" },
-              ...organizations.map((org) => ({ label: org.name, value: org._id }))
+              { label: AUTH_TEXTS.SIGNUP_PLACEHOLDER_ORG, value: "" },
+              ...organizations.map((org) => ({
+                label: org.name,
+                value: org._id,
+              })),
             ]}
             required
           />
@@ -142,17 +170,17 @@ export const Signup: React.FC<SignupProps> = ({ onSwitchMode }) => {
             className="w-full"
             loading={loading}
           >
-            Submit Access Request
+            {AUTH_TEXTS.SIGNUP_BTN_SUBMIT}
           </Button>
-          
-          <p className=" text-center text-xs text-gray-505 mt-4">
-            Already have an account?{" "}
+
+          <p className=" text-center text-xs text-gray-550 mt-4">
+            {AUTH_TEXTS.SIGNUP_HAS_ACCOUNT}{" "}
             <button
               type="button"
               onClick={onSwitchMode}
               className=" text-sky-600 hover:text-sky-700 hover:underline font-bold transition-colors cursor-pointer"
             >
-              Log In
+              {AUTH_TEXTS.SIGNUP_BTN_LOGIN}
             </button>
           </p>
         </form>

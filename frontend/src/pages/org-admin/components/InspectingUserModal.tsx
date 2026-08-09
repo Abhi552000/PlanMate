@@ -1,5 +1,5 @@
 import React from "react";
-import { User, X, Calendar, ClipboardList, CheckCircle2, AlertCircle } from "lucide-react";
+import { User, X, Calendar, AlertCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { InspectingUserModalProps } from "../../../types";
 
@@ -10,7 +10,8 @@ export const InspectingUserModal: React.FC<InspectingUserModalProps> = ({
   const navigate = useNavigate();
   if (!inspectingUser) return null;
 
-  const totalTasks = (inspectingUser.solvedTasks || 0) + (inspectingUser.pendingTasks || 0);
+  const totalTasks =
+    (inspectingUser.solvedTasks || 0) + (inspectingUser.pendingTasks || 0);
 
   return (
     <div className="fixed inset-0 bg-black/45 backdrop-blur-sm z-50 flex items-center justify-center p-4">
@@ -59,7 +60,8 @@ export const InspectingUserModal: React.FC<InspectingUserModalProps> = ({
                 Workspace Access
               </span>
               <div>
-                {inspectingUser.status === "active" || inspectingUser.status === undefined ? (
+                {inspectingUser.status === "active" ||
+                inspectingUser.status === undefined ? (
                   <span className="text-[9px] font-bold uppercase tracking-wider bg-green-50 text-green-700 px-2 py-0.5 rounded border border-green-200">
                     Approved
                   </span>
@@ -103,7 +105,9 @@ export const InspectingUserModal: React.FC<InspectingUserModalProps> = ({
                 <span className="block font-bold text-sky-700 dark:text-sky-400 text-sm sm:text-base">
                   {inspectingUser.todoTasks || 0}
                 </span>
-                <span className="text-[8px] sm:text-[9px] text-gray-400 uppercase font-black">To Do</span>
+                <span className="text-[8px] sm:text-[9px] text-gray-400 uppercase font-black">
+                  To Do
+                </span>
               </button>
               <button
                 onClick={() => {
@@ -115,7 +119,9 @@ export const InspectingUserModal: React.FC<InspectingUserModalProps> = ({
                 <span className="block font-bold text-amber-700 dark:text-amber-400 text-sm sm:text-base">
                   {inspectingUser.pendingTasks || 0}
                 </span>
-                <span className="text-[8px] sm:text-[9px] text-gray-400 uppercase font-black">Pending</span>
+                <span className="text-[8px] sm:text-[9px] text-gray-400 uppercase font-black">
+                  Pending
+                </span>
               </button>
               <button
                 onClick={() => {
@@ -127,7 +133,9 @@ export const InspectingUserModal: React.FC<InspectingUserModalProps> = ({
                 <span className="block font-bold text-green-700 dark:text-green-400 text-sm sm:text-base">
                   {inspectingUser.solvedTasks || 0}
                 </span>
-                <span className="text-[8px] sm:text-[9px] text-gray-400 uppercase font-black">Resolved</span>
+                <span className="text-[8px] sm:text-[9px] text-gray-400 uppercase font-black">
+                  Resolved
+                </span>
               </button>
               <button
                 onClick={() => {
@@ -139,7 +147,9 @@ export const InspectingUserModal: React.FC<InspectingUserModalProps> = ({
                 <span className="block font-bold text-gray-750 dark:text-gray-300 text-sm sm:text-base">
                   {totalTasks}
                 </span>
-                <span className="text-[8px] sm:text-[9px] text-gray-400 uppercase font-black">Total</span>
+                <span className="text-[8px] sm:text-[9px] text-gray-400 uppercase font-black">
+                  Total
+                </span>
               </button>
             </div>
           </div>

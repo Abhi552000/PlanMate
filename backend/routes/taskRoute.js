@@ -9,6 +9,7 @@ import {
   addTaskComment,
   deleteTaskComment,
   getTaskAnalytics,
+  logWork,
 } from "../controllers/taskContoller.js";
 
 const taskRouter = express.Router();
@@ -28,5 +29,6 @@ taskRouter
 
 taskRouter.route("/:id/comments").post(authMiddleware, addTaskComment);
 taskRouter.route("/:id/comments/:commentId").delete(authMiddleware, deleteTaskComment);
+taskRouter.route("/:id/worklogs").post(authMiddleware, logWork);
 
 export default taskRouter;
