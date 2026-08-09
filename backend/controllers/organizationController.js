@@ -3,33 +3,45 @@ import User from "../models/userModel.js";
 import Task from "../models/taskModel.js";
 import bcrypt from "bcrypt";
 import validator from "validator";
+import { HttpStatus } from "../constants/httpStatus.js";
+import { MESSAGES } from "../constants/messages.js";
 
 // Onboard a new organization (System Admin or Public Onboarding)
 export const onboardOrganization = async (req, res) => {
   if (req.user?.role !== "system_admin") {
-    return res.status(403).json({ success: false, message: "Access denied. System admin only." });
+    return res
+      .status(HttpStatus.FORBIDDEN)
+      .json({ success: false, message: MESSAGES.ORG.SYS_ADMIN_REQUIRED });
   }
   const { orgName, adminName, adminEmail, adminPassword } = req.body;
 
   if (!orgName || !adminName || !adminEmail) {
-    return res.status(400).json({ success: false, message: "Organization Name, Admin Name and Admin Email are required" });
+    return res
+      .status(HttpStatus.BAD_REQUEST)
+      .json({ success: false, message: "Organization Name, Admin Name and Admin Email are required" });
   }
 
   if (!validator.isEmail(adminEmail)) {
-    return res.status(400).json({ success: false, message: "Invalid email address" });
+    return res
+      .status(HttpStatus.BAD_REQUEST)
+      .json({ success: false, message: MESSAGES.AUTH.INVALID_EMAIL });
   }
 
   // Generate random password if not provided
   const generatedPassword = adminPassword || (Math.random().toString(36).slice(-8) + "!");
 
   if (generatedPassword.length < 8) {
-    return res.status(400).json({ success: false, message: "Password must be at least 8 characters" });
+    return res
+      .status(HttpStatus.BAD_REQUEST)
+      .json({ success: false, message: MESSAGES.AUTH.PASSWORD_LENGTH });
   }
 
   try {
     const existingUser = await User.findOne({ email: adminEmail });
     if (existingUser) {
-      return res.status(400).json({ success: false, message: "Admin user already exists" });
+      return res
+        .status(HttpStatus.BAD_REQUEST)
+        .json({ success: false, message: MESSAGES.ORG.ONBOARD_FAILED + ": Admin user already exists" });
     }
 
     // Hash password
@@ -57,9 +69,9 @@ export const onboardOrganization = async (req, res) => {
     savedUser.organization = savedOrg._id;
     await savedUser.save();
 
-    res.status(201).json({
+    res.status(HttpStatus.CREATED).json({
       success: true,
-      message: "Organization onboarded successfully",
+      message: MESSAGES.ORG.ONBOARD_SUCCESS,
       organization: savedOrg,
       admin: {
         id: savedUser._id,
@@ -70,7 +82,9 @@ export const onboardOrganization = async (req, res) => {
     });
   } catch (error) {
     console.error("Onboarding error:", error);
-    res.status(500).json({ success: false, message: "Server error during onboarding" });
+    res
+      .status(HttpStatus.INTERNAL_SERVER_ERROR)
+      .json({ success: false, message: MESSAGES.COMMON.SERVER_ERROR });
   }
 };
 
@@ -78,16 +92,22 @@ export const onboardOrganization = async (req, res) => {
 export const getOrganizationInfo = async (req, res) => {
   try {
     if (!req.user.organization) {
-      return res.status(404).json({ success: false, message: "User is not associated with any organization" });
+      return res
+        .status(HttpStatus.NOT_FOUND)
+        .json({ success: false, message: MESSAGES.ORG.NOT_FOUND });
     }
     const org = await Organization.findById(req.user.organization).populate("admin", "name email");
     if (!org) {
-      return res.status(404).json({ success: false, message: "Organization not found" });
+      return res
+        .status(HttpStatus.NOT_FOUND)
+        .json({ success: false, message: MESSAGES.ORG.NOT_FOUND });
     }
     res.json({ success: true, organization: org });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ success: false, message: "Server error fetching organization" });
+    res
+      .status(HttpStatus.INTERNAL_SERVER_ERROR)
+      .json({ success: false, message: MESSAGES.COMMON.SERVER_ERROR });
   }
 };
 
@@ -96,11 +116,15 @@ export const updateOrganizationInfo = async (req, res) => {
   const { name, description } = req.body;
 
   if (req.user.role !== "org_admin") {
-    return res.status(403).json({ success: false, message: "Only organization admins can perform this action" });
+    return res
+      .status(HttpStatus.FORBIDDEN)
+      .json({ success: false, message: MESSAGES.ORG.NOT_AUTHORIZED });
   }
 
   if (!name) {
-    return res.status(400).json({ success: false, message: "Organization name is required" });
+    return res
+      .status(HttpStatus.BAD_REQUEST)
+      .json({ success: false, message: MESSAGES.ORG.NOT_FOUND + ": Name required" });
   }
 
   try {
@@ -111,13 +135,17 @@ export const updateOrganizationInfo = async (req, res) => {
     );
 
     if (!updated) {
-      return res.status(404).json({ success: false, message: "Organization not found" });
+      return res
+        .status(HttpStatus.NOT_FOUND)
+        .json({ success: false, message: MESSAGES.ORG.NOT_FOUND });
     }
 
-    res.json({ success: true, message: "Organization updated successfully", organization: updated });
+    res.json({ success: true, message: MESSAGES.ORG.UPDATED, organization: updated });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ success: false, message: "Server error updating organization" });
+    res
+      .status(HttpStatus.INTERNAL_SERVER_ERROR)
+      .json({ success: false, message: MESSAGES.COMMON.SERVER_ERROR });
   }
 };
 
@@ -126,25 +154,35 @@ export const addOrganizationMember = async (req, res) => {
   const { name, email, password } = req.body;
 
   if (req.user.role !== "org_admin") {
-    return res.status(403).json({ success: false, message: "Only organization admins can add members" });
+    return res
+      .status(HttpStatus.FORBIDDEN)
+      .json({ success: false, message: MESSAGES.ORG.NOT_AUTHORIZED });
   }
 
   if (!name || !email || !password) {
-    return res.status(400).json({ success: false, message: "All fields are required" });
+    return res
+      .status(HttpStatus.BAD_REQUEST)
+      .json({ success: false, message: MESSAGES.AUTH.ALL_FIELDS_REQUIRED });
   }
 
   if (!validator.isEmail(email)) {
-    return res.status(400).json({ success: false, message: "Invalid email address" });
+    return res
+      .status(HttpStatus.BAD_REQUEST)
+      .json({ success: false, message: MESSAGES.AUTH.INVALID_EMAIL });
   }
 
   if (password.length < 8) {
-    return res.status(400).json({ success: false, message: "Password must be at least 8 characters" });
+    return res
+      .status(HttpStatus.BAD_REQUEST)
+      .json({ success: false, message: MESSAGES.AUTH.PASSWORD_LENGTH });
   }
 
   try {
     const existing = await User.findOne({ email });
     if (existing) {
-      return res.status(400).json({ success: false, message: "User already exists with this email" });
+      return res
+        .status(HttpStatus.BAD_REQUEST)
+        .json({ success: false, message: MESSAGES.AUTH.USER_EXISTS });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -156,9 +194,9 @@ export const addOrganizationMember = async (req, res) => {
       organization: req.user.organization,
     });
 
-    res.status(201).json({
+    res.status(HttpStatus.CREATED).json({
       success: true,
-      message: "Member added successfully",
+      message: MESSAGES.ORG.MEMBER_ADDED,
       member: {
         id: member._id,
         name: member.name,
@@ -168,7 +206,9 @@ export const addOrganizationMember = async (req, res) => {
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ success: false, message: "Server error adding member" });
+    res
+      .status(HttpStatus.INTERNAL_SERVER_ERROR)
+      .json({ success: false, message: MESSAGES.COMMON.SERVER_ERROR });
   }
 };
 
@@ -176,34 +216,44 @@ export const addOrganizationMember = async (req, res) => {
 export const getOrganizationMembers = async (req, res) => {
   try {
     if (!req.user.organization) {
-      return res.status(404).json({ success: false, message: "User has no organization context" });
+      return res
+        .status(HttpStatus.NOT_FOUND)
+        .json({ success: false, message: MESSAGES.ORG.NOT_FOUND });
     }
     const members = await User.find({ organization: req.user.organization, status: "active" }).select("name email role");
     res.json({ success: true, members });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ success: false, message: "Server error fetching members" });
+    res
+      .status(HttpStatus.INTERNAL_SERVER_ERROR)
+      .json({ success: false, message: MESSAGES.COMMON.SERVER_ERROR });
   }
 };
 
 // Get all organizations (System admin only)
 export const getAllOrganizations = async (req, res) => {
   if (req.user?.role !== "system_admin") {
-    return res.status(403).json({ success: false, message: "Access denied. System admin only." });
+    return res
+      .status(HttpStatus.FORBIDDEN)
+      .json({ success: false, message: MESSAGES.ORG.SYS_ADMIN_REQUIRED });
   }
   try {
     const orgs = await Organization.find({}).populate("admin", "name email");
     res.json({ success: true, organizations: orgs });
   } catch (error) {
     console.error("Error fetching organizations:", error);
-    res.status(500).json({ success: false, message: "Server error fetching organizations" });
+    res
+      .status(HttpStatus.INTERNAL_SERVER_ERROR)
+      .json({ success: false, message: MESSAGES.COMMON.SERVER_ERROR });
   }
 };
 
 // Delete Organization (System Admin cascades delete tasks, users and org document)
 export const deleteOrganization = async (req, res) => {
   if (req.user?.role !== "system_admin") {
-    return res.status(403).json({ success: false, message: "Access denied. System admin only." });
+    return res
+      .status(HttpStatus.FORBIDDEN)
+      .json({ success: false, message: MESSAGES.ORG.SYS_ADMIN_REQUIRED });
   }
 
   const { id } = req.params;
@@ -211,7 +261,9 @@ export const deleteOrganization = async (req, res) => {
   try {
     const org = await Organization.findById(id);
     if (!org) {
-      return res.status(404).json({ success: false, message: "Organization not found" });
+      return res
+        .status(HttpStatus.NOT_FOUND)
+        .json({ success: false, message: MESSAGES.ORG.NOT_FOUND });
     }
 
     // Cascade delete tasks
@@ -223,17 +275,21 @@ export const deleteOrganization = async (req, res) => {
     // Delete organization itself
     await Organization.findByIdAndDelete(id);
 
-    res.json({ success: true, message: "Organization and all associated users and tasks deleted successfully" });
+    res.json({ success: true, message: MESSAGES.ORG.ORG_DELETED });
   } catch (error) {
     console.error("Delete org error:", error);
-    res.status(500).json({ success: false, message: "Server error deleting organization" });
+    res
+      .status(HttpStatus.INTERNAL_SERVER_ERROR)
+      .json({ success: false, message: MESSAGES.COMMON.SERVER_ERROR });
   }
 };
 
 // Update Organization Admin details (System Admin)
 export const updateOrganizationAdmin = async (req, res) => {
   if (req.user?.role !== "system_admin") {
-    return res.status(403).json({ success: false, message: "Access denied. System admin only." });
+    return res
+      .status(HttpStatus.FORBIDDEN)
+      .json({ success: false, message: MESSAGES.ORG.SYS_ADMIN_REQUIRED });
   }
 
   const { id } = req.params;
@@ -242,7 +298,9 @@ export const updateOrganizationAdmin = async (req, res) => {
   try {
     const org = await Organization.findById(id);
     if (!org) {
-      return res.status(404).json({ success: false, message: "Organization not found" });
+      return res
+        .status(HttpStatus.NOT_FOUND)
+        .json({ success: false, message: MESSAGES.ORG.NOT_FOUND });
     }
 
     if (orgName) {
@@ -256,30 +314,42 @@ export const updateOrganizationAdmin = async (req, res) => {
       if (adminEmail) {
         const emailExists = await User.findOne({ email: adminEmail, _id: { $ne: adminUser._id } });
         if (emailExists) {
-          return res.status(400).json({ success: false, message: "Email is already in use by another user" });
+          return res
+            .status(HttpStatus.BAD_REQUEST)
+            .json({ success: false, message: "Email is already in use by another user" });
         }
         adminUser.email = adminEmail;
       }
       if (adminPassword) {
         if (adminPassword.length < 8) {
-          return res.status(400).json({ success: false, message: "Password must be at least 8 characters" });
+          return res
+            .status(HttpStatus.BAD_REQUEST)
+            .json({ success: false, message: MESSAGES.AUTH.PASSWORD_LENGTH });
         }
         adminUser.password = await bcrypt.hash(adminPassword, 10);
       }
       await adminUser.save();
+    } else {
+      return res
+        .status(HttpStatus.NOT_FOUND)
+        .json({ success: false, message: MESSAGES.ORG.ADMIN_NOT_FOUND });
     }
 
-    res.json({ success: true, message: "Organization and admin settings updated successfully" });
+    res.json({ success: true, message: MESSAGES.ORG.ADMIN_UPDATED });
   } catch (error) {
     console.error("Update org error:", error);
-    res.status(500).json({ success: false, message: "Server error updating organization" });
+    res
+      .status(HttpStatus.INTERNAL_SERVER_ERROR)
+      .json({ success: false, message: MESSAGES.COMMON.SERVER_ERROR });
   }
 };
 
 // Update Organization active status and remark (System Admin)
 export const updateOrganizationStatus = async (req, res) => {
   if (req.user?.role !== "system_admin") {
-    return res.status(403).json({ success: false, message: "Access denied. System admin only." });
+    return res
+      .status(HttpStatus.FORBIDDEN)
+      .json({ success: false, message: MESSAGES.ORG.SYS_ADMIN_REQUIRED });
   }
 
   const { id } = req.params;
@@ -288,7 +358,9 @@ export const updateOrganizationStatus = async (req, res) => {
   try {
     const org = await Organization.findById(id);
     if (!org) {
-      return res.status(404).json({ success: false, message: "Organization not found" });
+      return res
+        .status(HttpStatus.NOT_FOUND)
+        .json({ success: false, message: MESSAGES.ORG.NOT_FOUND });
     }
 
     if (isActive !== undefined) {
@@ -300,10 +372,12 @@ export const updateOrganizationStatus = async (req, res) => {
 
     await org.save();
 
-    res.json({ success: true, message: "Organization status updated successfully", organization: org });
+    res.json({ success: true, message: MESSAGES.ORG.MEMBER_STATUS_UPDATED, organization: org });
   } catch (error) {
     console.error("Status update error:", error);
-    res.status(500).json({ success: false, message: "Server error updating status" });
+    res
+      .status(HttpStatus.INTERNAL_SERVER_ERROR)
+      .json({ success: false, message: MESSAGES.COMMON.SERVER_ERROR });
   }
 };
 
@@ -314,7 +388,9 @@ export const getPublicOrganizations = async (req, res) => {
     res.json({ success: true, organizations: orgs });
   } catch (error) {
     console.error("Public list error:", error);
-    res.status(500).json({ success: false, message: "Server error fetching public organizations" });
+    res
+      .status(HttpStatus.INTERNAL_SERVER_ERROR)
+      .json({ success: false, message: MESSAGES.COMMON.SERVER_ERROR });
   }
 };
 
@@ -322,7 +398,9 @@ export const getPublicOrganizations = async (req, res) => {
 export const getOrganizationUsers = async (req, res) => {
   try {
     if (!req.user.organization) {
-      return res.status(404).json({ success: false, message: "User has no organization context" });
+      return res
+        .status(HttpStatus.NOT_FOUND)
+        .json({ success: false, message: MESSAGES.ORG.NOT_FOUND });
     }
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 5;
@@ -390,7 +468,9 @@ export const getOrganizationUsers = async (req, res) => {
     });
   } catch (error) {
     console.error("Get organization users error:", error);
-    res.status(500).json({ success: false, message: "Server error fetching organization users" });
+    res
+      .status(HttpStatus.INTERNAL_SERVER_ERROR)
+      .json({ success: false, message: MESSAGES.COMMON.SERVER_ERROR });
   }
 };
 
@@ -400,27 +480,35 @@ export const updateUserStatus = async (req, res) => {
   const { status, remark } = req.body;
 
   if (req.user.role !== "org_admin") {
-    return res.status(403).json({ success: false, message: "Only organization admins can manage users status" });
+    return res
+      .status(HttpStatus.FORBIDDEN)
+      .json({ success: false, message: MESSAGES.ORG.NOT_AUTHORIZED });
   }
 
   if (!["active", "rejected"].includes(status)) {
-    return res.status(400).json({ success: false, message: "Invalid status value" });
+    return res
+      .status(HttpStatus.BAD_REQUEST)
+      .json({ success: false, message: MESSAGES.ORG.STATUS_REQUIRED });
   }
 
   try {
     const userToUpdate = await User.findOne({ _id: userId, organization: req.user.organization });
     if (!userToUpdate) {
-      return res.status(404).json({ success: false, message: "User not found in your organization" });
+      return res
+        .status(HttpStatus.NOT_FOUND)
+        .json({ success: false, message: MESSAGES.ORG.MEMBER_NOT_FOUND });
     }
 
     userToUpdate.status = status;
     userToUpdate.statusRemark = remark || "";
     await userToUpdate.save();
 
-    res.json({ success: true, message: `User status successfully updated to ${status}` });
+    res.json({ success: true, message: MESSAGES.ORG.MEMBER_STATUS_UPDATED });
   } catch (error) {
     console.error("Status update error:", error);
-    res.status(500).json({ success: false, message: "Server error updating status" });
+    res
+      .status(HttpStatus.INTERNAL_SERVER_ERROR)
+      .json({ success: false, message: MESSAGES.COMMON.SERVER_ERROR });
   }
 };
 
@@ -429,11 +517,15 @@ export const addCustomStatus = async (req, res) => {
   const { status } = req.body;
 
   if (req.user.role !== "org_admin") {
-    return res.status(403).json({ success: false, message: "Only organization admins can add statuses" });
+    return res
+      .status(HttpStatus.FORBIDDEN)
+      .json({ success: false, message: MESSAGES.ORG.NOT_AUTHORIZED });
   }
 
   if (!status || !status.trim()) {
-    return res.status(400).json({ success: false, message: "Status name is required" });
+    return res
+      .status(HttpStatus.BAD_REQUEST)
+      .json({ success: false, message: MESSAGES.ORG.STATUS_REQUIRED });
   }
 
   const trimmedStatus = status.trim();
@@ -441,7 +533,9 @@ export const addCustomStatus = async (req, res) => {
   try {
     const org = await Organization.findById(req.user.organization);
     if (!org) {
-      return res.status(404).json({ success: false, message: "Organization not found" });
+      return res
+        .status(HttpStatus.NOT_FOUND)
+        .json({ success: false, message: MESSAGES.ORG.NOT_FOUND });
     }
 
     // Initialize statuses if not present
@@ -452,16 +546,20 @@ export const addCustomStatus = async (req, res) => {
     // Check for duplicate status (case-insensitive)
     const exists = org.statuses.some(s => s.toLowerCase() === trimmedStatus.toLowerCase());
     if (exists) {
-      return res.status(400).json({ success: false, message: `Status "${trimmedStatus}" already exists` });
+      return res
+        .status(HttpStatus.BAD_REQUEST)
+        .json({ success: false, message: MESSAGES.ORG.STATUS_EXISTS });
     }
 
     org.statuses.push(trimmedStatus);
     await org.save();
 
-    res.json({ success: true, message: "Status added successfully", statuses: org.statuses });
+    res.json({ success: true, message: MESSAGES.ORG.STATUS_ADDED, statuses: org.statuses });
   } catch (error) {
     console.error("Add custom status error:", error);
-    res.status(500).json({ success: false, message: "Server error adding custom status" });
+    res
+      .status(HttpStatus.INTERNAL_SERVER_ERROR)
+      .json({ success: false, message: MESSAGES.COMMON.SERVER_ERROR });
   }
 };
 
@@ -470,13 +568,17 @@ export const deleteCustomStatus = async (req, res) => {
   const { statusName } = req.params;
 
   if (req.user.role !== "org_admin") {
-    return res.status(403).json({ success: false, message: "Only organization admins can delete statuses" });
+    return res
+      .status(HttpStatus.FORBIDDEN)
+      .json({ success: false, message: MESSAGES.ORG.NOT_AUTHORIZED });
   }
 
   try {
     const org = await Organization.findById(req.user.organization);
     if (!org) {
-      return res.status(404).json({ success: false, message: "Organization not found" });
+      return res
+        .status(HttpStatus.NOT_FOUND)
+        .json({ success: false, message: MESSAGES.ORG.NOT_FOUND });
     }
 
     // Initialize statuses if not present
@@ -486,13 +588,17 @@ export const deleteCustomStatus = async (req, res) => {
 
     // Enforce that we don't delete if there is only 1 status left
     if (org.statuses.length <= 1) {
-      return res.status(400).json({ success: false, message: "Organization must have at least one status" });
+      return res
+        .status(HttpStatus.BAD_REQUEST)
+        .json({ success: false, message: "Organization must have at least one status" });
     }
 
     // Check if status exists in org
     const index = org.statuses.findIndex(s => s.toLowerCase() === statusName.toLowerCase());
     if (index === -1) {
-      return res.status(404).json({ success: false, message: "Status not found in organization" });
+      return res
+        .status(HttpStatus.NOT_FOUND)
+        .json({ success: false, message: MESSAGES.ORG.STATUS_NOT_FOUND });
     }
 
     // CRITICAL INTEGRITY CHECK: Check if any tasks in this organization use this status
@@ -503,7 +609,7 @@ export const deleteCustomStatus = async (req, res) => {
     });
 
     if (taskCount > 0) {
-      return res.status(400).json({
+      return res.status(HttpStatus.BAD_REQUEST).json({
         success: false,
         message: `Cannot delete status "${matchingStatusName}" because it is currently assigned to ${taskCount} task(s)`
       });
@@ -513,9 +619,11 @@ export const deleteCustomStatus = async (req, res) => {
     org.statuses.splice(index, 1);
     await org.save();
 
-    res.json({ success: true, message: "Status deleted successfully", statuses: org.statuses });
+    res.json({ success: true, message: MESSAGES.ORG.STATUS_DELETED, statuses: org.statuses });
   } catch (error) {
     console.error("Delete custom status error:", error);
-    res.status(500).json({ success: false, message: "Server error deleting custom status" });
+    res
+      .status(HttpStatus.INTERNAL_SERVER_ERROR)
+      .json({ success: false, message: MESSAGES.COMMON.SERVER_ERROR });
   }
 };

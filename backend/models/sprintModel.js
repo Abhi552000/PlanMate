@@ -27,5 +27,7 @@ const sprintSchema = new mongoose.Schema({
   },
 }, { timestamps: true });
 
+sprintSchema.index({ organization: 1 });
+
 const Sprint = mongoose.models.sprint || mongoose.model("sprint", sprintSchema);
 export default Sprint;

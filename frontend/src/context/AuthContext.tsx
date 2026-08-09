@@ -5,7 +5,9 @@ import { IUser, AuthContextType } from "../types";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const dispatch = useAppDispatch();
   const currentUser = useAppSelector((state) => state.auth.currentUser);
 
@@ -18,7 +20,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const login = (data: any, navigate: (path: string, options?: any) => void) => {
+  const login = (
+    data: any,
+    navigate: (path: string, options?: any) => void
+  ) => {
     const user: IUser = {
       _id: data.id || data._id || "",
       email: data.email,
@@ -41,7 +46,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider value={{ currentUser, setCurrentUser, login, logout }}>
+    <AuthContext.Provider
+      value={{ currentUser, setCurrentUser, login, logout }}
+    >
       {children}
     </AuthContext.Provider>
   );

@@ -1,6 +1,8 @@
 import axios, { InternalAxiosRequestConfig, AxiosResponse } from "axios";
 
-const baseURL = ((import.meta as any).env?.VITE_ENDPOINT_HTTPS as string) || "http://localhost:4000";
+const baseURL =
+  ((import.meta as any).env?.VITE_ENDPOINT_HTTPS as string) ||
+  "http://localhost:4000";
 
 const axiosInstance = axios.create({
   baseURL,

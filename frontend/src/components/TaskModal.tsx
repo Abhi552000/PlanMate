@@ -1,106 +1,85 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { baseControlClasses, DEFAULT_TASK } from "../assets/dummy";
-import { PlusCircle, Save, X, BookOpen } from "lucide-react";
 import { taskService } from "../services/taskService";
 import { orgService } from "../services/orgService";
 import { backlogService } from "../services/backlogService";
 import { toast } from "react-toastify";
-import { ITask, IUser, ISubtask, TaskModalProps } from "../types";
+import { IUser, ISubtask, TaskModalProps } from "../types";
+import { CONSOLE_ERRORS } from "../constants/messages";
+import { getNormalizedTaskData } from "../utils";
 
 // Sub-components
 import { TaskFormGeneral } from "./task-modal/TaskFormGeneral";
 import { TaskFormMeta } from "./task-modal/TaskFormMeta";
 import { TaskFormSubtasks } from "./task-modal/TaskFormSubtasks";
+import { TaskModalHeader } from "./task-modal/TaskModalHeader";
+import { TaskModalFooter } from "./task-modal/TaskModalFooter";
 
-const TaskModal: React.FC<TaskModalProps> = ({ isOpen, onClose, taskToEdit, onSave, onLogout, statuses = ["To Do", "In Progress", "Done", "Closed"] }) => {
-  const [taskData, setTaskData] = useState<any>({ 
-    ...DEFAULT_TASK, 
+const TaskModal: React.FC<TaskModalProps> = ({
+  isOpen,
+  onClose,
+  taskToEdit,
+  onSave,
+  onLogout,
+  statuses = ["To Do", "In Progress", "Done", "Closed"],
+}) => {
+  const [taskData, setTaskData] = useState<any>({
+    ...DEFAULT_TASK,
     subtasks: [] as ISubtask[],
     status: "To Do",
     issueType: "Task",
     storyPoints: 1,
     assignee: "",
-    key: ""
+    key: "",
   });
   const [members, setMembers] = useState<IUser[]>([]);
   const [sprints, setSprints] = useState<any[]>([]);
   const [epics, setEpics] = useState<any[]>([]);
   const [newSubtaskTitle, setNewSubtaskTitle] = useState("");
-  const [editingSubtaskIdx, setEditingSubtaskIdx] = useState<number | null>(null);
+  const [editingSubtaskIdx, setEditingSubtaskIdx] = useState<number | null>(
+    null
+  );
   const [editingSubtaskVal, setEditingSubtaskVal] = useState("");
   const [parentTask, setParentTask] = useState<any | null>(null);
   const [loading, setLoading] = useState(false);
   const today = new Date().toISOString().split("T")[0];
 
+  const fetchMembersAndAgile = useCallback(async () => {
+    try {
+      const memberData = await orgService.getOrgMembers();
+      if (memberData?.success && memberData?.members) {
+        setMembers(memberData.members);
+      }
+      const sprintData = await backlogService.getSprints();
+      if (sprintData?.success && sprintData?.sprints) {
+        setSprints(sprintData.sprints);
+      }
+      const epicData = await backlogService.getEpics();
+      if (epicData?.success && epicData?.epics) {
+        setEpics(epicData.epics);
+      }
+    } catch (err) {
+      console.error(CONSOLE_ERRORS.FETCH_DEPENDENCIES_MODAL, err);
+    }
+  }, []);
+
   useEffect(() => {
     if (!isOpen) return;
-    const fetchMembersAndAgile = async () => {
-      try {
-        const memberData = await orgService.getOrgMembers();
-        if (memberData?.success && memberData?.members) {
-          setMembers(memberData.members);
-        }
-        const sprintData = await backlogService.getSprints();
-        if (sprintData?.success && sprintData?.sprints) {
-          setSprints(sprintData.sprints);
-        }
-        const epicData = await backlogService.getEpics();
-        if (epicData?.success && epicData?.epics) {
-          setEpics(epicData.epics);
-        }
-      } catch (err) {
-        console.error("Error fetching dependencies inside TaskModal:", err);
-      }
-    };
     fetchMembersAndAgile();
-  }, [isOpen]);
+  }, [isOpen, fetchMembersAndAgile]);
 
   useEffect(() => {
     if (!isOpen) return;
     setParentTask(null);
-    if (taskToEdit) {
-      const normalized =
-        taskToEdit.completed === "yes" || taskToEdit.completed === true
-          ? "Yes"
-          : "No";
-      setTaskData({
-        ...DEFAULT_TASK,
-        title: taskToEdit.title || "",
-        description: taskToEdit.description || "",
-        priority: taskToEdit.priority || "Low",
-        dueDate: typeof taskToEdit.dueDate === "string" ? taskToEdit.dueDate.split("T")[0] : "",
-        completed: normalized,
-        id: taskToEdit._id,
-        subtasks: taskToEdit.subtasks || [],
-        status: taskToEdit.status || "To Do",
-        issueType: taskToEdit.issueType || "Task",
-        storyPoints: taskToEdit.storyPoints !== undefined ? taskToEdit.storyPoints : 1,
-        assignee: typeof taskToEdit.assignee === "object" && taskToEdit.assignee ? (taskToEdit.assignee as any)._id : taskToEdit.assignee || "",
-        key: taskToEdit.key || "",
-        sprint: typeof taskToEdit.sprint === "object" && taskToEdit.sprint ? (taskToEdit.sprint as any)._id : taskToEdit.sprint || "",
-        epic: typeof taskToEdit.epic === "object" && taskToEdit.epic ? (taskToEdit.epic as any)._id : taskToEdit.epic || "",
-      });
-    } else {
-      setTaskData({ 
-        ...DEFAULT_TASK, 
-        subtasks: [],
-        status: "To Do",
-        issueType: "Task",
-        storyPoints: 1,
-        assignee: "",
-        key: "",
-        sprint: "",
-        epic: ""
-      });
-    }
+    setTaskData(getNormalizedTaskData(taskToEdit, DEFAULT_TASK));
     setNewSubtaskTitle("");
   }, [isOpen, taskToEdit]);
 
   const handleAddSubtask = () => {
     if (!newSubtaskTitle.trim()) return;
-    const newSub = { 
-      title: newSubtaskTitle.trim(), 
-      completed: false 
+    const newSub = {
+      title: newSubtaskTitle.trim(),
+      completed: false,
     };
     setTaskData((prev: any) => ({
       ...prev,
@@ -116,12 +95,15 @@ const TaskModal: React.FC<TaskModalProps> = ({ isOpen, onClose, taskToEdit, onSa
       title: subtask.title || "",
       description: subtask.description || "",
       priority: subtask.priority || "Low",
-      dueDate: typeof subtask.dueDate === "string" ? subtask.dueDate.split("T")[0] : "",
+      dueDate:
+        typeof subtask.dueDate === "string"
+          ? subtask.dueDate.split("T")[0]
+          : "",
       completed: subtask.completed ? "Yes" : "No",
       status: subtask.status || "To Do",
       issueType: "Sub-task",
       storyPoints: subtask.storyPoints !== undefined ? subtask.storyPoints : 0,
-      subtasks: []
+      subtasks: [],
     });
   };
 
@@ -138,22 +120,29 @@ const TaskModal: React.FC<TaskModalProps> = ({ isOpen, onClose, taskToEdit, onSa
         dueDate: taskData.dueDate,
         completed: taskData.status === "Done",
         status: taskData.status,
-        storyPoints: taskData.storyPoints
+        storyPoints: taskData.storyPoints,
       };
     }
     setTaskData({ ...parentTask, subtasks: updatedSubtasks });
     setParentTask(null);
   };
 
-  const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setTaskData((prev: any) => ({ ...prev, [name]: value }));
-  }, []);
+  const handleChange = useCallback(
+    (
+      e: React.ChangeEvent<
+        HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+      >
+    ) => {
+      const { name, value } = e.target;
+      setTaskData((prev: any) => ({ ...prev, [name]: value }));
+    },
+    []
+  );
 
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {
       e.preventDefault();
-      
+
       let finalTaskData = taskData;
       if (parentTask) {
         const updatedSubtasks = [...parentTask.subtasks];
@@ -167,7 +156,7 @@ const TaskModal: React.FC<TaskModalProps> = ({ isOpen, onClose, taskToEdit, onSa
             dueDate: taskData.dueDate,
             completed: taskData.status === "Done",
             status: taskData.status,
-            storyPoints: taskData.storyPoints
+            storyPoints: taskData.storyPoints,
           };
         }
         finalTaskData = { ...parentTask, subtasks: updatedSubtasks };
@@ -182,18 +171,22 @@ const TaskModal: React.FC<TaskModalProps> = ({ isOpen, onClose, taskToEdit, onSa
 
       try {
         const isEdit = Boolean(finalTaskData.id);
-        const saved = isEdit 
-          ? await taskService.updateTask(finalTaskData.id, finalTaskData) 
+        const saved = isEdit
+          ? await taskService.updateTask(finalTaskData.id, finalTaskData)
           : await taskService.createTask(finalTaskData);
 
-        toast.success(isEdit ? "Task updated successfully!" : "Task created successfully!");
+        toast.success(
+          isEdit ? "Task updated successfully!" : "Task created successfully!"
+        );
         onSave?.(saved);
         onClose();
         setParentTask(null);
       } catch (err: any) {
         if (err?.status === 401) return onLogout?.();
         const msg =
-          err?.response?.data?.message || err?.message || "An unexpected error occurred";
+          err?.response?.data?.message ||
+          err?.message ||
+          "An unexpected error occurred";
         toast.error(msg);
         console.error(err);
       } finally {
@@ -206,54 +199,16 @@ const TaskModal: React.FC<TaskModalProps> = ({ isOpen, onClose, taskToEdit, onSa
   if (!isOpen) return null;
 
   return (
-    <div
-      className="fixed inset-0 backdrop-blur-sm bg-black/30 z-50 flex items-center justify-center p-4 overflow-y-auto"
-    >
-      <div
-        className="bg-white dark:bg-gray-800/90 border border-sky-100 dark:border-gray-700 rounded-2xl max-w-2xl sm:max-w-3xl lg:max-w-4xl w-full shadow-2xl relative p-6 sm:p-8 animate-fadeIn"
-      >
-        {parentTask && (
-          <button 
-            type="button"
-            onClick={handleBackToParent}
-            className="text-xs font-bold text-sky-600 hover:text-sky-850 mb-3 flex items-center gap-1.5 bg-sky-50 hover:bg-sky-100/70 px-2.5 py-1.5 rounded-lg transition-colors cursor-pointer w-fit"
-          >
-            ← Parent Issue: {parentTask.title}
-          </button>
-        )}
-        <div className=" flex justify-between items-center mb-6 border-b border-sky-100/50 pb-4">
-          <div className="space-y-1">
-            {taskData.key && (
-              <span className="text-[10px] font-black uppercase tracking-wider bg-sky-100 text-sky-700 px-2 py-0.5 rounded border border-sky-200 select-all mb-1 inline-block">
-                {taskData.key}
-              </span>
-            )}
-            <h2 className=" text-2xl font-bold text-gray-800 dark:text-gray-255 flex items-center gap-2">
-              {parentTask ? (
-                <>
-                  <BookOpen className=" text-sky-505 w-6 h-6" />
-                  Sub-task Detail
-                </>
-              ) : taskData.id ? (
-                <Save className=" text-sky-505 w-6 h-6" />
-              ) : (
-                <PlusCircle className="text-sky-505 w-6 h-6" />
-              )}
-              {!parentTask && (taskData.id ? "Edit Issue" : "Create New Issue")}
-            </h2>
-          </div>
-          <button
-            onClick={() => {
-              onClose();
-              setParentTask(null);
-            }}
-            className=" p-2 hover:bg-sky-50 rounded-lg transition-colors text-gray-400 hover:text-sky-700 cursor-pointer"
-          >
-            <X className=" w-5 h-5" />
-          </button>
-        </div>
+    <div className="fixed inset-0 backdrop-blur-sm bg-black/30 z-50 flex items-center justify-center p-4 overflow-y-auto">
+      <div className="bg-white dark:bg-gray-800/90 border border-sky-100 dark:border-gray-700 rounded-2xl max-w-2xl sm:max-w-3xl lg:max-w-4xl w-full shadow-2xl relative p-6 sm:p-8 animate-fadeIn">
+        <TaskModalHeader
+          parentTask={parentTask}
+          taskData={taskData}
+          handleBackToParent={handleBackToParent}
+          onClose={onClose}
+          setParentTask={setParentTask}
+        />
         <form onSubmit={handleSubmit} className=" space-y-5">
-          
           <div className="grid grid-cols-1 gap-4 md:grid-cols-12">
             {/* Left side: Main text fields and subtasks */}
             <div className="md:col-span-7 space-y-4">
@@ -295,40 +250,13 @@ const TaskModal: React.FC<TaskModalProps> = ({ isOpen, onClose, taskToEdit, onSa
             />
           </div>
 
-          {/* Form Actions footer */}
-          <div className="flex flex-col sm:flex-row gap-3 justify-end pt-4 border-t border-sky-100 dark:border-gray-800 mt-6">
-            <button
-              type="button"
-              onClick={() => {
-                onClose();
-                setParentTask(null);
-              }}
-              className="w-full sm:w-auto px-5 py-2.5 border border-sky-200 dark:border-gray-800 text-gray-600 dark:text-gray-300 hover:bg-sky-50 dark:hover:bg-gray-800 font-bold rounded-lg text-sm transition-colors cursor-pointer bg-white dark:bg-gray-900"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full sm:w-auto bg-gradient-to-r from-cyan-500 to-sky-600 text-white font-bold py-2.5 px-6 rounded-lg flex items-center justify-center gap-2 disabled:opacity-50 hover:shadow-md transition-all duration-200 cursor-pointer text-sm"
-            >
-              {loading ? (
-                "Saving..."
-              ) : parentTask ? (
-                <>
-                  <Save className="w-4 h-4" /> Save Sub-task
-                </>
-              ) : taskData.id ? (
-                <>
-                  <Save className="w-4 h-4" /> Save Changes
-                </>
-              ) : (
-                <>
-                  <PlusCircle className="w-4 h-4" /> Create Issue
-                </>
-              )}
-            </button>
-          </div>
+          <TaskModalFooter
+            loading={loading}
+            parentTask={parentTask}
+            taskData={taskData}
+            onClose={onClose}
+            setParentTask={setParentTask}
+          />
         </form>
       </div>
     </div>

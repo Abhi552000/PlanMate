@@ -1,19 +1,25 @@
 import Epic from "../models/epicModel.js";
 import Task from "../models/taskModel.js";
+import { HttpStatus } from "../constants/httpStatus.js";
+import { MESSAGES } from "../constants/messages.js";
 
 // GET ALL EPICS
 export const getEpics = async (req, res) => {
   try {
     const orgId = req.user.organization;
     if (!orgId) {
-      return res.status(400).json({ success: false, message: "User has no organization context" });
+      return res
+        .status(HttpStatus.BAD_REQUEST)
+        .json({ success: false, message: MESSAGES.ORG.NOT_FOUND });
     }
 
-    const epics = await Epic.find({ organization: orgId }).sort({ createdAt: -1 });
+    const epics = await Epic.find({ organization: orgId }).sort({ createdAt: -1 }).lean();
     res.json({ success: true, epics });
   } catch (error) {
     console.error("Error in getEpics:", error);
-    res.status(500).json({ success: false, message: "Server error fetching epics" });
+    res
+      .status(HttpStatus.INTERNAL_SERVER_ERROR)
+      .json({ success: false, message: MESSAGES.COMMON.SERVER_ERROR });
   }
 };
 
@@ -24,10 +30,14 @@ export const createEpic = async (req, res) => {
     const orgId = req.user.organization;
 
     if (!orgId) {
-      return res.status(400).json({ success: false, message: "User has no organization context" });
+      return res
+        .status(HttpStatus.BAD_REQUEST)
+        .json({ success: false, message: MESSAGES.ORG.NOT_FOUND });
     }
     if (!name) {
-      return res.status(400).json({ success: false, message: "Epic name is required" });
+      return res
+        .status(HttpStatus.BAD_REQUEST)
+        .json({ success: false, message: MESSAGES.EPIC.NAME_REQUIRED });
     }
 
     const epic = new Epic({
@@ -38,10 +48,12 @@ export const createEpic = async (req, res) => {
     });
 
     await epic.save();
-    res.status(201).json({ success: true, message: "Epic created successfully", epic });
+    res.status(HttpStatus.CREATED).json({ success: true, message: MESSAGES.EPIC.CREATED, epic });
   } catch (error) {
     console.error("Error in createEpic:", error);
-    res.status(500).json({ success: false, message: "Server error creating epic" });
+    res
+      .status(HttpStatus.INTERNAL_SERVER_ERROR)
+      .json({ success: false, message: MESSAGES.COMMON.SERVER_ERROR });
   }
 };
 
@@ -53,12 +65,16 @@ export const updateEpic = async (req, res) => {
     const orgId = req.user.organization;
 
     if (!orgId) {
-      return res.status(400).json({ success: false, message: "User has no organization context" });
+      return res
+        .status(HttpStatus.BAD_REQUEST)
+        .json({ success: false, message: MESSAGES.ORG.NOT_FOUND });
     }
 
     const epic = await Epic.findOne({ _id: id, organization: orgId });
     if (!epic) {
-      return res.status(404).json({ success: false, message: "Epic not found" });
+      return res
+        .status(HttpStatus.NOT_FOUND)
+        .json({ success: false, message: MESSAGES.EPIC.NOT_FOUND });
     }
 
     if (name !== undefined) epic.name = name;
@@ -66,10 +82,12 @@ export const updateEpic = async (req, res) => {
     if (description !== undefined) epic.description = description;
 
     await epic.save();
-    res.json({ success: true, message: "Epic updated successfully", epic });
+    res.json({ success: true, message: MESSAGES.ORG.UPDATED, epic });
   } catch (error) {
     console.error("Error in updateEpic:", error);
-    res.status(500).json({ success: false, message: "Server error updating epic" });
+    res
+      .status(HttpStatus.INTERNAL_SERVER_ERROR)
+      .json({ success: false, message: MESSAGES.COMMON.SERVER_ERROR });
   }
 };
 
@@ -80,12 +98,16 @@ export const deleteEpic = async (req, res) => {
     const orgId = req.user.organization;
 
     if (!orgId) {
-      return res.status(400).json({ success: false, message: "User has no organization context" });
+      return res
+        .status(HttpStatus.BAD_REQUEST)
+        .json({ success: false, message: MESSAGES.ORG.NOT_FOUND });
     }
 
     const epic = await Epic.findOneAndDelete({ _id: id, organization: orgId });
     if (!epic) {
-      return res.status(404).json({ success: false, message: "Epic not found" });
+      return res
+        .status(HttpStatus.NOT_FOUND)
+        .json({ success: false, message: MESSAGES.EPIC.NOT_FOUND });
     }
 
     // Reassign all tasks using this epic to null
@@ -94,9 +116,11 @@ export const deleteEpic = async (req, res) => {
       { $set: { epic: null } }
     );
 
-    res.json({ success: true, message: "Epic deleted successfully" });
+    res.json({ success: true, message: MESSAGES.ORG.STATUS_DELETED });
   } catch (error) {
     console.error("Error in deleteEpic:", error);
-    res.status(500).json({ success: false, message: "Server error deleting epic" });
+    res
+      .status(HttpStatus.INTERNAL_SERVER_ERROR)
+      .json({ success: false, message: MESSAGES.COMMON.SERVER_ERROR });
   }
 };

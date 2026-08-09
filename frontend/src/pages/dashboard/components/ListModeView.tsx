@@ -2,7 +2,7 @@ import React from "react";
 import { CalendarIcon } from "lucide-react";
 import { EMPTY_STATE } from "../../../assets/dummy";
 import TaskItem from "../../../components/TaskItem";
-import { ITask, ListModeViewProps } from "../../../types";
+import { ListModeViewProps } from "../../../types";
 
 export const ListModeView: React.FC<ListModeViewProps> = ({
   paginatedTasks,
@@ -23,9 +23,13 @@ export const ListModeView: React.FC<ListModeViewProps> = ({
           <CalendarIcon className=" w-8 h-8 text-sky-505" />
         </div>
 
-        <h3 className=" text-lg font-semibold text-gray-800 mb-2">No tasks found</h3>
+        <h3 className=" text-lg font-semibold text-gray-800 mb-2">
+          No tasks found
+        </h3>
         <p className=" text-sm text-gray-500 mb-4">
-          {selectedStatus === "all" ? "Create your first task to get started" : "No tasks match this filter"}
+          {selectedStatus === "all"
+            ? "Create your first task to get started"
+            : "No tasks match this filter"}
         </p>
         <button onClick={onAddTask} className={EMPTY_STATE.btn}>
           Add New Task
@@ -52,7 +56,11 @@ export const ListModeView: React.FC<ListModeViewProps> = ({
             disabled={loadingList}
             className="px-6 py-2 border-2 border-sky-100 dark:border-gray-800 text-sky-605 dark:text-sky-400 font-bold rounded-xl text-xs hover:bg-sky-50 dark:hover:bg-gray-800 hover:border-sky-305 dark:hover:border-gray-700 transition-all cursor-pointer flex items-center gap-1.5 shadow-sm disabled:opacity-50"
           >
-            {loadingList ? "Loading..." : `Load More Tasks (${totalTasksCount - paginatedTasks.length} remaining)`}
+            {loadingList
+              ? "Loading..."
+              : `Load More Tasks (${
+                  totalTasksCount - paginatedTasks.length
+                } remaining)`}
           </button>
         </div>
       )}

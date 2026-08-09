@@ -35,4 +35,8 @@ export const taskService = {
     const { data } = await axiosInstance.delete(API_ROUTES.TASKS.DELETE_COMMENT(id, commentId));
     return data;
   },
+  logWork: async (id: string, hoursSpent: number, description?: string) => {
+    const { data } = await axiosInstance.post(API_ROUTES.TASKS.LOG_WORK(id), { hoursSpent, description });
+    return data;
+  },
 };

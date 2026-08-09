@@ -1,8 +1,20 @@
 import React from "react";
-import { SelectOption, SelectProps } from "../../types";
+import { SelectProps } from "../../types";
 
 export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
-  ({ label, error, options, icon, wrapperClassName = "", className = "", id, ...props }, ref) => {
+  (
+    {
+      label,
+      error,
+      options,
+      icon,
+      wrapperClassName = "",
+      className = "",
+      id,
+      ...props
+    },
+    ref
+  ) => {
     const selectId = id || React.useId();
     return (
       <div className={`space-y-1.5 w-full ${wrapperClassName}`}>
@@ -19,7 +31,11 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
             error ? "border-red-500 focus-within:ring-red-500" : ""
           }`}
         >
-          {icon && <span className="text-sky-500 mr-2 flex items-center justify-center shrink-0">{icon}</span>}
+          {icon && (
+            <span className="text-sky-500 mr-2 flex items-center justify-center shrink-0">
+              {icon}
+            </span>
+          )}
           <select
             id={selectId}
             ref={ref}
@@ -27,15 +43,17 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
             {...props}
           >
             {options.map((opt) => (
-              <option key={opt.value} value={opt.value} className="bg-white dark:bg-gray-850 text-gray-850 dark:text-gray-200">
+              <option
+                key={opt.value}
+                value={opt.value}
+                className="bg-white dark:bg-gray-850 text-gray-850 dark:text-gray-200"
+              >
                 {opt.label}
               </option>
             ))}
           </select>
         </div>
-        {error && (
-          <p className="text-xs text-red-500 font-semibold">{error}</p>
-        )}
+        {error && <p className="text-xs text-red-500 font-semibold">{error}</p>}
       </div>
     );
   }

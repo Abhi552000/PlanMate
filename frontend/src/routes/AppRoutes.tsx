@@ -10,6 +10,7 @@ import SystemAdminDashboard from "../pages/sys-admin/SystemAdminDashboard";
 import WorkspaceSettings from "../pages/WorkspaceSettings";
 import Backlog from "../pages/dashboard/Backlog";
 import ActiveSprint from "../pages/dashboard/ActiveSprint";
+import { CalendarViewPage } from "../pages/CalendarViewPage";
 
 import { PublicRoute } from "./PublicRoute";
 import { ProtectedRoute } from "./ProtectedRoute";
@@ -57,6 +58,7 @@ export const AppRoutes: React.FC = () => {
         <Route path={ROUTES.WORKSPACE_SETTINGS} element={<WorkspaceSettings />} />
         <Route path={ROUTES.BACKLOG} element={<Backlog />} />
         <Route path={ROUTES.ACTIVE_SPRINT} element={<ActiveSprint />} />
+        <Route path={ROUTES.CALENDAR} element={<CalendarViewPage />} />
         <Route
           path={ROUTES.PROFILE}
           element={

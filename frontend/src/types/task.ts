@@ -39,6 +39,14 @@ export interface ITaskLink {
   targetTask: ITask | string | any;
 }
 
+export interface IWorkLog {
+  _id?: string;
+  hoursSpent: number;
+  description?: string;
+  user: IUser | string;
+  createdAt: string | Date;
+}
+
 export interface ITask {
   _id: string;
   id?: string;
@@ -57,6 +65,9 @@ export interface ITask {
   createdAt?: string | Date;
   updatedAt?: string | Date;
   storyPoints?: number;
+  originalEstimate?: number;
+  timeLogged?: number;
+  workLogs?: IWorkLog[];
   issueType?: string;
   comments?: ITaskComment[];
   links?: ITaskLink[];

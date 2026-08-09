@@ -2,12 +2,27 @@ import Task from "../models/taskModel.js";
 import Organization from "../models/organizationModel.js";
 import mongoose from "mongoose";
 import Notification from "../models/notificationModel.js";
+import { HttpStatus } from "../constants/httpStatus.js";
+import { MESSAGES } from "../constants/messages.js";
 
 // CREATE A NEW TASK
 export const createTask = async (req, res) => {
   try {
-    const { title, description, priority, dueDate, completed, status, issueType, storyPoints, subtasks, assignee, links } = req.body;
-    
+    const {
+      title,
+      description,
+      priority,
+      dueDate,
+      completed,
+      status,
+      issueType,
+      storyPoints,
+      subtasks,
+      assignee,
+      links,
+      originalEstimate,
+    } = req.body;
+
     let finalCompleted = completed === "Yes" || completed === true;
     let finalStatus = status || "To Do";
     if (status) {
@@ -27,7 +42,10 @@ export const createTask = async (req, res) => {
         const words = org.name.split(/\s+/).filter(Boolean);
         let prefix = "";
         if (words.length >= 2) {
-          prefix = words.map(w => w[0]).join("").toUpperCase();
+          prefix = words
+            .map((w) => w[0])
+            .join("")
+            .toUpperCase();
         } else if (words.length === 1) {
           prefix = words[0].slice(0, 3).toUpperCase();
         } else {
@@ -46,6 +64,8 @@ export const createTask = async (req, res) => {
       status: finalStatus,
       issueType: issueType || "Task",
       storyPoints: storyPoints !== undefined ? Number(storyPoints) : 1,
+      originalEstimate:
+        originalEstimate !== undefined ? Number(originalEstimate) : 0,
       subtasks: subtasks || [],
       owner: req.user.id,
       assignee: assignee || null,
@@ -62,7 +82,11 @@ export const createTask = async (req, res) => {
         await Notification.create({
           user: assignee,
           title: "New Issue Assigned",
-          message: `${req.user.name} created and assigned you the issue: "${title}" (${generatedKey || `PM-${saved._id.toString().slice(-4).toUpperCase()}`})`,
+          message: `${
+            req.user.name
+          } created and assigned you the issue: "${title}" (${
+            generatedKey || `PM-${saved._id.toString().slice(-4).toUpperCase()}`
+          })`,
           link: `/task/${saved._id}`,
           read: false,
         });
@@ -73,18 +97,31 @@ export const createTask = async (req, res) => {
 
     const populated = await Task.findById(saved._id)
       .populate("owner", "name email")
-      .populate("assignee", "name email");
-    res.status(201).json({ success: true, task: populated });
+      .populate("assignee", "name email")
+      .lean();
+    res.status(HttpStatus.CREATED).json({ success: true, task: populated });
   } catch (error) {
-    res.status(400).json({ success: false, message: error.message });
+    res
+      .status(HttpStatus.BAD_REQUEST)
+      .json({ success: false, message: error.message });
   }
 };
 
 // GET ALL TASK FOR LOGGED - IN USER'S ORGANIZATION
 export const getTasks = async (req, res) => {
   try {
-    const { page, limit, status, priority, assignee, search, timeframe, completed, sortBy } = req.query;
-    
+    const {
+      page,
+      limit,
+      status,
+      priority,
+      assignee,
+      search,
+      timeframe,
+      completed,
+      sortBy,
+    } = req.query;
+
     let query = req.user.organization
       ? { organization: req.user.organization }
       : { owner: req.user.id };
@@ -164,7 +201,8 @@ export const getTasks = async (req, res) => {
         .populate("links.targetTask", "title key status priority completed")
         .sort(sortQuery)
         .skip(skip)
-        .limit(l);
+        .limit(l)
+        .lean();
 
       return res.json({
         success: true,
@@ -183,11 +221,14 @@ export const getTasks = async (req, res) => {
       .populate("owner", "name email")
       .populate("assignee", "name email")
       .populate("links.targetTask", "title key status priority completed")
-      .sort(sortQuery);
+      .sort(sortQuery)
+      .lean();
 
     res.json({ success: true, tasks });
   } catch (error) {
-    res.status(400).json({ success: false, message: error.message });
+    res
+      .status(HttpStatus.BAD_REQUEST)
+      .json({ success: false, message: error.message });
   }
 };
 
@@ -202,15 +243,19 @@ export const getTaskById = async (req, res) => {
       .populate("assignee", "name email")
       .populate("history.updatedBy", "name email")
       .populate("comments.user", "name email avatar")
-      .populate("links.targetTask", "title key status priority completed");
+      .populate("links.targetTask", "title key status priority completed")
+      .populate("workLogs.user", "name email")
+      .lean();
     if (!task)
-      return res.status(404).json({
+      return res.status(HttpStatus.NOT_FOUND).json({
         success: false,
-        message: "Task not found",
+        message: MESSAGES.TASK.NOT_FOUND,
       });
     res.json({ success: true, task });
   } catch (error) {
-    res.status(400).json({ success: false, message: error.message });
+    res
+      .status(HttpStatus.BAD_REQUEST)
+      .json({ success: false, message: error.message });
   }
 };
 
@@ -218,12 +263,13 @@ export const getTaskById = async (req, res) => {
 export const updateTask = async (req, res) => {
   try {
     const data = { ...req.body };
-    
+
     if (data.status !== undefined || data.completed !== undefined) {
       if (data.status !== undefined) {
         data.completed = data.status.toLowerCase() === "done";
       } else if (data.completed !== undefined) {
-        const isCompletedVal = data.completed === "Yes" || data.completed === true;
+        const isCompletedVal =
+          data.completed === "Yes" || data.completed === true;
         data.completed = isCompletedVal;
         data.status = isCompletedVal ? "Done" : "To Do";
       }
@@ -232,6 +278,9 @@ export const updateTask = async (req, res) => {
     if (data.storyPoints !== undefined) {
       data.storyPoints = Number(data.storyPoints);
     }
+    if (data.originalEstimate !== undefined) {
+      data.originalEstimate = Number(data.originalEstimate);
+    }
 
     const query = req.user.organization
       ? { organization: req.user.organization }
@@ -239,19 +288,28 @@ export const updateTask = async (req, res) => {
 
     const task = await Task.findOne({
       _id: req.params.id,
-      ...query
+      ...query,
     });
     if (!task) {
-      return res.status(404).json({
+      return res.status(HttpStatus.NOT_FOUND).json({
         success: false,
-        message: "Task not found or not in your organization",
+        message: MESSAGES.TASK.NOT_FOUND,
       });
     }
 
     // Compare fields to generate history/changelog
     const historyEntries = [];
-    const fieldsToTrack = ["title", "description", "status", "priority", "assignee", "storyPoints", "dueDate"];
-    
+    const fieldsToTrack = [
+      "title",
+      "description",
+      "status",
+      "priority",
+      "assignee",
+      "storyPoints",
+      "originalEstimate",
+      "dueDate",
+    ];
+
     for (const field of fieldsToTrack) {
       if (data[field] !== undefined) {
         let oldVal = task[field];
@@ -259,8 +317,8 @@ export const updateTask = async (req, res) => {
 
         // Format dates for comparison
         if (field === "dueDate") {
-          oldVal = oldVal ? new Date(oldVal).toISOString().split('T')[0] : "";
-          newVal = newVal ? new Date(newVal).toISOString().split('T')[0] : "";
+          oldVal = oldVal ? new Date(oldVal).toISOString().split("T")[0] : "";
+          newVal = newVal ? new Date(newVal).toISOString().split("T")[0] : "";
         }
         // Format assignees for comparison
         if (field === "assignee") {
@@ -273,8 +331,12 @@ export const updateTask = async (req, res) => {
           let displayNewVal = String(newVal);
 
           if (field === "assignee") {
-            const oldUser = oldVal ? await mongoose.model("user").findById(oldVal) : null;
-            const newUser = newVal ? await mongoose.model("user").findById(newVal) : null;
+            const oldUser = oldVal
+              ? await mongoose.model("user").findById(oldVal)
+              : null;
+            const newUser = newVal
+              ? await mongoose.model("user").findById(newVal)
+              : null;
             displayOldVal = oldUser ? oldUser.name : "Unassigned";
             displayNewVal = newUser ? newUser.name : "Unassigned";
           }
@@ -284,23 +346,36 @@ export const updateTask = async (req, res) => {
             oldValue: displayOldVal,
             newValue: displayNewVal,
             updatedBy: req.user.id,
-            updatedAt: new Date()
+            updatedAt: new Date(),
           });
 
           // Send notification triggers
-          if (field === "assignee" && newVal && newVal.toString() !== req.user.id) {
+          if (
+            field === "assignee" &&
+            newVal &&
+            newVal.toString() !== req.user.id
+          ) {
             try {
               await Notification.create({
                 user: newVal,
                 title: "New Issue Assigned",
-                message: `${req.user.name} assigned you the issue: "${task.title}" (${task.key || `PM-${task._id.toString().slice(-4).toUpperCase()}`})`,
+                message: `${req.user.name} assigned you the issue: "${
+                  task.title
+                }" (${
+                  task.key ||
+                  `PM-${task._id.toString().slice(-4).toUpperCase()}`
+                })`,
                 link: `/task/${task._id}`,
                 read: false,
               });
             } catch (err) {
               console.error("Error creating assignment notification:", err);
             }
-          } else if (field !== "assignee" && task.assignee && task.assignee.toString() !== req.user.id) {
+          } else if (
+            field !== "assignee" &&
+            task.assignee &&
+            task.assignee.toString() !== req.user.id
+          ) {
             try {
               await Notification.create({
                 user: task.assignee,
@@ -332,11 +407,15 @@ export const updateTask = async (req, res) => {
       .populate("assignee", "name email")
       .populate("history.updatedBy", "name email")
       .populate("comments.user", "name email avatar")
-      .populate("links.targetTask", "title key status priority completed");
+      .populate("links.targetTask", "title key status priority completed")
+      .populate("workLogs.user", "name email")
+      .lean();
 
     res.json({ success: true, task: updated });
   } catch (error) {
-    res.status(400).json({ success: false, message: error.message });
+    res
+      .status(HttpStatus.BAD_REQUEST)
+      .json({ success: false, message: error.message });
   }
 };
 
@@ -353,11 +432,13 @@ export const deleteTask = async (req, res) => {
     });
     if (!deleted)
       return res
-        .status(404)
-        .json({ success: false, message: "Task not found or not in your organization" });
-    res.json({ success: true, message: "Task deleted" });
+        .status(HttpStatus.NOT_FOUND)
+        .json({ success: false, message: MESSAGES.TASK.NOT_FOUND });
+    res.json({ success: true, message: MESSAGES.TASK.DELETED });
   } catch (error) {
-    res.status(400).json({ success: false, message: error.message });
+    res
+      .status(HttpStatus.BAD_REQUEST)
+      .json({ success: false, message: error.message });
   }
 };
 
@@ -366,7 +447,9 @@ export const addTaskComment = async (req, res) => {
   try {
     const { text } = req.body;
     if (!text || !text.trim()) {
-      return res.status(400).json({ success: false, message: "Comment text is required" });
+      return res
+        .status(HttpStatus.BAD_REQUEST)
+        .json({ success: false, message: MESSAGES.TASK.COMMENT_REQUIRED });
     }
     const query = req.user.organization
       ? { organization: req.user.organization }
@@ -374,7 +457,9 @@ export const addTaskComment = async (req, res) => {
 
     const task = await Task.findOne({ _id: req.params.id, ...query });
     if (!task) {
-      return res.status(404).json({ success: false, message: "Task not found" });
+      return res
+        .status(HttpStatus.NOT_FOUND)
+        .json({ success: false, message: MESSAGES.TASK.NOT_FOUND });
     }
 
     task.comments.push({
@@ -390,11 +475,15 @@ export const addTaskComment = async (req, res) => {
       .populate("assignee", "name email")
       .populate("history.updatedBy", "name email")
       .populate("comments.user", "name email avatar")
-      .populate("links.targetTask", "title key status priority completed");
+      .populate("links.targetTask", "title key status priority completed")
+      .populate("workLogs.user", "name email")
+      .lean();
 
     res.json({ success: true, task: populatedTask });
   } catch (error) {
-    res.status(400).json({ success: false, message: error.message });
+    res
+      .status(HttpStatus.BAD_REQUEST)
+      .json({ success: false, message: error.message });
   }
 };
 
@@ -407,17 +496,27 @@ export const deleteTaskComment = async (req, res) => {
 
     const task = await Task.findOne({ _id: req.params.id, ...query });
     if (!task) {
-      return res.status(404).json({ success: false, message: "Task not found" });
+      return res
+        .status(HttpStatus.NOT_FOUND)
+        .json({ success: false, message: MESSAGES.TASK.NOT_FOUND });
     }
 
     const comment = task.comments.id(req.params.commentId);
     if (!comment) {
-      return res.status(404).json({ success: false, message: "Comment not found" });
+      return res
+        .status(HttpStatus.NOT_FOUND)
+        .json({ success: false, message: MESSAGES.TASK.COMMENT_NOT_FOUND });
     }
 
     // Check permissions: author, org admin, or system admin
-    if (comment.user.toString() !== req.user.id && req.user.role !== "org_admin" && req.user.role !== "system_admin") {
-      return res.status(403).json({ success: false, message: "Unauthorized to delete this comment" });
+    if (
+      comment.user.toString() !== req.user.id &&
+      req.user.role !== "org_admin" &&
+      req.user.role !== "system_admin"
+    ) {
+      return res
+        .status(HttpStatus.FORBIDDEN)
+        .json({ success: false, message: MESSAGES.COMMON.UNAUTHORIZED });
     }
 
     comment.deleteOne();
@@ -428,11 +527,15 @@ export const deleteTaskComment = async (req, res) => {
       .populate("assignee", "name email")
       .populate("history.updatedBy", "name email")
       .populate("comments.user", "name email avatar")
-      .populate("links.targetTask", "title key status priority completed");
+      .populate("links.targetTask", "title key status priority completed")
+      .populate("workLogs.user", "name email")
+      .lean();
 
     res.json({ success: true, task: populatedTask });
   } catch (error) {
-    res.status(400).json({ success: false, message: error.message });
+    res
+      .status(HttpStatus.BAD_REQUEST)
+      .json({ success: false, message: error.message });
   }
 };
 
@@ -443,7 +546,7 @@ export const getTaskAnalytics = async (req, res) => {
       ? { organization: req.user.organization }
       : { owner: req.user.id };
 
-    const tasks = await Task.find(query);
+    const tasks = await Task.find(query).lean();
 
     // 1. Weekly Velocity Calculation (Last 4 Weeks)
     const weeks = [];
@@ -452,14 +555,16 @@ export const getTaskAnalytics = async (req, res) => {
       end.setDate(end.getDate() - i * 7);
       const start = new Date();
       start.setDate(start.getDate() - (i + 1) * 7);
-      
+
       let weekPoints = 0;
       let weekCount = 0;
 
       tasks.forEach((t) => {
         if (t.completed) {
           let completionDate = t.updatedAt || t.createdAt;
-          const statusHistory = t.history.filter(h => h.field === "status" && h.newValue === "Done");
+          const statusHistory = t.history.filter(
+            (h) => h.field === "status" && h.newValue === "Done"
+          );
           if (statusHistory.length > 0) {
             completionDate = statusHistory[statusHistory.length - 1].updatedAt;
           }
@@ -474,13 +579,16 @@ export const getTaskAnalytics = async (req, res) => {
       weeks.push({
         label: `Week -${i}`,
         points: weekPoints,
-        count: weekCount
+        count: weekCount,
       });
     }
 
     // 2. Burndown Curve (Last 15 Days)
     const burndown = [];
-    const totalStoryPoints = tasks.reduce((sum, t) => sum + (t.storyPoints || 0), 0);
+    const totalStoryPoints = tasks.reduce(
+      (sum, t) => sum + (t.storyPoints || 0),
+      0
+    );
 
     for (let i = 14; i >= 0; i--) {
       const date = new Date();
@@ -491,7 +599,9 @@ export const getTaskAnalytics = async (req, res) => {
       tasks.forEach((t) => {
         if (t.completed) {
           let completionDate = t.updatedAt || t.createdAt;
-          const statusHistory = t.history.filter(h => h.field === "status" && h.newValue === "Done");
+          const statusHistory = t.history.filter(
+            (h) => h.field === "status" && h.newValue === "Done"
+          );
           if (statusHistory.length > 0) {
             completionDate = statusHistory[statusHistory.length - 1].updatedAt;
           }
@@ -502,8 +612,14 @@ export const getTaskAnalytics = async (req, res) => {
       });
 
       burndown.push({
-        day: date.toLocaleDateString("en-US", { month: "short", day: "numeric" }),
-        ideal: Math.max(0, Math.round(totalStoryPoints - (totalStoryPoints / 14) * (14 - i))),
+        day: date.toLocaleDateString("en-US", {
+          month: "short",
+          day: "numeric",
+        }),
+        ideal: Math.max(
+          0,
+          Math.round(totalStoryPoints - (totalStoryPoints / 14) * (14 - i))
+        ),
         remaining: Math.max(0, totalStoryPoints - resolvedBeforeDay),
       });
     }
@@ -521,10 +637,78 @@ export const getTaskAnalytics = async (req, res) => {
       analytics: {
         weeks,
         burndown,
-        priorityBreakdown
-      }
+        priorityBreakdown,
+      },
     });
   } catch (error) {
-    res.status(400).json({ success: false, message: error.message });
+    res
+      .status(HttpStatus.BAD_REQUEST)
+      .json({ success: false, message: error.message });
+  }
+};
+
+// LOG WORK ON A TASK
+export const logWork = async (req, res) => {
+  try {
+    const { hoursSpent, description } = req.body;
+    if (!hoursSpent || Number(hoursSpent) <= 0) {
+      return res
+        .status(HttpStatus.BAD_REQUEST)
+        .json({ success: false, message: MESSAGES.TASK.WORKLOG_HOURS_INVALID });
+    }
+
+    const query = req.user.organization
+      ? { organization: req.user.organization }
+      : { owner: req.user.id };
+
+    const task = await Task.findOne({ _id: req.params.id, ...query });
+    if (!task) {
+      return res
+        .status(HttpStatus.NOT_FOUND)
+        .json({ success: false, message: MESSAGES.TASK.NOT_FOUND });
+    }
+
+    // Add log entry
+    task.workLogs.push({
+      hoursSpent: Number(hoursSpent),
+      description: description || "",
+      user: req.user.id,
+      createdAt: new Date(),
+    });
+
+    // Update total logged hours
+    task.timeLogged = task.workLogs.reduce(
+      (sum, log) => sum + (log.hoursSpent || 0),
+      0
+    );
+
+    // Record history entry
+    if (!task.history) task.history = [];
+    task.history.push({
+      field: "workLog",
+      oldValue: "",
+      newValue: `Logged ${hoursSpent}h of work: ${
+        description || "No description"
+      }`,
+      updatedBy: req.user.id,
+      updatedAt: new Date(),
+    });
+
+    await task.save();
+
+    const updated = await Task.findById(task._id)
+      .populate("owner", "name email")
+      .populate("assignee", "name email")
+      .populate("history.updatedBy", "name email")
+      .populate("comments.user", "name email avatar")
+      .populate("links.targetTask", "title key status priority completed")
+      .populate("workLogs.user", "name email")
+      .lean();
+
+    res.json({ success: true, task: updated });
+  } catch (error) {
+    res
+      .status(HttpStatus.BAD_REQUEST)
+      .json({ success: false, message: error.message });
   }
 };

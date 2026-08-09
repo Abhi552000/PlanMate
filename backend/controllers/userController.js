@@ -3,6 +3,8 @@ import User from "../models/userModel.js";
 import Organization from "../models/organizationModel.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import { HttpStatus } from "../constants/httpStatus.js";
+import { MESSAGES } from "../constants/messages.js";
 
 const JWT_SECRET = process.env.JWT_SECRET || "your_jwt_secret_here";
 const TOKEN_EXPIRES = "24h";
@@ -16,24 +18,26 @@ export async function registerUser(req, res) {
 
   if (!name || !email || !password) {
     return res
-      .status(400)
-      .json({ success: false, message: "All fields are required" });
+      .status(HttpStatus.BAD_REQUEST)
+      .json({ success: false, message: MESSAGES.AUTH.ALL_FIELDS_REQUIRED });
   }
   if (!validator.isEmail(email)) {
-    return res.status(400).json({ success: false, message: "Invalid email" });
+    return res
+      .status(HttpStatus.BAD_REQUEST)
+      .json({ success: false, message: MESSAGES.AUTH.INVALID_EMAIL });
   }
   if (password.length < 8) {
-    return res.status(400).json({
+    return res.status(HttpStatus.BAD_REQUEST).json({
       success: false,
-      message: "Password must be atleast 8 characters",
+      message: MESSAGES.AUTH.PASSWORD_LENGTH,
     });
   }
 
   try {
     if (await User.findOne({ email })) {
       return res
-        .status(400)
-        .json({ success: false, message: "User already exists" });
+        .status(HttpStatus.BAD_REQUEST)
+        .json({ success: false, message: MESSAGES.AUTH.USER_EXISTS });
     }
 
     const hashed = await bcrypt.hash(password, 10);
@@ -42,7 +46,9 @@ export async function registerUser(req, res) {
     if (organization) {
       const orgExists = await Organization.findById(organization);
       if (!orgExists) {
-        return res.status(400).json({ success: false, message: "Selected organization not found" });
+        return res
+          .status(HttpStatus.BAD_REQUEST)
+          .json({ success: false, message: MESSAGES.AUTH.ORG_NOT_FOUND });
       }
 
       await User.create({
@@ -54,9 +60,9 @@ export async function registerUser(req, res) {
         status: "pending"
       });
 
-      return res.status(201).json({
+      return res.status(HttpStatus.CREATED).json({
         success: true,
-        message: "Registration successful! Your request is pending approval by your organization administrator."
+        message: MESSAGES.AUTH.REGISTRATION_SUCCESS_PENDING
       });
     }
 
@@ -79,7 +85,7 @@ export async function registerUser(req, res) {
     user.organization = org._id;
     await user.save();
 
-    res.status(201).json({
+    res.status(HttpStatus.CREATED).json({
       success: true,
       token,
       user: { 
@@ -92,7 +98,9 @@ export async function registerUser(req, res) {
     });
   } catch (err) {
     console.log(err);
-    res.status(500).json({ success: false, message: "Server error" });
+    res
+      .status(HttpStatus.INTERNAL_SERVER_ERROR)
+      .json({ success: false, message: MESSAGES.COMMON.SERVER_ERROR });
   }
 }
 
@@ -101,40 +109,40 @@ export async function loginUser(req, res) {
   const { email, password } = req.body;
   if (!email || !password) {
     return res
-      .status(400)
-      .json({ success: false, message: "Email and password required" });
+      .status(HttpStatus.BAD_REQUEST)
+      .json({ success: false, message: MESSAGES.AUTH.EMAIL_PASSWORD_REQUIRED });
   }
 
   try {
     const user = await User.findOne({ email }).populate("organization");
     if (!user) {
       return res
-        .status(401)
-        .json({ success: false, message: "Invalid credentials." });
+        .status(HttpStatus.UNAUTHORIZED)
+        .json({ success: false, message: MESSAGES.AUTH.INVALID_CREDENTIALS });
     }
     if (user.organization && user.organization.isActive === false) {
-      return res.status(403).json({
+      return res.status(HttpStatus.FORBIDDEN).json({
         success: false,
-        message: `Your organization is inactive: ${user.organization.remark || "Deactivated by System Admin"}. Please contact your administrator.`
+        message: MESSAGES.AUTH.ORG_INACTIVE(user.organization.remark)
       });
     }
     if (user.status === "pending") {
-      return res.status(403).json({
+      return res.status(HttpStatus.FORBIDDEN).json({
         success: false,
-        message: "Your registration request is pending approval by your organization administrator. Please contact your administrator for access."
+        message: MESSAGES.AUTH.REGISTRATION_PENDING
       });
     }
     if (user.status === "rejected") {
-      return res.status(403).json({
+      return res.status(HttpStatus.FORBIDDEN).json({
         success: false,
-        message: "Your access request has been rejected by your organization administrator."
+        message: MESSAGES.AUTH.REGISTRATION_REJECTED
       });
     }
     const match = await bcrypt.compare(password, user.password);
     if (!match) {
       return res
-        .status(401)
-        .json({ success: false, message: "Invalid credentials." });
+        .status(HttpStatus.UNAUTHORIZED)
+        .json({ success: false, message: MESSAGES.AUTH.INVALID_CREDENTIALS });
     }
     const token = createToken(user._id);
     res.json({
@@ -151,7 +159,9 @@ export async function loginUser(req, res) {
     });
   } catch (err) {
     console.log(err);
-    res.status(500).json({ success: false, message: "Server error" });
+    res
+      .status(HttpStatus.INTERNAL_SERVER_ERROR)
+      .json({ success: false, message: MESSAGES.COMMON.SERVER_ERROR });
   }
 }
 
@@ -163,19 +173,21 @@ export async function getCurrentUser(req, res) {
       .populate("organization");
     if (!user) {
       return res
-        .status(400)
-        .json({ success: false, message: "User not found" });
+        .status(HttpStatus.BAD_REQUEST)
+        .json({ success: false, message: MESSAGES.AUTH.USER_NOT_FOUND });
     }
     if (user.organization && user.organization.isActive === false) {
-      return res.status(403).json({
+      return res.status(HttpStatus.FORBIDDEN).json({
         success: false,
-        message: `Your organization is inactive: ${user.organization.remark || "Deactivated by System Admin"}. Please contact your administrator.`
+        message: MESSAGES.AUTH.ORG_INACTIVE(user.organization.remark)
       });
     }
     res.json({ success: true, user });
   } catch (err) {
     console.log(err);
-    res.status(500).json({ success: false, message: "Server error" });
+    res
+      .status(HttpStatus.INTERNAL_SERVER_ERROR)
+      .json({ success: false, message: MESSAGES.COMMON.SERVER_ERROR });
   }
 }
 
@@ -184,8 +196,8 @@ export async function updateProfile(req, res) {
   const { name } = req.body;
   if (!name) {
     return res
-      .status(400)
-      .json({ success: false, message: "valid name required" });
+      .status(HttpStatus.BAD_REQUEST)
+      .json({ success: false, message: MESSAGES.AUTH.VALID_NAME_REQUIRED });
   }
 
   try {
@@ -197,7 +209,9 @@ export async function updateProfile(req, res) {
     res.json({ success: true, user });
   } catch (err) {
     console.log(err);
-    res.status(500).json({ success: false, message: "Server error" });
+    res
+      .status(HttpStatus.INTERNAL_SERVER_ERROR)
+      .json({ success: false, message: MESSAGES.COMMON.SERVER_ERROR });
   }
 }
 
@@ -207,27 +221,29 @@ export async function updatePassword(req, res) {
 
   if (!currentPassword || !newPassword || newPassword.length < 8) {
     return res
-      .json(400)
-      .json({ success: false, message: "Password invalid or too short" });
+      .status(HttpStatus.BAD_REQUEST)
+      .json({ success: false, message: MESSAGES.AUTH.PASSWORD_INVALID });
   }
   try {
     const user = await User.findById(req.user.id).select("password");
     if (!user) {
       return res
-        .status(404)
-        .json({ success: false, message: "User not found" });
+        .status(HttpStatus.NOT_FOUND)
+        .json({ success: false, message: MESSAGES.AUTH.USER_NOT_FOUND });
     }
     const match = await bcrypt.compare(currentPassword, user.password);
     if (!match) {
       return res
-        .status(401)
-        .json({ success: false, message: "Current password incorrect" });
+        .status(HttpStatus.UNAUTHORIZED)
+        .json({ success: false, message: MESSAGES.AUTH.PASSWORD_INCORRECT });
     }
     user.password = await bcrypt.hash(newPassword, 10);
     await user.save();
-    res.json({ success: true, message: "Password changed" });
+    res.json({ success: true, message: MESSAGES.AUTH.PASSWORD_CHANGED });
   } catch (err) {
     console.log(err);
-    res.status(500).json({ success: false, message: "Server error" });
+    res
+      .status(HttpStatus.INTERNAL_SERVER_ERROR)
+      .json({ success: false, message: MESSAGES.COMMON.SERVER_ERROR });
   }
 }
