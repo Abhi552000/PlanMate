@@ -13,7 +13,7 @@ import { TaskMetaSidebar } from "./components/TaskMetaSidebar";
 import { useTaskDetail } from "./hooks/useTaskDetail";
 
 const baseControlClasses =
-  "w-full px-3 py-2 border border-sky-100 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-sky-505 focus:border-sky-505 transition-all duration-200 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-300";
+  "w-full px-3 py-2 border border-sky-100 dark:border-gray-800 rounded-lg text-xs focus:ring-2 focus:ring-sky-500 focus:outline-none bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 font-medium transition-all duration-200";
 
 const TaskDetailPage = () => {
   const { id } = useParams();
@@ -100,6 +100,7 @@ const TaskDetailPage = () => {
             description={taskData.description}
             onChange={handleChange}
             baseControlClasses={baseControlClasses}
+            members={members}
           />
 
           {!isEditingSubtask && (
@@ -133,6 +134,7 @@ const TaskDetailPage = () => {
               currentUser={currentUser}
               onAddComment={handleAddComment}
               onDeleteComment={handleDeleteComment}
+              members={members}
             />
           )}
         </div>

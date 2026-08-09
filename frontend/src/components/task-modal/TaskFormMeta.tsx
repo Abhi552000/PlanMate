@@ -9,6 +9,8 @@ import {
   Clock,
   Plus,
   History,
+  Link2,
+  Trash2,
 } from "lucide-react";
 import { priorityStyles } from "../../assets/dummy";
 import { TaskFormMetaProps } from "../../types";
@@ -33,6 +35,53 @@ export const TaskFormMeta: React.FC<TaskFormMetaProps> = ({
   const [logHours, setLogHours] = useState("");
   const [logDesc, setLogDesc] = useState("");
   const [logging, setLogging] = useState(false);
+
+  // Link issue local states
+  const [showLinkForm, setShowLinkForm] = useState(false);
+  const [linkType, setLinkType] = useState("blocks");
+  const [targetTaskId, setTargetTaskId] = useState("");
+  const [allTasks, setAllTasks] = useState<any[]>([]);
+  const [linkingIssue, setLinkingIssue] = useState(false);
+
+  const handleLinkIssue = async () => {
+    if (!targetTaskId) return;
+    setLinkingIssue(true);
+    try {
+      const res = await taskService.linkTask(
+        taskData.id || taskData._id,
+        linkType,
+        targetTaskId
+      );
+      if (res?.success && res?.task) {
+        setTaskData(res.task);
+        setTargetTaskId("");
+        setShowLinkForm(false);
+        toast.success("Issue linked successfully!");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to link issue.");
+    } finally {
+      setLinkingIssue(false);
+    }
+  };
+
+  const handleUnlinkIssue = async (linkId: string) => {
+    if (!window.confirm("Are you sure you want to remove this issue link?")) return;
+    try {
+      const res = await taskService.unlinkTask(
+        taskData.id || taskData._id,
+        linkId
+      );
+      if (res?.success && res?.task) {
+        setTaskData(res.task);
+        toast.success("Issue unlinked successfully!");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to unlink issue.");
+    }
+  };
 
   const estimate = taskData.originalEstimate || 0;
   const logged = taskData.timeLogged || 0;
@@ -384,6 +433,124 @@ export const TaskFormMeta: React.FC<TaskFormMetaProps> = ({
               </div>
             </div>
           )}
+
+          {/* Issue Links Sub-section */}
+          <div className="border-t border-sky-100 dark:border-gray-800 pt-4 mt-4 space-y-3">
+            <div className="flex justify-between items-center">
+              <span className="flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-gray-500">
+                <Link2 className="w-3.5 h-3.5 text-sky-500" /> Linked Issues
+              </span>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowLinkForm(!showLinkForm);
+                  if (!showLinkForm && allTasks.length === 0) {
+                    taskService.getTasks().then((data) => {
+                      if (data?.success && data?.tasks) {
+                        setAllTasks(data.tasks);
+                      }
+                    });
+                  }
+                }}
+                className="text-[10px] bg-sky-50 hover:bg-sky-100 dark:bg-gray-800 dark:hover:bg-gray-700 text-sky-600 dark:text-sky-400 px-2 py-1 rounded font-bold flex items-center gap-0.5 transition"
+              >
+                <Plus className="w-3 h-3" /> Link Issue
+              </button>
+            </div>
+
+            {/* Inline Link Form */}
+            {showLinkForm && (
+              <div className="bg-sky-50/50 dark:bg-gray-805 p-3 rounded-lg border border-sky-100 dark:border-gray-700 space-y-2 animate-fadeIn">
+                <div className="grid grid-cols-3 gap-2">
+                  <select
+                    value={linkType}
+                    onChange={(e) => setLinkType(e.target.value)}
+                    className="col-span-1 px-2 py-1 border border-sky-100 dark:border-gray-600 bg-white dark:bg-gray-900 rounded text-xs focus:ring-1 focus:ring-sky-500 dark:text-gray-200"
+                  >
+                    <option value="blocks">blocks</option>
+                    <option value="blocked by">blocked by</option>
+                    <option value="relates to">relates to</option>
+                  </select>
+                  <select
+                    value={targetTaskId}
+                    onChange={(e) => setTargetTaskId(e.target.value)}
+                    className="col-span-2 px-2 py-1 border border-sky-100 dark:border-gray-600 bg-white dark:bg-gray-900 rounded text-xs focus:ring-1 focus:ring-sky-500 dark:text-gray-200"
+                  >
+                    <option value="">Select task...</option>
+                    {allTasks
+                      .filter((t: any) => t._id !== (taskData.id || taskData._id))
+                      .map((t: any) => (
+                        <option key={t._id} value={t._id}>
+                          {t.key || `PM-${t._id.slice(-4).toUpperCase()}`} - {t.title}
+                        </option>
+                      ))}
+                  </select>
+                </div>
+                <div className="flex justify-end gap-1.5 pt-1">
+                  <button
+                    type="button"
+                    onClick={() => setShowLinkForm(false)}
+                    className="px-2 py-1 text-[10px] text-gray-500 hover:bg-gray-250 dark:hover:bg-gray-700 rounded transition font-medium"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleLinkIssue}
+                    disabled={linkingIssue || !targetTaskId}
+                    className="px-2 py-1 text-[10px] bg-sky-600 text-white hover:bg-sky-700 rounded transition font-bold disabled:opacity-50"
+                  >
+                    {linkingIssue ? "Linking..." : "Link"}
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* List of active issue links */}
+            {taskData.links && taskData.links.length > 0 ? (
+              <div className="space-y-1.5 pt-1">
+                {taskData.links.map((link: any) => {
+                  const target = link.targetTask;
+                  if (!target) return null;
+                  const isDone = target.status === "Done" || target.completed === true || target.completed === "Yes";
+                  return (
+                    <div
+                      key={link._id}
+                      className="p-1.5 bg-white/50 dark:bg-gray-800/40 rounded border border-sky-100/30 dark:border-gray-800/50 text-[10px] text-gray-600 dark:text-gray-400 flex items-center justify-between gap-2"
+                    >
+                      <div className="flex items-center gap-1.5 min-w-0">
+                        <span className="font-bold text-sky-600 dark:text-sky-400 capitalize shrink-0">
+                          {link.linkType}
+                        </span>
+                        <span
+                          className={`truncate text-gray-700 dark:text-gray-300 font-semibold ${
+                            isDone ? "line-through text-gray-400 dark:text-gray-500" : ""
+                          }`}
+                        >
+                          <span className="font-mono text-[9px] text-gray-400 dark:text-gray-500 mr-1">
+                            [{target.key || `PM-${target._id.slice(-4).toUpperCase()}`}]
+                          </span>
+                          {target.title}
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handleUnlinkIssue(link._id)}
+                        className="text-gray-400 hover:text-red-500 transition-colors p-1"
+                        title="Remove link"
+                      >
+                        <Trash2 className="w-3 h-3" />
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <p className="text-[10px] text-gray-400 dark:text-gray-500 italic pt-1">
+                No linked issues.
+              </p>
+            )}
+          </div>
         </div>
       )}
     </div>

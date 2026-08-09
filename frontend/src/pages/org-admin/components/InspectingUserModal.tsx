@@ -14,8 +14,14 @@ export const InspectingUserModal: React.FC<InspectingUserModalProps> = ({
     (inspectingUser.solvedTasks || 0) + (inspectingUser.pendingTasks || 0);
 
   return (
-    <div className="fixed inset-0 bg-black/45 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-xl border border-sky-100 dark:border-gray-800 max-w-md w-full p-6 space-y-4 animate-scaleUp animate-duration-150">
+    <div 
+      className="fixed inset-0 bg-black/45 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+      onClick={onClose}
+    >
+      <div 
+        className="bg-white dark:bg-gray-900 rounded-2xl shadow-xl border border-sky-100 dark:border-gray-800 max-w-md w-full p-6 space-y-4 animate-scaleUp animate-duration-150"
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Header */}
         <div className="flex items-center justify-between border-b border-sky-50 dark:border-gray-800 pb-3">
           <h3 className="font-bold text-gray-800 dark:text-gray-250 text-base flex items-center gap-1.5">

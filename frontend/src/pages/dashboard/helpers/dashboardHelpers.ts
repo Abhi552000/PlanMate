@@ -31,21 +31,36 @@ export const filterDashboardTasks = (tasks: ITask[], options: FilterOptions) => 
       }
     }
     // 5. Timeframe
-    if (selectedTimeframe !== "all" && task.dueDate) {
-      const due = new Date(task.dueDate);
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      const tomorrow = new Date(today);
-      tomorrow.setDate(tomorrow.getDate() + 1);
-      const endOfWeek = new Date(today);
-      endOfWeek.setDate(endOfWeek.getDate() + 7);
+    if (selectedTimeframe !== "all") {
+      if (!task.dueDate) return false;
+
+      const getLocalYYYYMMDD = (d: Date) => {
+        const year = d.getFullYear();
+        const month = String(d.getMonth() + 1).padStart(2, "0");
+        const day = String(d.getDate()).padStart(2, "0");
+        return `${year}-${month}-${day}`;
+      };
+
+      const dueStr =
+        typeof task.dueDate === "string"
+          ? task.dueDate.split("T")[0]
+          : getLocalYYYYMMDD(new Date(task.dueDate));
+      const todayStr = getLocalYYYYMMDD(new Date());
+
+      const isCompleted =
+        task.completed === true ||
+        task.completed === "Yes" ||
+        task.status === "Done";
 
       if (selectedTimeframe === "today") {
-        if (due < today || due >= tomorrow) return false;
+        if (dueStr !== todayStr) return false;
       } else if (selectedTimeframe === "week") {
-        if (due < today || due > endOfWeek) return false;
+        const dueTime = new Date(dueStr).getTime();
+        const todayTime = new Date(todayStr).getTime();
+        const nextWeekTime = todayTime + 7 * 24 * 60 * 60 * 1000;
+        if (dueTime < todayTime || dueTime > nextWeekTime) return false;
       } else if (selectedTimeframe === "overdue") {
-        if (due >= today || task.completed) return false;
+        if (dueStr >= todayStr || isCompleted) return false;
       }
     }
     return true;

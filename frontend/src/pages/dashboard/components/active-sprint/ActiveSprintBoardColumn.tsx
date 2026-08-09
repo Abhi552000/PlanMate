@@ -1,5 +1,6 @@
 import React from "react";
 import { User } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { ActiveSprintBoardColumnProps } from "../../../../types";
 import { EPIC_COLORS } from "../../../../constants/uiTexts";
 
@@ -12,6 +13,7 @@ export const ActiveSprintBoardColumn: React.FC<
   setSelectedTaskToEdit,
   setIsTaskModalOpen,
 }) => {
+  const navigate = useNavigate();
   return (
     <div
       className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-4"
@@ -51,8 +53,7 @@ export const ActiveSprintBoardColumn: React.FC<
                     e.dataTransfer.setData("text/plain", task._id)
                   }
                   onClick={() => {
-                    setSelectedTaskToEdit(task);
-                    setIsTaskModalOpen(true);
+                    navigate(`/task/${task._id}`);
                   }}
                   className="bg-white dark:bg-gray-955 border border-sky-100/40 dark:border-gray-855/60 rounded-xl p-3 shadow-xs hover:border-sky-305 dark:hover:border-sky-850 hover:shadow-xs transition-all cursor-pointer group space-y-2.5 relative"
                 >

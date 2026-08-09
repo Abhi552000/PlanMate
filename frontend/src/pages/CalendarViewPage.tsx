@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from "react";
-import { useOutletContext } from "react-router-dom";
+import { useOutletContext, useNavigate } from "react-router-dom";
 import {
   ChevronLeft,
   ChevronRight,
@@ -19,6 +19,7 @@ import { CONSOLE_ERRORS, TOAST_MESSAGES } from "../constants/messages";
 
 export const CalendarViewPage: React.FC = () => {
   const { tasks, refreshTasks } = useOutletContext<DashboardContext>();
+  const navigate = useNavigate();
 
   // Calendar Date State
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -95,14 +96,30 @@ export const CalendarViewPage: React.FC = () => {
   };
 
   const handleOpenTask = (task: ITask) => {
-    setSelectedTask(task);
-    setShowModal(true);
+    navigate(`/task/${task._id}`);
   };
 
   const handleCloseModal = () => {
     setShowModal(false);
     setSelectedTask(null);
     refreshTasks();
+  };
+
+  // Selected date state for Daily Agenda (essential for mobile responsiveness)
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [showMobileAgendaModal, setShowMobileAgendaModal] = useState(false);
+
+  const selectedDateTasks = useMemo(() => {
+    return scheduledTasks.filter((t) =>
+      isSameDay(new Date(t.dueDate!), selectedDate)
+    );
+  }, [scheduledTasks, selectedDate]);
+
+  const handleDayClick = (date: Date) => {
+    setSelectedDate(date);
+    if (window.innerWidth < 768) {
+      setShowMobileAgendaModal(true);
+    }
   };
 
   return (
@@ -128,7 +145,7 @@ export const CalendarViewPage: React.FC = () => {
           <div className="flex items-center gap-2 self-stretch sm:self-auto">
             <button
               onClick={handleToday}
-              className="px-3 py-1.5 bg-sky-50 hover:bg-sky-100 dark:bg-gray-800 dark:hover:bg-gray-700 text-sky-700 dark:text-sky-300 rounded-lg text-xs font-semibold shadow-sm transition"
+              className="px-3 py-1.5 bg-sky-50 hover:bg-sky-100 dark:bg-gray-880 dark:hover:bg-gray-700 text-sky-700 dark:text-sky-300 rounded-lg text-xs font-semibold shadow-sm transition"
             >
               Today
             </button>
@@ -169,11 +186,17 @@ export const CalendarViewPage: React.FC = () => {
             const dateTasks = scheduledTasks.filter((t) =>
               isSameDay(new Date(t.dueDate!), dayCell.date)
             );
+            const isSelected = isSameDay(dayCell.date, selectedDate);
 
             return (
               <div
                 key={idx}
-                className={`bg-white dark:bg-gray-900 min-h-[7rem] md:min-h-[8rem] p-2 flex flex-col group relative border-t border-sky-50 dark:border-gray-850 transition hover:bg-sky-50/10 dark:hover:bg-gray-850/10`}
+                onClick={() => handleDayClick(dayCell.date)}
+                className={`bg-white dark:bg-gray-900 min-h-[4.5rem] md:min-h-[8rem] p-1.5 md:p-2 flex flex-col group relative border-t border-sky-50 dark:border-gray-850 transition hover:bg-sky-50/10 dark:hover:bg-gray-850/10 cursor-pointer ${
+                  isSelected
+                    ? "ring-2 ring-sky-500 dark:ring-sky-400 z-10"
+                    : ""
+                }`}
               >
                 {/* Header Date Cell Label */}
                 <div className="flex justify-between items-center mb-1">
@@ -191,7 +214,10 @@ export const CalendarViewPage: React.FC = () => {
 
                   {/* Quick Add Button */}
                   <button
-                    onClick={() => handleOpenCreateForDate(dayCell.date)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleOpenCreateForDate(dayCell.date);
+                    }}
                     className="opacity-0 group-hover:opacity-100 p-0.5 hover:bg-sky-100 dark:hover:bg-gray-800 text-sky-600 dark:text-sky-400 rounded transition duration-200"
                   >
                     <Plus className="w-3.5 h-3.5" />
@@ -200,46 +226,74 @@ export const CalendarViewPage: React.FC = () => {
 
                 {/* Day Tasks List */}
                 <div className="flex-1 space-y-1 overflow-y-auto max-h-[5.5rem] scrollbar-thin">
-                  {dateTasks.slice(0, 3).map((task) => {
-                    const isCompleted = task.completed;
-                    const priority = task.priority || "Low";
-                    const isOverdue =
-                      !isCompleted &&
-                      new Date(task.dueDate!).getTime() <
-                        new Date().setHours(0, 0, 0, 0);
+                  {/* Desktop View Tasks (shows titles) */}
+                  <div className="hidden md:block space-y-1">
+                    {dateTasks.slice(0, 3).map((task) => {
+                      const isCompleted = task.completed;
+                      const priority = task.priority || "Low";
+                      const isOverdue =
+                        !isCompleted &&
+                        new Date(task.dueDate!).getTime() <
+                          new Date().setHours(0, 0, 0, 0);
 
-                    // Map priorities to CSS classes
-                    const priorityClasses =
-                      priorityStyles[priority] ||
-                      "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300";
+                      // Map priorities to CSS classes
+                      const priorityClasses =
+                        priorityStyles[priority] ||
+                        "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300";
 
-                    return (
-                      <div
-                        key={task._id}
-                        onClick={() => handleOpenTask(task)}
-                        className={`px-1.5 py-1 text-[10px] md:text-xs rounded border shadow-sm cursor-pointer flex items-center gap-1 transition-all truncate hover:brightness-95 dark:hover:brightness-110 ${priorityClasses} ${
-                          isCompleted ? "opacity-60 line-through" : ""
-                        }`}
-                      >
-                        {isCompleted ? (
-                          <CheckCircle2 className="w-3 h-3 text-green-600 shrink-0" />
-                        ) : isOverdue ? (
-                          <Clock className="w-3 h-3 text-red-500 shrink-0 animate-pulse" />
-                        ) : null}
-                        <span className="font-semibold shrink-0">
-                          {task.key || `PM-${task._id.slice(-4).toUpperCase()}`}
-                          :
-                        </span>
-                        <span className="truncate">{task.title}</span>
+                      return (
+                        <div
+                          key={task._id}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleOpenTask(task);
+                          }}
+                          className={`px-1.5 py-1 text-[10px] md:text-xs rounded border shadow-sm cursor-pointer flex items-center gap-1 transition-all truncate hover:brightness-95 dark:hover:brightness-110 ${priorityClasses} ${
+                            isCompleted ? "opacity-60 line-through" : ""
+                          }`}
+                        >
+                          {isCompleted ? (
+                            <CheckCircle2 className="w-3 h-3 text-green-600 shrink-0" />
+                          ) : isOverdue ? (
+                            <Clock className="w-3 h-3 text-red-500 shrink-0 animate-pulse" />
+                          ) : null}
+                          <span className="font-semibold shrink-0">
+                            {task.key || `PM-${task._id.slice(-4).toUpperCase()}`}
+                            :
+                          </span>
+                          <span className="truncate">{task.title}</span>
+                        </div>
+                      );
+                    })}
+
+                    {dateTasks.length > 3 && (
+                      <div className="text-[10px] font-semibold text-sky-600 dark:text-sky-400 text-center py-0.5">
+                        + {dateTasks.length - 3} more
                       </div>
-                    );
-                  })}
+                    )}
+                  </div>
 
-                  {dateTasks.length > 3 && (
-                    <div className="text-[10px] font-semibold text-sky-600 dark:text-sky-400 text-center py-0.5">
-                      + {dateTasks.length - 3} more
-                    </div>
-                  )}
+                  {/* Mobile View Tasks (shows colored indicator dots) */}
+                  <div className="flex md:hidden flex-wrap gap-1 justify-center items-center mt-1">
+                    {dateTasks.slice(0, 4).map((task) => {
+                      const priority = task.priority || "Low";
+                      let dotColor = "bg-green-500";
+                      if (priority === "Medium") dotColor = "bg-sky-500";
+                      if (priority === "High") dotColor = "bg-cyan-500";
+                      if (task.completed) dotColor = "bg-green-500/40 dark:bg-green-500/20";
+
+                      return (
+                        <span
+                          key={task._id}
+                          className={`w-1.5 h-1.5 rounded-full ${dotColor}`}
+                          title={task.title}
+                        />
+                      );
+                    })}
+                    {dateTasks.length > 4 && (
+                      <span className="w-1.5 h-1.5 rounded-full bg-gray-400 dark:bg-gray-600" />
+                    )}
+                  </div>
                 </div>
               </div>
             );
@@ -247,54 +301,223 @@ export const CalendarViewPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Unscheduled Tasks Sidebar Panel (ClickUp style) */}
-      <div className="w-full xl:w-72 bg-white dark:bg-gray-900 border border-sky-100 dark:border-gray-800 rounded-2xl shadow-sm p-4 flex flex-col transition-all duration-300">
-        <div className="flex items-center gap-2 border-b border-sky-50 dark:border-gray-800 pb-3 mb-4">
-          <div className="p-1.5 bg-yellow-100 dark:bg-yellow-900/50 rounded-lg text-yellow-600 dark:text-yellow-400">
-            <Inbox className="w-4 h-4" />
+      {/* Side Panels - Unscheduled & Daily Agenda */}
+      <div className="w-full xl:w-80 flex flex-col gap-6 shrink-0">
+        {/* Daily Agenda Panel (ClickUp style) */}
+        <div className="w-full bg-white dark:bg-gray-900 border border-sky-100 dark:border-gray-800 rounded-2xl shadow-sm p-4 flex flex-col transition-all duration-300">
+          <div className="flex items-center justify-between border-b border-sky-50 dark:border-gray-800 pb-3 mb-4">
+            <div className="flex items-center gap-2">
+              <div className="p-1.5 bg-sky-100 dark:bg-sky-900/50 rounded-lg text-sky-600 dark:text-sky-400">
+                <CalendarIcon className="w-4 h-4" />
+              </div>
+              <div>
+                <h2 className="text-sm font-bold text-gray-800 dark:text-gray-200">
+                  Daily Agenda
+                </h2>
+                <p className="text-[10px] text-gray-500">
+                  {selectedDate.toLocaleDateString("en-US", {
+                    month: "short",
+                    day: "numeric",
+                    year: "numeric",
+                  })}
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={() => handleOpenCreateForDate(selectedDate)}
+              className="p-1 hover:bg-sky-50 dark:hover:bg-gray-800 rounded-lg text-sky-600 dark:text-sky-400 transition"
+              title="Add task for this day"
+            >
+              <Plus className="w-4 h-4" />
+            </button>
           </div>
-          <div>
-            <h2 className="text-sm font-bold text-gray-800 dark:text-gray-200">
-              Unscheduled Tasks
-            </h2>
-            <p className="text-[10px] text-gray-500">
-              Inbox ({unscheduledTasks.length})
-            </p>
+
+          <div className="space-y-2 overflow-y-auto max-h-[15rem] xl:max-h-[18rem] scrollbar-thin">
+            {selectedDateTasks.length === 0 ? (
+              <div className="text-center py-6 text-xs text-gray-500 dark:text-gray-600">
+                No tasks scheduled for this day.
+              </div>
+            ) : (
+              selectedDateTasks.map((task) => (
+                <div
+                  key={task._id}
+                  onClick={() => handleOpenTask(task)}
+                  className={`p-2.5 border rounded-xl cursor-pointer transition-all duration-205 flex flex-col gap-1.5 shadow-sm group ${
+                    task.completed
+                      ? "bg-gray-50/50 border-gray-100 dark:bg-gray-900/50 dark:border-gray-800 opacity-70"
+                      : "bg-sky-50/10 border-sky-50 hover:bg-sky-50/30 dark:bg-gray-850 dark:border-gray-800/80 dark:hover:bg-gray-800"
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-bold text-sky-600 dark:text-sky-400">
+                      {task.key || `PM-${task._id.slice(-4).toUpperCase()}`}
+                    </span>
+                    <span
+                      className={`text-[9px] px-1.5 py-0.5 rounded-full shrink-0 font-semibold border ${
+                        priorityStyles[task.priority || "Low"]
+                      }`}
+                    >
+                      {task.priority || "Low"}
+                    </span>
+                  </div>
+                  <h3
+                    className={`text-xs font-semibold text-gray-800 dark:text-gray-300 group-hover:text-sky-600 transition truncate ${
+                      task.completed ? "line-through text-gray-500" : ""
+                    }`}
+                  >
+                    {task.title}
+                  </h3>
+                </div>
+              ))
+            )}
           </div>
         </div>
 
-        <div className="flex-1 space-y-2 overflow-y-auto max-h-[25rem] xl:max-h-none scrollbar-thin">
-          {unscheduledTasks.length === 0 ? (
-            <div className="text-center py-8 text-xs text-gray-500 dark:text-gray-600">
-              All tasks have deadlines!
+        {/* Unscheduled Tasks Panel */}
+        <div className="w-full bg-white dark:bg-gray-900 border border-sky-100 dark:border-gray-800 rounded-2xl shadow-sm p-4 flex flex-col transition-all duration-300">
+          <div className="flex items-center gap-2 border-b border-sky-50 dark:border-gray-800 pb-3 mb-4">
+            <div className="p-1.5 bg-yellow-100 dark:bg-yellow-900/50 rounded-lg text-yellow-600 dark:bg-yellow-400">
+              <Inbox className="w-4 h-4" />
             </div>
-          ) : (
-            unscheduledTasks.map((task) => (
-              <div
-                key={task._id}
-                onClick={() => handleOpenTask(task)}
-                className="p-2.5 border border-sky-50 dark:border-gray-800/80 rounded-xl bg-sky-50/10 hover:bg-sky-50/30 dark:bg-gray-850 dark:hover:bg-gray-800 cursor-pointer transition-all duration-200 flex flex-col gap-1.5 shadow-sm group"
-              >
-                <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-bold text-sky-600 dark:text-sky-400">
-                    {task.key || `PM-${task._id.slice(-4).toUpperCase()}`}
-                  </span>
-                  <span
-                    className={`text-[9px] px-1.5 py-0.5 rounded-full shrink-0 font-semibold border ${
-                      priorityStyles[task.priority || "Low"]
-                    }`}
-                  >
-                    {task.priority || "Low"}
-                  </span>
-                </div>
-                <h3 className="text-xs font-semibold text-gray-800 dark:text-gray-300 group-hover:text-sky-600 transition truncate">
-                  {task.title}
-                </h3>
+            <div>
+              <h2 className="text-sm font-bold text-gray-800 dark:text-gray-200">
+                Unscheduled Tasks
+              </h2>
+              <p className="text-[10px] text-gray-550">
+                Inbox ({unscheduledTasks.length})
+              </p>
+            </div>
+          </div>
+
+          <div className="space-y-2 overflow-y-auto max-h-[15rem] xl:max-h-[18rem] scrollbar-thin">
+            {unscheduledTasks.length === 0 ? (
+              <div className="text-center py-6 text-xs text-gray-500 dark:text-gray-600">
+                All tasks have deadlines!
               </div>
-            ))
-          )}
+            ) : (
+              unscheduledTasks.map((task) => (
+                <div
+                  key={task._id}
+                  onClick={() => handleOpenTask(task)}
+                  className="p-2.5 border border-sky-50 dark:border-gray-800/80 rounded-xl bg-sky-50/10 hover:bg-sky-50/30 dark:bg-gray-850 dark:hover:bg-gray-800 cursor-pointer transition-all duration-200 flex flex-col gap-1.5 shadow-sm group"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-bold text-sky-600 dark:text-sky-400">
+                      {task.key || `PM-${task._id.slice(-4).toUpperCase()}`}
+                    </span>
+                    <span
+                      className={`text-[9px] px-1.5 py-0.5 rounded-full shrink-0 font-semibold border ${
+                        priorityStyles[task.priority || "Low"]
+                      }`}
+                    >
+                      {task.priority || "Low"}
+                    </span>
+                  </div>
+                  <h3 className="text-xs font-semibold text-gray-800 dark:text-gray-300 group-hover:text-sky-600 transition truncate">
+                    {task.title}
+                  </h3>
+                </div>
+              ))
+            )}
+          </div>
         </div>
       </div>
+
+      {/* Mobile Agenda Modal */}
+      {showMobileAgendaModal && (
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/55 backdrop-blur-xs animate-fadeIn"
+          onClick={() => setShowMobileAgendaModal(false)}
+        >
+          <div 
+            className="bg-white dark:bg-gray-900 border border-sky-100 dark:border-gray-800 rounded-2xl shadow-xl p-5 w-full max-w-sm max-h-[75vh] flex flex-col animate-scaleUp"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className="flex items-center justify-between border-b border-sky-50 dark:border-gray-800 pb-3 mb-4">
+              <div className="flex items-center gap-2">
+                <div className="p-1.5 bg-sky-100 dark:bg-sky-900/50 rounded-lg text-sky-600 dark:text-sky-400">
+                  <CalendarIcon className="w-4 h-4" />
+                </div>
+                <div>
+                  <h2 className="text-sm font-bold text-gray-800 dark:text-gray-200">
+                    Daily Agenda
+                  </h2>
+                  <p className="text-[10px] text-gray-500">
+                    {selectedDate.toLocaleDateString("en-US", {
+                      month: "short",
+                      day: "numeric",
+                      year: "numeric",
+                    })}
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <button
+                  onClick={() => {
+                    setShowMobileAgendaModal(false);
+                    handleOpenCreateForDate(selectedDate);
+                  }}
+                  className="p-1.5 hover:bg-sky-50 dark:hover:bg-gray-800 rounded-lg text-sky-600 dark:text-sky-400 transition"
+                  title="Add task for this day"
+                >
+                  <Plus className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => setShowMobileAgendaModal(false)}
+                  className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-305 p-1 rounded-lg transition"
+                >
+                  <span className="text-xl font-bold leading-none">&times;</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Modal List */}
+            <div className="flex-1 overflow-y-auto space-y-2 pr-1 scrollbar-thin">
+              {selectedDateTasks.length === 0 ? (
+                <div className="text-center py-8 text-xs text-gray-500 dark:text-gray-600">
+                  No tasks scheduled for this day.
+                </div>
+              ) : (
+                selectedDateTasks.map((task) => (
+                  <div
+                    key={task._id}
+                    onClick={() => {
+                      setShowMobileAgendaModal(false);
+                      handleOpenTask(task);
+                    }}
+                    className={`p-2.5 border rounded-xl cursor-pointer transition-all duration-200 flex flex-col gap-1.5 shadow-sm group ${
+                      task.completed
+                        ? "bg-gray-50/50 border-gray-100 dark:bg-gray-900/50 dark:border-gray-800 opacity-70"
+                        : "bg-sky-50/10 border-sky-50 hover:bg-sky-50/30 dark:bg-gray-850 dark:border-gray-800/80 dark:hover:bg-gray-800"
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] font-bold text-sky-600 dark:text-sky-400">
+                        {task.key || `PM-${task._id.slice(-4).toUpperCase()}`}
+                      </span>
+                      <span
+                        className={`text-[9px] px-1.5 py-0.5 rounded-full shrink-0 font-semibold border ${
+                          priorityStyles[task.priority || "Low"]
+                        }`}
+                      >
+                        {task.priority || "Low"}
+                      </span>
+                    </div>
+                    <h3
+                      className={`text-xs font-semibold text-gray-850 dark:text-gray-200 group-hover:text-sky-600 transition truncate ${
+                        task.completed ? "line-through text-gray-500" : ""
+                      }`}
+                    >
+                      {task.title}
+                    </h3>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Task Creation & Edit Modal */}
       {showModal && (

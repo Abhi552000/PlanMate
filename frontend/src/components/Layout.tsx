@@ -59,7 +59,7 @@ const Layout: React.FC<LayoutProps> = ({ user, onLogout }) => {
 
       <div
         className={`${
-          hasSidebar ? "pl-0 md:pl-20 lg:pl-56" : "pl-0"
+          hasSidebar ? "pl-0 md:pl-20 lg:pl-60" : "pl-0"
         } transition-all duration-300 min-h-screen w-full overflow-x-hidden`}
       >
         <div className="px-4 sm:px-6 md:px-8 pt-8 pb-6 w-full transition-all duration-300 text-gray-900 dark:text-gray-100">

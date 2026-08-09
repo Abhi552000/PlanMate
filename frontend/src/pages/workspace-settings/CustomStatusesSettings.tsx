@@ -18,7 +18,7 @@ export const CustomStatusesSettings: React.FC<CustomStatusesSettingsProps> = ({
         <Settings className="w-4.5 h-4.5 text-sky-505" /> Custom Task Statuses
       </h3>
 
-      <form onSubmit={handleAddStatus} className="flex items-center gap-2">
+      <form onSubmit={handleAddStatus} className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
         <Input
           type="text"
           placeholder="Add new status (e.g. Ready for QA)"
@@ -32,7 +32,7 @@ export const CustomStatusesSettings: React.FC<CustomStatusesSettingsProps> = ({
           disabled={!newStatus.trim()}
           loading={addingStatus}
           variant="secondary"
-          className="h-[44px]"
+          className="h-[46px] sm:h-[44px] justify-center"
         >
           Add Status
         </Button>

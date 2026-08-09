@@ -106,6 +106,7 @@ export interface TaskFormGeneralProps {
   description: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
   baseControlClasses: string;
+  members: any[];
 }
 
 export interface TaskFormMetaProps {
@@ -169,6 +170,7 @@ export interface TaskDescriptionSectionProps {
   description: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
   baseControlClasses: string;
+  members: any[];
 }
 
 export interface TaskMetaSidebarProps {
@@ -201,4 +203,5 @@ export interface CommentsSectionProps {
   currentUser: any;
   onAddComment: (e: React.FormEvent) => void;
   onDeleteComment: (commentId: string) => void;
+  members: any[];
 }

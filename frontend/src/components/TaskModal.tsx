@@ -7,6 +7,7 @@ import { toast } from "react-toastify";
 import { IUser, ISubtask, TaskModalProps } from "../types";
 import { CONSOLE_ERRORS } from "../constants/messages";
 import { getNormalizedTaskData } from "../utils";
+import { cleanMentionsForEditing, formatMentionsForSaving } from "../utils/mentions";
 
 // Sub-components
 import { TaskFormGeneral } from "./task-modal/TaskFormGeneral";
@@ -71,9 +72,22 @@ const TaskModal: React.FC<TaskModalProps> = ({
   useEffect(() => {
     if (!isOpen) return;
     setParentTask(null);
-    setTaskData(getNormalizedTaskData(taskToEdit, DEFAULT_TASK));
+    const normalized = getNormalizedTaskData(taskToEdit, DEFAULT_TASK);
+    normalized.description = cleanMentionsForEditing(normalized.description || "");
+    setTaskData(normalized);
     setNewSubtaskTitle("");
   }, [isOpen, taskToEdit]);
+
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [isOpen]);
 
   const handleAddSubtask = () => {
     if (!newSubtaskTitle.trim()) return;
@@ -143,7 +157,10 @@ const TaskModal: React.FC<TaskModalProps> = ({
     async (e: React.FormEvent) => {
       e.preventDefault();
 
-      let finalTaskData = taskData;
+      let finalTaskData = {
+        ...taskData,
+        description: formatMentionsForSaving(taskData.description || "", members),
+      };
       if (parentTask) {
         const updatedSubtasks = [...parentTask.subtasks];
         const subtaskIdx = parentTask.editingSubtaskIndex;
@@ -151,7 +168,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
           updatedSubtasks[subtaskIdx] = {
             ...updatedSubtasks[subtaskIdx],
             title: taskData.title,
-            description: taskData.description,
+            description: formatMentionsForSaving(taskData.description || "", members),
             priority: taskData.priority,
             dueDate: taskData.dueDate,
             completed: taskData.status === "Done",
@@ -199,8 +216,14 @@ const TaskModal: React.FC<TaskModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 backdrop-blur-sm bg-black/30 z-50 flex items-center justify-center p-4 overflow-y-auto">
-      <div className="bg-white dark:bg-gray-800/90 border border-sky-100 dark:border-gray-700 rounded-2xl max-w-2xl sm:max-w-3xl lg:max-w-4xl w-full shadow-2xl relative p-6 sm:p-8 animate-fadeIn">
+    <div 
+      className="fixed inset-0 backdrop-blur-sm bg-black/30 z-50 flex items-center justify-center p-4 overflow-hidden"
+      onClick={onClose}
+    >
+      <div 
+        className="bg-white dark:bg-gray-800/90 border border-sky-100 dark:border-gray-700 rounded-2xl max-w-2xl sm:max-w-3xl lg:max-w-4xl w-full shadow-2xl relative p-6 sm:p-8 animate-fadeIn max-h-[90vh] flex flex-col overflow-hidden"
+        onClick={(e) => e.stopPropagation()}
+      >
         <TaskModalHeader
           parentTask={parentTask}
           taskData={taskData}
@@ -208,55 +231,60 @@ const TaskModal: React.FC<TaskModalProps> = ({
           onClose={onClose}
           setParentTask={setParentTask}
         />
-        <form onSubmit={handleSubmit} className=" space-y-5">
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-12">
-            {/* Left side: Main text fields and subtasks */}
-            <div className="md:col-span-7 space-y-4">
-              <TaskFormGeneral
-                title={taskData.title}
-                description={taskData.description}
-                onChange={handleChange}
-                baseControlClasses={baseControlClasses}
-              />
-
-              {parentTask === null && (
-                <TaskFormSubtasks
-                  subtasks={taskData.subtasks || []}
-                  setTaskData={setTaskData}
-                  newSubtaskTitle={newSubtaskTitle}
-                  setNewSubtaskTitle={setNewSubtaskTitle}
-                  editingSubtaskIdx={editingSubtaskIdx}
-                  setEditingSubtaskIdx={setEditingSubtaskIdx}
-                  editingSubtaskVal={editingSubtaskVal}
-                  setEditingSubtaskVal={setEditingSubtaskVal}
-                  statuses={statuses}
-                  onOpenSubtaskDetail={handleOpenSubtaskDetail}
-                  onAddSubtask={handleAddSubtask}
+        <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0 space-y-5 overflow-hidden">
+          <div className="flex-1 overflow-y-auto pr-2 min-h-0 py-2 scrollbar-thin">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-12">
+              {/* Left side: Main text fields and subtasks */}
+              <div className="md:col-span-7 space-y-4">
+                <TaskFormGeneral
+                  title={taskData.title}
+                  description={taskData.description}
+                  onChange={handleChange}
+                  baseControlClasses={baseControlClasses}
+                  members={members}
                 />
-              )}
+
+                {parentTask === null && (
+                  <TaskFormSubtasks
+                    subtasks={taskData.subtasks || []}
+                    setTaskData={setTaskData}
+                    newSubtaskTitle={newSubtaskTitle}
+                    setNewSubtaskTitle={setNewSubtaskTitle}
+                    editingSubtaskIdx={editingSubtaskIdx}
+                    setEditingSubtaskIdx={setEditingSubtaskIdx}
+                    editingSubtaskVal={editingSubtaskVal}
+                    setEditingSubtaskVal={setEditingSubtaskVal}
+                    statuses={statuses}
+                    onOpenSubtaskDetail={handleOpenSubtaskDetail}
+                    onAddSubtask={handleAddSubtask}
+                  />
+                )}
+              </div>
+              {/* Right side: Jira metadata layout */}
+              <TaskFormMeta
+                taskData={taskData}
+                setTaskData={setTaskData}
+                statuses={statuses}
+                members={members}
+                sprints={sprints}
+                epics={epics}
+                parentTask={parentTask}
+                today={today}
+                baseControlClasses={baseControlClasses}
+                handleChange={handleChange}
+              />
             </div>
-            {/* Right side: Jira metadata layout */}
-            <TaskFormMeta
-              taskData={taskData}
-              setTaskData={setTaskData}
-              statuses={statuses}
-              members={members}
-              sprints={sprints}
-              epics={epics}
-              parentTask={parentTask}
-              today={today}
-              baseControlClasses={baseControlClasses}
-              handleChange={handleChange}
-            />
           </div>
 
-          <TaskModalFooter
-            loading={loading}
-            parentTask={parentTask}
-            taskData={taskData}
-            onClose={onClose}
-            setParentTask={setParentTask}
-          />
+          <div className="shrink-0 pt-2 border-t border-sky-50 dark:border-gray-700">
+            <TaskModalFooter
+              loading={loading}
+              parentTask={parentTask}
+              taskData={taskData}
+              onClose={onClose}
+              setParentTask={setParentTask}
+            />
+          </div>
         </form>
       </div>
     </div>

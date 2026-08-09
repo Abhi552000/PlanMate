@@ -1,5 +1,5 @@
 import React from "react";
-import { Search, X, List, LayoutGrid } from "lucide-react";
+import { Search, X, List, LayoutGrid, BarChart2 } from "lucide-react";
 import { FilterSelect } from "./FilterSelect";
 import { DashboardFiltersProps } from "../../../types";
 
@@ -155,6 +155,18 @@ export const DashboardFilters: React.FC<DashboardFiltersProps> = ({
           >
             <LayoutGrid className="w-3.5 h-3.5" />
             Board
+          </button>
+          <button
+            onClick={() => setViewMode("analytics")}
+            className={`px-3 py-1.5 rounded-md text-xs font-semibold flex items-center gap-1.5 transition-all duration-200 cursor-pointer ${
+              viewMode === "analytics"
+                ? "bg-white dark:bg-gray-700 text-sky-700 dark:text-sky-300 shadow-sm border border-sky-100 dark:border-gray-600 font-bold"
+                : "text-gray-600 dark:text-gray-400 hover:text-sky-700 dark:hover:text-sky-300"
+            }`}
+            title="Interactive Analytics"
+          >
+            <BarChart2 className="w-3.5 h-3.5" />
+            Analytics
           </button>
         </div>
       </div>

@@ -5,6 +5,7 @@ import { taskService } from "../../../services/taskService";
 import { orgService } from "../../../services/orgService";
 import { ITask, IUser } from "../../../types";
 import { TOAST_MESSAGES, CONSOLE_ERRORS } from "../../../constants/messages";
+import { cleanMentionsForEditing, formatMentionsForSaving } from "../../../utils/mentions";
 
 export const useTaskDetail = (id: string | undefined, subtaskIndex: number | null) => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -61,7 +62,8 @@ export const useTaskDetail = (id: string | undefined, subtaskIndex: number | nul
     if (!commentText.trim()) return;
     setAddingComment(true);
     try {
-      const data = await taskService.addComment(id!, commentText.trim());
+      const formattedComment = formatMentionsForSaving(commentText.trim(), members);
+      const data = await taskService.addComment(id!, formattedComment);
       if (data?.success && data?.task) {
         setParentTaskData(data.task);
         setCommentText("");
@@ -162,7 +164,7 @@ export const useTaskDetail = (id: string | undefined, subtaskIndex: number | nul
       const sub = parentTaskData.subtasks[subtaskIndex];
       setTaskData({
         title: sub.title || "",
-        description: sub.description || "",
+        description: cleanMentionsForEditing(sub.description || ""),
         priority: sub.priority || "Low",
         dueDate: sub.dueDate ? new Date(sub.dueDate).toISOString().split("T")[0] : "",
         assignee: "",
@@ -173,7 +175,7 @@ export const useTaskDetail = (id: string | undefined, subtaskIndex: number | nul
     } else {
       setTaskData({
         title: parentTaskData.title || "",
-        description: parentTaskData.description || "",
+        description: cleanMentionsForEditing(parentTaskData.description || ""),
         priority: parentTaskData.priority || "Low",
         dueDate: parentTaskData.dueDate ? new Date(parentTaskData.dueDate).toISOString().split("T")[0] : "",
         assignee: parentTaskData.assignee?._id || parentTaskData.assignee || "",
@@ -223,7 +225,7 @@ export const useTaskDetail = (id: string | undefined, subtaskIndex: number | nul
         updatedSubtasks[subtaskIndex] = {
           ...updatedSubtasks[subtaskIndex],
           title: taskData.title.trim(),
-          description: taskData.description,
+          description: formatMentionsForSaving(taskData.description, members),
           priority: taskData.priority,
           dueDate: taskData.dueDate || undefined,
           status: taskData.status,
@@ -234,7 +236,7 @@ export const useTaskDetail = (id: string | undefined, subtaskIndex: number | nul
       } else {
         dataToUpdate = {
           title: taskData.title.trim(),
-          description: taskData.description,
+          description: formatMentionsForSaving(taskData.description, members),
           priority: taskData.priority,
           dueDate: taskData.dueDate || undefined,
           assignee: taskData.assignee || null,
