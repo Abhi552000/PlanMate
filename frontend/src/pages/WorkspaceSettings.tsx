@@ -6,6 +6,7 @@ import { taskService } from "../services/taskService";
 import { ROUTES } from "../constants/routeConstant";
 import { IUser } from "../types";
 import { TOAST_MESSAGES, CONSOLE_ERRORS } from "../constants/messages";
+import { toast } from "react-toastify";
 import { WorkspaceBrandingForm } from "./workspace-settings/WorkspaceBrandingForm";
 import { CustomStatusesSettings } from "./workspace-settings/CustomStatusesSettings";
 import { ConfirmDeleteStatusModal } from "./workspace-settings/ConfirmDeleteStatusModal";

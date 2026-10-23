@@ -57,22 +57,30 @@ const Navbar: React.FC<NavbarProps> = ({ user = {}, onLogout }) => {
     return () => document.removeEventListener("mousedown", handleNotiOutside);
   }, []);
 
-  const fetchNotifications = async () => {
+  const fetchNotifications = useCallback(async () => {
     try {
       const data = await notificationService.getNotifications();
-      if (data?.success && data?.notifications) {
-        setNotifications(data.notifications);
+      if (data?.success && Array.isArray(data?.notifications)) {
+        setNotifications((prev) => {
+          if (prev.length === data.notifications.length) {
+            const hasChanged = data.notifications.some(
+              (n: INotification, idx: number) => n._id !== prev[idx]?._id || n.read !== prev[idx]?.read
+            );
+            if (!hasChanged) return prev;
+          }
+          return data.notifications;
+        });
       }
     } catch (err) {
       console.error(CONSOLE_ERRORS.FETCH_NOTIFICATIONS, err);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchNotifications();
-    const interval = setInterval(fetchNotifications, 8000);
+    const interval = setInterval(fetchNotifications, 10000);
     return () => clearInterval(interval);
-  }, []);
+  }, [fetchNotifications]);
 
   const handleMarkAllRead = async () => {
     try {
@@ -130,7 +138,7 @@ const Navbar: React.FC<NavbarProps> = ({ user = {}, onLogout }) => {
             group-hover:scale-105 transition-all duration-300"
             >
               <Zap className="w-6 h-6 text-white" />
-              <div className="absolute -bottom-1 -middle-1 w-3 h-3 bg-white rounded-full shadow-md animate-ping" />
+              <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-sky-400 rounded-full opacity-75 animate-ping" />
             </div>
 
             {/* BRAND NAME */}
@@ -201,4 +209,4 @@ const Navbar: React.FC<NavbarProps> = ({ user = {}, onLogout }) => {
   );
 };
 
-export default Navbar;
+export default React.memo(Navbar);

@@ -12,7 +12,7 @@ import {
 import { DashboardHeaderProps } from "../../../types";
 import { STATS_CONFIG } from "../../../constants/uiTexts";
 
-export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
+export const DashboardHeader: React.FC<DashboardHeaderProps> = React.memo(({
   totalTasks,
   lowPriority,
   mediumPriority,
@@ -73,4 +73,4 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
       </div>
     </div>
   );
-};
+});

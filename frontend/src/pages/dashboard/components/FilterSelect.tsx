@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { ChevronDown, Check } from "lucide-react";
 import { FilterSelectProps } from "../../../types";
 
-export const FilterSelect: React.FC<FilterSelectProps> = ({ label, value, options, onChange }) => {
+export const FilterSelect: React.FC<FilterSelectProps> = React.memo(({ label, value, options, onChange }) => {
   const [isOpen, setIsOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -55,4 +55,4 @@ export const FilterSelect: React.FC<FilterSelectProps> = ({ label, value, option
       )}
     </div>
   );
-};
+});

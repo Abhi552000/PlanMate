@@ -80,8 +80,8 @@ export interface IssueLinkingSectionProps {
   workspaceTasks: any[];
   linking: boolean;
   links: any[];
-  onAddLink: (e: React.FormEvent) => Promise<void>;
-  onRemoveLink: (linkId: string) => Promise<void>;
+  onAddLink: (e: React.FormEvent) => Promise<void> | void;
+  onRemoveLink: (linkId: string) => Promise<void> | void;
   baseControlClasses: string;
 }
 

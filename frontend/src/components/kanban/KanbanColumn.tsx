@@ -2,7 +2,7 @@ import React from "react";
 import { ITask, KanbanColumnProps } from "../../types";
 import { KanbanCard } from "./KanbanCard";
 
-export const KanbanColumn: React.FC<KanbanColumnProps> = ({
+export const KanbanColumn: React.FC<KanbanColumnProps> = React.memo(({
   col,
   columns,
   colTasks,
@@ -63,4 +63,4 @@ export const KanbanColumn: React.FC<KanbanColumnProps> = ({
       </div>
     </div>
   );
-};
+});

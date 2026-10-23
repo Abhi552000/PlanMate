@@ -2,7 +2,7 @@ import React from "react";
 import { Bell, CheckCheck } from "lucide-react";
 import { INotification, NotificationDropdownProps } from "../../types";
 
-export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
+export const NotificationDropdown: React.FC<NotificationDropdownProps> = React.memo(({
   notiOpen,
   setNotiOpen,
   notifications,
@@ -78,4 +78,4 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
       )}
     </div>
   );
-};
+});

@@ -15,7 +15,6 @@ import { LoginProps } from "../types";
 export const Login: React.FC<LoginProps> = ({ onSubmit, onSwitchMode }) => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
-  const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState(INITIAL_FORM);
 
@@ -49,10 +48,6 @@ export const Login: React.FC<LoginProps> = ({ onSubmit, onSwitchMode }) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!rememberMe) {
-      toast.error(TOAST_MESSAGES.AUTH_REMEMBER_ME_REQUIRED);
-      return;
-    }
     setLoading(true);
     try {
       const data = await authService.login(formData);
@@ -126,22 +121,6 @@ export const Login: React.FC<LoginProps> = ({ onSubmit, onSwitchMode }) => {
           </button>
         </div>
 
-        <div className=" flex items-center">
-          <input
-            type="checkbox"
-            id="rememberMe"
-            checked={rememberMe}
-            onChange={() => setRememberMe(!rememberMe)}
-            className=" h-4 w-4 text-sky-500 focus:ring-sky-400 border-gray-300 rounded cursor-pointer"
-            required
-          />
-          <label
-            htmlFor="rememberMe"
-            className=" ml-2 block text-sm text-gray-700 cursor-pointer select-none"
-          >
-            {AUTH_TEXTS.LOGIN_REMEMBER_ME}
-          </label>
-        </div>
         <Button
           type="submit"
           className="w-full"

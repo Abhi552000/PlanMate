@@ -3,7 +3,7 @@ import { ChevronDown, Settings, LogOut } from "lucide-react";
 import { ROUTES } from "../../constants/routeConstant";
 import { UserMenuDropdownProps } from "../../types";
 
-export const UserMenuDropdown: React.FC<UserMenuDropdownProps> = ({
+export const UserMenuDropdown: React.FC<UserMenuDropdownProps> = React.memo(({
   menuOpen,
   setMenuOpen,
   handleMenuToggle,
@@ -64,4 +64,4 @@ export const UserMenuDropdown: React.FC<UserMenuDropdownProps> = ({
       )}
     </div>
   );
-};
+});
