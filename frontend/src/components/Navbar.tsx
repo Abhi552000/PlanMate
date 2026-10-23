@@ -133,12 +133,10 @@ const Navbar: React.FC<NavbarProps> = ({ user = {}, onLogout }) => {
           >
             {/* LOGO */}
             <div
-              className="relative w-10 h-10 flex items-center justify-center rounded-xl bg-gradient-to-br 
-            from-cyan-500 via-sky-500 to-indigo-500 shadow-lg group-hover:shadow-sky-300/50
-            group-hover:scale-105 transition-all duration-300"
+              className="w-10 h-10 flex items-center justify-center rounded-xl bg-gradient-to-br 
+            from-cyan-500 via-sky-500 to-indigo-500 shadow-sm"
             >
               <Zap className="w-6 h-6 text-white" />
-              <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-sky-400 rounded-full opacity-75 animate-ping" />
             </div>
 
             {/* BRAND NAME */}

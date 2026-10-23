@@ -48,8 +48,8 @@ export const ActiveSprint: React.FC = () => {
   // EMPTY STATE: No Active Sprint
   if (!activeSprint) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] max-w-md mx-auto text-center space-y-5 font-sans animate-fadeIn">
-        <div className="w-16 h-16 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-lg text-white animate-bounce">
+      <div className="flex flex-col items-center justify-center min-h-[60vh] max-w-md mx-auto text-center space-y-5 font-sans">
+        <div className="w-16 h-16 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-md text-white">
           <Flame className="w-8 h-8" />
         </div>
         <div className="space-y-1">
@@ -137,7 +137,7 @@ export const ActiveSprint: React.FC = () => {
             {tasksByEpic.unassigned.length > 0 && (
               <div className="space-y-2.5">
                 <div className="flex items-center gap-2 bg-gray-50 dark:bg-gray-900 px-3 py-2 rounded-xl border border-sky-100/30">
-                  <Sparkles className="w-4 h-4 text-amber-500 animate-pulse" />
+                  <Sparkles className="w-4 h-4 text-amber-500" />
                   <span className="text-xs font-extrabold text-gray-800 dark:text-gray-200">
                     {ACTIVE_SPRINT_TEXTS.SWIMLANE_UNASSIGNED}
                   </span>

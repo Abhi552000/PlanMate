@@ -23,8 +23,8 @@ import { ROUTES } from "../constants/routeConstant";
 
 const RouteLoadingFallback = () => (
   <div className="w-full min-h-[50vh] flex flex-col items-center justify-center p-8">
-    <div className="w-10 h-10 border-3 border-sky-200 border-t-sky-500 rounded-full animate-spin" />
-    <span className="mt-3 text-xs font-semibold text-gray-400 animate-pulse tracking-wide uppercase">
+    <div className="w-8 h-8 border-2 border-sky-200 border-t-sky-500 rounded-full animate-spin" />
+    <span className="mt-3 text-xs font-semibold text-gray-400 tracking-wide uppercase">
       Loading...
     </span>
   </div>
