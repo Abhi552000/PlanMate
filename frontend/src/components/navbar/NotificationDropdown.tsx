@@ -18,10 +18,10 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = React.m
         className="p-2 text-gray-600 dark:text-gray-400 hover:text-sky-500 dark:hover:text-sky-400 hover:bg-sky-50 dark:hover:bg-gray-800 rounded-full cursor-pointer relative"
         aria-label="Notifications"
       >
-        <Bell className="w-5 h-5" />
+        <Bell className="w-6 h-6" />
         {unreadCount > 0 && (
-          <span className="absolute top-1.5 right-1.5 w-4 h-4 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center">
-            {unreadCount}
+          <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 bg-sky-600 text-white text-[10px] font-bold rounded-full flex items-center justify-center ring-2 ring-white dark:ring-gray-900 shadow-xs">
+            {unreadCount > 99 ? "99+" : unreadCount}
           </span>
         )}
       </button>

@@ -25,9 +25,9 @@ export const SysAdminHeader: React.FC<SysAdminHeaderProps> = ({ user, onLogout }
           </div>
           <button
             onClick={onLogout}
-            className="px-3.5 py-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg text-xs font-bold transition-all duration-200 flex items-center gap-1.5 border border-red-100 cursor-pointer"
+            className="px-3.5 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-lg text-xs font-semibold transition-colors flex items-center gap-1.5 border border-gray-200 dark:border-gray-700 cursor-pointer"
           >
-            <LogOut className="w-3.5 h-3.5" /> Log Out
+            <LogOut className="w-3.5 h-3.5 text-gray-500 dark:text-gray-400" /> Log Out
           </button>
         </div>
       </div>

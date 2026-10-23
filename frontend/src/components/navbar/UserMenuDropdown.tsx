@@ -50,12 +50,13 @@ export const UserMenuDropdown: React.FC<UserMenuDropdownProps> = React.memo(({
               Profile Setting
             </button>
           </li>
+          <li className="my-1 border-t border-gray-100 dark:border-gray-800" />
           <li>
             <button
               onClick={handleLogout}
-              className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-xs font-bold hover:bg-red-50 dark:hover:bg-red-950/35 text-red-600 dark:text-red-400 cursor-pointer"
+              className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-xs font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white transition-colors cursor-pointer"
             >
-              <LogOut className="w-3.5 h-3.5" />
+              <LogOut className="w-3.5 h-3.5 text-gray-500 dark:text-gray-400" />
               Logout
             </button>
           </li>
