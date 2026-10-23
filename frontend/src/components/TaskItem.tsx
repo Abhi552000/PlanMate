@@ -227,4 +227,4 @@ const TaskItem: React.FC<TaskItemProps> = ({
   );
 };
 
-export default TaskItem;
+export default React.memo(TaskItem);

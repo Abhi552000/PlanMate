@@ -6,7 +6,7 @@ import { EPIC_COLORS } from "../../../../constants/uiTexts";
 
 export const ActiveSprintBoardColumn: React.FC<
   ActiveSprintBoardColumnProps
-> = ({
+> = React.memo(({
   statuses,
   sprintTasks,
   handleUpdateStatus,
@@ -120,4 +120,4 @@ export const ActiveSprintBoardColumn: React.FC<
       })}
     </div>
   );
-};
+});

@@ -62,6 +62,18 @@ const taskSlice = createSlice({
     setStatuses: (state, action: PayloadAction<string[]>) => {
       state.statuses = action.payload;
     },
+    updateTaskOptimistic: (
+      state,
+      action: PayloadAction<{ id: string; status: string; completed?: string | boolean | number }>
+    ) => {
+      const task = state.tasks.find((t) => t._id === action.payload.id);
+      if (task) {
+        task.status = action.payload.status;
+        if (action.payload.completed !== undefined) {
+          task.completed = action.payload.completed;
+        }
+      }
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -96,5 +108,5 @@ const taskSlice = createSlice({
   },
 });
 
-export const { setStatuses } = taskSlice.actions;
+export const { setStatuses, updateTaskOptimistic } = taskSlice.actions;
 export default taskSlice.reducer;

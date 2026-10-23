@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState, useMemo } from "react";
 import Navbar from "./Navbar";
 import Sidebar from "./Sidebar";
 import { Outlet } from "react-router-dom";
@@ -19,6 +19,16 @@ const Layout: React.FC<LayoutProps> = ({ user, onLogout }) => {
       dispatch(fetchTasks());
     },
     [dispatch, user?.role]
+  );
+
+  const outletContext = useMemo(
+    () => ({
+      tasks,
+      refreshTasks: fetchTasksData,
+      viewMode,
+      setViewMode,
+    }),
+    [tasks, fetchTasksData, viewMode]
   );
 
   useEffect(() => {
@@ -75,14 +85,7 @@ const Layout: React.FC<LayoutProps> = ({ user, onLogout }) => {
             </div>
           )}
           <div className="w-full">
-            <Outlet
-              context={{
-                tasks,
-                refreshTasks: fetchTasksData,
-                viewMode,
-                setViewMode,
-              }}
-            />
+            <Outlet context={outletContext} />
           </div>
         </div>
       </div>
@@ -90,4 +93,4 @@ const Layout: React.FC<LayoutProps> = ({ user, onLogout }) => {
   );
 };
 
-export default Layout;
+export default React.memo(Layout);

@@ -29,7 +29,7 @@ const getIssueTypeLeftBorder = (type: string) => {
   }
 };
 
-export const KanbanCard: React.FC<KanbanCardProps> = ({
+export const KanbanCard: React.FC<KanbanCardProps> = React.memo(({
   task,
   col,
   columns,
@@ -141,4 +141,4 @@ export const KanbanCard: React.FC<KanbanCardProps> = ({
       </div>
     </div>
   );
-};
+});

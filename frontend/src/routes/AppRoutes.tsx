@@ -1,16 +1,19 @@
-import React from "react";
+import React, { Suspense, lazy } from "react";
 import { Navigate, Route, Routes, useNavigate } from "react-router-dom";
-import Login from "../components/Login";
-import Signup from "../components/Signup";
-import Dashboard from "../pages/dashboard/Dashboard";
-import Profile from "../pages/Profile";
-import TaskDetailPage from "../pages/task-detail/TaskDetailPage";
-import OrganizationAdmin from "../pages/org-admin/OrganizationAdmin";
-import SystemAdminDashboard from "../pages/sys-admin/SystemAdminDashboard";
-import WorkspaceSettings from "../pages/WorkspaceSettings";
-import Backlog from "../pages/dashboard/Backlog";
-import ActiveSprint from "../pages/dashboard/ActiveSprint";
-import { CalendarViewPage } from "../pages/CalendarViewPage";
+
+const Login = lazy(() => import("../components/Login"));
+const Signup = lazy(() => import("../components/Signup"));
+const Dashboard = lazy(() => import("../pages/dashboard/Dashboard"));
+const Profile = lazy(() => import("../pages/Profile"));
+const TaskDetailPage = lazy(() => import("../pages/task-detail/TaskDetailPage"));
+const OrganizationAdmin = lazy(() => import("../pages/org-admin/OrganizationAdmin"));
+const SystemAdminDashboard = lazy(() => import("../pages/sys-admin/SystemAdminDashboard"));
+const WorkspaceSettings = lazy(() => import("../pages/WorkspaceSettings"));
+const Backlog = lazy(() => import("../pages/dashboard/Backlog"));
+const ActiveSprint = lazy(() => import("../pages/dashboard/ActiveSprint"));
+const CalendarViewPage = lazy(() =>
+  import("../pages/CalendarViewPage").then((m) => ({ default: m.CalendarViewPage }))
+);
 
 import { PublicRoute } from "./PublicRoute";
 import { ProtectedRoute } from "./ProtectedRoute";
@@ -18,12 +21,22 @@ import { SystemAdminRoute } from "./SystemAdminRoute";
 import { useAuth } from "../context/AuthContext";
 import { ROUTES } from "../constants/routeConstant";
 
+const RouteLoadingFallback = () => (
+  <div className="w-full min-h-[50vh] flex flex-col items-center justify-center p-8">
+    <div className="w-8 h-8 border-2 border-sky-200 border-t-sky-500 rounded-full animate-spin" />
+    <span className="mt-3 text-xs font-semibold text-gray-400 tracking-wide uppercase">
+      Loading...
+    </span>
+  </div>
+);
+
 export const AppRoutes: React.FC = () => {
   const { login, logout, currentUser, setCurrentUser } = useAuth();
   const navigate = useNavigate();
 
   return (
-    <Routes>
+    <Suspense fallback={<RouteLoadingFallback />}>
+      <Routes>
       {/* Public Routes */}
       <Route element={<PublicRoute />}>
         <Route
@@ -90,6 +103,7 @@ export const AppRoutes: React.FC = () => {
         element={<Navigate to={currentUser ? ROUTES.DASHBOARD : ROUTES.LOGIN} replace />}
       />
     </Routes>
+    </Suspense>
   );
 };
 

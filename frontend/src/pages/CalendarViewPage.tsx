@@ -255,7 +255,7 @@ export const CalendarViewPage: React.FC = () => {
                           {isCompleted ? (
                             <CheckCircle2 className="w-3 h-3 text-green-600 shrink-0" />
                           ) : isOverdue ? (
-                            <Clock className="w-3 h-3 text-red-500 shrink-0 animate-pulse" />
+                            <Clock className="w-3 h-3 text-red-500 shrink-0" />
                           ) : null}
                           <span className="font-semibold shrink-0">
                             {task.key || `PM-${task._id.slice(-4).toUpperCase()}`}

@@ -3,7 +3,7 @@ import { Search, X, List, LayoutGrid, BarChart2 } from "lucide-react";
 import { FilterSelect } from "./FilterSelect";
 import { DashboardFiltersProps } from "../../../types";
 
-export const DashboardFilters: React.FC<DashboardFiltersProps> = ({
+export const DashboardFilters: React.FC<DashboardFiltersProps> = React.memo(({
   searchQuery,
   setSearchQuery,
   selectedAssignee,
@@ -28,13 +28,42 @@ export const DashboardFilters: React.FC<DashboardFiltersProps> = ({
     selectedStatus !== "all" ||
     selectedTimeframe !== "all";
 
-  const handleClearFilters = () => {
+  const handleClearFilters = React.useCallback(() => {
     setSearchQuery("");
     setSelectedAssignee("all");
     setSelectedPriority("all");
     setSelectedStatus("all");
     setSelectedTimeframe("all");
-  };
+  }, [setSearchQuery, setSelectedAssignee, setSelectedPriority, setSelectedStatus, setSelectedTimeframe]);
+
+  const assigneeOptions = React.useMemo(() => [
+    { label: "All", value: "all" },
+    { label: "Unassigned", value: "unassigned" },
+    ...members.map((member) => ({
+      label: member.name,
+      value: member._id,
+    })),
+  ], [members]);
+
+  const priorityOptions = React.useMemo(() => [
+    { label: "All", value: "all" },
+    { label: "Low", value: "Low" },
+    { label: "Medium", value: "Medium" },
+    { label: "High", value: "High" },
+  ], []);
+
+  const statusOptions = React.useMemo(() => [
+    { label: "All", value: "all" },
+    { label: "Pending (Unresolved)", value: "pending" },
+    ...statuses.map((status) => ({ label: status, value: status })),
+  ], [statuses]);
+
+  const timeframeOptions = React.useMemo(() => [
+    { label: "All Time", value: "all" },
+    { label: "Due Today", value: "today" },
+    { label: "Due This Week", value: "week" },
+    { label: "Overdue", value: "overdue" },
+  ], []);
 
   return (
     <div className="flex flex-col gap-3 bg-white dark:bg-gray-900 p-3 sm:p-4 rounded-2xl border border-sky-100 dark:border-gray-800 shadow-sm">
@@ -67,14 +96,7 @@ export const DashboardFilters: React.FC<DashboardFiltersProps> = ({
           label="Assignee"
           value={selectedAssignee}
           onChange={setSelectedAssignee}
-          options={[
-            { label: "All", value: "all" },
-            { label: "Unassigned", value: "unassigned" },
-            ...members.map((member) => ({
-              label: member.name,
-              value: member._id,
-            })),
-          ]}
+          options={assigneeOptions}
         />
 
         {/* Priority Filter Dropdown */}
@@ -82,12 +104,7 @@ export const DashboardFilters: React.FC<DashboardFiltersProps> = ({
           label="Priority"
           value={selectedPriority}
           onChange={setSelectedPriority}
-          options={[
-            { label: "All", value: "all" },
-            { label: "Low", value: "Low" },
-            { label: "Medium", value: "Medium" },
-            { label: "High", value: "High" },
-          ]}
+          options={priorityOptions}
         />
 
         {/* Status Filter Dropdown */}
@@ -95,11 +112,7 @@ export const DashboardFilters: React.FC<DashboardFiltersProps> = ({
           label="Status"
           value={selectedStatus}
           onChange={setSelectedStatus}
-          options={[
-            { label: "All", value: "all" },
-            { label: "Pending (Unresolved)", value: "pending" },
-            ...statuses.map((status) => ({ label: status, value: status })),
-          ]}
+          options={statusOptions}
         />
 
         {/* Timeframe Filter Dropdown */}
@@ -107,12 +120,7 @@ export const DashboardFilters: React.FC<DashboardFiltersProps> = ({
           label="Timeframe"
           value={selectedTimeframe}
           onChange={setSelectedTimeframe}
-          options={[
-            { label: "All Time", value: "all" },
-            { label: "Due Today", value: "today" },
-            { label: "Due This Week", value: "week" },
-            { label: "Overdue", value: "overdue" },
-          ]}
+          options={timeframeOptions}
         />
 
         {hasActiveFilters && (
@@ -172,4 +180,4 @@ export const DashboardFilters: React.FC<DashboardFiltersProps> = ({
       </div>
     </div>
   );
-};
+});

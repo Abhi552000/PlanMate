@@ -5,7 +5,7 @@ import { BacklogTaskRowProps } from "../../../../types";
 import { EPIC_COLORS } from "../../../../constants/uiTexts";
 import { getPriorityStyle } from "../../../../utils";
 
-export const BacklogTaskRow: React.FC<BacklogTaskRowProps> = ({
+export const BacklogTaskRow: React.FC<BacklogTaskRowProps> = React.memo(({
   task,
   currentSprintId,
   onEdit,
@@ -149,4 +149,4 @@ export const BacklogTaskRow: React.FC<BacklogTaskRowProps> = ({
       </div>
     </div>
   );
-};
+});
