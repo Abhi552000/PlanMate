@@ -406,9 +406,28 @@ export const getOrganizationUsers = async (req, res) => {
     const limit = parseInt(req.query.limit) || 5;
     const skip = (page - 1) * limit;
 
-    const totalCount = await User.countDocuments({ organization: req.user.organization });
-    const users = await User.find({ organization: req.user.organization })
+    const filter = { organization: req.user.organization };
+
+    // Filter by Status (active, pending, rejected)
+    if (req.query.status && req.query.status !== "all") {
+      filter.status = req.query.status;
+    }
+
+    // Filter by Role (org_admin, member)
+    if (req.query.role && req.query.role !== "all") {
+      filter.role = req.query.role;
+    }
+
+    // Search by Name or Email
+    if (req.query.search && req.query.search.trim()) {
+      const searchRegex = new RegExp(req.query.search.trim(), "i");
+      filter.$or = [{ name: searchRegex }, { email: searchRegex }];
+    }
+
+    const totalCount = await User.countDocuments(filter);
+    const users = await User.find(filter)
       .select("name email role status statusRemark createdAt")
+      .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit);
 

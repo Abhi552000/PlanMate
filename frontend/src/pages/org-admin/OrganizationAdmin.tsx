@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { orgService } from "../../services/orgService";
@@ -32,6 +32,22 @@ const OrganizationAdmin = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
+
+  // Filters State
+  const [selectedStatus, setSelectedStatus] = useState("all");
+  const [selectedRole, setSelectedRole] = useState("all");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+
+  const isFirstMount = useRef(true);
+
+  // Debounce search input (350ms)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchQuery);
+    }, 350);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
 
   // Member invite inputs
   const [newMember, setNewMember] = useState({
@@ -68,23 +84,67 @@ const OrganizationAdmin = () => {
     }
   };
 
-  // Fetch organization users list (including solved ticket stats)
-  const fetchTeamUsers = async (page = 1) => {
-    try {
-      const params = new URLSearchParams({
-        page: page.toString(),
-        limit: ITEMS_PER_PAGE.toString(),
-      });
-      const data = await orgService.getOrgUsers(params);
-      if (data?.success && data?.users) {
-        setTeamUsers(data.users);
-        setCurrentPage(data.pagination.currentPage);
-        setTotalPages(data.pagination.totalPages);
-        setTotalCount(data.pagination.totalCount);
+  // Fetch organization users list with backend filter integration
+  const fetchTeamUsers = useCallback(
+    async (
+      page = 1,
+      status = selectedStatus,
+      role = selectedRole,
+      search = debouncedSearch
+    ) => {
+      try {
+        const params = new URLSearchParams({
+          page: page.toString(),
+          limit: ITEMS_PER_PAGE.toString(),
+        });
+        if (status && status !== "all") {
+          params.append("status", status);
+        }
+        if (role && role !== "all") {
+          params.append("role", role);
+        }
+        if (search && search.trim()) {
+          params.append("search", search.trim());
+        }
+        const data = await orgService.getOrgUsers(params);
+        if (data?.success && data?.users) {
+          setTeamUsers(data.users);
+          setCurrentPage(data.pagination.currentPage);
+          setTotalPages(data.pagination.totalPages);
+          setTotalCount(data.pagination.totalCount);
+        }
+      } catch (err) {
+        console.error(CONSOLE_ERRORS.FETCH_ORG_USERS, err);
       }
-    } catch (err) {
-      console.error(CONSOLE_ERRORS.FETCH_ORG_USERS, err);
+    },
+    [selectedStatus, selectedRole, debouncedSearch]
+  );
+
+  // Trigger backend fetch whenever debounced search, status, or role changes
+  useEffect(() => {
+    if (isFirstMount.current) {
+      isFirstMount.current = false;
+      return;
     }
+    fetchTeamUsers(1, selectedStatus, selectedRole, debouncedSearch);
+  }, [debouncedSearch, selectedStatus, selectedRole, fetchTeamUsers]);
+
+  const handleStatusChange = (newStatus: string) => {
+    setSelectedStatus(newStatus);
+  };
+
+  const handleRoleChange = (newRole: string) => {
+    setSelectedRole(newRole);
+  };
+
+  const handleSearchChange = (newSearch: string) => {
+    setSearchQuery(newSearch);
+  };
+
+  const handleResetFilters = () => {
+    setSelectedStatus("all");
+    setSelectedRole("all");
+    setSearchQuery("");
   };
 
   useEffect(() => {
@@ -95,7 +155,7 @@ const OrganizationAdmin = () => {
       }
       setLoading(true);
       try {
-        await Promise.all([fetchOrgDetails(), fetchTeamUsers()]);
+        await Promise.all([fetchOrgDetails(), fetchTeamUsers(1, "all", "all", "")]);
       } catch (err) {
         console.error(CONSOLE_ERRORS.LOAD_ROSTER, err);
       } finally {
@@ -183,9 +243,19 @@ const OrganizationAdmin = () => {
         totalPages={totalPages}
         totalCount={totalCount}
         togglingStatus={togglingStatus}
-        onPageChange={fetchTeamUsers}
+        onPageChange={(page) => {
+          fetchTeamUsers(page, selectedStatus, selectedRole, debouncedSearch);
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        }}
         onInspectUser={setInspectingUser}
         onUpdateUserStatusClick={handleUpdateUserStatusClick}
+        selectedStatus={selectedStatus}
+        onStatusChange={handleStatusChange}
+        selectedRole={selectedRole}
+        onRoleChange={handleRoleChange}
+        searchQuery={searchQuery}
+        onSearchChange={handleSearchChange}
+        onResetFilters={handleResetFilters}
       />
 
       <InspectingUserModal
