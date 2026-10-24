@@ -67,7 +67,7 @@ const Layout: React.FC<LayoutProps> = ({ user, onLogout }) => {
       <Navbar user={user || undefined} onLogout={onLogout} />
       {hasSidebar && <Sidebar user={user} tasks={tasks} />}
 
-      <div
+      <main
         className={`${
           hasSidebar ? "pl-0 md:pl-20 lg:pl-60" : "pl-0"
         } transition-all duration-300 min-h-screen w-full overflow-x-hidden`}
@@ -88,7 +88,7 @@ const Layout: React.FC<LayoutProps> = ({ user, onLogout }) => {
             <Outlet context={outletContext} />
           </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 };

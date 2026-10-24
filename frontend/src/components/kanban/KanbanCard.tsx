@@ -48,7 +48,7 @@ export const KanbanCard: React.FC<KanbanCardProps> = React.memo(({
         if (target.closest("button") || target.closest("select")) return;
         navigate(`/task/${task._id}`);
       }}
-      className={`bg-white dark:bg-gray-955 border rounded-lg p-3.5 shadow-sm hover:shadow-md transition-all duration-200 flex flex-col justify-between gap-3 group cursor-grab active:cursor-grabbing ${getIssueTypeLeftBorder(
+      className={`[content-visibility:auto] [contain-intrinsic-size:0_130px] bg-white dark:bg-gray-950 border rounded-lg p-3.5 shadow-sm hover:shadow-md transition-all duration-200 flex flex-col justify-between gap-3 group cursor-grab active:cursor-grabbing ${getIssueTypeLeftBorder(
         type
       )}`}
     >
@@ -66,6 +66,7 @@ export const KanbanCard: React.FC<KanbanCardProps> = React.memo(({
               onClick={() => navigate(`/task/${task._id}`)}
               className="p-1 text-gray-400 hover:text-sky-600 dark:hover:text-sky-400 hover:bg-sky-50 dark:hover:bg-gray-800 rounded transition-colors cursor-pointer"
               title="Open Issue"
+              aria-label={`Open issue ${task.title}`}
             >
               <Edit className="w-3.5 h-3.5" />
             </button>
@@ -73,9 +74,9 @@ export const KanbanCard: React.FC<KanbanCardProps> = React.memo(({
         </div>
 
         {/* Title */}
-        <h4 className="text-sm font-semibold text-gray-800 dark:text-gray-200 leading-tight">
+        <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-200 leading-tight">
           {task.title}
-        </h4>
+        </h3>
 
         {/* Description */}
         {task.description && (
@@ -119,8 +120,9 @@ export const KanbanCard: React.FC<KanbanCardProps> = React.memo(({
                 const prevIdx = columns.indexOf(col) - 1;
                 handleStatusTransition(task._id, columns[prevIdx]);
               }}
-              className="p-1 bg-sky-50 dark:bg-sky-955 hover:bg-sky-100 dark:hover:bg-sky-900 text-sky-600 rounded transition-colors cursor-pointer"
+              className="p-1 bg-sky-50 dark:bg-sky-950 hover:bg-sky-100 dark:hover:bg-sky-900 text-sky-600 rounded transition-colors cursor-pointer"
               title="Move Left"
+              aria-label="Move issue left"
             >
               <ArrowLeft className="w-3 h-3" />
             </button>
@@ -131,8 +133,9 @@ export const KanbanCard: React.FC<KanbanCardProps> = React.memo(({
                 const nextIdx = columns.indexOf(col) + 1;
                 handleStatusTransition(task._id, columns[nextIdx]);
               }}
-              className="p-1 bg-sky-50 dark:bg-sky-955 hover:bg-sky-100 dark:hover:bg-sky-900 text-sky-600 rounded transition-colors cursor-pointer"
+              className="p-1 bg-sky-50 dark:bg-sky-950 hover:bg-sky-100 dark:hover:bg-sky-900 text-sky-600 rounded transition-colors cursor-pointer"
               title="Move Right"
+              aria-label="Move issue right"
             >
               <ArrowRight className="w-3 h-3" />
             </button>

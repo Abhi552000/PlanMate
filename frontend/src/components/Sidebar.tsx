@@ -145,6 +145,7 @@ const Sidebar: React.FC<SidebarProps> = ({ user, tasks }) => {
         <button
           onClick={() => setMobileOpen(true)}
           className={SIDEBAR_CLASSES.mobileButton}
+          aria-label="Open navigation menu"
         >
           <Menu className=" w-5 h-5" />
         </button>
@@ -166,6 +167,7 @@ const Sidebar: React.FC<SidebarProps> = ({ user, tasks }) => {
               <button
                 className=" text-gray-700 dark:text-gray-300 hover:text-sky-600 p-1 rounded-lg transition-colors cursor-pointer"
                 onClick={() => setMobileOpen(false)}
+                aria-label="Close navigation menu"
               >
                 <X className=" w-5 h-5" />
               </button>

@@ -77,9 +77,14 @@ const Navbar: React.FC<NavbarProps> = ({ user = {}, onLogout }) => {
   }, []);
 
   useEffect(() => {
-    fetchNotifications();
-    const interval = setInterval(fetchNotifications, 10000);
-    return () => clearInterval(interval);
+    const initialTimer = setTimeout(() => {
+      fetchNotifications();
+    }, 800);
+    const interval = setInterval(fetchNotifications, 15000);
+    return () => {
+      clearTimeout(initialTimer);
+      clearInterval(interval);
+    };
   }, [fetchNotifications]);
 
   const handleMarkAllRead = async () => {
@@ -176,6 +181,7 @@ const Navbar: React.FC<NavbarProps> = ({ user = {}, onLogout }) => {
           <button
             className="p-2 text-gray-600 dark:text-gray-400 hover:text-sky-500 dark:hover:text-sky-400 transition-colors duration-300 hover:bg-sky-50 dark:hover:bg-gray-800 rounded-full cursor-pointer"
             onClick={() => navigate(ROUTES.PROFILE)}
+            aria-label="Settings"
           >
             <Settings className="w-5 h-5" />
           </button>

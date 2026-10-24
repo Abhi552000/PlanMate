@@ -30,9 +30,9 @@ export const KanbanColumn: React.FC<KanbanColumnProps> = React.memo(({
       {/* Column Header */}
       <div className="flex items-center justify-between mb-4 pb-2 border-b border-sky-100/50 dark:border-gray-800">
         <div className="flex items-center gap-2">
-          <span className="font-bold text-gray-700 dark:text-gray-300 text-sm tracking-wide uppercase">
+          <h2 className="font-bold text-gray-700 dark:text-gray-300 text-sm tracking-wide uppercase">
             {col}
-          </span>
+          </h2>
           <span className="bg-sky-100/80 dark:bg-sky-950/50 text-sky-700 dark:text-sky-400 px-2 py-0.5 rounded-full text-xs font-semibold">
             {colTasks.length}
           </span>

@@ -1,8 +1,8 @@
 import React, { useCallback, useMemo, useState, useEffect } from "react";
 import { WRAPPER } from "../../assets/dummy";
 import { useOutletContext, useSearchParams } from "react-router-dom";
-import TaskModal from "../../components/TaskModal";
 import KanbanBoard from "../../components/KanbanBoard";
+const TaskModal = React.lazy(() => import("../../components/TaskModal"));
 import { DashboardHeader } from "./components/DashboardHeader";
 import { DashboardFilters } from "./components/DashboardFilters";
 import { ListModeView } from "./components/ListModeView";
@@ -103,7 +103,8 @@ const Dashboard = () => {
         console.error(CONSOLE_ERRORS.FETCH_MEMBERS_DASHBOARD, err);
       }
     };
-    fetchMembers();
+    const timer = setTimeout(fetchMembers, 300);
+    return () => clearTimeout(timer);
   }, []);
 
   useEffect(() => {
@@ -117,7 +118,8 @@ const Dashboard = () => {
         console.error(CONSOLE_ERRORS.FETCH_ORG_DETAILS, err);
       }
     };
-    fetchOrgDetails();
+    const timer = setTimeout(fetchOrgDetails, 400);
+    return () => clearTimeout(timer);
   }, []);
 
   // Filter tasks dynamically for the Board view
@@ -277,12 +279,14 @@ const Dashboard = () => {
       </div>
 
       {showModal && (
-        <TaskModal
-          isOpen={showModal}
-          onClose={handleCloseModal}
-          taskToEdit={selectedTask}
-          statuses={statuses}
-        />
+        <React.Suspense fallback={null}>
+          <TaskModal
+            isOpen={showModal}
+            onClose={handleCloseModal}
+            taskToEdit={selectedTask}
+            statuses={statuses}
+          />
+        </React.Suspense>
       )}
     </div>
   );

@@ -16,6 +16,7 @@ export const UserMenuDropdown: React.FC<UserMenuDropdownProps> = React.memo(({
     <div ref={menuref} className="relative">
       <button
         onClick={handleMenuToggle}
+        aria-label={user?.name ? `${user.name} profile menu` : "User profile menu"}
         className="flex items-center gap-2 px-3 py-2 rounded-full cursor-pointer hover:bg-sky-50 dark:hover:bg-gray-800 border border-transparent hover:border-sky-200 dark:hover:border-gray-700"
       >
         <div>
