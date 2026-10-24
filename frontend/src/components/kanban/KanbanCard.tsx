@@ -2,6 +2,7 @@ import React from "react";
 import { Edit, ArrowLeft, ArrowRight, Bug, BookOpen, Award, CheckSquare } from "lucide-react";
 import { ITask, KanbanCardProps } from "../../types";
 import { getPriorityStyle } from "../../utils";
+import { MentionText } from "../MentionText";
 
 const getIssueTypeIcon = (type: string) => {
   switch (type?.toLowerCase()) {
@@ -81,7 +82,7 @@ export const KanbanCard: React.FC<KanbanCardProps> = React.memo(({
         {/* Description */}
         {task.description && (
           <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 line-clamp-2">
-            {task.description}
+            <MentionText text={task.description} />
           </p>
         )}
       </div>

@@ -1,6 +1,7 @@
 import React from "react";
 import { Activity } from "lucide-react";
 import { ActivityTimelineSectionProps } from "../../../types";
+import { MentionText } from "../../../components/MentionText";
 
 export const ActivityTimelineSection: React.FC<ActivityTimelineSectionProps> = ({ history }) => {
   if (!history || history.length === 0) return null;
@@ -28,10 +29,14 @@ export const ActivityTimelineSection: React.FC<ActivityTimelineSectionProps> = (
                 </span>
               </div>
               
-              <div className="text-[11px] text-gray-500 dark:text-gray-400 flex items-center gap-1.5 bg-gray-50/50 dark:bg-gray-900/50 p-2 rounded-lg border border-sky-100/30 dark:border-gray-850 w-fit font-medium">
-                <span className="line-through text-red-606 dark:text-red-400">{item.oldValue || "None"}</span>
-                <span className="text-gray-400">→</span>
-                <span className="font-bold text-green-700 dark:text-green-400">{item.newValue || "None"}</span>
+              <div className="text-[11px] text-gray-500 dark:text-gray-400 flex flex-wrap items-center gap-1.5 bg-gray-50/50 dark:bg-gray-900/50 p-2 rounded-lg border border-sky-100/30 dark:border-gray-850 max-w-full font-medium break-words">
+                <span className="line-through text-red-606 dark:text-red-400">
+                  <MentionText text={item.oldValue || "None"} />
+                </span>
+                <span className="text-gray-400 shrink-0">→</span>
+                <span className="font-bold text-green-700 dark:text-green-400">
+                  <MentionText text={item.newValue || "None"} />
+                </span>
               </div>
               
               {item.updatedAt && (
