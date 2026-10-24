@@ -27,9 +27,7 @@ export const BacklogTasksSection: React.FC<BacklogTasksSectionProps> = ({
 
   return (
     <div
-      className={`bg-white dark:bg-gray-900 border border-sky-100/70 dark:border-gray-855 rounded-2xl shadow-sm overflow-hidden transition-all ${
-        !isBacklogExpanded ? "p-3 sm:p-3.5" : "p-4 sm:p-5 space-y-4"
-      }`}
+      className="bg-white dark:bg-gray-900 border border-sky-100/70 dark:border-gray-855 rounded-2xl shadow-sm overflow-hidden p-3.5 sm:p-4"
       onDragOver={(e) => e.preventDefault()}
       onDrop={(e) => {
         const taskId = e.dataTransfer.getData("text/plain");
@@ -37,8 +35,8 @@ export const BacklogTasksSection: React.FC<BacklogTasksSectionProps> = ({
       }}
     >
       <div
-        className={`flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 transition-all ${
-          !isBacklogExpanded ? "" : "pb-3 border-b border-sky-50 dark:border-gray-855"
+        className={`flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 ${
+          !isBacklogExpanded ? "" : "pb-3 border-b border-sky-50 dark:border-gray-855 mb-3"
         }`}
       >
         <div className="flex items-center gap-2 min-w-0">

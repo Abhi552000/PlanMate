@@ -33,9 +33,7 @@ export const BacklogSprintAccordion: React.FC<BacklogSprintAccordionProps> = ({
 
   return (
     <div
-      className={`bg-white dark:bg-gray-900 border rounded-2xl shadow-sm overflow-hidden transition-all ${
-        isCollapsed ? "p-3 sm:p-3.5" : "p-4 sm:p-5 space-y-4"
-      } ${
+      className={`bg-white dark:bg-gray-900 border rounded-2xl shadow-sm overflow-hidden p-3.5 sm:p-4 ${
         sprint.status === "active"
           ? "border-sky-300 ring-2 ring-sky-500/10 dark:border-sky-850"
           : "border-sky-100/70 dark:border-gray-850"
@@ -48,10 +46,10 @@ export const BacklogSprintAccordion: React.FC<BacklogSprintAccordionProps> = ({
     >
       {/* Sprint Header Panel */}
       <div
-        className={`flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 transition-all ${
+        className={`flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 ${
           isCollapsed
             ? ""
-            : "pb-3 border-b border-sky-55 dark:border-gray-855"
+            : "pb-3 border-b border-sky-55 dark:border-gray-855 mb-3"
         }`}
       >
         <div className="flex items-center gap-2 min-w-0">

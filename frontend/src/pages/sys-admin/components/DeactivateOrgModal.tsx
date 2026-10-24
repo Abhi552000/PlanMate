@@ -10,7 +10,24 @@ export const DeactivateOrgModal: React.FC<DeactivateOrgModalProps> = ({
   togglingStatus,
   onSubmit,
 }) => {
+  const [error, setError] = React.useState("");
+
+  React.useEffect(() => {
+    if (deactivatingOrg) {
+      setError("");
+    }
+  }, [deactivatingOrg]);
+
   if (!deactivatingOrg) return null;
+
+  const handleFormSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!deactivateRemark.trim()) {
+      setError("Reason / Remark is mandatory.");
+      return;
+    }
+    onSubmit(e);
+  };
 
   return (
     <div 
@@ -33,19 +50,34 @@ export const DeactivateOrgModal: React.FC<DeactivateOrgModalProps> = ({
           </button>
         </div>
 
-        <form onSubmit={onSubmit} className="space-y-4">
+        <form onSubmit={handleFormSubmit} className="space-y-4">
           <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1">
-              Reason for Deactivation (Remark)
+            <label className="block text-xs font-bold uppercase tracking-wider text-gray-600 dark:text-gray-300 mb-1 flex items-center gap-1">
+              <span>Reason for Deactivation (Remark)</span>
+              <span className="text-red-500 text-xs font-bold">*</span>
             </label>
             <textarea
               rows={3}
               value={deactivateRemark}
-              onChange={(e) => setDeactivateRemark(e.target.value)}
-              className="w-full px-3.5 py-2.5 border border-sky-100 dark:border-gray-800 rounded-lg text-sm bg-white dark:bg-gray-950 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200 text-gray-700 dark:text-gray-300 font-medium"
+              onChange={(e) => {
+                setDeactivateRemark(e.target.value);
+                if (error && e.target.value.trim()) setError("");
+              }}
+              onBlur={() => {
+                if (!deactivateRemark.trim()) setError("Reason / Remark is mandatory.");
+              }}
+              className={`w-full px-3.5 py-2.5 border rounded-lg text-sm bg-white dark:bg-gray-950 focus:outline-none transition-all duration-200 font-medium ${
+                error
+                  ? "border-red-500 focus:ring-2 focus:ring-red-400/50"
+                  : "border-sky-100 dark:border-gray-800 focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+              }`}
               placeholder="e.g. Payment pending, License expired, Contract ended"
-              required
             />
+            {error && (
+              <p className="text-[11px] text-red-500 mt-1 font-medium">
+                {error}
+              </p>
+            )}
           </div>
 
           <div className="flex justify-end gap-2.5 pt-3 border-t border-sky-50 dark:border-gray-800 mt-4">

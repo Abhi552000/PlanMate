@@ -78,8 +78,9 @@ export const OnboardOrgModal: React.FC<OnboardOrgModalProps> = ({
         ) : (
           <form onSubmit={onboardSubmit} className="space-y-4">
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1">
-                Organization Name
+              <label className="flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1">
+                <span>Organization Name</span>
+                <span className="text-red-500 font-bold">*</span>
               </label>
               <div className="flex items-center border border-sky-100 dark:border-gray-800 rounded-lg px-3 py-2 bg-white dark:bg-gray-950 focus-within:ring-2 focus-within:ring-sky-500 focus-within:border-sky-500 transition-all duration-200">
                 <Building className="w-4 h-4 text-sky-500 mr-2 shrink-0" />
@@ -95,8 +96,9 @@ export const OnboardOrgModal: React.FC<OnboardOrgModalProps> = ({
             </div>
 
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1">
-                Admin Full Name
+              <label className="flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1">
+                <span>Admin Full Name</span>
+                <span className="text-red-500 font-bold">*</span>
               </label>
               <div className="flex items-center border border-sky-100 dark:border-gray-800 rounded-lg px-3 py-2 bg-white dark:bg-gray-950 focus-within:ring-2 focus-within:ring-sky-500 focus-within:border-sky-500 transition-all duration-200">
                 <User className="w-4.5 h-4.5 text-sky-500 mr-2 shrink-0" />
@@ -112,8 +114,9 @@ export const OnboardOrgModal: React.FC<OnboardOrgModalProps> = ({
             </div>
 
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1">
-                Admin Email Address
+              <label className="flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1">
+                <span>Admin Email Address</span>
+                <span className="text-red-500 font-bold">*</span>
               </label>
               <div className="flex items-center border border-sky-100 dark:border-gray-800 rounded-lg px-3 py-2 bg-white dark:bg-gray-950 focus-within:ring-2 focus-within:ring-sky-500 focus-within:border-sky-500 transition-all duration-200">
                 <Mail className="w-4 h-4 text-sky-500 mr-2 shrink-0" />

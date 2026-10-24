@@ -11,10 +11,12 @@ export const AccessRemarkModal: React.FC<AccessRemarkModalProps> = ({
   loading = false,
 }) => {
   const [remark, setRemark] = useState("");
+  const [error, setError] = useState("");
 
   useEffect(() => {
     if (isOpen) {
       setRemark("");
+      setError("");
     }
   }, [isOpen]);
 
@@ -22,6 +24,10 @@ export const AccessRemarkModal: React.FC<AccessRemarkModalProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!remark.trim()) {
+      setError("Reason / Remark is mandatory.");
+      return;
+    }
     onConfirm(remark.trim());
   };
 
@@ -52,17 +58,32 @@ export const AccessRemarkModal: React.FC<AccessRemarkModalProps> = ({
           </p>
 
           <div>
-            <label className="block text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-1.5">
-              Reason / Remark
+            <label className="block text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5 flex items-center gap-1">
+              <span>Reason / Remark</span>
+              <span className="text-red-500 text-xs font-bold">*</span>
             </label>
             <textarea
-              required
               rows={3}
               value={remark}
-              onChange={(e) => setRemark(e.target.value)}
+              onChange={(e) => {
+                setRemark(e.target.value);
+                if (error && e.target.value.trim()) setError("");
+              }}
+              onBlur={() => {
+                if (!remark.trim()) setError("Reason / Remark is mandatory.");
+              }}
               placeholder="e.g. Contract ended, temporary leave, role reassignment..."
-              className="w-full px-3 py-2 text-xs border border-sky-100 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all text-gray-750 dark:text-gray-300 font-medium"
+              className={`w-full px-3 py-2 text-xs border rounded-lg bg-white dark:bg-gray-800 focus:outline-none transition-all text-gray-750 dark:text-gray-300 font-medium ${
+                error
+                  ? "border-red-500 focus:ring-2 focus:ring-red-400/50"
+                  : "border-sky-100 dark:border-gray-700 focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+              }`}
             />
+            {error && (
+              <p className="text-[11px] text-red-500 mt-1 font-medium">
+                {error}
+              </p>
+            )}
           </div>
 
           <div className="flex justify-end gap-2 pt-2 border-t border-sky-50 dark:border-gray-800">
@@ -75,7 +96,7 @@ export const AccessRemarkModal: React.FC<AccessRemarkModalProps> = ({
             </button>
             <button
               type="submit"
-              disabled={loading || !remark.trim()}
+              disabled={loading}
               className="px-4 py-2 bg-sky-500 hover:bg-sky-600 text-white font-bold rounded-lg text-xs hover:shadow-md transition-all duration-200 cursor-pointer disabled:opacity-50"
             >
               {loading ? "Saving..." : "Confirm Action"}
