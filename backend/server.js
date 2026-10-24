@@ -24,8 +24,20 @@ app.use(cors({ origin: allowedOrigins, credentials: true }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// DB CONNECT
-connectDB();
+// Ensure DB connection middleware before processing any API route
+app.use(async (req, res, next) => {
+  if (req.path === "/" || req.method === "OPTIONS") return next();
+  try {
+    await connectDB();
+    next();
+  } catch (err) {
+    console.error("Database connection middleware error:", err.message);
+    return res.status(500).json({
+      success: false,
+      message: `Database connection error: ${err.message}`,
+    });
+  }
+});
 
 // Routes
 app.use("/api/user", userRouter);
@@ -42,6 +54,10 @@ app.get("/", (req, res) => {
 // Centralized Error Handling Middleware (must be registered last)
 app.use(errorHandler);
 
-app.listen(port, () => {
-  console.log(`Server started on http://localhost:${port}`);
-});
+if (process.env.NODE_ENV !== "production") {
+  app.listen(port, () => {
+    console.log(`Server started on http://localhost:${port}`);
+  });
+}
+
+export default app;
