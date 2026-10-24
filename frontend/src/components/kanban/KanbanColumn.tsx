@@ -40,7 +40,7 @@ export const KanbanColumn: React.FC<KanbanColumnProps> = React.memo(({
       </div>
 
       {/* Column Cards */}
-      <div className="space-y-3 flex-1 overflow-y-auto max-h-[600px] pr-1">
+      <div className="space-y-3 flex-1 overflow-y-auto max-h-[600px] pr-1.5 scrollbar-thin">
         {colTasks.map((task) => (
           <KanbanCard
             key={task._id}
