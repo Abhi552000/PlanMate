@@ -33,9 +33,7 @@ export const BacklogSprintAccordion: React.FC<BacklogSprintAccordionProps> = ({
 
   return (
     <div
-      className={`bg-white dark:bg-gray-900 border rounded-2xl shadow-sm overflow-hidden transition-all ${
-        isCollapsed ? "p-3 sm:p-3.5" : "p-4 sm:p-5 space-y-4"
-      } ${
+      className={`bg-white dark:bg-gray-900 border rounded-2xl shadow-sm overflow-hidden p-3.5 sm:p-4 ${
         sprint.status === "active"
           ? "border-sky-300 ring-2 ring-sky-500/10 dark:border-sky-850"
           : "border-sky-100/70 dark:border-gray-850"
@@ -48,10 +46,10 @@ export const BacklogSprintAccordion: React.FC<BacklogSprintAccordionProps> = ({
     >
       {/* Sprint Header Panel */}
       <div
-        className={`flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 transition-all ${
+        className={`flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 ${
           isCollapsed
             ? ""
-            : "pb-3 border-b border-sky-55 dark:border-gray-855"
+            : "pb-3 border-b border-sky-55 dark:border-gray-855 mb-3"
         }`}
       >
         <div className="flex items-center gap-2 min-w-0">
@@ -79,7 +77,7 @@ export const BacklogSprintAccordion: React.FC<BacklogSprintAccordionProps> = ({
                   {BACKLOG_TEXTS.STATUS_COMPLETED}
                 </span>
               ) : (
-                <span className="text-[9px] font-black uppercase tracking-wider bg-amber-50 text-amber-700 border border-amber-100 px-2 py-0.5 rounded dark:bg-amber-955/20 dark:text-amber-400 dark:border-amber-900/50">
+                <span className="text-[9px] font-black uppercase tracking-wider bg-slate-100 text-slate-650 border border-slate-200 px-2 py-0.5 rounded dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700">
                   {BACKLOG_TEXTS.STATUS_PLANNED}
                 </span>
               )}
@@ -129,7 +127,7 @@ export const BacklogSprintAccordion: React.FC<BacklogSprintAccordionProps> = ({
 
           <button
             onClick={() => setConfirmDeleteSprintId(sprint._id)}
-            className="p-1 hover:bg-amber-50 text-amber-600 dark:hover:bg-amber-955/20 rounded cursor-pointer"
+            className="p-1 hover:bg-sky-50 text-gray-400 hover:text-sky-600 dark:hover:bg-gray-800 dark:hover:text-sky-400 rounded cursor-pointer transition-colors"
             title={BACKLOG_TEXTS.TOOLTIP_CLOSE_SPRINT}
           >
             <Archive className="w-3.5 h-3.5" />

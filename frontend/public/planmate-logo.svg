@@ -1,0 +1,27 @@
+<svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="pmLogoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#06B6D4" />
+      <stop offset="45%" stop-color="#0284C7" />
+      <stop offset="100%" stop-color="#4F46E5" />
+    </linearGradient>
+    <filter id="pmLogoShadow" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="3" stdDeviation="3" flood-color="#020617" flood-opacity="0.25" />
+    </filter>
+  </defs>
+  <!-- Background Squircle -->
+  <rect x="4" y="4" width="92" height="92" rx="24" fill="url(#pmLogoGrad)" />
+  <rect x="4.75" y="4.75" width="90.5" height="90.5" rx="23.25" stroke="white" stroke-opacity="0.25" stroke-width="1.5" />
+  
+  <g filter="url(#pmLogoShadow)">
+    <!-- Left Pillar (Plan Stem) -->
+    <rect x="23" y="24" width="12" height="52" rx="6" fill="#FFFFFF" />
+    
+    <!-- P Loop returning to stem -->
+    <path d="M 35 30 H 53 C 61.8 30 69 37.2 69 46 C 69 54.8 61.8 62 53 62 H 35" 
+          stroke="#FFFFFF" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" />
+    
+    <!-- Right Pillar (Mate Column) -->
+    <rect x="63" y="46" width="12" height="30" rx="6" fill="#FFFFFF" />
+  </g>
+</svg>

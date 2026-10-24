@@ -21,7 +21,7 @@ export const KanbanColumn: React.FC<KanbanColumnProps> = React.memo(({
       onDragEnter={(e) => handleDragEnter(e, col)}
       onDragLeave={handleDragLeave}
       onDrop={(e) => handleDrop(e, col)}
-      className={`border rounded-xl p-4 flex flex-col min-h-[500px] w-[290px] sm:w-[320px] md:w-full shrink-0 shadow-sm transition-all duration-200 ${
+      className={`border rounded-xl p-3.5 sm:p-4 flex flex-col min-h-[480px] snap-center w-[85vw] max-w-[320px] sm:w-[320px] md:w-full shrink-0 shadow-sm transition-all duration-200 ${
         activeOverColumn === col
           ? "bg-sky-100/70 dark:bg-sky-950/20 border-sky-300 dark:border-sky-700"
           : "bg-gray-50/70 dark:bg-gray-900/50 border-sky-100 dark:border-gray-800"
@@ -30,9 +30,9 @@ export const KanbanColumn: React.FC<KanbanColumnProps> = React.memo(({
       {/* Column Header */}
       <div className="flex items-center justify-between mb-4 pb-2 border-b border-sky-100/50 dark:border-gray-800">
         <div className="flex items-center gap-2">
-          <span className="font-bold text-gray-700 dark:text-gray-300 text-sm tracking-wide uppercase">
+          <h2 className="font-bold text-gray-700 dark:text-gray-300 text-sm tracking-wide uppercase">
             {col}
-          </span>
+          </h2>
           <span className="bg-sky-100/80 dark:bg-sky-950/50 text-sky-700 dark:text-sky-400 px-2 py-0.5 rounded-full text-xs font-semibold">
             {colTasks.length}
           </span>

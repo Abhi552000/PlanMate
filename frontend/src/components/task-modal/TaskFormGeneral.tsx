@@ -13,8 +13,9 @@ export const TaskFormGeneral: React.FC<TaskFormGeneralProps> = ({
   return (
     <div className="space-y-4">
       <div>
-        <label className=" block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">
-          Summary
+        <label className=" flex items-center gap-1 text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">
+          <span>Summary</span>
+          <span className="text-red-500 font-bold">*</span>
         </label>
         <div className="flex items-center border border-sky-100 dark:border-gray-800 rounded-lg px-3 py-2 bg-white dark:bg-gray-900 focus-within:ring-2 focus-within:ring-sky-500 transition-all duration-200">
           <input

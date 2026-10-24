@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { Settings, Zap } from "lucide-react";
+import { Settings, Menu } from "lucide-react";
 import { ROUTES } from "../constants/routeConstant";
 import { INotification, NavbarProps } from "../types";
 import { notificationService } from "../services/notificationService";
@@ -8,8 +8,14 @@ import { orgService } from "../services/orgService";
 import { CONSOLE_ERRORS } from "../constants/messages";
 import { NotificationDropdown } from "./navbar/NotificationDropdown";
 import { UserMenuDropdown } from "./navbar/UserMenuDropdown";
+import { PlanMateLogo } from "./common/PlanMateLogo";
 
-const Navbar: React.FC<NavbarProps> = ({ user = {}, onLogout }) => {
+const Navbar: React.FC<NavbarProps> = ({
+  user = {},
+  onLogout,
+  onToggleMobileMenu,
+  hasSidebar,
+}) => {
   const menuref = useRef<HTMLDivElement>(null);
   const notiref = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
@@ -77,9 +83,14 @@ const Navbar: React.FC<NavbarProps> = ({ user = {}, onLogout }) => {
   }, []);
 
   useEffect(() => {
-    fetchNotifications();
-    const interval = setInterval(fetchNotifications, 10000);
-    return () => clearInterval(interval);
+    const initialTimer = setTimeout(() => {
+      fetchNotifications();
+    }, 800);
+    const interval = setInterval(fetchNotifications, 15000);
+    return () => {
+      clearTimeout(initialTimer);
+      clearInterval(interval);
+    };
   }, [fetchNotifications]);
 
   const handleMarkAllRead = async () => {
@@ -124,25 +135,24 @@ const Navbar: React.FC<NavbarProps> = ({ user = {}, onLogout }) => {
     >
       <div className="flex flex-row items-center justify-between gap-2 md:gap-4 px-4 sm:px-6 md:px-8 py-3 w-full">
         {/* LOGO & ORG BADGE */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
+          {hasSidebar && onToggleMobileMenu && (
+            <button
+              onClick={onToggleMobileMenu}
+              className="md:hidden p-1.5 -ml-1 text-gray-600 dark:text-gray-300 hover:text-sky-600 dark:hover:text-sky-400 hover:bg-sky-50 dark:hover:bg-gray-800 rounded-lg transition-colors cursor-pointer"
+              aria-label="Open navigation menu"
+            >
+              <Menu className="w-5 h-5" />
+            </button>
+          )}
+
           <div
-            className=" flex items-center gap-2 cursor-pointer group"
+            className="flex items-center gap-2.5 cursor-pointer group"
             onClick={() => {
               navigate(ROUTES.DASHBOARD);
             }}
           >
-            {/* LOGO */}
-            <div
-              className="w-10 h-10 flex items-center justify-center rounded-xl bg-gradient-to-br 
-            from-cyan-500 via-sky-500 to-indigo-500 shadow-sm"
-            >
-              <Zap className="w-6 h-6 text-white" />
-            </div>
-
-            {/* BRAND NAME */}
-            <span className=" text-2xl font-extrabold bg-gradient-to-r from-cyan-500 via-sky-500 to-indigo-500 bg-clip-text text-transparent tracking-wide">
-              PlanMate
-            </span>
+            <PlanMateLogo size="sm" showText textClassName="text-xl sm:text-2xl" />
           </div>
 
           {orgName && (
@@ -176,6 +186,7 @@ const Navbar: React.FC<NavbarProps> = ({ user = {}, onLogout }) => {
           <button
             className="p-2 text-gray-600 dark:text-gray-400 hover:text-sky-500 dark:hover:text-sky-400 transition-colors duration-300 hover:bg-sky-50 dark:hover:bg-gray-800 rounded-full cursor-pointer"
             onClick={() => navigate(ROUTES.PROFILE)}
+            aria-label="Settings"
           >
             <Settings className="w-5 h-5" />
           </button>

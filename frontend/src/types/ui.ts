@@ -36,9 +36,13 @@ export interface LayoutProps {
 export interface SidebarProps {
   user: IUser | null;
   tasks?: ITask[];
+  mobileOpen?: boolean;
+  setMobileOpen?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export interface NavbarProps {
   user?: Partial<IUser> | null;
   onLogout: () => void;
+  onToggleMobileMenu?: () => void;
+  hasSidebar?: boolean;
 }

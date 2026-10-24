@@ -27,7 +27,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = React.memo(({
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* HEADER */}
       <div className={HEADER}>
         <div className=" min-w-0">

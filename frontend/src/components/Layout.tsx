@@ -12,6 +12,7 @@ const Layout: React.FC<LayoutProps> = ({ user, onLogout }) => {
   const loading = useAppSelector((state) => state.tasks.loading);
   const error = useAppSelector((state) => state.tasks.error);
   const [viewMode, setViewMode] = useState("kanban");
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const fetchTasksData = useCallback(
     async (silent = true) => {
@@ -64,15 +65,27 @@ const Layout: React.FC<LayoutProps> = ({ user, onLogout }) => {
 
   return (
     <div className=" min-h-screen bg-gray-50 dark:bg-gray-950 transition-colors duration-300">
-      <Navbar user={user || undefined} onLogout={onLogout} />
-      {hasSidebar && <Sidebar user={user} tasks={tasks} />}
+      <Navbar
+        user={user || undefined}
+        onLogout={onLogout}
+        hasSidebar={hasSidebar}
+        onToggleMobileMenu={() => setMobileMenuOpen((prev) => !prev)}
+      />
+      {hasSidebar && (
+        <Sidebar
+          user={user}
+          tasks={tasks}
+          mobileOpen={mobileMenuOpen}
+          setMobileOpen={setMobileMenuOpen}
+        />
+      )}
 
-      <div
+      <main
         className={`${
           hasSidebar ? "pl-0 md:pl-20 lg:pl-60" : "pl-0"
         } transition-all duration-300 min-h-screen w-full overflow-x-hidden`}
       >
-        <div className="px-4 sm:px-6 md:px-8 pt-8 pb-6 w-full transition-all duration-300 text-gray-900 dark:text-gray-100">
+        <div className="px-3.5 sm:px-6 md:px-8 pt-4 sm:pt-6 md:pt-8 pb-6 w-full transition-all duration-300 text-gray-900 dark:text-gray-100">
           {error && (
             <div className=" mb-4 bg-red-50 text-red-600 p-3 rounded-lg border border-red-100 flex justify-between items-center text-sm animate-fadeIn">
               <span>Failed to sync tasks: {error}</span>
@@ -88,7 +101,7 @@ const Layout: React.FC<LayoutProps> = ({ user, onLogout }) => {
             <Outlet context={outletContext} />
           </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 };

@@ -30,7 +30,7 @@ export const BacklogTaskRow: React.FC<BacklogTaskRowProps> = React.memo(({
       className={`flex flex-col sm:flex-row sm:items-center justify-between p-2 sm:p-2.5 bg-white dark:bg-gray-900 hover:bg-sky-5/30 dark:hover:bg-gray-800/35 rounded-xl border border-sky-100/70 dark:border-gray-800 shadow-xs transition-all duration-200 cursor-pointer gap-3 border-l-4 ${task.priority === "High"
         ? "border-l-red-500"
         : task.priority === "Medium"
-          ? "border-l-amber-500"
+          ? "border-l-sky-500"
           : "border-l-green-500"
         }`}
     >
@@ -76,10 +76,10 @@ export const BacklogTaskRow: React.FC<BacklogTaskRowProps> = React.memo(({
         {task.status && (
           <span
             className={`px-2 py-0.5 rounded text-[10px] font-bold border ${isCompleted
-              ? "text-green-700 bg-green-55/20 dark:bg-green-950/20 border-green-100"
+              ? "text-green-700 bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-800/40"
               : task.status === "In Progress"
-                ? "text-amber-700 bg-amber-55/20 dark:bg-amber-950/20 border-amber-100"
-                : "text-sky-700 bg-sky-55/20 dark:bg-sky-950/20 border-sky-100"
+                ? "text-sky-700 bg-sky-50 dark:bg-sky-950/20 border-sky-200 dark:border-sky-800/40"
+                : "text-slate-700 bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700"
               }`}
           >
             {task.status}
