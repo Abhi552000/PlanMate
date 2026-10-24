@@ -81,6 +81,13 @@ export interface OrgMembersTableProps {
   onPageChange: (page: number) => void;
   onInspectUser: (user: any) => void;
   onUpdateUserStatusClick: (user: any, actionType: "activate" | "deactivate") => void;
+  selectedStatus: string;
+  onStatusChange: (status: string) => void;
+  selectedRole: string;
+  onRoleChange: (role: string) => void;
+  searchQuery: string;
+  onSearchChange: (search: string) => void;
+  onResetFilters: () => void;
 }
 
 export interface OrgAdminHeaderProps {

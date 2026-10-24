@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Users, Eye, Power, RotateCcw, MoreVertical } from "lucide-react";
+import { Users, Eye, Power, RotateCcw, MoreVertical, Search, Filter, X } from "lucide-react";
 import { OrgMembersTableProps } from "../../../types";
 
 const ITEMS_PER_PAGE = 5;
@@ -13,6 +13,13 @@ export const OrgMembersTable: React.FC<OrgMembersTableProps> = ({
   onPageChange,
   onInspectUser,
   onUpdateUserStatusClick,
+  selectedStatus,
+  onStatusChange,
+  selectedRole,
+  onRoleChange,
+  searchQuery,
+  onSearchChange,
+  onResetFilters,
 }) => {
   const [activeMenuUserId, setActiveMenuUserId] = useState<string | null>(null);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
@@ -28,12 +35,74 @@ export const OrgMembersTable: React.FC<OrgMembersTableProps> = ({
     return () => document.removeEventListener("mousedown", handleOutsideClick);
   }, []);
 
+  const hasActiveFilters = selectedStatus !== "all" || selectedRole !== "all" || Boolean(searchQuery);
+
   return (
     <div className="bg-white dark:bg-gray-900 rounded-2xl border border-sky-100/50 dark:border-gray-800 shadow-sm overflow-visible">
-      <div className="p-5 border-b border-sky-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/50">
-        <h3 className="text-sm font-bold text-gray-800 dark:text-gray-200 flex items-center gap-2">
-          <Users className="w-4.5 h-4.5 text-sky-500" /> User Access & Approval Management
-        </h3>
+      {/* Table Header with Integrated Backend Filter Toolbar */}
+      <div className="p-4 sm:p-5 border-b border-sky-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/50 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+        <div>
+          <h3 className="text-sm font-bold text-gray-800 dark:text-gray-200 flex items-center gap-2">
+            <Users className="w-4.5 h-4.5 text-sky-500" /> User Access & Approval Management
+          </h3>
+          <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
+            Manage member credentials, assign roles, and approve workspace access
+          </p>
+        </div>
+
+        {/* Backend Filters */}
+        <div className="flex flex-wrap items-center gap-2.5">
+          {/* Search Input */}
+          <div className="relative min-w-[190px] flex-1 sm:flex-initial">
+            <Search className="w-3.5 h-3.5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <input
+              type="text"
+              placeholder="Search by name or email..."
+              value={searchQuery}
+              onChange={(e) => onSearchChange(e.target.value)}
+              className="w-full h-8 pl-8.5 pr-3 text-xs bg-white dark:bg-gray-800 border border-sky-100 dark:border-gray-700 rounded-lg text-gray-750 dark:text-gray-200 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-sky-500/40"
+            />
+          </div>
+
+          {/* Role Filter Dropdown */}
+          <div className="relative">
+            <select
+              value={selectedRole}
+              onChange={(e) => onRoleChange(e.target.value)}
+              className="h-8 px-3 text-xs font-semibold bg-white dark:bg-gray-800 border border-sky-100 dark:border-gray-700 rounded-lg text-gray-750 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-sky-500/40 cursor-pointer"
+            >
+              <option value="all">All Roles</option>
+              <option value="org_admin">Org Admin</option>
+              <option value="member">Member</option>
+            </select>
+          </div>
+
+          {/* Status Filter Dropdown */}
+          <div className="relative">
+            <select
+              value={selectedStatus}
+              onChange={(e) => onStatusChange(e.target.value)}
+              className="h-8 px-3 text-xs font-semibold bg-white dark:bg-gray-800 border border-sky-100 dark:border-gray-700 rounded-lg text-gray-750 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-sky-500/40 cursor-pointer"
+            >
+              <option value="all">All Statuses</option>
+              <option value="active">Approved (Active)</option>
+              <option value="pending">Pending Approval</option>
+              <option value="rejected">Access Rejected</option>
+            </select>
+          </div>
+
+          {/* Reset Filters Button */}
+          {hasActiveFilters && (
+            <button
+              onClick={onResetFilters}
+              className="h-8 px-2.5 text-xs font-bold text-gray-500 hover:text-sky-600 hover:bg-sky-50 dark:hover:bg-gray-800 rounded-lg flex items-center gap-1 cursor-pointer"
+              title="Reset all filters"
+            >
+              <X className="w-3.5 h-3.5" />
+              Reset
+            </button>
+          )}
+        </div>
       </div>
 
       <div className="overflow-x-auto overflow-y-visible min-h-[250px]">
@@ -49,7 +118,19 @@ export const OrgMembersTable: React.FC<OrgMembersTableProps> = ({
             </tr>
           </thead>
           <tbody className="divide-y divide-sky-50/45 dark:divide-gray-800 text-sm overflow-y-visible">
-            {teamUsers.map((member) => (
+            {teamUsers.length === 0 ? (
+              <tr>
+                <td colSpan={6} className="text-center py-14 text-gray-400 dark:text-gray-500">
+                  <div className="flex flex-col items-center justify-center gap-2">
+                    <Users className="w-8 h-8 text-gray-300 dark:text-gray-650" />
+                    <p className="text-sm font-semibold text-gray-600 dark:text-gray-400">
+                      No members found
+                    </p>
+                  </div>
+                </td>
+              </tr>
+            ) : (
+              teamUsers.map((member) => (
               <tr
                 key={member._id}
                 className={`hover:bg-sky-50/20 transition-all ${
@@ -156,7 +237,7 @@ export const OrgMembersTable: React.FC<OrgMembersTableProps> = ({
                   </div>
                 </td>
               </tr>
-            ))}
+            )))}
           </tbody>
         </table>
       </div>

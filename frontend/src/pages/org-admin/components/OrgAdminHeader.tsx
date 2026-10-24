@@ -23,7 +23,7 @@ export const OrgAdminHeader: React.FC<OrgAdminHeaderProps> = ({ orgName, onOnboa
           onClick={onOnboardClick}
           className="px-4 py-2 bg-gradient-to-r from-cyan-500 to-sky-600 text-white font-bold rounded-lg text-sm transition-colors flex items-center gap-1.5 cursor-pointer shadow-sm hover:shadow hover:from-cyan-600 hover:to-sky-750"
         >
-          <UserPlus className="w-4 h-4" /> Onboard Team Member
+          <UserPlus className="w-4 h-4" /> Onboard Member
         </button>
       </div>
     </div>
