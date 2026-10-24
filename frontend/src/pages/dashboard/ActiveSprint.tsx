@@ -49,7 +49,7 @@ export const ActiveSprint: React.FC = () => {
   if (!activeSprint) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] max-w-md mx-auto text-center space-y-5 font-sans">
-        <div className="w-16 h-16 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-md text-white">
+        <div className="w-16 h-16 rounded-full bg-gradient-to-br from-cyan-500 to-sky-600 flex items-center justify-center shadow-md text-white">
           <Flame className="w-8 h-8" />
         </div>
         <div className="space-y-1">

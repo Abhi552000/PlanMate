@@ -30,6 +30,16 @@ const RouteLoadingFallback = () => (
   </div>
 );
 
+const AuthWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <div className="fixed inset-0 w-full h-full min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-gray-950 flex items-center justify-center p-4 overflow-y-auto z-50">
+    {/* Subtle, sober ambient glow for depth */}
+    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[520px] h-[520px] bg-sky-500/10 rounded-full blur-[100px] pointer-events-none" />
+    <div className="relative z-10 w-full flex items-center justify-center my-auto">
+      {children}
+    </div>
+  </div>
+);
+
 export const AppRoutes: React.FC = () => {
   const { login, logout, currentUser, setCurrentUser } = useAuth();
   const navigate = useNavigate();
@@ -42,23 +52,23 @@ export const AppRoutes: React.FC = () => {
         <Route
           path={ROUTES.LOGIN}
           element={
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 overflow-y-auto">
+            <AuthWrapper>
               <Login
                 onSubmit={(data) => login(data, navigate)}
                 onSwitchMode={() => navigate(ROUTES.SIGNUP)}
               />
-            </div>
+            </AuthWrapper>
           }
         />
         <Route
           path={ROUTES.SIGNUP}
           element={
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 overflow-y-auto">
+            <AuthWrapper>
               <Signup
                 onSubmit={(data) => login(data, navigate)}
                 onSwitchMode={() => navigate(ROUTES.LOGIN)}
               />
-            </div>
+            </AuthWrapper>
           }
         />
       </Route>

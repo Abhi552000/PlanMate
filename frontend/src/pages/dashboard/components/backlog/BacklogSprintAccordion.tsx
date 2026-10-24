@@ -77,7 +77,7 @@ export const BacklogSprintAccordion: React.FC<BacklogSprintAccordionProps> = ({
                   {BACKLOG_TEXTS.STATUS_COMPLETED}
                 </span>
               ) : (
-                <span className="text-[9px] font-black uppercase tracking-wider bg-amber-50 text-amber-700 border border-amber-100 px-2 py-0.5 rounded dark:bg-amber-955/20 dark:text-amber-400 dark:border-amber-900/50">
+                <span className="text-[9px] font-black uppercase tracking-wider bg-slate-100 text-slate-650 border border-slate-200 px-2 py-0.5 rounded dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700">
                   {BACKLOG_TEXTS.STATUS_PLANNED}
                 </span>
               )}
@@ -127,7 +127,7 @@ export const BacklogSprintAccordion: React.FC<BacklogSprintAccordionProps> = ({
 
           <button
             onClick={() => setConfirmDeleteSprintId(sprint._id)}
-            className="p-1 hover:bg-amber-50 text-amber-600 dark:hover:bg-amber-955/20 rounded cursor-pointer"
+            className="p-1 hover:bg-sky-50 text-gray-400 hover:text-sky-600 dark:hover:bg-gray-800 dark:hover:text-sky-400 rounded cursor-pointer transition-colors"
             title={BACKLOG_TEXTS.TOOLTIP_CLOSE_SPRINT}
           >
             <Archive className="w-3.5 h-3.5" />

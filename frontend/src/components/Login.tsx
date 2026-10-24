@@ -7,6 +7,7 @@ import { Input } from "./ui/Input";
 import { Button } from "./ui/Button";
 import { TOAST_MESSAGES } from "../constants/messages";
 import { AUTH_TEXTS } from "../constants/uiTexts";
+import { PlanMateLogo } from "./common/PlanMateLogo";
 
 const INITIAL_FORM = { email: "", password: "" };
 
@@ -75,10 +76,10 @@ export const Login: React.FC<LoginProps> = ({ onSubmit, onSwitchMode }) => {
   };
 
   return (
-    <div className=" max-w-md w-full bg-white dark:bg-gray-900 shadow-xl border border-sky-100 dark:border-gray-800 rounded-2xl p-6 sm:p-8 my-auto">
-      <div className=" mb-6 text-center">
-        <div className=" w-16 h-16 bg-gradient-to-br from-cyan-500 to-sky-600 rounded-full mx-auto flex items-center justify-center mb-4">
-          <LogIn className=" w-8 h-8 text-white" />
+    <div className="max-w-md w-full bg-white dark:bg-gray-900 shadow-2xl shadow-slate-950/40 border border-slate-100 dark:border-slate-800 rounded-2xl p-6 sm:p-8 my-auto">
+      <div className="mb-6 text-center">
+        <div className="flex justify-center mb-4">
+          <PlanMateLogo size={56} />
         </div>
         <h2 className=" text-2xl font-bold text-gray-800">
           {" "}

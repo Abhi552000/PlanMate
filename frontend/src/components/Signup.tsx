@@ -15,6 +15,7 @@ import { Select } from "./ui/Select";
 import { Button } from "./ui/Button";
 import { TOAST_MESSAGES } from "../constants/messages";
 import { AUTH_TEXTS } from "../constants/uiTexts";
+import { PlanMateLogo } from "./common/PlanMateLogo";
 
 import { SignupProps, Organization } from "../types";
 
@@ -75,10 +76,10 @@ export const Signup: React.FC<SignupProps> = ({ onSwitchMode }) => {
   };
 
   return (
-    <div className=" max-w-md w-full bg-white dark:bg-gray-900 shadow-xl border border-sky-100 dark:border-gray-800 rounded-2xl p-6 sm:p-8 space-y-5 my-auto">
+    <div className="max-w-md w-full bg-white dark:bg-gray-900 shadow-2xl shadow-slate-950/40 border border-slate-100 dark:border-slate-800 rounded-2xl p-6 sm:p-8 space-y-5 my-auto">
       <div className="text-center">
-        <div className=" w-14 h-14 bg-gradient-to-r from-cyan-500 to-sky-600 rounded-full mx-auto flex items-center justify-center mb-3">
-          <UserPlus className=" w-7 h-7 text-white" />
+        <div className="flex justify-center mb-3">
+          <PlanMateLogo size={56} />
         </div>
         <h2 className=" text-2xl font-bold text-gray-800">
           {AUTH_TEXTS.SIGNUP_TITLE}

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { Settings, Zap, Menu } from "lucide-react";
+import { Settings, Menu } from "lucide-react";
 import { ROUTES } from "../constants/routeConstant";
 import { INotification, NavbarProps } from "../types";
 import { notificationService } from "../services/notificationService";
@@ -8,6 +8,7 @@ import { orgService } from "../services/orgService";
 import { CONSOLE_ERRORS } from "../constants/messages";
 import { NotificationDropdown } from "./navbar/NotificationDropdown";
 import { UserMenuDropdown } from "./navbar/UserMenuDropdown";
+import { PlanMateLogo } from "./common/PlanMateLogo";
 
 const Navbar: React.FC<NavbarProps> = ({
   user = {},
@@ -146,23 +147,12 @@ const Navbar: React.FC<NavbarProps> = ({
           )}
 
           <div
-            className=" flex items-center gap-2 cursor-pointer group"
+            className="flex items-center gap-2.5 cursor-pointer group"
             onClick={() => {
               navigate(ROUTES.DASHBOARD);
             }}
           >
-            {/* LOGO */}
-            <div
-              className="w-10 h-10 flex items-center justify-center rounded-xl bg-gradient-to-br 
-            from-cyan-500 via-sky-500 to-indigo-500 shadow-sm"
-            >
-              <Zap className="w-6 h-6 text-white" />
-            </div>
-
-            {/* BRAND NAME */}
-            <span className=" text-2xl font-extrabold bg-gradient-to-r from-cyan-500 via-sky-500 to-indigo-500 bg-clip-text text-transparent tracking-wide">
-              PlanMate
-            </span>
+            <PlanMateLogo size="sm" showText textClassName="text-xl sm:text-2xl" />
           </div>
 
           {orgName && (
