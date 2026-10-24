@@ -217,11 +217,11 @@ const TaskModal: React.FC<TaskModalProps> = ({
 
   return (
     <div 
-      className="fixed inset-0 backdrop-blur-sm bg-black/30 z-50 flex items-center justify-center p-4 overflow-hidden"
+      className="fixed inset-0 backdrop-blur-sm bg-black/40 z-50 flex items-center justify-center p-3 sm:p-4 overflow-hidden"
       onClick={onClose}
     >
       <div 
-        className="bg-white dark:bg-gray-800/90 border border-sky-100 dark:border-gray-700 rounded-2xl max-w-2xl sm:max-w-3xl lg:max-w-4xl w-full shadow-2xl relative p-6 sm:p-8 animate-fadeIn max-h-[90vh] flex flex-col overflow-hidden"
+        className="bg-white dark:bg-gray-800/90 border border-sky-100 dark:border-gray-700 rounded-2xl max-w-2xl sm:max-w-3xl lg:max-w-4xl w-full shadow-2xl relative p-4 sm:p-6 md:p-8 animate-fadeIn max-h-[92vh] flex flex-col overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
         <TaskModalHeader

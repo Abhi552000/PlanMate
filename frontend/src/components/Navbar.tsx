@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { Settings, Zap } from "lucide-react";
+import { Settings, Zap, Menu } from "lucide-react";
 import { ROUTES } from "../constants/routeConstant";
 import { INotification, NavbarProps } from "../types";
 import { notificationService } from "../services/notificationService";
@@ -9,7 +9,12 @@ import { CONSOLE_ERRORS } from "../constants/messages";
 import { NotificationDropdown } from "./navbar/NotificationDropdown";
 import { UserMenuDropdown } from "./navbar/UserMenuDropdown";
 
-const Navbar: React.FC<NavbarProps> = ({ user = {}, onLogout }) => {
+const Navbar: React.FC<NavbarProps> = ({
+  user = {},
+  onLogout,
+  onToggleMobileMenu,
+  hasSidebar,
+}) => {
   const menuref = useRef<HTMLDivElement>(null);
   const notiref = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
@@ -129,7 +134,17 @@ const Navbar: React.FC<NavbarProps> = ({ user = {}, onLogout }) => {
     >
       <div className="flex flex-row items-center justify-between gap-2 md:gap-4 px-4 sm:px-6 md:px-8 py-3 w-full">
         {/* LOGO & ORG BADGE */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
+          {hasSidebar && onToggleMobileMenu && (
+            <button
+              onClick={onToggleMobileMenu}
+              className="md:hidden p-1.5 -ml-1 text-gray-600 dark:text-gray-300 hover:text-sky-600 dark:hover:text-sky-400 hover:bg-sky-50 dark:hover:bg-gray-800 rounded-lg transition-colors cursor-pointer"
+              aria-label="Open navigation menu"
+            >
+              <Menu className="w-5 h-5" />
+            </button>
+          )}
+
           <div
             className=" flex items-center gap-2 cursor-pointer group"
             onClick={() => {

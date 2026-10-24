@@ -42,7 +42,7 @@ export const AppRoutes: React.FC = () => {
         <Route
           path={ROUTES.LOGIN}
           element={
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 overflow-y-auto">
               <Login
                 onSubmit={(data) => login(data, navigate)}
                 onSwitchMode={() => navigate(ROUTES.SIGNUP)}
@@ -53,7 +53,7 @@ export const AppRoutes: React.FC = () => {
         <Route
           path={ROUTES.SIGNUP}
           element={
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 overflow-y-auto">
               <Signup
                 onSubmit={(data) => login(data, navigate)}
                 onSwitchMode={() => navigate(ROUTES.LOGIN)}

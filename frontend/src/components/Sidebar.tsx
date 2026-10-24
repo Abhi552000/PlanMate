@@ -4,8 +4,16 @@ import { Menu, X, Users, Building } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import { SidebarProps } from "../types";
 
-const Sidebar: React.FC<SidebarProps> = ({ user, tasks }) => {
-  const [mobileOpen, setMobileOpen] = useState(false);
+const Sidebar: React.FC<SidebarProps> = ({
+  user,
+  tasks,
+  mobileOpen: controlledMobileOpen,
+  setMobileOpen: controlledSetMobileOpen,
+}) => {
+  const [internalMobileOpen, setInternalMobileOpen] = useState(false);
+  const isControlled = controlledMobileOpen !== undefined;
+  const mobileOpen = isControlled ? controlledMobileOpen : internalMobileOpen;
+  const setMobileOpen = isControlled && controlledSetMobileOpen ? controlledSetMobileOpen : setInternalMobileOpen;
 
   const username = user?.name || "user";
   const initial = username.charAt(0).toUpperCase();
@@ -140,8 +148,8 @@ const Sidebar: React.FC<SidebarProps> = ({ user, tasks }) => {
         </div>
       </div>
 
-      {/* MOBILE MENU */}
-      {!mobileOpen && (
+      {/* MOBILE MENU (only fallback if not controlled from Navbar) */}
+      {!isControlled && !mobileOpen && (
         <button
           onClick={() => setMobileOpen(true)}
           className={SIDEBAR_CLASSES.mobileButton}

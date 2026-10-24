@@ -70,7 +70,7 @@ export const DashboardFilters: React.FC<DashboardFiltersProps> = React.memo(({
       {/* Top Row: Search and Filters */}
       <div className="flex flex-wrap items-center gap-3">
         {/* Search Input */}
-        <div className="relative min-w-[200px] sm:min-w-[280px] flex-1">
+        <div className="relative w-full sm:w-auto sm:min-w-[280px] sm:flex-1">
           <input
             type="text"
             placeholder="Search issues (title, desc, key)..."
@@ -134,15 +134,15 @@ export const DashboardFilters: React.FC<DashboardFiltersProps> = React.memo(({
       </div>
 
       {/* Bottom Row: View Mode Toggle */}
-      <div className="flex justify-between items-center pt-2.5 border-t border-sky-100/50 dark:border-gray-800/50 text-xs">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2.5 pt-2.5 border-t border-sky-100/50 dark:border-gray-800/50 text-xs">
         <span className="font-semibold text-gray-500 dark:text-gray-400">
           Showing {filterTasksCount} of {totalTasksCount} issues
         </span>
 
-        <div className="flex bg-sky-50 dark:bg-gray-800 p-1 rounded-lg border border-sky-100/50 dark:border-gray-700">
+        <div className="flex w-full sm:w-auto bg-sky-50 dark:bg-gray-800 p-1 rounded-lg border border-sky-100/50 dark:border-gray-700">
           <button
             onClick={() => setViewMode("list")}
-            className={`px-3 py-1.5 rounded-md text-xs font-semibold flex items-center gap-1.5 transition-all duration-200 cursor-pointer ${
+            className={`flex-1 sm:flex-initial justify-center px-3 py-1.5 rounded-md text-xs font-semibold flex items-center gap-1.5 transition-all duration-200 cursor-pointer ${
               viewMode === "list"
                 ? "bg-white dark:bg-gray-700 text-sky-700 dark:text-sky-300 shadow-sm border border-sky-100 dark:border-gray-600 font-bold"
                 : "text-gray-600 dark:text-gray-400 hover:text-sky-700 dark:hover:text-sky-300"
@@ -154,7 +154,7 @@ export const DashboardFilters: React.FC<DashboardFiltersProps> = React.memo(({
           </button>
           <button
             onClick={() => setViewMode("kanban")}
-            className={`px-3 py-1.5 rounded-md text-xs font-semibold flex items-center gap-1.5 transition-all duration-200 cursor-pointer ${
+            className={`flex-1 sm:flex-initial justify-center px-3 py-1.5 rounded-md text-xs font-semibold flex items-center gap-1.5 transition-all duration-200 cursor-pointer ${
               viewMode === "kanban"
                 ? "bg-white dark:bg-gray-700 text-sky-700 dark:text-sky-300 shadow-sm border border-sky-100 dark:border-gray-600 font-bold"
                 : "text-gray-600 dark:text-gray-400 hover:text-sky-700 dark:hover:text-sky-300"
@@ -166,7 +166,7 @@ export const DashboardFilters: React.FC<DashboardFiltersProps> = React.memo(({
           </button>
           <button
             onClick={() => setViewMode("analytics")}
-            className={`px-3 py-1.5 rounded-md text-xs font-semibold flex items-center gap-1.5 transition-all duration-200 cursor-pointer ${
+            className={`flex-1 sm:flex-initial justify-center px-3 py-1.5 rounded-md text-xs font-semibold flex items-center gap-1.5 transition-all duration-200 cursor-pointer ${
               viewMode === "analytics"
                 ? "bg-white dark:bg-gray-700 text-sky-700 dark:text-sky-300 shadow-sm border border-sky-100 dark:border-gray-600 font-bold"
                 : "text-gray-600 dark:text-gray-400 hover:text-sky-700 dark:hover:text-sky-300"

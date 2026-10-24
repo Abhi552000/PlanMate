@@ -75,7 +75,7 @@ export const Signup: React.FC<SignupProps> = ({ onSwitchMode }) => {
   };
 
   return (
-    <div className=" max-w-md w-full bg-white shadow-lg border border-sky-100 rounded-xl p-8 space-y-5">
+    <div className=" max-w-md w-full bg-white dark:bg-gray-900 shadow-xl border border-sky-100 dark:border-gray-800 rounded-2xl p-6 sm:p-8 space-y-5 my-auto">
       <div className="text-center">
         <div className=" w-14 h-14 bg-gradient-to-r from-cyan-500 to-sky-600 rounded-full mx-auto flex items-center justify-center mb-3">
           <UserPlus className=" w-7 h-7 text-white" />

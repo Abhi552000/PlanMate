@@ -183,7 +183,7 @@ const Dashboard = () => {
         onAddTask={handleAddTask}
       />
 
-      <div className=" space-y-6">
+      <div className="space-y-4 sm:space-y-6">
         <DashboardFilters
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}

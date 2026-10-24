@@ -75,7 +75,7 @@ export const Login: React.FC<LoginProps> = ({ onSubmit, onSwitchMode }) => {
   };
 
   return (
-    <div className=" max-w-md w-full bg-white shadow-lg border border-sky-100 rounded-xl p-8">
+    <div className=" max-w-md w-full bg-white dark:bg-gray-900 shadow-xl border border-sky-100 dark:border-gray-800 rounded-2xl p-6 sm:p-8 my-auto">
       <div className=" mb-6 text-center">
         <div className=" w-16 h-16 bg-gradient-to-br from-cyan-500 to-sky-600 rounded-full mx-auto flex items-center justify-center mb-4">
           <LogIn className=" w-8 h-8 text-white" />
