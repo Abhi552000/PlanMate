@@ -12,6 +12,7 @@ const Layout: React.FC<LayoutProps> = ({ user, onLogout }) => {
   const loading = useAppSelector((state) => state.tasks.loading);
   const error = useAppSelector((state) => state.tasks.error);
   const [viewMode, setViewMode] = useState("kanban");
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const fetchTasksData = useCallback(
     async (silent = true) => {
@@ -60,7 +61,6 @@ const Layout: React.FC<LayoutProps> = ({ user, onLogout }) => {
       </div>
     );
 
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const hasSidebar = user?.role === "org_admin" || user?.role === "member";
 
   return (
