@@ -158,10 +158,10 @@ export async function loginUser(req, res) {
       },
     });
   } catch (err) {
-    console.log(err);
+    console.error("Login Error:", err);
     res
       .status(HttpStatus.INTERNAL_SERVER_ERROR)
-      .json({ success: false, message: MESSAGES.COMMON.SERVER_ERROR });
+      .json({ success: false, message: err.message || MESSAGES.COMMON.SERVER_ERROR });
   }
 }
 
