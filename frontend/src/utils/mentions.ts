@@ -9,7 +9,7 @@
  */
 export const cleanMentionsForEditing = (text: string): string => {
   if (!text) return "";
-  return text.replace(/@\[([^\]]+)\]\(user:[a-f\d]{24}\)/g, "@$1");
+  return text.replace(/@\[([^\]]+)\]\(user:[^)]+\)/g, "@$1");
 };
 
 /**

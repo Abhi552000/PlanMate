@@ -1,6 +1,7 @@
 import React from "react";
 import { Bell, CheckCheck } from "lucide-react";
 import { INotification, NotificationDropdownProps } from "../../types";
+import { MentionText } from "../MentionText";
 
 export const NotificationDropdown: React.FC<NotificationDropdownProps> = React.memo(({
   notiOpen,
@@ -65,7 +66,7 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = React.m
                     )}
                   </div>
                   <p className="text-gray-600 dark:text-gray-400 text-[11px] leading-relaxed">
-                    {noti.message}
+                    <MentionText text={noti.message} />
                   </p>
                   <span className="text-[9px] text-gray-400 mt-1 block">
                     {new Date(noti.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}

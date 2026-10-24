@@ -5,6 +5,12 @@ import Notification from "../models/notificationModel.js";
 import { HttpStatus } from "../constants/httpStatus.js";
 import { MESSAGES } from "../constants/messages.js";
 
+// HELPER TO CONVERT STORED MENTIONS TO READABLE FORMAT
+export const cleanMentions = (text) => {
+  if (!text || typeof text !== "string") return text;
+  return text.replace(/@\[([^\]]+)\]\(user:[^)]+\)/g, "@$1");
+};
+
 // HELPER TO CREATE NOTIFICATIONS FOR USER MENTIONS
 export const handleMentions = async (text, task, sender, type = "comment") => {
   if (!text) return;
@@ -391,8 +397,8 @@ export const updateTask = async (req, res) => {
 
           historyEntries.push({
             field,
-            oldValue: displayOldVal,
-            newValue: displayNewVal,
+            oldValue: cleanMentions(displayOldVal),
+            newValue: cleanMentions(displayNewVal),
             updatedBy: req.user.id,
             updatedAt: new Date(),
           });
@@ -425,10 +431,12 @@ export const updateTask = async (req, res) => {
             task.assignee.toString() !== req.user.id
           ) {
             try {
+              const cleanOld = cleanMentions(displayOldVal);
+              const cleanNew = cleanMentions(displayNewVal);
               await Notification.create({
                 user: task.assignee,
                 title: "Task Updated",
-                message: `${req.user.name} updated the ${field} of task "${task.title}" from "${displayOldVal}" to "${displayNewVal}"`,
+                message: `${req.user.name} updated the ${field} of task "${task.title}" from "${cleanOld}" to "${cleanNew}"`,
                 link: `/task/${task._id}`,
                 read: false,
               });
