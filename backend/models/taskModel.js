@@ -27,6 +27,17 @@ const taskSchema = new mongoose.Schema({
     ref: "user",
     default: null,
   },
+  reporter: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "user",
+    default: null,
+  },
+  labels: [
+    {
+      type: String,
+      trim: true,
+    },
+  ],
   key: {
     type: String,
   },

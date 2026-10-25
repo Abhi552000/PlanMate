@@ -1,5 +1,5 @@
-import React from "react";
-import { CheckCircle, AlignLeft, Flag, User, Calendar, Clock } from "lucide-react";
+import React, { useState } from "react";
+import { CheckCircle, AlignLeft, Flag, User, UserCheck, Calendar, Clock, Tag, X, Plus } from "lucide-react";
 import { TaskMetaSidebarProps } from "../../../types";
 import { getPriorityStyle } from "../../../utils";
 import { IssueLinkingSection } from "./IssueLinkingSection";
@@ -24,6 +24,7 @@ export const TaskMetaSidebar: React.FC<TaskMetaSidebarProps> = ({
   onRemoveLink,
   createdAt,
 }) => {
+  const [labelInput, setLabelInput] = useState("");
   return (
     <div className="lg:col-span-4 space-y-4 bg-white dark:bg-gray-900 p-5 sm:p-6 rounded-2xl border border-sky-100/50 dark:border-gray-800 shadow-sm self-start">
       <h3 className="text-xs font-bold uppercase tracking-wider text-gray-400 border-b border-sky-100/50 dark:border-gray-800 pb-2">
@@ -127,6 +128,28 @@ export const TaskMetaSidebar: React.FC<TaskMetaSidebarProps> = ({
         </div>
       )}
 
+      {/* Reporter Selection */}
+      {!isEditingSubtask && (
+        <div className="flex flex-col gap-1.5">
+          <label className="flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-gray-500 mb-1">
+            <UserCheck className="w-3.5 h-3.5 text-sky-500" /> Reporter
+          </label>
+          <select
+            name="reporter"
+            value={taskData.reporter || ""}
+            onChange={handleChange}
+            className={`${baseControlClasses} font-semibold`}
+          >
+            <option value="">Select Reporter</option>
+            {members.map(member => (
+              <option key={member._id} value={member._id}>
+                {member.name}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
+
       <div>
         <label className="flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-gray-500 mb-1">
           <Calendar className="w-3.5 h-3.5 text-sky-500" /> Due Date
@@ -142,20 +165,116 @@ export const TaskMetaSidebar: React.FC<TaskMetaSidebarProps> = ({
         />
       </div>
 
+      {/* Estimation: Story Points & Time Estimate */}
+      <div className="grid grid-cols-2 gap-2.5">
+        <div>
+          <label className="flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-gray-500 mb-1">
+            <Flag className="w-3.5 h-3.5 text-sky-500" /> Story Points
+          </label>
+          <input
+            type="number"
+            name="storyPoints"
+            min="0"
+            max="100"
+            value={taskData.storyPoints !== undefined ? taskData.storyPoints : 1}
+            onChange={handleChange}
+            className={baseControlClasses}
+            required
+          />
+        </div>
+
+        <div>
+          <label className="flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-gray-500 mb-1" title="Original Time Estimate in hours">
+            <Clock className="w-3.5 h-3.5 text-sky-500" /> Estimate (h)
+          </label>
+          <input
+            type="number"
+            name="originalEstimate"
+            min="0"
+            max="1000"
+            step="0.5"
+            placeholder="0"
+            value={taskData.originalEstimate !== undefined ? taskData.originalEstimate : 0}
+            onChange={handleChange}
+            className={baseControlClasses}
+          />
+        </div>
+      </div>
+
+      {/* Labels Section */}
       <div>
-        <label className="flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-gray-500 mb-1">
-          <Flag className="w-3.5 h-3.5 text-sky-500" /> Story Points
+        <label className="flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-gray-500 mb-1.5">
+          <Tag className="w-3.5 h-3.5 text-sky-500" /> Labels
         </label>
-        <input
-          type="number"
-          name="storyPoints"
-          min="0"
-          max="100"
-          value={taskData.storyPoints !== undefined ? taskData.storyPoints : 1}
-          onChange={handleChange}
-          className={baseControlClasses}
-          required
-        />
+
+        {/* Existing Labels */}
+        <div className="flex flex-wrap items-center gap-1.5 mb-2 min-h-[22px]">
+          {(taskData.labels || []).map((label: string, idx: number) => (
+            <span
+              key={idx}
+              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-semibold bg-sky-50 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300 border border-sky-100 dark:border-sky-850"
+            >
+              {label}
+              <button
+                type="button"
+                onClick={() => {
+                  setTaskData((prev: any) => ({
+                    ...prev,
+                    labels: (prev.labels || []).filter((_: any, i: number) => i !== idx),
+                  }));
+                }}
+                className="hover:text-red-500 transition-colors cursor-pointer"
+                title={`Remove ${label}`}
+              >
+                <X className="w-3 h-3" />
+              </button>
+            </span>
+          ))}
+          {(!taskData.labels || taskData.labels.length === 0) && (
+            <span className="text-[11px] text-gray-400 italic">None</span>
+          )}
+        </div>
+
+        {/* Add Label Input */}
+        <div className="flex items-center gap-1.5">
+          <input
+            type="text"
+            placeholder="Add label and press Enter..."
+            value={labelInput}
+            onChange={(e) => setLabelInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === ",") {
+                e.preventDefault();
+                const trimmed = labelInput.trim().toLowerCase();
+                if (trimmed && !(taskData.labels || []).includes(trimmed)) {
+                  setTaskData((prev: any) => ({
+                    ...prev,
+                    labels: [...(prev.labels || []), trimmed],
+                  }));
+                  setLabelInput("");
+                }
+              }
+            }}
+            className={`${baseControlClasses} py-1.5 text-xs`}
+          />
+          <button
+            type="button"
+            onClick={() => {
+              const trimmed = labelInput.trim().toLowerCase();
+              if (trimmed && !(taskData.labels || []).includes(trimmed)) {
+                setTaskData((prev: any) => ({
+                  ...prev,
+                  labels: [...(prev.labels || []), trimmed],
+                }));
+                setLabelInput("");
+              }
+            }}
+            className="p-1.5 rounded-lg border border-sky-100 dark:border-gray-800 text-sky-600 dark:text-sky-400 hover:bg-sky-50 dark:hover:bg-gray-800 cursor-pointer shrink-0"
+            title="Add Label"
+          >
+            <Plus className="w-4 h-4" />
+          </button>
+        </div>
       </div>
 
       {/* Issue Linking Section (Only parent task) */}

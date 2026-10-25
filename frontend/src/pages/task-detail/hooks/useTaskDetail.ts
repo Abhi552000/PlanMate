@@ -179,8 +179,11 @@ export const useTaskDetail = (id: string | undefined, subtaskIndex: number | nul
         priority: parentTaskData.priority || "Low",
         dueDate: parentTaskData.dueDate ? new Date(parentTaskData.dueDate).toISOString().split("T")[0] : "",
         assignee: parentTaskData.assignee?._id || parentTaskData.assignee || "",
+        reporter: parentTaskData.reporter?._id || parentTaskData.reporter || parentTaskData.owner?._id || parentTaskData.owner || "",
         status: parentTaskData.status || "To Do",
         storyPoints: parentTaskData.storyPoints !== undefined ? parentTaskData.storyPoints : 1,
+        originalEstimate: parentTaskData.originalEstimate !== undefined ? parentTaskData.originalEstimate : 0,
+        labels: Array.isArray(parentTaskData.labels) ? parentTaskData.labels : [],
         issueType: parentTaskData.issueType || "Task"
       });
     }
@@ -240,8 +243,11 @@ export const useTaskDetail = (id: string | undefined, subtaskIndex: number | nul
           priority: taskData.priority,
           dueDate: taskData.dueDate || undefined,
           assignee: taskData.assignee || null,
+          reporter: taskData.reporter || null,
           status: taskData.status,
           storyPoints: Number(taskData.storyPoints),
+          originalEstimate: Number(taskData.originalEstimate || 0),
+          labels: Array.isArray(taskData.labels) ? taskData.labels : [],
           issueType: taskData.issueType
         };
       }

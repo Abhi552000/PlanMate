@@ -69,6 +69,20 @@ export const BacklogTaskRow: React.FC<BacklogTaskRowProps> = React.memo(({
             {(task.epic as any).name}
           </span>
         )}
+
+        {/* Labels */}
+        {task.labels && task.labels.length > 0 && (
+          <div className="flex items-center gap-1 shrink-0">
+            {task.labels.map((lbl: string, idx: number) => (
+              <span
+                key={idx}
+                className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-sky-50 dark:bg-sky-950/30 text-sky-600 dark:text-sky-400 border border-sky-100 dark:border-sky-900/40"
+              >
+                {lbl}
+              </span>
+            ))}
+          </div>
+        )}
       </div>
 
       <div className="flex items-center gap-3.5 text-xs shrink-0 flex-wrap sm:flex-nowrap justify-between sm:justify-end">
