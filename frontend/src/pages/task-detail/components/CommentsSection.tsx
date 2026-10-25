@@ -17,11 +17,7 @@ export const CommentsSection: React.FC<CommentsSectionProps> = ({
   members,
 }) => {
   return (
-    <div className="border-t border-sky-100/50 dark:border-gray-800 pt-5 mt-5">
-      <label className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-gray-400 mb-4">
-        <MessageSquare className="w-4 h-4 text-sky-500" /> Discussion Comments
-      </label>
-
+    <div className="space-y-4">
       {/* Comment Input */}
       <form onSubmit={onAddComment} className="flex gap-2 mb-4 w-full">
         <MentionInput

@@ -90,7 +90,7 @@ const TaskItem: React.FC<TaskItemProps> = ({
           task.priority === "High"
             ? "border-l-red-500"
             : task.priority === "Medium"
-            ? "border-l-amber-500"
+            ? "border-l-gray-300 dark:border-l-gray-700"
             : "border-l-green-500"
         }`}
       >
