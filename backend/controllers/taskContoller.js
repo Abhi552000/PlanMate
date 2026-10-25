@@ -65,6 +65,8 @@ export const createTask = async (req, res) => {
       storyPoints,
       subtasks,
       assignee,
+      reporter,
+      labels,
       links,
       originalEstimate,
     } = req.body;
@@ -114,6 +116,8 @@ export const createTask = async (req, res) => {
         originalEstimate !== undefined ? Number(originalEstimate) : 0,
       subtasks: subtasks || [],
       owner: req.user.id,
+      reporter: reporter || req.user.id,
+      labels: Array.isArray(labels) ? labels : [],
       assignee: assignee || null,
       key: generatedKey || undefined,
       organization: req.user.organization || null,
@@ -251,6 +255,7 @@ export const getTasks = async (req, res) => {
       const totalCount = await Task.countDocuments(query);
       const tasks = await Task.find(query)
         .populate("owner", "name email")
+        .populate("reporter", "name email")
         .populate("assignee", "name email")
         .populate("links.targetTask", "title key status priority completed")
         .sort(sortQuery)
@@ -273,6 +278,7 @@ export const getTasks = async (req, res) => {
     // Default: fetch all tasks
     const tasks = await Task.find(query)
       .populate("owner", "name email")
+      .populate("reporter", "name email")
       .populate("assignee", "name email")
       .populate("links.targetTask", "title key status priority completed")
       .sort(sortQuery)
@@ -294,6 +300,7 @@ export const getTaskById = async (req, res) => {
       : { owner: req.user.id };
     const task = await Task.findOne({ _id: req.params.id, ...query })
       .populate("owner", "name email")
+      .populate("reporter", "name email")
       .populate("assignee", "name email")
       .populate("history.updatedBy", "name email")
       .populate("comments.user", "name email avatar")
@@ -359,8 +366,10 @@ export const updateTask = async (req, res) => {
       "status",
       "priority",
       "assignee",
+      "reporter",
       "storyPoints",
       "originalEstimate",
+      "labels",
       "dueDate",
     ];
 
@@ -374,17 +383,21 @@ export const updateTask = async (req, res) => {
           oldVal = oldVal ? new Date(oldVal).toISOString().split("T")[0] : "";
           newVal = newVal ? new Date(newVal).toISOString().split("T")[0] : "";
         }
-        // Format assignees for comparison
-        if (field === "assignee") {
+        // Format assignees and reporters for comparison
+        if (field === "assignee" || field === "reporter") {
           oldVal = oldVal ? oldVal.toString() : "";
           newVal = newVal ? newVal.toString() : "";
+        }
+        if (field === "labels") {
+          oldVal = Array.isArray(oldVal) ? oldVal.slice().sort().join(", ") : "";
+          newVal = Array.isArray(newVal) ? newVal.slice().sort().join(", ") : "";
         }
 
         if (String(oldVal) !== String(newVal)) {
           let displayOldVal = String(oldVal);
           let displayNewVal = String(newVal);
 
-          if (field === "assignee") {
+          if (field === "assignee" || field === "reporter") {
             const oldUser = oldVal
               ? await mongoose.model("user").findById(oldVal)
               : null;
@@ -393,6 +406,10 @@ export const updateTask = async (req, res) => {
               : null;
             displayOldVal = oldUser ? oldUser.name : "Unassigned";
             displayNewVal = newUser ? newUser.name : "Unassigned";
+          }
+          if (field === "labels") {
+            displayOldVal = oldVal || "None";
+            displayNewVal = newVal || "None";
           }
 
           historyEntries.push({
@@ -465,6 +482,7 @@ export const updateTask = async (req, res) => {
 
     const updated = await Task.findById(task._id)
       .populate("owner", "name email")
+      .populate("reporter", "name email")
       .populate("assignee", "name email")
       .populate("history.updatedBy", "name email")
       .populate("comments.user", "name email avatar")

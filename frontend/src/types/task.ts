@@ -58,7 +58,9 @@ export interface ITask {
   dueDate?: string | Date;
   completed: boolean | number | string;
   owner: IUser | string;
+  reporter?: IUser | string | any;
   assignee?: IUser | string | any;
+  labels?: string[];
   subtasks: ISubtask[];
   history: IHistoryEntry[];
   organization?: string | null;

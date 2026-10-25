@@ -85,6 +85,20 @@ export const KanbanCard: React.FC<KanbanCardProps> = React.memo(({
             <MentionText text={task.description} />
           </p>
         )}
+
+        {/* Labels */}
+        {task.labels && task.labels.length > 0 && (
+          <div className="flex flex-wrap items-center gap-1 mt-1.5">
+            {task.labels.map((lbl, idx) => (
+              <span
+                key={idx}
+                className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-sky-50 dark:bg-sky-950/40 text-sky-600 dark:text-sky-400 border border-sky-100 dark:border-sky-900/40"
+              >
+                {lbl}
+              </span>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Bottom Row: Attributes & Transitions */}

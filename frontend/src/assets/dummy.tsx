@@ -34,6 +34,8 @@ export const DEFAULT_TASK = {
   completed: "No",
   id: null as string | null,
   originalEstimate: 0,
+  labels: [] as string[],
+  reporter: null as string | null,
 };
 
 // LOGIN CSS
