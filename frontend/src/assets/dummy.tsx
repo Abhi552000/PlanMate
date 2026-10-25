@@ -20,9 +20,9 @@ export const baseControlClasses =
   "w-full px-3 py-2 border border-sky-100 dark:border-gray-800 rounded-lg text-xs focus:ring-2 focus:ring-sky-500 focus:outline-none bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 font-medium transition-all duration-200";
 
 export const priorityStyles: Record<string, string> = {
-  Low: "bg-green-100 text-green-700 border-green-200",
-  Medium: "bg-sky-100 text-sky-700 border-sky-200",
-  High: "bg-cyan-100 text-cyan-700 border-cyan-200",
+  Low: "bg-green-100 text-green-700 border-green-200 dark:bg-green-950/30 dark:text-green-400 dark:border-green-900/40",
+  Medium: "bg-gray-100 text-gray-700 border-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700",
+  High: "bg-red-100 text-red-700 border-red-200 dark:bg-red-950/30 dark:text-red-400 dark:border-red-900/40",
 };
 
 // data/defaultTask.js
