@@ -13,6 +13,7 @@ import {
   Award,
   Edit2,
   Calendar,
+  BarChart2,
 } from "lucide-react";
 
 // FRONTEND CONSTANTS
@@ -73,6 +74,7 @@ export const menuItems = [
   { text: "Backlog", path: "/backlog", icon: <ListChecks className="w-5 h-5" /> },
   { text: "Active Sprint", path: "/active-sprint", icon: <Flame className="w-5 h-5" /> },
   { text: "Calendar", path: "/calendar", icon: <Calendar className="w-5 h-5" /> },
+  { text: "Reports", path: "/reports", icon: <BarChart2 className="w-5 h-5" /> },
 ];
 
 export const SIDEBAR_CLASSES = {

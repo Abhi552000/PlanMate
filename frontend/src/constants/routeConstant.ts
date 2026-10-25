@@ -10,4 +10,5 @@ export const ROUTES = {
   BACKLOG: "/backlog",
   ACTIVE_SPRINT: "/active-sprint",
   CALENDAR: "/calendar",
+  REPORTS: "/reports",
 };
