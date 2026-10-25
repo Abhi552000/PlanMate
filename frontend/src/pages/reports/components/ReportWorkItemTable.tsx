@@ -176,7 +176,7 @@ export const ReportWorkItemTable: React.FC<ReportWorkItemTableProps> = ({
             <option value="Low">Low</option>
           </select>
 
-          {/* Export Button (Jira-style) */}
+          {/* Export Button */}
           <button
             onClick={handleExportCSV}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-sky-50 dark:bg-sky-950/60 hover:bg-sky-100 dark:hover:bg-sky-900/60 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800 transition-colors cursor-pointer"

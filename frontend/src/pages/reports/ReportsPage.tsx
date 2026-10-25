@@ -146,7 +146,7 @@ export const ReportsPage: React.FC = () => {
             </h1>
           </div>
           <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1">
-            Deep Jira-style insights into team velocity, cycle time, completion throughput, and work items.
+            Comprehensive insights into team velocity, cycle time, completion throughput, and work items.
           </p>
         </div>
 
@@ -180,8 +180,8 @@ export const ReportsPage: React.FC = () => {
         </div>
       </div>
 
-      {/* 1. Top 4 7-Day KPI Cards */}
-      <ReportSummaryKPIs kpis={kpis} onFilterClick={handleKPIClick} />
+      {/* 1. Top 4 7-Day KPI Cards (Commented out for now) */}
+      {/* <ReportSummaryKPIs kpis={kpis} onFilterClick={handleKPIClick} /> */}
 
       {/* 2. Donut Breakdown Charts (Status, Type, Assignee) */}
       <ReportDonutBreakdowns
@@ -206,7 +206,7 @@ export const ReportsPage: React.FC = () => {
         onSelectTask={(task) => navigate(`/task/${task._id}`)}
       />
 
-      {/* 5. Jira-Style View Work Items Side Drawer */}
+      {/* 5. View Work Items Side Drawer */}
       <ReportWorkItemDrawer
         isOpen={drawerOpen}
         onClose={() => setDrawerOpen(false)}
