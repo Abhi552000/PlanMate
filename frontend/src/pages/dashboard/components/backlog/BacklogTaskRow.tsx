@@ -1,9 +1,22 @@
 import React from "react";
-import { CheckSquare, User } from "lucide-react";
+import { CheckSquare, Bug, BookOpen, Award, User } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { BacklogTaskRowProps } from "../../../../types";
 import { EPIC_COLORS } from "../../../../constants/uiTexts";
 import { getPriorityStyle } from "../../../../utils";
+
+const getIssueTypeIcon = (type?: string) => {
+  switch (type?.toLowerCase()) {
+    case "bug":
+      return <Bug className="w-4 h-4 text-rose-500 fill-rose-500/20 shrink-0" />;
+    case "story":
+      return <BookOpen className="w-4 h-4 text-emerald-500 fill-emerald-500/20 shrink-0" />;
+    case "epic":
+      return <Award className="w-4 h-4 text-purple-500 fill-purple-500/20 shrink-0" />;
+    default:
+      return <CheckSquare className="w-4 h-4 text-sky-500 fill-sky-500/20 shrink-0" />;
+  }
+};
 
 export const BacklogTaskRow: React.FC<BacklogTaskRowProps> = React.memo(({
   task,
@@ -27,25 +40,25 @@ export const BacklogTaskRow: React.FC<BacklogTaskRowProps> = React.memo(({
         if (target.closest("button") || target.closest("select")) return;
         navigate(`/task/${task._id}`);
       }}
-      className={`flex flex-col sm:flex-row sm:items-center justify-between p-2 sm:p-2.5 bg-white dark:bg-gray-900 hover:bg-sky-5/30 dark:hover:bg-gray-800/35 rounded-xl border border-sky-100/70 dark:border-gray-800 shadow-xs transition-all duration-200 cursor-pointer gap-3 border-l-4 ${task.priority === "High"
-        ? "border-l-red-500"
+      className={`flex flex-col sm:flex-row sm:items-center justify-between p-2 sm:p-2.5 bg-white dark:bg-gray-900 hover:bg-sky-50/40 dark:hover:bg-gray-800/40 rounded-xl border border-sky-100/70 dark:border-gray-800 shadow-xs transition-all duration-200 cursor-pointer gap-3 border-l-4 ${task.priority === "High"
+        ? "border-l-rose-500"
         : task.priority === "Medium"
-          ? "border-l-sky-500"
-          : "border-l-green-500"
+          ? "border-l-amber-500"
+          : "border-l-emerald-500"
         }`}
     >
       <div className="flex items-center gap-3 min-w-0 flex-1">
         {/* Drag Handle */}
-        <div className="text-gray-305 dark:text-gray-650 cursor-grab active:cursor-grabbing shrink-0 flex flex-col gap-0.5">
+        <div className="text-gray-400 dark:text-gray-600 cursor-grab active:cursor-grabbing shrink-0 flex flex-col gap-0.5">
           <span className="w-1.5 h-0.5 bg-current rounded-full" />
           <span className="w-1.5 h-0.5 bg-current rounded-full" />
           <span className="w-1.5 h-0.5 bg-current rounded-full" />
         </div>
 
-        <CheckSquare className="w-4 h-4 text-sky-500 fill-sky-50 dark:fill-sky-950/20 shrink-0" />
+        {getIssueTypeIcon(task.issueType)}
 
         {/* Issue Key */}
-        <span className="text-xs font-bold text-gray-400 select-all shrink-0">
+        <span className="text-[11px] font-bold text-sky-700 dark:text-sky-300 bg-sky-100/80 dark:bg-sky-950/80 px-2 py-0.5 rounded border border-sky-200 dark:border-sky-800 select-all shrink-0">
           {task.key ||
             `PM-${task._id ? task._id.slice(-4).toUpperCase() : "TASK"}`}
         </span>
@@ -54,7 +67,7 @@ export const BacklogTaskRow: React.FC<BacklogTaskRowProps> = React.memo(({
         <h3
           className={`text-sm font-semibold truncate ${isCompleted
             ? "text-gray-400 line-through"
-            : "text-gray-750 dark:text-gray-200"
+            : "text-gray-800 dark:text-gray-200"
             }`}
         >
           {task.title}

@@ -86,18 +86,18 @@ const TaskItem: React.FC<TaskItemProps> = ({
           if (target.closest("button") || target.closest("select")) return;
           navigate(`/task/${task._id}`);
         }}
-        className={`flex flex-col sm:flex-row sm:items-center justify-between p-3.5 bg-white dark:bg-gray-900 hover:bg-sky-50/30 dark:hover:bg-gray-800/35 rounded-xl border border-sky-100/70 dark:border-gray-800 shadow-sm transition-all duration-200 cursor-pointer gap-3 border-l-4 ${
+        className={`flex flex-col sm:flex-row sm:items-center justify-between p-3.5 bg-white dark:bg-gray-900 hover:bg-sky-50/40 dark:hover:bg-gray-800/40 rounded-xl border border-sky-100/70 dark:border-gray-800 shadow-sm transition-all duration-200 cursor-pointer gap-3 border-l-4 ${
           task.priority === "High"
-            ? "border-l-red-500"
+            ? "border-l-rose-500"
             : task.priority === "Medium"
-            ? "border-l-gray-300 dark:border-l-gray-700"
-            : "border-l-green-500"
+            ? "border-l-amber-500"
+            : "border-l-emerald-500"
         }`}
       >
         <div className="flex items-center gap-3 min-w-0 flex-1">
           <CheckSquare className="w-4 h-4 text-sky-500 fill-sky-50 dark:fill-sky-950/20 shrink-0" />
 
-          <span className="text-xs font-bold text-gray-400 select-all shrink-0">
+          <span className="text-[11px] font-bold text-sky-700 dark:text-sky-300 bg-sky-100/80 dark:bg-sky-950/80 px-2 py-0.5 rounded border border-sky-200 dark:border-sky-800 select-all shrink-0">
             {task.key ||
               `PM-${task._id ? task._id.slice(-4).toUpperCase() : "TASK"}`}
           </span>

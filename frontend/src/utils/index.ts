@@ -3,11 +3,12 @@ import { ITask } from "../types";
 export const getPriorityStyle = (priority?: string) => {
   switch (priority?.toLowerCase()) {
     case "high":
-      return "text-red-605 bg-red-50 dark:bg-red-950/20 border-red-100 dark:border-red-900/30";
+      return "text-rose-700 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 border-rose-200 dark:border-rose-900/50";
     case "medium":
-      return "text-gray-700 dark:text-gray-300 bg-gray-100/80 dark:bg-gray-800/60 border-gray-200 dark:border-gray-700";
+      return "text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 border-amber-200 dark:border-amber-900/50";
+    case "low":
     default:
-      return "text-green-605 bg-green-50 dark:bg-green-950/20 border-green-100 dark:border-green-900/30";
+      return "text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-900/50";
   }
 };
 

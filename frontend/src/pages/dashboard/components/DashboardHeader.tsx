@@ -51,16 +51,16 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = React.memo(({
           ({ key, label, icon: Icon, iconColor, borderColor, valueKey }) => (
             <div
               key={key}
-              className={`${STAT_CARD} ${borderColor} dark:bg-gray-900/40 backdrop-blur-sm`}
+              className={`${STAT_CARD} ${borderColor} dark:bg-gray-900/60 backdrop-blur-sm hover:border-opacity-100 transition-all`}
             >
-              <div className=" flex items-center gap-2 md:gap-3">
+              <div className="flex items-center gap-2 md:gap-3">
                 <div className={`${ICON_WRAPPER} ${iconColor}`}>
-                  <Icon className=" w-4 h-4 md:w-5 md:h-5" />
+                  <Icon className="w-4 h-4 md:w-5 md:h-5" />
                 </div>
 
-                <div className=" min-w-0">
+                <div className="min-w-0">
                   <p
-                    className={`${VALUE_CLASS} text-gray-850 dark:text-gray-100 font-bold`}
+                    className={`${VALUE_CLASS} text-gray-900 dark:text-gray-100 font-bold`}
                   >
                     {statsValues[valueKey]}
                   </p>
