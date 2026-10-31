@@ -1,5 +1,5 @@
 import React from "react";
-import { CheckCircle2, Edit3, PlusSquare, Calendar } from "lucide-react";
+import { CheckCircle2, Clock, PlusSquare, Calendar } from "lucide-react";
 import { IReportKPIs } from "../utils/reportCalculations";
 
 interface ReportSummaryKPIsProps {
@@ -8,38 +8,63 @@ interface ReportSummaryKPIsProps {
 }
 
 export const ReportSummaryKPIs: React.FC<ReportSummaryKPIsProps> = ({ kpis, onFilterClick }) => {
+  const isAllTime = kpis.timeframe === "all";
+  const is30d = kpis.timeframe === "30d";
+
   const cards = [
     {
       id: "completed",
-      count: kpis.completedLast7Days,
-      label: "work items completed in the last 7 days",
+      title: "Resolved",
+      count: kpis.completedCount,
+      subtitle: isAllTime
+        ? `${kpis.completionRate} resolution rate (${kpis.completedCount} of ${kpis.totalCount})`
+        : is30d
+        ? "Resolved in last 30 days"
+        : "Resolved this week",
       icon: CheckCircle2,
-      iconColor: "text-emerald-500 bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-800/60",
-      borderColor: "border-emerald-100/80 dark:border-gray-800",
+      iconColor:
+        "text-[#36b37e] bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60",
     },
     {
-      id: "updated",
-      count: kpis.updatedLast7Days,
-      label: "work items updated in the last 7 days",
-      icon: Edit3,
-      iconColor: "text-sky-500 bg-sky-50 dark:bg-sky-950/40 border-sky-200 dark:border-sky-800/60",
-      borderColor: "border-sky-100/80 dark:border-gray-800",
+      id: "inProgress",
+      title: kpis.inProgressCount > 0 ? "In Progress" : "Open Work",
+      count: kpis.inProgressCount > 0 ? kpis.inProgressCount : kpis.openCount,
+      subtitle: isAllTime
+        ? kpis.inProgressCount > 0
+          ? "Under active development"
+          : "Unresolved backlog & sprint items"
+        : is30d
+        ? "Active in last 30 days"
+        : "Active this week",
+      icon: Clock,
+      iconColor:
+        "text-[#ffab00] bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60",
     },
     {
       id: "created",
-      count: kpis.createdLast7Days,
-      label: "work items created in the last 7 days",
+      title: "Created",
+      count: kpis.createdCount,
+      subtitle: isAllTime
+        ? "Total intake logged in project"
+        : is30d
+        ? "Created in last 30 days"
+        : "Created this week",
       icon: PlusSquare,
-      iconColor: "text-cyan-500 bg-cyan-50 dark:bg-cyan-950/40 border-cyan-200 dark:border-cyan-800/60",
-      borderColor: "border-cyan-100/80 dark:border-gray-800",
+      iconColor:
+        "text-[#0052cc] bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800/60",
     },
     {
       id: "due",
-      count: kpis.dueNext7Days,
-      label: "work items due in the next 7 days",
+      title: "Due Soon",
+      count: kpis.dueCount,
+      subtitle: isAllTime
+        ? "Active items with due date"
+        : is30d
+        ? "Due in next 30 days"
+        : "Due within next 7 days",
       icon: Calendar,
-      iconColor: "text-rose-500 bg-rose-50 dark:bg-rose-950/40 border-rose-200 dark:border-rose-800/60",
-      borderColor: "border-rose-100/80 dark:border-gray-800",
+      iconColor:
+        "text-[#ff5630] bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800/60",
     },
   ];
 
@@ -51,19 +76,29 @@ export const ReportSummaryKPIs: React.FC<ReportSummaryKPIsProps> = ({ kpis, onFi
           <div
             key={card.id}
             onClick={() => onFilterClick?.(card.id)}
-            className={`p-4 rounded-xl bg-white dark:bg-gray-900/60 border ${card.borderColor} shadow-xs hover:shadow-md transition-all duration-200 flex items-center gap-3.5 cursor-pointer group backdrop-blur-xs`}
+            className="p-4 rounded-lg bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 hover:shadow-xs transition-all cursor-pointer flex flex-col justify-between"
           >
-            <div className={`p-2 rounded-lg border shrink-0 ${card.iconColor} group-hover:scale-105 transition-transform`}>
-              <Icon className="w-5 h-5" />
-            </div>
-            <div className="min-w-0">
-              <span className="text-base font-bold text-gray-900 dark:text-gray-100">
-                {card.count} {card.label.split(" ")[0]}
+            {/* Top row: Title + Jira Icon */}
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                {card.title}
               </span>
-              <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
-                {card.label.replace(/^\w+\s/, "")}
-              </p>
+              <div className={`p-1.5 rounded-md shrink-0 ${card.iconColor}`}>
+                <Icon className="w-4 h-4" />
+              </div>
             </div>
+
+            {/* Metric Value */}
+            <div className="my-2.5">
+              <span className="text-2xl sm:text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
+                {card.count}
+              </span>
+            </div>
+
+            {/* Insight / Helper */}
+            <p className="text-xs text-gray-500 dark:text-gray-400 truncate font-normal">
+              {card.subtitle}
+            </p>
           </div>
         );
       })}

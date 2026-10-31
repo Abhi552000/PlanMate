@@ -21,6 +21,16 @@ export const ReportWorkItemDrawer: React.FC<ReportWorkItemDrawerProps> = ({
 }) => {
   const navigate = useNavigate();
 
+  React.useEffect(() => {
+    if (isOpen) {
+      const originalOverflow = document.body.style.overflow;
+      document.body.style.overflow = "hidden";
+      return () => {
+        document.body.style.overflow = originalOverflow || "auto";
+      };
+    }
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   const getWorkTypeIcon = (type?: string) => {

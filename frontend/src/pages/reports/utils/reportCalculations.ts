@@ -1,12 +1,5 @@
 import { ITask } from "../../../types";
 
-export interface IReportKPIs {
-  completedLast7Days: number;
-  updatedLast7Days: number;
-  createdLast7Days: number;
-  dueNext7Days: number;
-}
-
 export interface IDonutItem {
   name: string;
   value: number;
@@ -47,31 +40,35 @@ export interface ICreationTrendPoint {
 }
 
 const STATUS_COLORS: Record<string, string> = {
-  "to do": "#38bdf8", // Sky
-  "in progress": "#f59e0b", // Amber
-  "done": "#10b981", // Emerald
-  "reopen": "#a855f7", // Purple
-  "closed": "#64748b", // Slate
-  "qa ready": "#06b6d4",
-  "cr ready": "#6366f1",
+  "to do": "#4c9aff", // Jira Blue
+  "in progress": "#ffab00", // Jira Amber
+  "done": "#36b37e", // Jira Green
+  "reopen": "#6554c0", // Jira Purple
+  "closed": "#5e6c84", // Jira Gray
+  "qa ready": "#00b8d9", // Jira Teal
+  "cr ready": "#5243aa", // Jira Indigo
+  "backlog": "#6b778c",
 };
 
 const TYPE_COLORS: Record<string, string> = {
-  task: "#0ea5e9", // Sky
-  bug: "#f43f5e", // Rose
-  story: "#10b981", // Emerald
-  epic: "#8b5cf6", // Purple
+  task: "#4c9aff", // Jira Blue
+  bug: "#ff5630", // Jira Crimson
+  story: "#36b37e", // Jira Green
+  epic: "#6554c0", // Jira Purple
+  subtask: "#00b8d9", // Jira Teal
 };
 
 const ASSIGNEE_PALETTE = [
-  "#38bdf8",
-  "#10b981",
-  "#f59e0b",
-  "#ec4899",
-  "#8b5cf6",
-  "#06b6d4",
-  "#f97316",
-  "#64748b",
+  "#0052cc", // Jira Navy
+  "#36b37e", // Jira Green
+  "#ffab00", // Jira Amber
+  "#6554c0", // Jira Purple
+  "#00b8d9", // Jira Teal
+  "#ff5630", // Jira Red
+  "#42526e", // Jira Slate
+  "#2684ff", // Jira Bright Blue
+  "#57d9a3", // Jira Sage
+  "#8777d9", // Jira Lavender
 ];
 
 // Helper: Get days difference
@@ -80,51 +77,110 @@ export const getDaysDiff = (d1: Date, d2: Date) => {
   return Math.max(0, Math.round(diffTime / (1000 * 60 * 60 * 24)));
 };
 
-// 1. Calculate Top 4 7-Day KPIs
-export const calculateReportKPIs = (tasks: ITask[]): IReportKPIs => {
-  const now = new Date();
-  const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-  const sevenDaysFuture = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+export interface IReportKPIs {
+  completedCount: number;
+  inProgressCount: number;
+  openCount: number;
+  createdCount: number;
+  dueCount: number;
+  totalCount: number;
+  completionRate: string;
+  timeframe: "all" | "30d" | "7d";
+  periodLabel: string;
+}
 
-  let completedLast7Days = 0;
-  let updatedLast7Days = 0;
-  let createdLast7Days = 0;
-  let dueNext7Days = 0;
+// 1. Calculate Dynamic KPIs based on selected timeframe
+export const calculateReportKPIs = (
+  tasks: ITask[],
+  timeframe: "all" | "30d" | "7d" = "all"
+): IReportKPIs => {
+  const now = new Date();
+  const days = timeframe === "7d" ? 7 : timeframe === "30d" ? 30 : null;
+  const pastCutoff = days ? new Date(now.getTime() - days * 24 * 60 * 60 * 1000) : null;
+  const futureCutoff = days ? new Date(now.getTime() + days * 24 * 60 * 60 * 1000) : null;
+
+  let completedCount = 0;
+  let inProgressCount = 0;
+  let openCount = 0;
+  let createdCount = 0;
+  let dueCount = 0;
 
   tasks.forEach((t) => {
-    // Completed in last 7 days
-    const isDone = t.status === "Done" || t.completed === true || t.completed === "Yes";
+    const isDone =
+      t.status === "Done" ||
+      t.completed === true ||
+      t.completed === "Yes" ||
+      (t.status || "").toLowerCase() === "done" ||
+      (t.status || "").toLowerCase() === "closed";
+
+    const statusLower = (t.status || "").toLowerCase();
+    const isInProgress =
+      !isDone &&
+      (statusLower.includes("progress") ||
+        statusLower.includes("qa") ||
+        statusLower.includes("cr") ||
+        statusLower.includes("review") ||
+        statusLower === "reopen");
+
     const updatedAt = t.updatedAt ? new Date(t.updatedAt) : null;
     const createdAt = t.createdAt ? new Date(t.createdAt) : null;
+    const activityDate = updatedAt || createdAt;
 
-    if (isDone && updatedAt && updatedAt >= sevenDaysAgo && updatedAt <= now) {
-      completedLast7Days++;
+    // Completed
+    if (isDone) {
+      if (!pastCutoff || (activityDate && activityDate >= pastCutoff && activityDate <= now)) {
+        completedCount++;
+      }
+    } else {
+      openCount++;
     }
 
-    // Updated in last 7 days
-    if (updatedAt && updatedAt >= sevenDaysAgo && updatedAt <= now) {
-      updatedLast7Days++;
+    // In Progress / Active Work
+    if (isInProgress) {
+      if (!pastCutoff || (activityDate && activityDate >= pastCutoff && activityDate <= now)) {
+        inProgressCount++;
+      }
     }
 
-    // Created in last 7 days
-    if (createdAt && createdAt >= sevenDaysAgo && createdAt <= now) {
-      createdLast7Days++;
+    // Created
+    if (createdAt) {
+      if (!pastCutoff || (createdAt >= pastCutoff && createdAt <= now)) {
+        createdCount++;
+      }
+    } else if (!pastCutoff) {
+      createdCount++;
     }
 
-    // Due in next 7 days (and not already completed)
+    // Due
     if (t.dueDate && !isDone) {
       const due = new Date(t.dueDate);
-      if (due >= now && due <= sevenDaysFuture) {
-        dueNext7Days++;
+      if (!futureCutoff || (due >= now && due <= futureCutoff)) {
+        dueCount++;
       }
     }
   });
 
+  const totalCount = tasks.length;
+  const completionRate =
+    totalCount > 0 ? `${((completedCount / totalCount) * 100).toFixed(1)}%` : "0%";
+
+  const periodLabel =
+    timeframe === "7d"
+      ? "the last 7 days"
+      : timeframe === "30d"
+      ? "the last 30 days"
+      : "all time";
+
   return {
-    completedLast7Days,
-    updatedLast7Days,
-    createdLast7Days,
-    dueNext7Days,
+    completedCount,
+    inProgressCount,
+    openCount,
+    createdCount,
+    dueCount,
+    totalCount,
+    completionRate,
+    timeframe,
+    periodLabel,
   };
 };
 
@@ -233,79 +289,145 @@ export const getCycleTimeData = (tasks: ITask[]): ICycleTimePoint[] => {
 };
 
 // 7. Work Item Completion Trend (by Month/Period, stacked by Type)
-export const getCompletionTrendData = (tasks: ITask[]): ICompletionTrendPoint[] => {
-  const periodMap: Record<string, { task: number; bug: number; story: number; epic: number }> = {};
+export const getCompletionTrendData = (
+  tasks: ITask[],
+  timeframe: "all" | "30d" | "7d" = "all"
+): ICompletionTrendPoint[] => {
+  const periodMap: Record<
+    string,
+    { task: number; bug: number; story: number; epic: number; label: string; sortKey: string }
+  > = {};
 
   tasks.forEach((t) => {
-    const isDone = t.status === "Done" || t.completed === true;
+    const isDone =
+      t.status === "Done" ||
+      t.completed === true ||
+      t.completed === "Yes" ||
+      (t.status || "").toLowerCase() === "done" ||
+      (t.status || "").toLowerCase() === "closed";
     if (!isDone) return;
-    const d = t.updatedAt ? new Date(t.updatedAt) : new Date();
-    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+    const d = t.updatedAt ? new Date(t.updatedAt) : t.createdAt ? new Date(t.createdAt) : new Date();
 
-    if (!periodMap[key]) {
-      periodMap[key] = { task: 0, bug: 0, story: 0, epic: 0 };
+    let label = "";
+    let sortKey = "";
+
+    if (timeframe === "7d") {
+      label = d.toLocaleDateString("en-US", { weekday: "short", month: "numeric", day: "numeric" });
+      sortKey = d.toISOString().split("T")[0];
+    } else if (timeframe === "30d") {
+      label = d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+      sortKey = d.toISOString().split("T")[0];
+    } else {
+      label = d.toLocaleDateString("en-US", { month: "short", year: "2-digit" });
+      sortKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+    }
+
+    if (!periodMap[sortKey]) {
+      periodMap[sortKey] = { task: 0, bug: 0, story: 0, epic: 0, sortKey, label };
     }
 
     const type = (t.issueType || "Task").toLowerCase();
-    if (type === "bug") periodMap[key].bug++;
-    else if (type === "story") periodMap[key].story++;
-    else if (type === "epic") periodMap[key].epic++;
-    else periodMap[key].task++;
+    if (type === "bug") periodMap[sortKey].bug++;
+    else if (type === "story") periodMap[sortKey].story++;
+    else if (type === "epic") periodMap[sortKey].epic++;
+    else periodMap[sortKey].task++;
   });
 
-  const sortedPeriods = Object.keys(periodMap).sort().slice(-6);
+  const sortedKeys = Object.keys(periodMap).sort();
+  const recentKeys = sortedKeys.slice(timeframe === "all" ? -6 : -8);
 
-  // If no completed items, fallback to current month
-  if (sortedPeriods.length === 0) {
+  // If no completed items, fallback
+  if (recentKeys.length === 0) {
     const now = new Date();
-    const curKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
-    return [{ period: curKey, task: 0, bug: 0, story: 0, epic: 0, total: 0 }];
+    const curLabel =
+      timeframe === "7d"
+        ? now.toLocaleDateString("en-US", { weekday: "short", month: "numeric", day: "numeric" })
+        : timeframe === "30d"
+        ? now.toLocaleDateString("en-US", { month: "short", day: "numeric" })
+        : now.toLocaleDateString("en-US", { month: "short", year: "2-digit" });
+    return [{ period: curLabel, task: 0, bug: 0, story: 0, epic: 0, total: 0 }];
   }
 
-  return sortedPeriods.map((period) => {
-    const entry = periodMap[period];
+  return recentKeys.map((k) => {
+    const entry = periodMap[k];
     const total = entry.task + entry.bug + entry.story + entry.epic;
     return {
-      period,
-      ...entry,
+      period: entry.label || k,
+      task: entry.task,
+      bug: entry.bug,
+      story: entry.story,
+      epic: entry.epic,
       total,
     };
   });
 };
 
 // 8. Work Item Creation Trend (by Week/Month, stacked by Status)
-export const getCreationTrendData = (tasks: ITask[]): ICreationTrendPoint[] => {
-  const map: Record<string, { todo: number; inProgress: number; done: number; reopen: number }> = {};
+export const getCreationTrendData = (
+  tasks: ITask[],
+  timeframe: "all" | "30d" | "7d" = "all"
+): ICreationTrendPoint[] => {
+  const map: Record<
+    string,
+    { todo: number; inProgress: number; done: number; reopen: number; label: string; sortKey: string }
+  > = {};
 
   tasks.forEach((t) => {
     const d = t.createdAt ? new Date(t.createdAt) : new Date();
-    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
 
-    if (!map[key]) {
-      map[key] = { todo: 0, inProgress: 0, done: 0, reopen: 0 };
+    let label = "";
+    let sortKey = "";
+
+    if (timeframe === "7d") {
+      label = d.toLocaleDateString("en-US", { weekday: "short", month: "numeric", day: "numeric" });
+      sortKey = d.toISOString().split("T")[0];
+    } else if (timeframe === "30d") {
+      label = d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+      sortKey = d.toISOString().split("T")[0];
+    } else {
+      label = d.toLocaleDateString("en-US", { month: "short", year: "2-digit" });
+      sortKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+    }
+
+    if (!map[sortKey]) {
+      map[sortKey] = { todo: 0, inProgress: 0, done: 0, reopen: 0, label, sortKey };
     }
 
     const status = (t.status || "To Do").toLowerCase();
-    if (status.includes("progress")) map[key].inProgress++;
-    else if (status.includes("done") || status.includes("closed")) map[key].done++;
-    else if (status.includes("reopen")) map[key].reopen++;
-    else map[key].todo++;
+    if (status.includes("progress") || status.includes("qa") || status.includes("cr")) {
+      map[sortKey].inProgress++;
+    } else if (status.includes("done") || status.includes("closed") || t.completed) {
+      map[sortKey].done++;
+    } else if (status.includes("reopen")) {
+      map[sortKey].reopen++;
+    } else {
+      map[sortKey].todo++;
+    }
   });
 
-  const sortedKeys = Object.keys(map).sort().slice(-6);
+  const sortedKeys = Object.keys(map).sort();
+  const recentKeys = sortedKeys.slice(timeframe === "all" ? -6 : -8);
 
-  if (sortedKeys.length === 0) {
+  if (recentKeys.length === 0) {
     const now = new Date();
-    const curKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
-    return [{ period: curKey, todo: 0, inProgress: 0, done: 0, reopen: 0, total: 0 }];
+    const curLabel =
+      timeframe === "7d"
+        ? now.toLocaleDateString("en-US", { weekday: "short", month: "numeric", day: "numeric" })
+        : timeframe === "30d"
+        ? now.toLocaleDateString("en-US", { month: "short", day: "numeric" })
+        : now.toLocaleDateString("en-US", { month: "short", year: "2-digit" });
+    return [{ period: curLabel, todo: 0, inProgress: 0, done: 0, reopen: 0, total: 0 }];
   }
 
-  return sortedKeys.map((period) => {
-    const entry = map[period];
+  return recentKeys.map((k) => {
+    const entry = map[k];
     const total = entry.todo + entry.inProgress + entry.done + entry.reopen;
     return {
-      period,
-      ...entry,
+      period: entry.label || k,
+      todo: entry.todo,
+      inProgress: entry.inProgress,
+      done: entry.done,
+      reopen: entry.reopen,
       total,
     };
   });

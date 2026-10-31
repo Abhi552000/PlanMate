@@ -22,7 +22,7 @@ export const ReportsPage: React.FC = () => {
   const { tasks, refreshTasks } = useOutletContext<DashboardContext>();
   const navigate = useNavigate();
 
-  const [timeframe, setTimeframe] = useState<"all" | "30d" | "14d" | "7d">("all");
+  const [timeframe, setTimeframe] = useState<"all" | "30d" | "7d">("all");
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   // Drawer state for drilldowns
@@ -35,7 +35,7 @@ export const ReportsPage: React.FC = () => {
   const filteredTasks = useMemo(() => {
     if (timeframe === "all") return tasks;
     const now = new Date().getTime();
-    const daysMap = { "7d": 7, "14d": 14, "30d": 30 };
+    const daysMap = { "7d": 7, "30d": 30 };
     const cutoff = now - (daysMap[timeframe] || 30) * 24 * 60 * 60 * 1000;
 
     return tasks.filter((t) => {
@@ -44,15 +44,21 @@ export const ReportsPage: React.FC = () => {
     });
   }, [tasks, timeframe]);
 
-  // Calculated Metrics
-  const kpis = useMemo(() => calculateReportKPIs(tasks), [tasks]);
+  // Calculated Metrics (KPIs and trends dynamically adjust with timeframe)
+  const kpis = useMemo(() => calculateReportKPIs(tasks, timeframe), [tasks, timeframe]);
   const statusDonut = useMemo(() => getWorkItemsByStatus(filteredTasks), [filteredTasks]);
   const typeDonut = useMemo(() => getWorkItemsByType(filteredTasks), [filteredTasks]);
   const assigneeDonut = useMemo(() => getWorkItemsByAssignee(filteredTasks), [filteredTasks]);
   const leadTimeData = useMemo(() => getLeadTimeData(filteredTasks), [filteredTasks]);
   const cycleTimeData = useMemo(() => getCycleTimeData(filteredTasks), [filteredTasks]);
-  const completionTrendData = useMemo(() => getCompletionTrendData(filteredTasks), [filteredTasks]);
-  const creationTrendData = useMemo(() => getCreationTrendData(filteredTasks), [filteredTasks]);
+  const completionTrendData = useMemo(
+    () => getCompletionTrendData(filteredTasks, timeframe),
+    [filteredTasks, timeframe]
+  );
+  const creationTrendData = useMemo(
+    () => getCreationTrendData(filteredTasks, timeframe),
+    [filteredTasks, timeframe]
+  );
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
@@ -63,38 +69,55 @@ export const ReportsPage: React.FC = () => {
   // KPI card click handler
   const handleKPIClick = (type: string) => {
     const now = new Date();
-    const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-    const sevenDaysFuture = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+    const days = timeframe === "7d" ? 7 : timeframe === "30d" ? 30 : null;
+    const pastCutoff = days ? new Date(now.getTime() - days * 24 * 60 * 60 * 1000) : null;
+    const futureCutoff = days ? new Date(now.getTime() + days * 24 * 60 * 60 * 1000) : null;
 
     let matching: ITask[] = [];
     let title = "";
 
     if (type === "completed") {
-      title = "Completed in last 7 days";
+      title = `Resolved Issues (${timeframe === "all" ? "All Time" : timeframe === "30d" ? "Last 30 Days" : "Last 7 Days"})`;
       matching = tasks.filter((t) => {
-        const isDone = t.status === "Done" || t.completed === true;
-        const d = t.updatedAt ? new Date(t.updatedAt) : null;
-        return isDone && d && d >= sevenDaysAgo && d <= now;
+        const isDone =
+          t.status === "Done" ||
+          t.completed === true ||
+          t.completed === "Yes" ||
+          (t.status || "").toLowerCase() === "done" ||
+          (t.status || "").toLowerCase() === "closed";
+        const d = t.updatedAt ? new Date(t.updatedAt) : t.createdAt ? new Date(t.createdAt) : null;
+        return isDone && (!pastCutoff || (d && d >= pastCutoff && d <= now));
       });
-    } else if (type === "updated") {
-      title = "Updated in last 7 days";
+    } else if (type === "inProgress" || type === "open") {
+      title = `In Progress / Active Issues`;
       matching = tasks.filter((t) => {
-        const d = t.updatedAt ? new Date(t.updatedAt) : null;
-        return d && d >= sevenDaysAgo && d <= now;
+        const isDone =
+          t.status === "Done" ||
+          t.completed === true ||
+          t.completed === "Yes" ||
+          (t.status || "").toLowerCase() === "done" ||
+          (t.status || "").toLowerCase() === "closed";
+        return !isDone;
       });
     } else if (type === "created") {
-      title = "Created in last 7 days";
+      title = `Created Issues (${timeframe === "all" ? "All Time" : timeframe === "30d" ? "Last 30 Days" : "Last 7 Days"})`;
       matching = tasks.filter((t) => {
         const d = t.createdAt ? new Date(t.createdAt) : null;
-        return d && d >= sevenDaysAgo && d <= now;
+        return !pastCutoff || (d && d >= pastCutoff && d <= now);
       });
     } else if (type === "due") {
-      title = "Due in next 7 days";
+      title =
+        timeframe === "all"
+          ? "Due & Open Issues"
+          : `Due in ${kpis.periodLabel.replace("the last", "the next")}`;
       matching = tasks.filter((t) => {
-        const isDone = t.status === "Done" || t.completed === true;
+        const isDone =
+          t.status === "Done" ||
+          t.completed === true ||
+          (t.status || "").toLowerCase() === "done";
         if (!t.dueDate || isDone) return false;
         const d = new Date(t.dueDate);
-        return d >= now && d <= sevenDaysFuture;
+        return !futureCutoff || (d >= now && d <= futureCutoff);
       });
     }
 
@@ -133,34 +156,29 @@ export const ReportsPage: React.FC = () => {
   };
 
   return (
-    <div className="w-full space-y-6 pb-12 animate-fadeIn font-sans">
+    <div className="w-full space-y-6 pb-12 font-sans">
       {/* Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-sky-100/70 dark:border-gray-800">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-gray-200 dark:border-gray-800">
         <div>
-          <div className="flex items-center gap-2">
-            <div className="p-1.5 rounded-lg bg-sky-500/10 text-sky-500">
-              <BarChart2 className="w-5 h-5" />
-            </div>
-            <h1 className="text-xl md:text-2xl font-black text-gray-900 dark:text-white tracking-tight">
-              Reports
-            </h1>
-          </div>
-          <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1">
-            Comprehensive insights into team velocity, cycle time, completion throughput, and work items.
+          <h1 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-gray-100">
+            Reports
+          </h1>
+          <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-0.5">
+            Overview of team throughput, cycle times, work distribution, and issue breakdown.
           </p>
         </div>
 
         {/* Timeframe selector & Refresh */}
         <div className="flex items-center gap-2 self-start sm:self-auto">
           {/* Timeframe pills */}
-          <div className="flex items-center p-1 rounded-xl bg-gray-100 dark:bg-gray-900 border border-sky-100 dark:border-gray-800 text-xs">
-            {(["all", "30d", "14d", "7d"] as const).map((t) => (
+          <div className="flex items-center p-1 rounded-lg bg-gray-100 dark:bg-gray-800/80 border border-gray-200 dark:border-gray-700 text-xs">
+            {(["all", "30d", "7d"] as const).map((t) => (
               <button
                 key={t}
                 onClick={() => setTimeframe(t)}
-                className={`px-2.5 py-1 rounded-lg font-semibold capitalize transition-all cursor-pointer ${
+                className={`px-2.5 py-1 rounded-md font-medium capitalize transition-colors cursor-pointer ${
                   timeframe === t
-                    ? "bg-white dark:bg-gray-800 text-sky-600 dark:text-sky-400 shadow-xs"
+                    ? "bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 shadow-xs"
                     : "text-gray-500 hover:text-gray-900 dark:hover:text-gray-200"
                 }`}
               >
@@ -172,7 +190,7 @@ export const ReportsPage: React.FC = () => {
           <button
             onClick={handleRefresh}
             disabled={isRefreshing}
-            className="p-2 rounded-xl bg-white dark:bg-gray-900 border border-sky-100 dark:border-gray-800 hover:bg-sky-50 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300 transition-colors shadow-xs cursor-pointer"
+            className="p-2 rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300 transition-colors cursor-pointer"
             title="Refresh reports data"
           >
             <RefreshCw className={`w-4 h-4 ${isRefreshing ? "animate-spin text-sky-500" : ""}`} />
@@ -180,8 +198,8 @@ export const ReportsPage: React.FC = () => {
         </div>
       </div>
 
-      {/* 1. Top 4 7-Day KPI Cards (Commented out for now) */}
-      {/* <ReportSummaryKPIs kpis={kpis} onFilterClick={handleKPIClick} /> */}
+      {/* 1. Top 4 7-Day KPI Cards */}
+      <ReportSummaryKPIs kpis={kpis} onFilterClick={handleKPIClick} />
 
       {/* 2. Donut Breakdown Charts (Status, Type, Assignee) */}
       <ReportDonutBreakdowns

@@ -116,15 +116,15 @@ export const ReportWorkItemTable: React.FC<ReportWorkItemTableProps> = ({
   };
 
   return (
-    <div className="bg-white dark:bg-gray-900/60 border border-sky-100/70 dark:border-gray-800 rounded-2xl shadow-xs overflow-hidden backdrop-blur-xs">
+    <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg overflow-hidden">
       {/* Table Header Controls */}
-      <div className="p-4 sm:p-5 border-b border-sky-50 dark:border-gray-800 flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="p-4 sm:p-5 border-b border-gray-100 dark:border-gray-800 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h3 className="text-base font-bold text-gray-900 dark:text-gray-100">
+          <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
             Work item details
           </h3>
           <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-            Detailed tabular breakdown of all project tickets
+            Tabular list of work items with status, type, and priority
           </p>
         </div>
 

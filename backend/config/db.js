@@ -1,6 +1,11 @@
+import dns from "dns";
 import mongoose from "mongoose";
 import User from "../models/userModel.js";
 import bcrypt from "bcrypt";
+
+try {
+  dns.setServers(["8.8.8.8", "8.8.4.4", "1.1.1.1"]);
+} catch {}
 
 let cached = global.mongoose;
 
