@@ -108,16 +108,16 @@ export const OrgMembersTable: React.FC<OrgMembersTableProps> = ({
       <div className="overflow-x-auto overflow-y-visible min-h-[250px]">
         <table className="w-full text-left border-collapse">
           <thead>
-            <tr className="border-b border-sky-50/70 dark:border-gray-800 text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase bg-gray-50/30 dark:bg-gray-950/20">
-              <th className="px-6 py-4">User Name</th>
-              <th className="px-6 py-4">Email</th>
-              <th className="px-6 py-4">Role</th>
-              <th className="px-6 py-4">Solved Tickets</th>
-              <th className="px-6 py-4">Access Status</th>
-              <th className="px-6 py-4 text-right">Actions</th>
+            <tr className="border-b border-sky-50/70 dark:border-gray-800 text-[10px] sm:text-[11px] font-bold text-gray-500 dark:text-gray-300 uppercase bg-gray-50/30 dark:bg-gray-950/20 whitespace-nowrap">
+              <th className="px-3 sm:px-6 py-3 sm:py-4">User Name</th>
+              <th className="px-3 sm:px-6 py-3 sm:py-4 hidden sm:table-cell">Email</th>
+              <th className="px-3 sm:px-6 py-3 sm:py-4">Role</th>
+              <th className="px-3 sm:px-6 py-3 sm:py-4 hidden md:table-cell">Solved Tickets</th>
+              <th className="px-3 sm:px-6 py-3 sm:py-4">Access Status</th>
+              <th className="px-3 sm:px-6 py-3 sm:py-4 text-right">Actions</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-sky-50/45 dark:divide-gray-800 text-sm overflow-y-visible">
+          <tbody className="divide-y divide-sky-50/45 dark:divide-gray-800 text-[11px] sm:text-xs overflow-y-visible">
             {teamUsers.length === 0 ? (
               <tr>
                 <td colSpan={6} className="text-center py-14 text-gray-400 dark:text-gray-500">
@@ -133,7 +133,7 @@ export const OrgMembersTable: React.FC<OrgMembersTableProps> = ({
               teamUsers.map((member) => (
               <tr
                 key={member._id}
-                className={`hover:bg-sky-50/20 transition-all ${
+                className={`hover:bg-sky-50/20 transition-all whitespace-nowrap ${
                   member.status === "pending"
                     ? "bg-amber-50/[0.08]"
                     : member.status === "rejected"
@@ -141,18 +141,18 @@ export const OrgMembersTable: React.FC<OrgMembersTableProps> = ({
                     : ""
                 }`}
               >
-                <td className="px-6 py-4 font-bold text-gray-800 dark:text-gray-200">
+                <td className="px-3 sm:px-6 py-3 sm:py-4 font-bold text-gray-800 dark:text-gray-200">
                   <div className="flex items-center gap-2.5">
-                    <div className="w-8 h-8 rounded-full bg-sky-100 dark:bg-sky-950 text-sky-700 dark:text-sky-300 flex items-center justify-center font-bold text-xs">
+                    <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-sky-100 dark:bg-sky-950 text-sky-700 dark:text-sky-300 flex items-center justify-center font-bold text-[11px] sm:text-xs shrink-0">
                       {member.name.charAt(0).toUpperCase()}
                     </div>
-                    <span>{member.name}</span>
+                    <span className="truncate max-w-[140px] sm:max-w-none">{member.name}</span>
                   </div>
                 </td>
-                <td className="px-6 py-4 font-semibold text-gray-500 text-xs dark:text-gray-400">
+                <td className="px-3 sm:px-6 py-3 sm:py-4 font-semibold text-gray-500 text-[11px] sm:text-xs dark:text-gray-400 hidden sm:table-cell">
                   {member.email}
                 </td>
-                <td className="px-6 py-4">
+                <td className="px-3 sm:px-6 py-3 sm:py-4">
                   {member.role === "org_admin" ? (
                     <span className="text-[9px] font-bold bg-amber-50 text-amber-700 px-2 py-0.5 rounded border border-amber-200 uppercase tracking-wide">
                       Org Admin
@@ -163,10 +163,10 @@ export const OrgMembersTable: React.FC<OrgMembersTableProps> = ({
                     </span>
                   )}
                 </td>
-                <td className="px-6 py-4 text-xs text-gray-700 dark:text-gray-300 font-bold">
+                <td className="px-3 sm:px-6 py-3 sm:py-4 text-[11px] sm:text-xs text-gray-700 dark:text-gray-300 font-bold hidden md:table-cell">
                   {member.solvedTasks || 0} Solved
                 </td>
-                <td className="px-6 py-4">
+                <td className="px-3 sm:px-6 py-3 sm:py-4">
                   {member.status === "active" || member.status === undefined ? (
                     <span className="text-[9px] font-bold uppercase tracking-wider bg-green-50 text-green-700 px-2 py-0.5 rounded border border-green-200">
                       Approved
@@ -181,7 +181,7 @@ export const OrgMembersTable: React.FC<OrgMembersTableProps> = ({
                     </span>
                   )}
                 </td>
-                <td className="px-6 py-4 text-right overflow-visible relative">
+                <td className="px-3 sm:px-6 py-3 sm:py-4 text-right overflow-visible relative">
                   <div className="flex items-center justify-end relative">
                     <button
                       onClick={() => setActiveMenuUserId(activeMenuUserId === member._id ? null : member._id)}

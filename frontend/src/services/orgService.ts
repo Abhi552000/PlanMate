@@ -35,8 +35,8 @@ export const orgService = {
     const { data } = await axiosInstance.delete(API_ROUTES.ORGANIZATION.STATUS_DELETE(statusName));
     return data;
   },
-  getSystemAdminOrgs: async () => {
-    const { data } = await axiosInstance.get(API_ROUTES.ORGANIZATION.ALL);
+  getSystemAdminOrgs: async (params?: Record<string, any>) => {
+    const { data } = await axiosInstance.get(API_ROUTES.ORGANIZATION.ALL, { params });
     return data;
   },
   onboardOrg: async (orgData: any) => {
@@ -75,12 +75,12 @@ export const orgService = {
     const { data } = await axiosInstance.put(API_ROUTES.ORGANIZATION.SUBSCRIPTION_BY_ID(orgId), payload);
     return data;
   },
-  getBillingHistory: async () => {
-    const { data } = await axiosInstance.get(API_ROUTES.ORGANIZATION.BILLING_HISTORY);
+  getBillingHistory: async (params?: Record<string, any>) => {
+    const { data } = await axiosInstance.get(API_ROUTES.ORGANIZATION.BILLING_HISTORY, { params });
     return data;
   },
-  getAllPaymentsForAdmin: async () => {
-    const { data } = await axiosInstance.get(API_ROUTES.ORGANIZATION.ALL_PAYMENTS);
+  getAllPaymentsForAdmin: async (params?: Record<string, any>) => {
+    const { data } = await axiosInstance.get(API_ROUTES.ORGANIZATION.ALL_PAYMENTS, { params });
     return data;
   },
 };

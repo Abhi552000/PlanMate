@@ -80,6 +80,13 @@ export interface OrgListTableProps {
   organizations: any[];
   searchQuery: string;
   setSearchQuery: (val: string) => void;
+  statusFilter: "all" | "active" | "inactive";
+  setStatusFilter: (val: "all" | "active" | "inactive") => void;
+  currentPage: number;
+  totalPages: number;
+  totalCount: number;
+  onPageChange: (page: number) => void;
+  tableLoading?: boolean;
   togglingStatus: boolean;
   onToggleActive: (org: any) => void;
   onEditClick: (org: any) => void;
@@ -92,6 +99,7 @@ export interface OrgListTableProps {
 export interface SysAdminHeaderProps {
   user: any;
   onLogout: () => void;
+  onToggleMobileMenu?: () => void;
 }
 
 export interface OnboardOrgModalProps {

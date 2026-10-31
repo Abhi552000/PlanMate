@@ -1,43 +1,21 @@
-import { ITask } from "../../../types";
+import {
+  ITask,
+  IDonutItem,
+  ILeadTimePoint,
+  ICompletionTrendPoint,
+  ICycleTimePoint,
+  ICreationTrendPoint,
+  IReportKPIs,
+} from "../../../types";
 
-export interface IDonutItem {
-  name: string;
-  value: number;
-  color: string;
-}
-
-export interface ILeadTimePoint {
-  date: string;
-  bug: number;
-  task: number;
-  story: number;
-  epic?: number;
-}
-
-export interface ICompletionTrendPoint {
-  period: string;
-  task: number;
-  bug: number;
-  story: number;
-  epic: number;
-  total: number;
-}
-
-export interface ICycleTimePoint {
-  date: string;
-  cycleTime: number; // in days
-  key?: string;
-  title?: string;
-}
-
-export interface ICreationTrendPoint {
-  period: string;
-  todo: number;
-  inProgress: number;
-  done: number;
-  reopen: number;
-  total: number;
-}
+export type {
+  IDonutItem,
+  ILeadTimePoint,
+  ICompletionTrendPoint,
+  ICycleTimePoint,
+  ICreationTrendPoint,
+  IReportKPIs,
+};
 
 const STATUS_COLORS: Record<string, string> = {
   "to do": "#4c9aff", // Jira Blue
@@ -76,18 +54,6 @@ export const getDaysDiff = (d1: Date, d2: Date) => {
   const diffTime = Math.abs(d2.getTime() - d1.getTime());
   return Math.max(0, Math.round(diffTime / (1000 * 60 * 60 * 24)));
 };
-
-export interface IReportKPIs {
-  completedCount: number;
-  inProgressCount: number;
-  openCount: number;
-  createdCount: number;
-  dueCount: number;
-  totalCount: number;
-  completionRate: string;
-  timeframe: "all" | "30d" | "7d";
-  periodLabel: string;
-}
 
 // 1. Calculate Dynamic KPIs based on selected timeframe
 export const calculateReportKPIs = (

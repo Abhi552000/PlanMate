@@ -13,13 +13,8 @@ import {
   ArrowDown,
   ExternalLink,
 } from "lucide-react";
-import { ITask } from "../../../types";
+import { ITask, ReportWorkItemTableProps } from "../../../types";
 import { getPriorityStyle } from "../../../utils";
-
-interface ReportWorkItemTableProps {
-  tasks: ITask[];
-  onSelectTask?: (task: ITask) => void;
-}
 
 export const ReportWorkItemTable: React.FC<ReportWorkItemTableProps> = ({
   tasks,

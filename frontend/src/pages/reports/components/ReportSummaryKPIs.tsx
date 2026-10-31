@@ -1,6 +1,6 @@
 import React from "react";
 import { CheckCircle2, Clock, PlusSquare, Calendar } from "lucide-react";
-import { IReportKPIs } from "../utils/reportCalculations";
+import { IReportKPIs, ReportSummaryKPIsProps } from "../../../types";
 import {
   STAT_CARD,
   STATS_GRID,
@@ -8,11 +8,6 @@ import {
   VALUE_CLASS,
   LABEL_CLASS,
 } from "../../../assets/dummy";
-
-interface ReportSummaryKPIsProps {
-  kpis: IReportKPIs;
-  onFilterClick?: (filterType: string) => void;
-}
 
 export const ReportSummaryKPIs: React.FC<ReportSummaryKPIsProps> = ({ kpis, onFilterClick }) => {
   const cards = [

@@ -31,11 +31,10 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = React.memo(({
       {/* HEADER */}
       <div className={HEADER}>
         <div className=" min-w-0">
-          <h1 className="text-lg md:text-2xl font-black text-gray-900 dark:text-white tracking-tight flex items-center gap-2">
-            <HomeIcon className=" text-sky-500 w-5 h-5 md:w-6 md:h-6 shrink-0" />
-            <span className=" truncate">Task Overview</span>
+          <h1 className="text-lg md:text-2xl font-black text-gray-900 dark:text-white tracking-tight">
+            Task Overview
           </h1>
-          <p className=" text-sm text-gray-500 dark:text-gray-400 mt-1 ml-7 truncate">
+          <p className=" text-sm text-gray-500 dark:text-gray-400 mt-1 truncate">
             Manage your tasks efficiently
           </p>
         </div>

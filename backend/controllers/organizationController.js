@@ -259,7 +259,7 @@ export const getOrganizationMembers = async (req, res) => {
   }
 };
 
-// Get all organizations (System admin only with resource aggregations)
+// Get all organizations (System admin only with resource aggregations & backend filtering)
 export const getAllOrganizations = async (req, res) => {
   if (req.user?.role !== "system_admin") {
     return res
@@ -267,10 +267,69 @@ export const getAllOrganizations = async (req, res) => {
       .json({ success: false, message: MESSAGES.ORG.SYS_ADMIN_REQUIRED });
   }
   try {
-    const orgs = await Organization.find({}).populate("admin", "name email").lean();
+    const { status, search, plan, billingCycle, page, limit } = req.query;
+
+    const filter = {};
+
+    // 1. Status Filter
+    if (status && status !== "all") {
+      if (status === "active") filter.isActive = true;
+      else if (status === "inactive") filter.isActive = false;
+    }
+
+    // 2. Plan Filter
+    if (plan && plan !== "all") {
+      filter["subscription.planId"] = plan.toLowerCase();
+    }
+
+    // 3. Billing Cycle Filter
+    if (billingCycle && billingCycle !== "all") {
+      filter["subscription.billingCycle"] = billingCycle.toLowerCase();
+    }
+
+    // 4. Search Filter (matches name, slug, or admin user name/email)
+    if (search && search.trim()) {
+      const q = search.trim();
+      const matchingAdmins = await User.find({
+        $or: [
+          { name: { $regex: q, $options: "i" } },
+          { email: { $regex: q, $options: "i" } },
+        ],
+      }).select("_id");
+      const adminIds = matchingAdmins.map((u) => u._id);
+
+      filter.$or = [
+        { name: { $regex: q, $options: "i" } },
+        { slug: { $regex: q, $options: "i" } },
+        { admin: { $in: adminIds } },
+      ];
+    }
+
+    const [totalPlatformUsers, totalPlatformTasks, totalOrganizations, activeOrganizations, inactiveOrganizations, totalCount] =
+      await Promise.all([
+        User.countDocuments({ role: { $ne: "system_admin" } }),
+        Task.countDocuments({}),
+        Organization.countDocuments({}),
+        Organization.countDocuments({ isActive: true }),
+        Organization.countDocuments({ isActive: false }),
+        Organization.countDocuments(filter),
+      ]);
+
+    let query = Organization.find(filter)
+      .populate("admin", "name email")
+      .sort({ createdAt: -1 });
+
+    const pageNum = parseInt(page);
+    const limitNum = parseInt(limit);
+    if (!isNaN(pageNum) && !isNaN(limitNum) && limitNum > 0) {
+      const skip = (pageNum - 1) * limitNum;
+      query = query.skip(skip).limit(limitNum);
+    }
+
+    const orgs = await query.lean();
 
     const orgIds = orgs.map((o) => o._id);
-    const [userCounts, taskCounts, totalPlatformUsers, totalPlatformTasks] = await Promise.all([
+    const [userCounts, taskCounts] = await Promise.all([
       User.aggregate([
         { $match: { organization: { $in: orgIds } } },
         { $group: { _id: "$organization", count: { $sum: 1 } } },
@@ -279,8 +338,6 @@ export const getAllOrganizations = async (req, res) => {
         { $match: { organization: { $in: orgIds } } },
         { $group: { _id: "$organization", count: { $sum: 1 } } },
       ]),
-      User.countDocuments({ role: { $ne: "system_admin" } }),
-      Task.countDocuments({}),
     ]);
 
     const userCountMap = new Map(userCounts.map((u) => [u._id.toString(), u.count]));
@@ -295,12 +352,18 @@ export const getAllOrganizations = async (req, res) => {
     res.json({
       success: true,
       organizations: enrichedOrgs,
+      pagination: {
+        total: totalCount,
+        page: pageNum || 1,
+        limit: limitNum || totalCount,
+        totalPages: limitNum ? Math.max(1, Math.ceil(totalCount / limitNum)) : 1,
+      },
       systemMetrics: {
         totalPlatformUsers,
         totalPlatformTasks,
-        totalOrganizations: orgs.length,
-        activeOrganizations: orgs.filter((o) => o.isActive).length,
-        inactiveOrganizations: orgs.filter((o) => !o.isActive).length,
+        totalOrganizations,
+        activeOrganizations,
+        inactiveOrganizations,
         dbStatus: "connected",
         nodeEnv: process.env.NODE_ENV || "development",
       },
@@ -996,7 +1059,7 @@ export const subscribeToPlan = async (req, res) => {
   }
 };
 
-// GET /api/organization/billing-history - Org Admin: Get all payment transactions for organization
+// GET /api/organization/billing-history - Org Admin: Get payment transactions with backend filters
 export const getOrganizationBillingHistory = async (req, res) => {
   try {
     if (!req.user?.organization) {
@@ -1005,11 +1068,29 @@ export const getOrganizationBillingHistory = async (req, res) => {
         .json({ success: false, message: "Organization is required" });
     }
 
-    const payments = await Payment.find({ organization: req.user.organization })
+    const { status, billingCycle, search } = req.query;
+    const filter = { organization: req.user.organization };
+
+    if (status && status !== "all") {
+      filter.status = status.toLowerCase();
+    }
+    if (billingCycle && billingCycle !== "all") {
+      filter.billingCycle = billingCycle.toLowerCase();
+    }
+    if (search && search.trim()) {
+      const q = search.trim();
+      filter.$or = [
+        { planName: { $regex: q, $options: "i" } },
+        { invoiceNumber: { $regex: q, $options: "i" } },
+        { transactionId: { $regex: q, $options: "i" } },
+      ];
+    }
+
+    const payments = await Payment.find(filter)
       .sort({ paidAt: -1 })
       .lean();
 
-    res.json({ success: true, payments });
+    res.json({ success: true, payments, total: payments.length });
   } catch (error) {
     console.error("Billing history error:", error);
     res
@@ -1018,7 +1099,7 @@ export const getOrganizationBillingHistory = async (req, res) => {
   }
 };
 
-// GET /api/organization/all-payments - System Admin: Get all payment history across all organizations
+// GET /api/organization/all-payments - System Admin: Get all payment history across all organizations with backend filters
 export const getAllPaymentsForSysAdmin = async (req, res) => {
   if (req.user?.role !== "system_admin") {
     return res
@@ -1027,12 +1108,42 @@ export const getAllPaymentsForSysAdmin = async (req, res) => {
   }
 
   try {
-    const payments = await Payment.find()
+    const { status, search, plan, billingCycle } = req.query;
+    const filter = {};
+
+    if (status && status !== "all") {
+      filter.status = status.toLowerCase();
+    }
+    if (billingCycle && billingCycle !== "all") {
+      filter.billingCycle = billingCycle.toLowerCase();
+    }
+    if (plan && plan !== "all") {
+      filter.planId = plan.toLowerCase();
+    }
+
+    if (search && search.trim()) {
+      const q = search.trim();
+      const matchingOrgs = await Organization.find({
+        name: { $regex: q, $options: "i" },
+      }).select("_id");
+      const orgIds = matchingOrgs.map((o) => o._id);
+
+      filter.$or = [
+        { organization: { $in: orgIds } },
+        { planName: { $regex: q, $options: "i" } },
+        { invoiceNumber: { $regex: q, $options: "i" } },
+        { transactionId: { $regex: q, $options: "i" } },
+        { userName: { $regex: q, $options: "i" } },
+        { userEmail: { $regex: q, $options: "i" } },
+      ];
+    }
+
+    const payments = await Payment.find(filter)
       .populate("organization", "name slug")
       .sort({ paidAt: -1 })
       .lean();
 
-    res.json({ success: true, payments });
+    res.json({ success: true, payments, total: payments.length });
   } catch (error) {
     console.error("All payments error:", error);
     res

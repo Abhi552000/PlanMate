@@ -1,11 +1,5 @@
 import React from "react";
-
-export interface PlanMateLogoProps {
-  size?: "xs" | "sm" | "md" | "lg" | "xl" | number;
-  className?: string;
-  showText?: boolean;
-  textClassName?: string;
-}
+import { PlanMateLogoProps } from "../../types";
 
 const SIZE_MAP: Record<string, number> = {
   xs: 24,

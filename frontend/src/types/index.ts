@@ -6,3 +6,6 @@ export * from "./auth";
 export * from "./ui";
 export * from "./dashboard";
 export * from "./components";
+export * from "./payment";
+export * from "./sysAdmin";
+export * from "./report";

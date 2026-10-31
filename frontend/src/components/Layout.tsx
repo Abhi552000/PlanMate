@@ -77,7 +77,7 @@ const Layout: React.FC<LayoutProps> = ({ user, onLogout }) => {
     fetchTasksData(false);
   }, [fetchTasksData]);
 
-  const hasSidebar = user?.role === "org_admin" || user?.role === "member";
+  const hasSidebar = Boolean(user && user.role !== "system_admin");
 
   // Error state (rendered AFTER all hooks)
   if (error && tasks.length === 0)
@@ -112,12 +112,13 @@ const Layout: React.FC<LayoutProps> = ({ user, onLogout }) => {
           setMobileOpen={setMobileMenuOpen}
           isCollapsed={isCollapsed}
           onToggleCollapse={handleToggleCollapse}
+          onLogout={onLogout}
         />
       )}
 
       <main
         className={`${
-          hasSidebar ? (isCollapsed ? "pl-0 md:pl-16" : "pl-0 md:pl-60") : "pl-0"
+          hasSidebar ? (isCollapsed ? "pl-0 lg:pl-16" : "pl-0 lg:pl-60") : "pl-0"
         } transition-all duration-300 ease-in-out min-h-screen w-full overflow-x-hidden`}
       >
         <div className="px-3.5 sm:px-6 md:px-8 pt-3 sm:pt-5 pb-6 w-full transition-all duration-300 text-gray-900 dark:text-gray-100">

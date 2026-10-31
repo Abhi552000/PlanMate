@@ -1,9 +1,5 @@
 import React from "react";
-
-interface MentionTextProps {
-  text: string;
-  className?: string;
-}
+import { MentionTextProps } from "../types";
 
 export const MentionText: React.FC<MentionTextProps> = ({ text = "", className = "" }) => {
   if (!text) return null;

@@ -40,6 +40,7 @@ export interface SidebarProps {
   setMobileOpen?: React.Dispatch<React.SetStateAction<boolean>>;
   isCollapsed?: boolean;
   onToggleCollapse?: () => void;
+  onLogout?: () => void;
 }
 
 export interface NavbarProps {

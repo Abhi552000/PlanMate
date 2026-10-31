@@ -139,7 +139,7 @@ const Navbar: React.FC<NavbarProps> = ({
           {hasSidebar && onToggleMobileMenu && (
             <button
               onClick={onToggleMobileMenu}
-              className="md:hidden p-1.5 -ml-1 text-gray-600 dark:text-gray-300 hover:text-sky-600 dark:hover:text-sky-400 hover:bg-sky-50 dark:hover:bg-gray-800 rounded-lg transition-colors cursor-pointer"
+              className="lg:hidden p-1.5 -ml-1 text-gray-600 dark:text-gray-300 hover:text-sky-600 dark:hover:text-sky-400 hover:bg-sky-50 dark:hover:bg-gray-800 rounded-lg transition-colors cursor-pointer"
               aria-label="Open navigation menu"
             >
               <Menu className="w-4.5 h-4.5" />
