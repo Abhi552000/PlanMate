@@ -7,7 +7,8 @@ export const getNotifications = async (req, res) => {
   try {
     const notifications = await Notification.find({ user: req.user.id })
       .sort({ createdAt: -1 })
-      .limit(50);
+      .limit(50)
+      .lean();
     res.json({ success: true, notifications });
   } catch (error) {
     res.status(HttpStatus.BAD_REQUEST).json({ success: false, message: error.message });

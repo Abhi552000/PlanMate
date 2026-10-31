@@ -23,6 +23,8 @@ axiosInstance.interceptors.request.use(
   (error: any) => Promise.reject(error)
 );
 
+let isRedirecting = false;
+
 axiosInstance.interceptors.response.use(
   (response: AxiosResponse) => response,
   (error: any) => {
@@ -33,8 +35,11 @@ axiosInstance.interceptors.response.use(
       originalRequest?.url?.includes("/register");
 
     if (error?.response?.status === 401 && !isAuthRoute) {
-      localStorage.clear();
-      window.location.href = "/login";
+      if (!isRedirecting) {
+        isRedirecting = true;
+        localStorage.clear();
+        window.location.href = "/login";
+      }
     }
 
     return Promise.reject(error);

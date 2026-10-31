@@ -37,27 +37,26 @@ export const handleMentions = async (text, task, sender, type = "comment") => {
     }
   }
 
-  for (const userId of userIds) {
-    try {
-      const title = type === "comment" ? "Mentioned in Comment" : "Mentioned in Description";
-      const message = type === "comment"
-        ? `${sender.name} mentioned you in a comment on: "${task.title}" (${
-            task.key || `PM-${task._id.toString().slice(-4).toUpperCase()}`
-          })`
-        : `${sender.name} mentioned you in the description of: "${task.title}" (${
-            task.key || `PM-${task._id.toString().slice(-4).toUpperCase()}`
-          })`;
+  if (userIds.size === 0) return;
 
-      await Notification.create({
-        user: userId,
-        title,
-        message,
-        link: `/task/${task._id}`,
-        read: false,
-      });
-    } catch (err) {
-      console.error("Error creating mention notification:", err);
-    }
+  const title = type === "comment" ? "Mentioned in Comment" : "Mentioned in Description";
+  const taskKey = task.key || `PM-${task._id.toString().slice(-4).toUpperCase()}`;
+  const message = type === "comment"
+    ? `${sender.name} mentioned you in a comment on: "${task.title}" (${taskKey})`
+    : `${sender.name} mentioned you in the description of: "${task.title}" (${taskKey})`;
+
+  const notifications = Array.from(userIds).map((userId) => ({
+    user: userId,
+    title,
+    message,
+    link: `/task/${task._id}`,
+    read: false,
+  }));
+
+  try {
+    await Notification.insertMany(notifications, { ordered: false });
+  } catch (err) {
+    console.error("Error creating mention notifications in batch:", err);
   }
 };
 
