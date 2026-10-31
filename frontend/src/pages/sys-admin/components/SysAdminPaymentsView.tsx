@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import {
-  Receipt,
+  History,
   Search,
   RotateCw,
   Building,
@@ -125,11 +125,10 @@ export const SysAdminPaymentsView: React.FC = () => {
       {/* HEADER SECTION */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-lg md:text-2xl font-black text-gray-900 dark:text-white tracking-tight flex items-center gap-2">
-            <Receipt className="w-5 h-5 md:w-6 md:h-6 text-sky-500 shrink-0" />
-            <span>{SYSADMIN_PAYMENTS_TEXTS.PAGE_TITLE}</span>
+          <h1 className="text-lg md:text-2xl font-black text-gray-900 dark:text-white tracking-tight">
+            {SYSADMIN_PAYMENTS_TEXTS.PAGE_TITLE}
           </h1>
-          <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1 ml-7">
+          <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1">
             {SYSADMIN_PAYMENTS_TEXTS.PAGE_SUBTITLE}
           </p>
         </div>
@@ -156,7 +155,7 @@ export const SysAdminPaymentsView: React.FC = () => {
             <p className="text-xl font-bold text-gray-900 dark:text-white mt-0.5">{payments.length}</p>
           </div>
           <div className="w-9 h-9 rounded-lg bg-sky-50 dark:bg-sky-950/50 flex items-center justify-center text-sky-500">
-            <Receipt className="w-5 h-5" />
+            <History className="w-5 h-5" />
           </div>
         </div>
 
@@ -220,44 +219,44 @@ export const SysAdminPaymentsView: React.FC = () => {
         <div className="overflow-x-auto scrollbar-thin">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="border-b border-gray-100 dark:border-gray-800 text-[11px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider bg-gray-50/60 dark:bg-gray-950/40">
-                <th className="px-5 py-3">{SYSADMIN_PAYMENTS_TEXTS.COL_INVOICE_DATE}</th>
-                <th className="px-5 py-3">{SYSADMIN_PAYMENTS_TEXTS.COL_ORGANIZATION}</th>
-                <th className="px-5 py-3">{SYSADMIN_PAYMENTS_TEXTS.COL_PLAN}</th>
-                <th className="px-5 py-3">{SYSADMIN_PAYMENTS_TEXTS.COL_PLAN_TYPE}</th>
-                <th className="px-5 py-3">{SYSADMIN_PAYMENTS_TEXTS.COL_AMOUNT}</th>
-                <th className="px-5 py-3">{SYSADMIN_PAYMENTS_TEXTS.COL_METHOD}</th>
-                <th className="px-5 py-3">{SYSADMIN_PAYMENTS_TEXTS.COL_STATUS}</th>
-                <th className="px-5 py-3 text-right">{SYSADMIN_PAYMENTS_TEXTS.COL_TRANSACTION_ID}</th>
+              <tr className="border-b border-gray-100 dark:border-gray-800 text-[10px] sm:text-[11px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider bg-gray-50/60 dark:bg-gray-950/40 whitespace-nowrap">
+                <th className="px-3 sm:px-5 py-3">{SYSADMIN_PAYMENTS_TEXTS.COL_INVOICE_DATE}</th>
+                <th className="px-3 sm:px-5 py-3">{SYSADMIN_PAYMENTS_TEXTS.COL_ORGANIZATION}</th>
+                <th className="px-3 sm:px-5 py-3">{SYSADMIN_PAYMENTS_TEXTS.COL_PLAN}</th>
+                <th className="hidden md:table-cell px-3 sm:px-5 py-3">{SYSADMIN_PAYMENTS_TEXTS.COL_PLAN_TYPE}</th>
+                <th className="px-3 sm:px-5 py-3">{SYSADMIN_PAYMENTS_TEXTS.COL_AMOUNT}</th>
+                <th className="hidden sm:table-cell px-3 sm:px-5 py-3">{SYSADMIN_PAYMENTS_TEXTS.COL_METHOD}</th>
+                <th className="px-3 sm:px-5 py-3">{SYSADMIN_PAYMENTS_TEXTS.COL_STATUS}</th>
+                <th className="hidden lg:table-cell px-3 sm:px-5 py-3 text-right">{SYSADMIN_PAYMENTS_TEXTS.COL_TRANSACTION_ID}</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100 dark:divide-gray-800 text-xs">
+            <tbody className="divide-y divide-gray-100 dark:divide-gray-800 text-[11px] sm:text-xs">
               {tableLoading ? (
                 Array.from({ length: 5 }).map((_, i) => (
                   <tr key={i} className="animate-pulse">
-                    <td className="px-5 py-4">
+                    <td className="px-3 sm:px-5 py-3.5">
+                      <div className="h-4 w-24 rounded bg-slate-200 dark:bg-slate-800" />
+                    </td>
+                    <td className="px-3 sm:px-5 py-3.5">
                       <div className="h-4 w-28 rounded bg-slate-200 dark:bg-slate-800" />
                     </td>
-                    <td className="px-5 py-4">
-                      <div className="h-4 w-32 rounded bg-slate-200 dark:bg-slate-800" />
+                    <td className="px-3 sm:px-5 py-3.5">
+                      <div className="h-5 w-14 rounded-full bg-slate-200 dark:bg-slate-800" />
                     </td>
-                    <td className="px-5 py-4">
-                      <div className="h-5 w-16 rounded-full bg-slate-200 dark:bg-slate-800" />
+                    <td className="hidden md:table-cell px-3 sm:px-5 py-3.5">
+                      <div className="h-5 w-14 rounded-md bg-slate-200 dark:bg-slate-800" />
                     </td>
-                    <td className="px-5 py-4">
-                      <div className="h-5 w-16 rounded-md bg-slate-200 dark:bg-slate-800" />
-                    </td>
-                    <td className="px-5 py-4">
-                      <div className="h-4 w-16 rounded bg-slate-200 dark:bg-slate-800" />
-                    </td>
-                    <td className="px-5 py-4">
+                    <td className="px-3 sm:px-5 py-3.5">
                       <div className="h-4 w-14 rounded bg-slate-200 dark:bg-slate-800" />
                     </td>
-                    <td className="px-5 py-4">
-                      <div className="h-5 w-16 rounded-full bg-slate-200 dark:bg-slate-800" />
+                    <td className="hidden sm:table-cell px-3 sm:px-5 py-3.5">
+                      <div className="h-4 w-12 rounded bg-slate-200 dark:bg-slate-800" />
                     </td>
-                    <td className="px-5 py-4 text-right">
-                      <div className="h-4 w-28 rounded bg-slate-200 dark:bg-slate-800 ml-auto" />
+                    <td className="px-3 sm:px-5 py-3.5">
+                      <div className="h-5 w-14 rounded-full bg-slate-200 dark:bg-slate-800" />
+                    </td>
+                    <td className="hidden lg:table-cell px-3 sm:px-5 py-3.5 text-right">
+                      <div className="h-4 w-24 rounded bg-slate-200 dark:bg-slate-800 ml-auto" />
                     </td>
                   </tr>
                 ))
@@ -285,65 +284,65 @@ export const SysAdminPaymentsView: React.FC = () => {
                   return (
                     <tr
                       key={p._id || txn}
-                      className="hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors"
+                      className="hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors whitespace-nowrap"
                     >
-                      <td className="px-5 py-3.5">
+                      <td className="px-3 sm:px-5 py-3">
                         <div className="font-bold text-gray-900 dark:text-white">
                           {p.invoiceNumber || `INV-${p._id?.slice(-6).toUpperCase()}`}
                         </div>
-                        <div className="text-[11px] text-gray-400 flex items-center gap-1 mt-0.5">
-                          <Calendar className="w-3 h-3 text-gray-400" />
+                        <div className="text-[10px] text-gray-400 flex items-center gap-1 mt-0.5">
+                          <Calendar className="w-3 h-3 text-gray-400 shrink-0" />
                           <span>{dateStr}</span>
                         </div>
                       </td>
 
-                      <td className="px-5 py-3.5">
-                        <div className="flex items-center gap-2">
-                          <div className="w-6 h-6 rounded-md bg-sky-50 dark:bg-sky-950/50 flex items-center justify-center text-sky-600 dark:text-sky-400 shrink-0">
-                            <Building className="w-3.5 h-3.5" />
+                      <td className="px-3 sm:px-5 py-3">
+                        <div className="flex items-center gap-1.5 sm:gap-2">
+                          <div className="w-5.5 h-5.5 rounded-md bg-sky-50 dark:bg-sky-950/50 flex items-center justify-center text-sky-600 dark:text-sky-400 shrink-0">
+                            <Building className="w-3 h-3" />
                           </div>
-                          <span className="font-semibold text-gray-800 dark:text-gray-200">
+                          <span className="font-semibold text-gray-800 dark:text-gray-200 max-w-[140px] truncate">
                             {orgName}
                           </span>
                         </div>
                       </td>
 
-                      <td className="px-5 py-3.5">
-                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-sky-50 dark:bg-sky-950/50 text-sky-700 dark:text-sky-300 border border-sky-100 dark:border-sky-800">
+                      <td className="px-3 sm:px-5 py-3">
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-semibold bg-sky-50 dark:bg-sky-950/50 text-sky-700 dark:text-sky-300 border border-sky-100 dark:border-sky-800">
                           {p.planName}
                         </span>
                       </td>
 
-                      <td className="px-5 py-3.5">
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-md text-[11px] font-semibold bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 capitalize border border-gray-200/80 dark:border-gray-700">
+                      <td className="hidden md:table-cell px-3 sm:px-5 py-3">
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] sm:text-[11px] font-semibold bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 capitalize border border-gray-200/80 dark:border-gray-700">
                           {p.billingCycle || "Monthly"}
                         </span>
                       </td>
 
-                      <td className="px-5 py-3.5">
+                      <td className="px-3 sm:px-5 py-3">
                         <span className="font-bold text-gray-900 dark:text-white">
                           ₹{(p.amount || 0).toLocaleString()}
                         </span>
                       </td>
 
-                      <td className="px-5 py-3.5 text-gray-600 dark:text-gray-400 font-medium">
+                      <td className="hidden sm:table-cell px-3 sm:px-5 py-3 text-gray-600 dark:text-gray-400 font-medium">
                         {p.paymentMethod || "Card"}
                       </td>
 
-                      <td className="px-5 py-3.5">
+                      <td className="px-3 sm:px-5 py-3">
                         <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/40">
                           <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                           {p.status || "Paid"}
                         </span>
                       </td>
 
-                      <td className="px-5 py-3.5 text-right font-mono text-[11px] text-gray-500">
+                      <td className="hidden lg:table-cell px-3 sm:px-5 py-3 text-right font-mono text-[10px] sm:text-[11px] text-gray-500">
                         <button
                           onClick={() => handleCopy(txn)}
                           className="inline-flex items-center gap-1 hover:text-sky-600 cursor-pointer ml-auto"
                           title={SYSADMIN_PAYMENTS_TEXTS.MSG_TXN_COPIED}
                         >
-                          <span>{txn.length > 16 ? `${txn.substring(0, 16)}...` : txn}</span>
+                          <span>{txn.length > 14 ? `${txn.substring(0, 14)}...` : txn}</span>
                           {copiedId === txn ? (
                             <Check className="w-3 h-3 text-emerald-500" />
                           ) : (

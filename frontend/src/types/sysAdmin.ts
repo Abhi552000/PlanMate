@@ -10,6 +10,8 @@ export interface SysAdminSidebarProps {
   isCollapsed?: boolean;
   onToggleCollapse?: () => void;
   onOnboardClick: () => void;
+  mobileOpen?: boolean;
+  setMobileOpen?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export interface SysAdminNavItem {

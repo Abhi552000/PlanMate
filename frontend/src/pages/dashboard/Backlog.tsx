@@ -146,7 +146,7 @@ export const Backlog: React.FC = () => {
           size="sm"
           onClick={() => setShowCreateEpic(true)}
           icon={<FolderPlus className="w-3.5 h-3.5 text-sky-600" />}
-          className="ml-auto"
+          className="sm:ml-auto"
         >
           {BACKLOG_TEXTS.BTN_NEW_EPIC}
         </Button>

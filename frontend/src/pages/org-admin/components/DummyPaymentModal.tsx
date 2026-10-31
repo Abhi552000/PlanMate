@@ -101,7 +101,7 @@ export const DummyPaymentModal: React.FC<DummyPaymentModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs animate-in fade-in duration-150">
-      <div className="bg-white dark:bg-gray-900 rounded-2xl max-w-md w-full shadow-2xl border border-slate-200 dark:border-gray-800 overflow-hidden text-gray-800 dark:text-gray-100">
+      <div className="bg-white dark:bg-gray-900 rounded-2xl max-w-md w-full shadow-2xl border border-slate-200 dark:border-gray-800 overflow-hidden max-h-[90vh] overflow-y-auto text-gray-800 dark:text-gray-100">
         {/* Header */}
         <div className="flex items-center justify-between p-5 border-b border-gray-100 dark:border-gray-800">
           <div>

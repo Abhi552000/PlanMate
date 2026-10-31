@@ -102,49 +102,49 @@ export const OrgListTable: React.FC<OrgListTableProps> = ({
       <div className="overflow-x-auto scrollbar-thin">
         <table className="w-full text-left border-collapse">
           <thead>
-            <tr className="border-b border-gray-200 dark:border-gray-800 text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider bg-gray-50/70 dark:bg-gray-950/40">
-              <th className="px-5 py-3.5">{ORG_TABLE_TEXTS.COL_ORGANIZATION}</th>
-              <th className="px-5 py-3.5">{ORG_TABLE_TEXTS.COL_ADMIN}</th>
-              <th className="px-5 py-3.5">{ORG_TABLE_TEXTS.COL_PLAN}</th>
-              <th className="px-5 py-3.5">{ORG_TABLE_TEXTS.COL_PLAN_TYPE}</th>
-              <th className="px-5 py-3.5">{ORG_TABLE_TEXTS.COL_STATUS}</th>
-              <th className="px-5 py-3.5">{ORG_TABLE_TEXTS.COL_CREATED}</th>
-              <th className="px-5 py-3.5 text-right">{ORG_TABLE_TEXTS.COL_ACTIONS}</th>
+            <tr className="border-b border-gray-200 dark:border-gray-800 text-[10px] sm:text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider bg-gray-50/70 dark:bg-gray-950/40 whitespace-nowrap">
+              <th className="px-3 sm:px-5 py-3.5">{ORG_TABLE_TEXTS.COL_ORGANIZATION}</th>
+              <th className="hidden md:table-cell px-3 sm:px-5 py-3.5">{ORG_TABLE_TEXTS.COL_ADMIN}</th>
+              <th className="px-3 sm:px-5 py-3.5">{ORG_TABLE_TEXTS.COL_PLAN}</th>
+              <th className="hidden sm:table-cell px-3 sm:px-5 py-3.5">{ORG_TABLE_TEXTS.COL_PLAN_TYPE}</th>
+              <th className="px-3 sm:px-5 py-3.5">{ORG_TABLE_TEXTS.COL_STATUS}</th>
+              <th className="hidden lg:table-cell px-3 sm:px-5 py-3.5">{ORG_TABLE_TEXTS.COL_CREATED}</th>
+              <th className="px-3 sm:px-5 py-3.5 text-right">{ORG_TABLE_TEXTS.COL_ACTIONS}</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100 dark:divide-gray-800/80 text-sm">
+          <tbody className="divide-y divide-gray-100 dark:divide-gray-800/80 text-[11px] sm:text-xs">
             {tableLoading ? (
               Array.from({ length: 5 }).map((_, i) => (
                 <tr key={i} className="animate-pulse">
-                  <td className="px-5 py-4">
+                  <td className="px-3 sm:px-5 py-4">
                     <div className="flex items-center gap-2.5">
-                      <div className="w-8 h-8 rounded-lg bg-slate-200 dark:bg-slate-800 shrink-0" />
+                      <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-slate-200 dark:bg-slate-800 shrink-0" />
                       <div className="space-y-1.5 flex-1">
-                        <div className="h-4 w-32 rounded bg-slate-200 dark:bg-slate-800" />
-                        <div className="h-3 w-16 rounded bg-slate-100 dark:bg-slate-800/60" />
+                        <div className="h-4 w-28 rounded bg-slate-200 dark:bg-slate-800" />
+                        <div className="h-3 w-14 rounded bg-slate-100 dark:bg-slate-800/60" />
                       </div>
                     </div>
                   </td>
-                  <td className="px-5 py-4">
+                  <td className="hidden md:table-cell px-3 sm:px-5 py-4">
                     <div className="space-y-1.5">
-                      <div className="h-4 w-28 rounded bg-slate-200 dark:bg-slate-800" />
-                      <div className="h-3 w-36 rounded bg-slate-100 dark:bg-slate-800/60" />
+                      <div className="h-4 w-24 rounded bg-slate-200 dark:bg-slate-800" />
+                      <div className="h-3 w-32 rounded bg-slate-100 dark:bg-slate-800/60" />
                     </div>
                   </td>
-                  <td className="px-5 py-4">
-                    <div className="h-6 w-16 rounded-full bg-slate-200 dark:bg-slate-800" />
+                  <td className="px-3 sm:px-5 py-4">
+                    <div className="h-5 w-14 rounded-full bg-slate-200 dark:bg-slate-800" />
                   </td>
-                  <td className="px-5 py-4">
-                    <div className="h-5 w-16 rounded-md bg-slate-200 dark:bg-slate-800" />
+                  <td className="hidden sm:table-cell px-3 sm:px-5 py-4">
+                    <div className="h-5 w-14 rounded-md bg-slate-200 dark:bg-slate-800" />
                   </td>
-                  <td className="px-5 py-4">
-                    <div className="h-6 w-20 rounded-full bg-slate-200 dark:bg-slate-800" />
+                  <td className="px-3 sm:px-5 py-4">
+                    <div className="h-5 w-16 rounded-full bg-slate-200 dark:bg-slate-800" />
                   </td>
-                  <td className="px-5 py-4">
-                    <div className="h-4 w-20 rounded bg-slate-100 dark:bg-slate-800/60" />
+                  <td className="hidden lg:table-cell px-3 sm:px-5 py-4">
+                    <div className="h-4 w-16 rounded bg-slate-100 dark:bg-slate-800/60" />
                   </td>
-                  <td className="px-5 py-4 text-right">
-                    <div className="h-7 w-24 rounded-lg bg-slate-200 dark:bg-slate-800 ml-auto" />
+                  <td className="px-3 sm:px-5 py-4 text-right">
+                    <div className="h-7 w-20 rounded-lg bg-slate-200 dark:bg-slate-800 ml-auto" />
                   </td>
                 </tr>
               ))
@@ -152,22 +152,22 @@ export const OrgListTable: React.FC<OrgListTableProps> = ({
               organizations.map((org) => (
                 <tr
                   key={org._id}
-                  className={`hover:bg-sky-50/30 dark:hover:bg-gray-800/30 transition-colors ${
+                  className={`hover:bg-sky-50/30 dark:hover:bg-gray-800/30 transition-colors whitespace-nowrap ${
                     !org.isActive ? "bg-red-50/[0.04]" : ""
                   }`}
                 >
                 {/* Org Name (clickable to inspect) */}
-                <td className="px-5 py-3.5">
+                <td className="px-3 sm:px-5 py-3 sm:py-3.5">
                   <div
                     onClick={() => onInspectClick?.(org)}
-                    className="flex items-center gap-2.5 cursor-pointer group"
+                    className="flex items-center gap-2 sm:gap-2.5 cursor-pointer group"
                     title={ORG_TABLE_TEXTS.TOOLTIP_INSPECT}
                   >
-                    <div className="w-8 h-8 rounded-lg bg-sky-50 dark:bg-sky-950/60 border border-sky-100 dark:border-sky-900 flex items-center justify-center font-bold text-xs text-sky-600 dark:text-sky-400 shrink-0 group-hover:scale-105 transition-transform">
+                    <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-sky-50 dark:bg-sky-950/60 border border-sky-100 dark:border-sky-900 flex items-center justify-center font-bold text-xs text-sky-600 dark:text-sky-400 shrink-0 group-hover:scale-105 transition-transform">
                       {org.name?.[0]?.toUpperCase() || "O"}
                     </div>
                     <div>
-                      <p className="font-bold text-gray-900 dark:text-gray-100 text-sm leading-tight group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors">
+                      <p className="font-bold text-gray-900 dark:text-gray-100 text-xs sm:text-sm leading-tight group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors">
                         {org.name}
                       </p>
                       {org.slug && (
@@ -178,39 +178,39 @@ export const OrgListTable: React.FC<OrgListTableProps> = ({
                 </td>
 
                 {/* Admin Representative */}
-                <td className="px-5 py-3.5">
-                  <p className="font-medium text-gray-800 dark:text-gray-200 text-sm leading-tight">
+                <td className="hidden md:table-cell px-3 sm:px-5 py-3 sm:py-3.5">
+                  <p className="font-medium text-gray-800 dark:text-gray-200 text-xs sm:text-sm leading-tight">
                     {org.admin?.name || ORG_TABLE_TEXTS.UNASSIGNED}
                   </p>
-                  <p className="text-xs text-gray-400 dark:text-gray-500 font-mono">
+                  <p className="text-[11px] text-gray-400 dark:text-gray-500 font-mono">
                     {org.admin?.email || "—"}
                   </p>
                 </td>
 
                 {/* Subscription Plan */}
-                <td className="px-5 py-3.5">
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 border border-sky-100 dark:border-sky-800">
+                <td className="px-3 sm:px-5 py-3 sm:py-3.5">
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-bold bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 border border-sky-100 dark:border-sky-800">
                     {org.subscription?.planName || "Starter"}
                   </span>
                 </td>
 
                 {/* Plan Type (Billing Cycle: Monthly / Yearly) */}
-                <td className="px-5 py-3.5">
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-md text-[11px] font-semibold bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 capitalize border border-gray-200/80 dark:border-gray-700">
+                <td className="hidden sm:table-cell px-3 sm:px-5 py-3 sm:py-3.5">
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] sm:text-[11px] font-semibold bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 capitalize border border-gray-200/80 dark:border-gray-700">
                     {org.subscription?.billingCycle || "Monthly"}
                   </span>
                 </td>
 
                 {/* Status Badge */}
-                <td className="px-5 py-3.5">
+                <td className="px-3 sm:px-5 py-3 sm:py-3.5">
                   {org.isActive ? (
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 text-[11px] font-semibold rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                    <span className="inline-flex items-center gap-1 sm:gap-1.5 px-2 py-0.5 text-[10px] sm:text-[11px] font-semibold rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                       {ORG_TABLE_TEXTS.BADGE_ACTIVE}
                     </span>
                   ) : (
                     <div className="flex flex-col gap-0.5">
-                      <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 text-[11px] font-semibold rounded-full bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800 self-start">
+                      <span className="inline-flex items-center gap-1 sm:gap-1.5 px-2 py-0.5 text-[10px] sm:text-[11px] font-semibold rounded-full bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800 self-start">
                         <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
                         {ORG_TABLE_TEXTS.BADGE_INACTIVE}
                       </span>
@@ -227,7 +227,7 @@ export const OrgListTable: React.FC<OrgListTableProps> = ({
                 </td>
 
                 {/* Created Date */}
-                <td className="px-5 py-3.5 text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
+                <td className="hidden lg:table-cell px-3 sm:px-5 py-3 sm:py-3.5 text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
                   {org.createdAt
                     ? new Date(org.createdAt).toLocaleDateString(undefined, {
                         year: "numeric",
@@ -238,7 +238,7 @@ export const OrgListTable: React.FC<OrgListTableProps> = ({
                 </td>
 
                 {/* Action Controls */}
-                <td className="px-5 py-3.5 text-right">
+                <td className="px-3 sm:px-5 py-3 sm:py-3.5 text-right">
                   <div className="flex items-center justify-end gap-1">
                     {/* 1-Click Reset Password Key with project sky color */}
                     {onResetPasswordClick && (

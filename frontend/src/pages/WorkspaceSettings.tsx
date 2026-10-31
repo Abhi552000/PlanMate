@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { Building } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { orgService } from "../services/orgService";
 import { taskService } from "../services/taskService";
@@ -207,19 +206,13 @@ const WorkspaceSettings = () => {
     <div className="w-full space-y-6 font-sans">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-sky-100/50 dark:border-gray-800 pb-4">
-        <div className="flex items-center gap-3">
-          <div className="p-2.5 bg-gradient-to-br from-cyan-500 to-sky-600 rounded-xl text-white shadow-md">
-            <Building className="w-6 h-6" />
-          </div>
-          <div>
-            <h1 className="text-xl font-bold text-gray-800 dark:text-gray-200">
-              Workspace Settings
-            </h1>
-            <p className="text-xs font-semibold text-gray-400">
-              Configure name, description, branding and details of your team
-              space.
-            </p>
-          </div>
+        <div>
+          <h1 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-gray-100">
+            Workspace Settings
+          </h1>
+          <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1">
+            Configure name, description, branding and details of your team space.
+          </p>
         </div>
       </div>
 

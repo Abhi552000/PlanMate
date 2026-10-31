@@ -90,6 +90,7 @@ const SystemAdminDashboard: React.FC<SystemAdminDashboardProps> = ({ onLogout, u
   // Super Admin Navigation Tab State
   const [activeTab, setActiveTab] = useState<SysAdminTab>("organizations");
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showPlansModal, setShowPlansModal] = useState(false);
 
   const stats = useMemo(() => {
@@ -115,7 +116,7 @@ const SystemAdminDashboard: React.FC<SystemAdminDashboardProps> = ({ onLogout, u
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex flex-col">
         <SysAdminHeader user={user} onLogout={onLogout} />
-        <main className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8 flex-1 w-full space-y-6 animate-pulse">
+        <main className="px-3.5 sm:px-6 lg:px-8 py-4 sm:py-8 flex-1 w-full space-y-6 animate-pulse">
           <div className="flex justify-between items-center">
             <div className="space-y-2">
               <div className="h-7 w-56 rounded bg-slate-200 dark:bg-slate-800" />
@@ -143,7 +144,11 @@ const SystemAdminDashboard: React.FC<SystemAdminDashboardProps> = ({ onLogout, u
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex flex-col font-sans transition-colors duration-300">
-      <SysAdminHeader user={user} onLogout={onLogout} />
+      <SysAdminHeader
+        user={user}
+        onLogout={onLogout}
+        onToggleMobileMenu={() => setMobileMenuOpen((prev) => !prev)}
+      />
 
       {/* SUPER ADMIN WORKSPACE LAYOUT WITH SIDEBAR */}
       <div className="flex-1 flex overflow-hidden">
@@ -153,6 +158,8 @@ const SystemAdminDashboard: React.FC<SystemAdminDashboardProps> = ({ onLogout, u
           onTabChange={setActiveTab}
           isCollapsed={isSidebarCollapsed}
           onToggleCollapse={() => setIsSidebarCollapsed((prev) => !prev)}
+          mobileOpen={mobileMenuOpen}
+          setMobileOpen={setMobileMenuOpen}
           onOnboardClick={() => {
             setShowOnboardModal(true);
             setOnboardedResult(null);
@@ -162,17 +169,16 @@ const SystemAdminDashboard: React.FC<SystemAdminDashboardProps> = ({ onLogout, u
         />
 
         {/* Main Content Area */}
-        <main className="flex-1 overflow-y-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6">
+        <main className="flex-1 overflow-y-auto px-3.5 sm:px-6 lg:px-8 py-4 sm:py-8 space-y-6">
           {activeTab === "organizations" && (
             <>
               {/* HEADER SECTION */}
               <div className={HEADER}>
                 <div className="min-w-0">
-                  <h1 className="text-lg md:text-2xl font-black text-gray-900 dark:text-white tracking-tight flex items-center gap-2">
-                    <ShieldAlert className="text-sky-500 w-5 h-5 md:w-6 md:h-6 shrink-0" />
-                    <span className="truncate">Organizations Administration</span>
+                  <h1 className="text-lg md:text-2xl font-black text-gray-900 dark:text-white tracking-tight">
+                    Organizations Administration
                   </h1>
-                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 ml-7 truncate">
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 truncate">
                     Manage tenant workspaces, representatives, resource utilization, and tenant credentials
                   </p>
                 </div>

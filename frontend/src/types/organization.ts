@@ -99,6 +99,7 @@ export interface OrgListTableProps {
 export interface SysAdminHeaderProps {
   user: any;
   onLogout: () => void;
+  onToggleMobileMenu?: () => void;
 }
 
 export interface OnboardOrgModalProps {

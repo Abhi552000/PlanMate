@@ -1,9 +1,13 @@
 import React, { useState } from "react";
-import { LogOut } from "lucide-react";
+import { LogOut, Menu } from "lucide-react";
 import { SysAdminHeaderProps } from "../../../types";
 import { PlanMateLogo } from "../../../components/common/PlanMateLogo";
 
-export const SysAdminHeader: React.FC<SysAdminHeaderProps> = ({ user, onLogout }) => {
+export const SysAdminHeader: React.FC<SysAdminHeaderProps> = ({
+  user,
+  onLogout,
+  onToggleMobileMenu,
+}) => {
   const [isDark, setIsDark] = useState(() =>
     document.documentElement.classList.contains("dark")
   );
@@ -22,11 +26,20 @@ export const SysAdminHeader: React.FC<SysAdminHeaderProps> = ({ user, onLogout }
 
   return (
     <header className="sticky top-0 z-40 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md shadow-xs border-b border-gray-200 dark:border-gray-800 font-sans">
-      <div className="flex flex-row items-center justify-between gap-2 md:gap-4 px-4 sm:px-6 lg:px-8 h-[52px] w-full">
+      <div className="flex flex-row items-center justify-between gap-2 md:gap-4 px-3 sm:px-6 lg:px-8 h-[52px] w-full">
         {/* BRAND LOGO & BADGE */}
         <div className="flex items-center gap-2 sm:gap-2.5">
+          {onToggleMobileMenu && (
+            <button
+              onClick={onToggleMobileMenu}
+              className="lg:hidden p-1.5 -ml-1 text-gray-500 hover:text-sky-600 dark:text-gray-400 dark:hover:text-sky-400 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors cursor-pointer"
+              aria-label="Open Navigation Menu"
+            >
+              <Menu className="w-5 h-5" />
+            </button>
+          )}
           <div className="flex items-center gap-2 select-none">
-            <PlanMateLogo size={28} showText textClassName="text-lg sm:text-xl font-bold tracking-tight" />
+            <PlanMateLogo size={28} showText textClassName="text-base sm:text-xl font-bold tracking-tight" />
           </div>
           <span className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-0.5 text-[11px] font-bold uppercase bg-sky-50 dark:bg-gray-800 text-sky-600 dark:text-sky-400 rounded-full border border-sky-100 dark:border-gray-700 tracking-wider shadow-2xs">
             System Admin

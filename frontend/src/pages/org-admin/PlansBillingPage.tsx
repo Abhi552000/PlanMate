@@ -5,7 +5,7 @@ import {
   Users,
   RotateCw,
   ArrowRight,
-  Receipt,
+  History,
   Check,
   Copy,
 } from "lucide-react";
@@ -144,7 +144,7 @@ export const PlansBillingPage: React.FC = () => {
             <div className="h-9 w-36 rounded-xl bg-slate-200 dark:bg-slate-800 self-start sm:self-auto" />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {[1, 2, 3].map((i) => (
               <div
                 key={i}
@@ -196,11 +196,10 @@ export const PlansBillingPage: React.FC = () => {
       {/* PAGE HEADER */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-lg md:text-2xl font-black text-gray-900 dark:text-white tracking-tight flex items-center gap-2">
-            <CreditCard className="text-sky-500 w-5 h-5 md:w-6 md:h-6 shrink-0" />
-            <span>{PLANS_BILLING_TEXTS.PAGE_TITLE}</span>
+          <h1 className="text-lg md:text-2xl font-black text-gray-900 dark:text-white tracking-tight">
+            {PLANS_BILLING_TEXTS.PAGE_TITLE}
           </h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 ml-7 truncate">
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 truncate">
             {PLANS_BILLING_TEXTS.PAGE_SUBTITLE}
           </p>
         </div>
@@ -320,7 +319,7 @@ export const PlansBillingPage: React.FC = () => {
         </div>
 
         {/* Tiers Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {plans.map((plan) => {
             const isCurrent = plan.planId.toLowerCase() === currentPlanId;
             const displayPrice =
@@ -423,7 +422,7 @@ export const PlansBillingPage: React.FC = () => {
       <div className="bg-white dark:bg-gray-900 rounded-2xl border border-slate-200 dark:border-gray-800 shadow-2xs overflow-hidden">
         <div className="p-4 sm:p-5 border-b border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-950/30">
           <h3 className="text-sm font-bold text-gray-900 dark:text-white flex items-center gap-2">
-            <Receipt className="w-4 h-4 text-sky-500" />
+            <History className="w-4 h-4 text-sky-500" />
             {PLANS_BILLING_TEXTS.INVOICES_TITLE}
           </h3>
           <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
@@ -434,17 +433,17 @@ export const PlansBillingPage: React.FC = () => {
         <div className="overflow-x-auto scrollbar-thin">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="border-b border-gray-100 dark:border-gray-800 text-[11px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider bg-gray-50/60 dark:bg-gray-950/40">
-                <th className="px-5 py-3">{PLANS_BILLING_TEXTS.COL_INVOICE}</th>
-                <th className="px-5 py-3">{PLANS_BILLING_TEXTS.COL_DATE}</th>
-                <th className="px-5 py-3">{PLANS_BILLING_TEXTS.COL_PLAN}</th>
-                <th className="px-5 py-3">{PLANS_BILLING_TEXTS.COL_PLAN_TYPE}</th>
-                <th className="px-5 py-3">{PLANS_BILLING_TEXTS.COL_AMOUNT}</th>
-                <th className="px-5 py-3">{PLANS_BILLING_TEXTS.COL_STATUS}</th>
-                <th className="px-5 py-3 text-right">{PLANS_BILLING_TEXTS.COL_TRANSACTION}</th>
+              <tr className="border-b border-gray-100 dark:border-gray-800 text-[10px] sm:text-[11px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider bg-gray-50/60 dark:bg-gray-950/40 whitespace-nowrap">
+                <th className="px-3 sm:px-5 py-3">{PLANS_BILLING_TEXTS.COL_INVOICE}</th>
+                <th className="hidden sm:table-cell px-3 sm:px-5 py-3">{PLANS_BILLING_TEXTS.COL_DATE}</th>
+                <th className="px-3 sm:px-5 py-3">{PLANS_BILLING_TEXTS.COL_PLAN}</th>
+                <th className="hidden md:table-cell px-3 sm:px-5 py-3">{PLANS_BILLING_TEXTS.COL_PLAN_TYPE}</th>
+                <th className="px-3 sm:px-5 py-3">{PLANS_BILLING_TEXTS.COL_AMOUNT}</th>
+                <th className="px-3 sm:px-5 py-3">{PLANS_BILLING_TEXTS.COL_STATUS}</th>
+                <th className="hidden lg:table-cell px-3 sm:px-5 py-3 text-right">{PLANS_BILLING_TEXTS.COL_TRANSACTION}</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100 dark:divide-gray-800 text-xs">
+            <tbody className="divide-y divide-gray-100 dark:divide-gray-800 text-[11px] sm:text-xs">
               {invoices.length === 0 ? (
                 <tr>
                   <td colSpan={7} className="px-5 py-8 text-center text-xs text-gray-400">
@@ -468,40 +467,40 @@ export const PlansBillingPage: React.FC = () => {
                   return (
                     <tr
                       key={inv._id || txnId}
-                      className="hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors"
+                      className="hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors whitespace-nowrap"
                     >
-                      <td className="px-5 py-3.5 font-bold text-gray-900 dark:text-white">
+                      <td className="px-3 sm:px-5 py-3 font-bold text-gray-900 dark:text-white">
                         {invId}
                       </td>
-                      <td className="px-5 py-3.5 text-gray-600 dark:text-gray-400">
+                      <td className="hidden sm:table-cell px-3 sm:px-5 py-3 text-gray-600 dark:text-gray-400">
                         {invDate}
                       </td>
-                      <td className="px-5 py-3.5">
-                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-sky-50 dark:bg-sky-950/50 text-sky-700 dark:text-sky-300 border border-sky-100 dark:border-sky-800">
+                      <td className="px-3 sm:px-5 py-3">
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-semibold bg-sky-50 dark:bg-sky-950/50 text-sky-700 dark:text-sky-300 border border-sky-100 dark:border-sky-800">
                           {inv.planName}
                         </span>
                       </td>
-                      <td className="px-5 py-3.5">
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-md text-[11px] font-semibold bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 capitalize border border-gray-200/80 dark:border-gray-700">
+                      <td className="hidden md:table-cell px-3 sm:px-5 py-3">
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] sm:text-[11px] font-semibold bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 capitalize border border-gray-200/80 dark:border-gray-700">
                           {inv.billingCycle || "Monthly"}
                         </span>
                       </td>
-                      <td className="px-5 py-3.5 font-bold text-gray-900 dark:text-white">
+                      <td className="px-3 sm:px-5 py-3 font-bold text-gray-900 dark:text-white">
                         ₹{(inv.amount || 0).toLocaleString()}
                       </td>
-                      <td className="px-5 py-3.5">
+                      <td className="px-3 sm:px-5 py-3">
                         <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/40">
                           <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                           {inv.status || "Paid"}
                         </span>
                       </td>
-                      <td className="px-5 py-3.5 text-right font-mono text-[11px] text-gray-500">
+                      <td className="hidden lg:table-cell px-3 sm:px-5 py-3 text-right font-mono text-[10px] sm:text-[11px] text-gray-500">
                         <button
                           onClick={() => handleCopy(txnId)}
                           className="inline-flex items-center gap-1 hover:text-sky-600 cursor-pointer ml-auto"
                           title={PLANS_BILLING_TEXTS.TOOLTIP_COPY_TXN}
                         >
-                          <span>{txnId.length > 18 ? `${txnId.substring(0, 18)}...` : txnId}</span>
+                          <span>{txnId.length > 14 ? `${txnId.substring(0, 14)}...` : txnId}</span>
                           {copiedTxn === txnId ? (
                             <Check className="w-3 h-3 text-emerald-500" />
                           ) : (

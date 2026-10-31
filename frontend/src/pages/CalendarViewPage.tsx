@@ -172,18 +172,13 @@ export const CalendarViewPage: React.FC = () => {
       <div className="flex-1 bg-white dark:bg-gray-900 border border-sky-100 dark:border-gray-800 rounded-2xl shadow-sm p-4 md:p-6 transition-all duration-300">
         {/* Calendar Header Controls */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-          <div className="flex items-center gap-3">
-            <div className="p-2.5 bg-sky-100 dark:bg-sky-900/50 rounded-xl text-sky-600 dark:text-sky-400">
-              <CalendarIcon className="w-6 h-6" />
-            </div>
-            <div>
-              <h1 className="text-xl md:text-2xl font-bold text-gray-800 dark:text-gray-200">
-                Calendar View
-              </h1>
-              <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400">
-                Visualize and schedule deadlines dynamically
-              </p>
-            </div>
+          <div>
+            <h1 className="text-xl md:text-2xl font-bold text-gray-800 dark:text-gray-200">
+              Calendar View
+            </h1>
+            <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400">
+              Visualize and schedule deadlines dynamically
+            </p>
           </div>
 
           <div className="flex items-center gap-2 self-stretch sm:self-auto">
@@ -214,7 +209,8 @@ export const CalendarViewPage: React.FC = () => {
         </div>
 
         {/* Calendar Grid Sheet */}
-        <div className="grid grid-cols-7 gap-px bg-sky-100 dark:bg-gray-850 rounded-xl overflow-hidden border border-sky-100 dark:border-gray-800">
+        <div className="overflow-x-auto scrollbar-thin rounded-xl">
+          <div className="grid grid-cols-7 gap-px bg-sky-100 dark:bg-gray-850 min-w-[340px] sm:min-w-0 border border-sky-100 dark:border-gray-800">
           {/* Weekdays Row */}
           {CALENDAR_TEXTS.WEEKDAY_NAMES.map((name) => (
             <div
@@ -342,6 +338,7 @@ export const CalendarViewPage: React.FC = () => {
               </div>
             );
           })}
+          </div>
         </div>
       </div>
 
