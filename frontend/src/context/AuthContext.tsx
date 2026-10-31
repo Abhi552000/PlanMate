@@ -1,4 +1,4 @@
-import React, { createContext, useContext } from "react";
+import React, { createContext, useContext, useCallback, useMemo } from "react";
 import { useAppDispatch, useAppSelector } from "../store";
 import { loginSuccess, logoutSuccess } from "../store/slices/authSlice";
 import { IUser, AuthContextType } from "../types";
@@ -11,44 +11,58 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const dispatch = useAppDispatch();
   const currentUser = useAppSelector((state) => state.auth.currentUser);
 
-  const setCurrentUser = (updater: any) => {
-    if (typeof updater === "function") {
-      const updatedUser = updater(currentUser);
-      dispatch(loginSuccess(updatedUser));
-    } else {
-      dispatch(loginSuccess(updater));
-    }
-  };
+  const setCurrentUser = useCallback(
+    (updater: any) => {
+      if (typeof updater === "function") {
+        const updatedUser = updater(currentUser);
+        dispatch(loginSuccess(updatedUser));
+      } else {
+        dispatch(loginSuccess(updater));
+      }
+    },
+    [dispatch, currentUser]
+  );
 
-  const login = (
-    data: any,
-    navigate: (path: string, options?: any) => void
-  ) => {
-    const user: IUser = {
-      _id: data.id || data._id || "",
-      email: data.email,
-      name: data.name || "User",
-      role: data.role || "member",
-      status: data.status || "active",
-      organization: data.organization || null,
-      avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(
-        data.name || "User"
-      )}&background=random`,
-    };
-    dispatch(loginSuccess(user));
-    const targetPath = user.role === "system_admin" ? "/system-admin" : "/";
-    navigate(targetPath, { replace: true });
-  };
+  const login = useCallback(
+    (data: any, navigate: (path: string, options?: any) => void) => {
+      const user: IUser = {
+        _id: data.id || data._id || "",
+        email: data.email,
+        name: data.name || "User",
+        role: data.role || "member",
+        status: data.status || "active",
+        organization: data.organization || null,
+        avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(
+          data.name || "User"
+        )}&background=random`,
+      };
+      dispatch(loginSuccess(user));
+      const targetPath = user.role === "system_admin" ? "/system-admin" : "/";
+      navigate(targetPath, { replace: true });
+    },
+    [dispatch]
+  );
 
-  const logout = (navigate: (path: string, options?: any) => void) => {
-    dispatch(logoutSuccess());
-    navigate("/login", { replace: true });
-  };
+  const logout = useCallback(
+    (navigate: (path: string, options?: any) => void) => {
+      dispatch(logoutSuccess());
+      navigate("/login", { replace: true });
+    },
+    [dispatch]
+  );
+
+  const contextValue = useMemo(
+    () => ({
+      currentUser,
+      setCurrentUser,
+      login,
+      logout,
+    }),
+    [currentUser, setCurrentUser, login, logout]
+  );
 
   return (
-    <AuthContext.Provider
-      value={{ currentUser, setCurrentUser, login, logout }}
-    >
+    <AuthContext.Provider value={contextValue}>
       {children}
     </AuthContext.Provider>
   );

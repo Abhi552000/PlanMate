@@ -83,6 +83,10 @@ const organizationSchema = new mongoose.Schema({
   },
 });
 
+organizationSchema.index({ admin: 1 });
+organizationSchema.index({ isActive: 1 });
+organizationSchema.index({ "subscription.planId": 1 });
+
 const organizationModel =
   mongoose.models.organization ||
   mongoose.model("organization", organizationSchema);

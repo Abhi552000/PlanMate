@@ -96,36 +96,39 @@ const Dashboard = () => {
 
   useEffect(() => {
     let isMounted = true;
-    const fetchMembers = async () => {
+    const fetchMetadata = async () => {
       try {
-        const data = await orgService.getOrgMembers();
-        if (isMounted && data?.success && data?.members) {
-          setMembers(data.members);
-        }
-      } catch (err) {
-        console.error(CONSOLE_ERRORS.FETCH_MEMBERS_DASHBOARD, err);
-      }
-    };
-    fetchMembers();
-    return () => {
-      isMounted = false;
-    };
-  }, []);
+        const [membersRes, orgRes] = await Promise.all([
+          orgService.getOrgMembers().catch((err) => {
+            console.error(CONSOLE_ERRORS.FETCH_MEMBERS_DASHBOARD, err);
+            return null;
+          }),
+          orgService.getOrgDetails().catch((err) => {
+            console.error(CONSOLE_ERRORS.FETCH_ORG_DETAILS, err);
+            return null;
+          }),
+        ]);
 
-  useEffect(() => {
-    let isMounted = true;
-    const fetchOrgDetails = async () => {
-      try {
-        const data = await orgService.getOrgDetails();
-        if (isMounted && data?.success && Array.isArray(data?.organization?.statuses) && data.organization.statuses.length > 0) {
-          setCachedStatuses(data.organization.statuses);
-          setStatuses(data.organization.statuses);
+        if (!isMounted) return;
+
+        if (membersRes?.success && membersRes?.members) {
+          setMembers(membersRes.members);
+        }
+
+        if (
+          orgRes?.success &&
+          Array.isArray(orgRes?.organization?.statuses) &&
+          orgRes.organization.statuses.length > 0
+        ) {
+          setCachedStatuses(orgRes.organization.statuses);
+          setStatuses(orgRes.organization.statuses);
         }
       } catch (err) {
-        console.error(CONSOLE_ERRORS.FETCH_ORG_DETAILS, err);
+        console.error("Error fetching dashboard metadata:", err);
       }
     };
-    fetchOrgDetails();
+
+    fetchMetadata();
     return () => {
       isMounted = false;
     };

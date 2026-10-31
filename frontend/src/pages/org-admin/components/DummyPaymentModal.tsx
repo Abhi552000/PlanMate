@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import {
   X,
   CreditCard,
@@ -11,7 +11,19 @@ import {
 import { DummyPaymentModalProps, PaymentMethodOption, IPaymentReceipt } from "../../../types";
 import { PAYMENT_MODAL_TEXTS } from "../../../constants/billingTexts";
 
-export const DummyPaymentModal: React.FC<DummyPaymentModalProps> = ({
+const MS_PER_DAY = 86_400_000; // 1000 * 60 * 60 * 24
+
+const PAYMENT_METHODS: Array<{
+  id: PaymentMethodOption;
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+}> = [
+  { id: "card", label: PAYMENT_MODAL_TEXTS.METHOD_CARD, icon: CreditCard },
+  { id: "upi", label: PAYMENT_MODAL_TEXTS.METHOD_UPI, icon: Smartphone },
+  { id: "netbanking", label: PAYMENT_MODAL_TEXTS.METHOD_NETBANKING, icon: Landmark },
+];
+
+export const DummyPaymentModal: React.FC<DummyPaymentModalProps> = React.memo(({
   isOpen,
   onClose,
   plan,
@@ -26,49 +38,115 @@ export const DummyPaymentModal: React.FC<DummyPaymentModalProps> = ({
   const [copiedTxn, setCopiedTxn] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethodOption>("card");
 
-  if (!isOpen || !plan) return null;
+  const copyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Proration calculation for mid-cycle upgrade
-  const basePrice =
-    billingCycle === "yearly" && plan.price > 0 ? plan.price * 10 : plan.price;
+  // Clear timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (copyTimeoutRef.current) {
+        clearTimeout(copyTimeoutRef.current);
+      }
+    };
+  }, []);
 
-  let unusedCredit = 0;
-  let remainingDays = 0;
-  if (
-    currentSubscription &&
-    currentSubscription.amountPaid > 0 &&
-    currentSubscription.validUntil
-  ) {
-    const validUntilDate = new Date(currentSubscription.validUntil);
-    const now = new Date();
-    const remainingMs = validUntilDate.getTime() - now.getTime();
-    if (remainingMs > 0) {
-      remainingDays = Math.ceil(remainingMs / (1000 * 60 * 60 * 24));
-      const totalDays = currentSubscription.billingCycle === "yearly" ? 365 : 30;
-      unusedCredit = Math.min(
-        currentSubscription.amountPaid,
-        Math.round((currentSubscription.amountPaid / totalDays) * remainingDays)
-      );
+  // Lock body scroll when modal is active
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
     }
-  }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isOpen]);
 
-  const finalPayable = Math.max(0, basePrice - unusedCredit);
+  // Reset internal states when modal closes or plan changes
+  useEffect(() => {
+    if (!isOpen) {
+      setPaymentReceipt(null);
+      setError(null);
+      setCopiedTxn(false);
+      setSubmitting(false);
+    }
+  }, [isOpen]);
 
-  const handlePay = async (e: React.FormEvent) => {
+  const handleClose = useCallback(() => {
+    setPaymentReceipt(null);
+    setError(null);
+    onClose();
+  }, [onClose]);
+
+  // Handle ESC key to dismiss modal
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && !submitting) {
+        handleClose();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen, submitting, handleClose]);
+
+  // Memoized proration calculation for mid-cycle upgrade
+  const { basePrice, unusedCredit, remainingDays, finalPayable } = useMemo(() => {
+    if (!plan) {
+      return { basePrice: 0, unusedCredit: 0, remainingDays: 0, finalPayable: 0 };
+    }
+
+    const base = billingCycle === "yearly" && plan.price > 0 ? plan.price * 10 : plan.price;
+    let credit = 0;
+    let days = 0;
+
+    if (
+      currentSubscription &&
+      currentSubscription.amountPaid > 0 &&
+      currentSubscription.validUntil
+    ) {
+      const validUntilMs = new Date(currentSubscription.validUntil).getTime();
+      const remainingMs = validUntilMs - Date.now();
+
+      if (remainingMs > 0) {
+        days = Math.ceil(remainingMs / MS_PER_DAY);
+        const totalDays = currentSubscription.billingCycle === "yearly" ? 365 : 30;
+        credit = Math.min(
+          currentSubscription.amountPaid,
+          Math.round((currentSubscription.amountPaid / totalDays) * days)
+        );
+      }
+    }
+
+    return {
+      basePrice: base,
+      unusedCredit: credit,
+      remainingDays: days,
+      finalPayable: Math.max(0, base - credit),
+    };
+  }, [plan, billingCycle, currentSubscription]);
+
+  const handlePay = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
+    if (submitting || !plan) return;
+
     setSubmitting(true);
     setError(null);
+
+    const methodLabel =
+      paymentMethod === "card"
+        ? PAYMENT_MODAL_TEXTS.METHOD_CARD
+        : paymentMethod === "upi"
+        ? PAYMENT_MODAL_TEXTS.METHOD_UPI
+        : PAYMENT_MODAL_TEXTS.METHOD_NETBANKING;
+
     try {
       const res = await subscribeToPlan({
         planId: plan.planId,
         billingCycle,
         paymentDetails: {
-          method:
-            paymentMethod === "card"
-              ? PAYMENT_MODAL_TEXTS.METHOD_CARD
-              : paymentMethod === "upi"
-              ? PAYMENT_MODAL_TEXTS.METHOD_UPI
-              : PAYMENT_MODAL_TEXTS.METHOD_NETBANKING,
+          method: methodLabel,
         },
       });
 
@@ -83,24 +161,32 @@ export const DummyPaymentModal: React.FC<DummyPaymentModalProps> = ({
     } finally {
       setSubmitting(false);
     }
-  };
+  }, [submitting, plan, billingCycle, paymentMethod, subscribeToPlan, onSuccess]);
 
-  const handleCopyTxn = () => {
+  const handleCopyTxn = useCallback(() => {
     if (paymentReceipt?.transactionId) {
       navigator.clipboard.writeText(paymentReceipt.transactionId);
       setCopiedTxn(true);
-      setTimeout(() => setCopiedTxn(false), 2000);
+      if (copyTimeoutRef.current) {
+        clearTimeout(copyTimeoutRef.current);
+      }
+      copyTimeoutRef.current = setTimeout(() => setCopiedTxn(false), 2000);
     }
-  };
+  }, [paymentReceipt?.transactionId]);
 
-  const handleClose = () => {
-    setPaymentReceipt(null);
-    setError(null);
-    onClose();
-  };
+  if (!isOpen || !plan) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs animate-in fade-in duration-150">
+    <div
+      role="dialog"
+      aria-modal="true"
+      onClick={(e) => {
+        if (e.target === e.currentTarget && !submitting) {
+          handleClose();
+        }
+      }}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-150"
+    >
       <div className="bg-white dark:bg-gray-900 rounded-2xl max-w-md w-full shadow-2xl border border-slate-200 dark:border-gray-800 overflow-hidden max-h-[90vh] overflow-y-auto text-gray-800 dark:text-gray-100">
         {/* Header */}
         <div className="flex items-center justify-between p-5 border-b border-gray-100 dark:border-gray-800">
@@ -117,8 +203,10 @@ export const DummyPaymentModal: React.FC<DummyPaymentModalProps> = ({
             </p>
           </div>
           <button
+            type="button"
             onClick={handleClose}
             className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer"
+            aria-label="Close modal"
           >
             <X className="w-5 h-5" />
           </button>
@@ -179,6 +267,7 @@ export const DummyPaymentModal: React.FC<DummyPaymentModalProps> = ({
             </div>
 
             <button
+              type="button"
               onClick={handleClose}
               className="w-full h-10 bg-sky-500 hover:bg-sky-600 text-white rounded-xl text-xs font-bold transition-all shadow-2xs cursor-pointer"
             >
@@ -239,44 +328,24 @@ export const DummyPaymentModal: React.FC<DummyPaymentModalProps> = ({
                 {PAYMENT_MODAL_TEXTS.PAYMENT_OPTION_LABEL}
               </label>
               <div className="grid grid-cols-3 gap-2">
-                <button
-                  type="button"
-                  onClick={() => setPaymentMethod("card")}
-                  className={`p-2.5 rounded-xl border text-center transition-all cursor-pointer flex flex-col items-center justify-center gap-1 ${
-                    paymentMethod === "card"
-                      ? "border-sky-500 bg-sky-50/50 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300 ring-1 ring-sky-500"
-                      : "border-slate-200 dark:border-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800"
-                  }`}
-                >
-                  <CreditCard className="w-4 h-4" />
-                  <span className="text-[11px] font-bold">{PAYMENT_MODAL_TEXTS.METHOD_CARD}</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setPaymentMethod("upi")}
-                  className={`p-2.5 rounded-xl border text-center transition-all cursor-pointer flex flex-col items-center justify-center gap-1 ${
-                    paymentMethod === "upi"
-                      ? "border-sky-500 bg-sky-50/50 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300 ring-1 ring-sky-500"
-                      : "border-slate-200 dark:border-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800"
-                  }`}
-                >
-                  <Smartphone className="w-4 h-4" />
-                  <span className="text-[11px] font-bold">{PAYMENT_MODAL_TEXTS.METHOD_UPI}</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setPaymentMethod("netbanking")}
-                  className={`p-2.5 rounded-xl border text-center transition-all cursor-pointer flex flex-col items-center justify-center gap-1 ${
-                    paymentMethod === "netbanking"
-                      ? "border-sky-500 bg-sky-50/50 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300 ring-1 ring-sky-500"
-                      : "border-slate-200 dark:border-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800"
-                  }`}
-                >
-                  <Landmark className="w-4 h-4" />
-                  <span className="text-[11px] font-bold">{PAYMENT_MODAL_TEXTS.METHOD_NETBANKING}</span>
-                </button>
+                {PAYMENT_METHODS.map(({ id, label, icon: Icon }) => {
+                  const isSelected = paymentMethod === id;
+                  return (
+                    <button
+                      key={id}
+                      type="button"
+                      onClick={() => setPaymentMethod(id)}
+                      className={`p-2.5 rounded-xl border text-center transition-all cursor-pointer flex flex-col items-center justify-center gap-1 ${
+                        isSelected
+                          ? "border-sky-500 bg-sky-50/50 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300 ring-1 ring-sky-500"
+                          : "border-slate-200 dark:border-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800"
+                      }`}
+                    >
+                      <Icon className="w-4 h-4" />
+                      <span className="text-[11px] font-bold">{label}</span>
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
@@ -307,6 +376,8 @@ export const DummyPaymentModal: React.FC<DummyPaymentModalProps> = ({
       </div>
     </div>
   );
-};
+});
+
+DummyPaymentModal.displayName = "DummyPaymentModal";
 
 export default DummyPaymentModal;

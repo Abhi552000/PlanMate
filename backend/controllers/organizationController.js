@@ -305,15 +305,15 @@ export const getAllOrganizations = async (req, res) => {
       ];
     }
 
-    const [totalPlatformUsers, totalPlatformTasks, totalOrganizations, activeOrganizations, inactiveOrganizations, totalCount] =
+    const [totalPlatformUsers, totalPlatformTasks, totalOrganizations, activeOrganizations, totalCount] =
       await Promise.all([
         User.countDocuments({ role: { $ne: "system_admin" } }),
         Task.countDocuments({}),
         Organization.countDocuments({}),
         Organization.countDocuments({ isActive: true }),
-        Organization.countDocuments({ isActive: false }),
         Organization.countDocuments(filter),
       ]);
+    const inactiveOrganizations = Math.max(0, totalOrganizations - activeOrganizations);
 
     let query = Organization.find(filter)
       .populate("admin", "name email")
