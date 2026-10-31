@@ -5,12 +5,14 @@ import KanbanBoard from "../../components/KanbanBoard";
 const TaskModal = React.lazy(() => import("../../components/TaskModal"));
 import { DashboardHeader } from "./components/DashboardHeader";
 import { DashboardFilters } from "./components/DashboardFilters";
+import { DashboardSkeleton } from "./components/DashboardSkeleton";
 import { ListModeView } from "./components/ListModeView";
 import { taskService } from "../../services/taskService";
 import { orgService } from "../../services/orgService";
 import { ITask, IUser, DashboardContext } from "../../types";
 import { CONSOLE_ERRORS } from "../../constants/messages";
 import { filterDashboardTasks } from "./helpers/dashboardHelpers";
+import { getCachedStatuses, setCachedStatuses } from "../../utils/statusUtils";
 
 const AnalyticsDashboard = React.lazy(() =>
   import("../../components/AnalyticsDashboard").then((m) => ({
@@ -19,7 +21,7 @@ const AnalyticsDashboard = React.lazy(() =>
 );
 
 const Dashboard = () => {
-  const { tasks, refreshTasks, viewMode, setViewMode } = useOutletContext<DashboardContext>();
+  const { tasks, refreshTasks, viewMode, setViewMode, loading } = useOutletContext<DashboardContext>();
   const [searchParams] = useSearchParams();
   const [showModal, setShowModal] = useState(false);
   const [selectedTask, setSelectedTask] = useState<ITask | null>(null);
@@ -54,7 +56,7 @@ const Dashboard = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [totalTasksCount, setTotalTasksCount] = useState(0);
   const [loadingList, setLoadingList] = useState(false);
-  const [statuses, setStatuses] = useState<string[]>(["To Do", "In Progress", "Done"]);
+  const [statuses, setStatuses] = useState<string[]>(getCachedStatuses);
 
   const fetchPaginatedListTasks = useCallback(async (page = 1, append = false) => {
     setLoadingList(true);
@@ -93,33 +95,40 @@ const Dashboard = () => {
   }, [viewMode, fetchPaginatedListTasks]);
 
   useEffect(() => {
+    let isMounted = true;
     const fetchMembers = async () => {
       try {
         const data = await orgService.getOrgMembers();
-        if (data?.success && data?.members) {
+        if (isMounted && data?.success && data?.members) {
           setMembers(data.members);
         }
       } catch (err) {
         console.error(CONSOLE_ERRORS.FETCH_MEMBERS_DASHBOARD, err);
       }
     };
-    const timer = setTimeout(fetchMembers, 300);
-    return () => clearTimeout(timer);
+    fetchMembers();
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   useEffect(() => {
+    let isMounted = true;
     const fetchOrgDetails = async () => {
       try {
         const data = await orgService.getOrgDetails();
-        if (data?.success && data?.organization?.statuses) {
+        if (isMounted && data?.success && Array.isArray(data?.organization?.statuses) && data.organization.statuses.length > 0) {
+          setCachedStatuses(data.organization.statuses);
           setStatuses(data.organization.statuses);
         }
       } catch (err) {
         console.error(CONSOLE_ERRORS.FETCH_ORG_DETAILS, err);
       }
     };
-    const timer = setTimeout(fetchOrgDetails, 400);
-    return () => clearTimeout(timer);
+    fetchOrgDetails();
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   // Filter tasks dynamically for the Board view
@@ -172,6 +181,14 @@ const Dashboard = () => {
     refreshTasks();
     fetchPaginatedListTasks(1, false);
   }, [refreshTasks, fetchPaginatedListTasks]);
+
+  if (loading && tasks.length === 0) {
+    return (
+      <div className={WRAPPER}>
+        <DashboardSkeleton />
+      </div>
+    );
+  }
 
   return (
     <div className={WRAPPER}>

@@ -21,7 +21,7 @@ export const KanbanColumn: React.FC<KanbanColumnProps> = React.memo(({
       onDragEnter={(e) => handleDragEnter(e, col)}
       onDragLeave={handleDragLeave}
       onDrop={(e) => handleDrop(e, col)}
-      className={`border rounded-xl p-3.5 sm:p-4 flex flex-col min-h-[480px] snap-center w-[85vw] max-w-[320px] sm:w-[320px] md:w-full shrink-0 shadow-sm transition-all duration-200 ${
+      className={`border rounded-xl p-3.5 sm:p-4 flex flex-col min-h-[480px] snap-center w-[85vw] min-w-[270px] max-w-[340px] md:max-w-none md:w-full shrink-0 shadow-sm transition-all duration-200 ${
         activeOverColumn === col
           ? "bg-sky-100/70 dark:bg-sky-950/20 border-sky-300 dark:border-sky-700"
           : "bg-gray-50/70 dark:bg-gray-900/50 border-sky-100 dark:border-gray-800"

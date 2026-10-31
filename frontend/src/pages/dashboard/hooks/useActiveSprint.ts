@@ -9,6 +9,7 @@ import { orgService } from "../../../services/orgService";
 import { ITask } from "../../../types";
 import { TOAST_MESSAGES } from "../../../constants/messages";
 import { getRemainingDaysText } from "../../../utils";
+import { getCachedStatuses, setCachedStatuses } from "../../../utils/statusUtils";
 
 export const useActiveSprint = () => {
   const navigate = useNavigate();
@@ -16,7 +17,7 @@ export const useActiveSprint = () => {
   const activeSprint = useAppSelector((state) => state.sprints.activeSprint);
   const epics = useAppSelector((state) => state.epics.epics);
   const loading = useAppSelector((state) => state.sprints.loading || state.epics.loading);
-  const [statuses, setStatuses] = useState<string[]>(["To Do", "In Progress", "Done", "Closed"]);
+  const [statuses, setStatuses] = useState<string[]>(getCachedStatuses);
   const [showConfirmComplete, setShowConfirmComplete] = useState(false);
   const [completingSprint, setCompletingSprint] = useState(false);
 
@@ -34,7 +35,8 @@ export const useActiveSprint = () => {
       await dispatch(fetchSprints()).unwrap();
       await dispatch(fetchEpics()).unwrap();
       const orgRes = await orgService.getOrgDetails();
-      if (orgRes?.success && orgRes?.organization?.statuses) {
+      if (orgRes?.success && Array.isArray(orgRes?.organization?.statuses) && orgRes.organization.statuses.length > 0) {
+        setCachedStatuses(orgRes.organization.statuses);
         setStatuses(orgRes.organization.statuses);
       }
     } catch (err: any) {

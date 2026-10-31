@@ -7,13 +7,14 @@ import { TOAST_MESSAGES, CONSOLE_ERRORS } from "../constants/messages";
 import { KanbanColumn } from "./kanban/KanbanColumn";
 import { useAppDispatch } from "../store";
 import { updateTaskOptimistic } from "../store/slices/taskSlice";
+import { DEFAULT_STATUSES } from "../utils/statusUtils";
 
 const KanbanBoard: React.FC<KanbanBoardProps> = ({
   tasks,
   onRefresh,
   onEdit,
   onLogout,
-  columns = ["To Do", "In Progress", "Done"],
+  columns = DEFAULT_STATUSES,
 }) => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
@@ -181,7 +182,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
   return (
     <div
       style={{ gridTemplateColumns: `repeat(${columns.length}, minmax(0, 1fr))` }}
-      className="flex flex-row overflow-x-auto gap-3.5 sm:gap-4 md:gap-6 pt-2 pb-4 md:grid md:items-start select-none max-w-full snap-x snap-mandatory scroll-smooth -mx-3.5 px-3.5 sm:mx-0 sm:px-0"
+      className="flex flex-row overflow-x-auto gap-4 lg:gap-5 pt-2 pb-4 md:grid md:items-start select-none max-w-full snap-x snap-mandatory scroll-smooth -mx-3.5 px-3.5 sm:mx-0 sm:px-0"
     >
       {columns.map((col) => {
         const colTasks = groupedTasks[col] || [];

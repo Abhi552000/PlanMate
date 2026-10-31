@@ -1,10 +1,11 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import { ITask, TaskState } from "../../types";
 import { taskService } from "../../services/taskService";
+import { getCachedStatuses } from "../../utils/statusUtils";
 
 const initialState: TaskState = {
   tasks: [],
-  statuses: ["To Do", "In Progress", "Done"],
+  statuses: getCachedStatuses(),
   loading: false,
   error: null,
 };

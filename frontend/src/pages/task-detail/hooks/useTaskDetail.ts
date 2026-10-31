@@ -6,6 +6,7 @@ import { orgService } from "../../../services/orgService";
 import { ITask, IUser } from "../../../types";
 import { TOAST_MESSAGES, CONSOLE_ERRORS } from "../../../constants/messages";
 import { cleanMentionsForEditing, formatMentionsForSaving } from "../../../utils/mentions";
+import { getCachedStatuses, setCachedStatuses } from "../../../utils/statusUtils";
 
 export const useTaskDetail = (id: string | undefined, subtaskIndex: number | null) => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -31,7 +32,7 @@ export const useTaskDetail = (id: string | undefined, subtaskIndex: number | nul
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [statuses, setStatuses] = useState<string[]>(["To Do", "In Progress", "Done"]);
+  const [statuses, setStatuses] = useState<string[]>(getCachedStatuses);
 
   const [commentText, setCommentText] = useState("");
   const [addingComment, setAddingComment] = useState(false);
@@ -212,7 +213,8 @@ export const useTaskDetail = (id: string | undefined, subtaskIndex: number | nul
           setMembers(membersData.members);
         }
         const orgData = await orgService.getOrgDetails();
-        if (orgData?.success && orgData?.organization?.statuses) {
+        if (orgData?.success && Array.isArray(orgData?.organization?.statuses) && orgData.organization.statuses.length > 0) {
+          setCachedStatuses(orgData.organization.statuses);
           setStatuses(orgData.organization.statuses);
         }
       } catch (err) {
