@@ -14,8 +14,48 @@ const Layout: React.FC<LayoutProps> = ({ user, onLogout }) => {
   const [viewMode, setViewMode] = useState("kanban");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
+  // 1. Collapsible sidebar state (persisted across page reloads like Jira)
+  const [isCollapsed, setIsCollapsed] = useState<boolean>(() => {
+    try {
+      const saved = localStorage.getItem("planmate_sidebar_collapsed");
+      return saved ? JSON.parse(saved) : false;
+    } catch {
+      return false;
+    }
+  });
+
+  const handleToggleCollapse = useCallback(() => {
+    setIsCollapsed((prev) => {
+      const next = !prev;
+      try {
+        localStorage.setItem("planmate_sidebar_collapsed", JSON.stringify(next));
+      } catch {}
+      return next;
+    });
+  }, []);
+
+  // 2. Jira keyboard shortcut: press "[" to toggle sidebar
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement;
+      if (
+        target.tagName === "INPUT" ||
+        target.tagName === "TEXTAREA" ||
+        target.isContentEditable
+      ) {
+        return;
+      }
+      if (e.key === "[") {
+        e.preventDefault();
+        handleToggleCollapse();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [handleToggleCollapse]);
+
   const fetchTasksData = useCallback(
-    async (silent = true) => {
+    async (_silent = true) => {
       if (user?.role === "system_admin") return;
       dispatch(fetchTasks());
     },
@@ -36,24 +76,26 @@ const Layout: React.FC<LayoutProps> = ({ user, onLogout }) => {
     fetchTasksData(false);
   }, [fetchTasksData]);
 
-  // Loading
+  const hasSidebar = user?.role === "org_admin" || user?.role === "member";
+
+  // Loading state (rendered AFTER all hooks)
   if (loading && tasks.length === 0)
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex items-center justify-center">
-        <div className=" animate-spin rounded-full h-12 w-12 border-t-2 border-sky-500" />
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-sky-500" />
       </div>
     );
 
-  // Error
+  // Error state (rendered AFTER all hooks)
   if (error && tasks.length === 0)
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-950 p-6 flex items-center justify-center">
-        <div className=" bg-red-50 dark:bg-red-950/20 text-red-600 dark:text-red-400 p-4 rounded-xl border border-red-100 dark:border-red-900/50 max-w-md">
-          <p className=" font-medium mb-2">Error loading tasks</p>
-          <p className=" text-sm">{error}</p>
+        <div className="bg-red-50 dark:bg-red-950/20 text-red-600 dark:text-red-400 p-4 rounded-xl border border-red-100 dark:border-red-900/50 max-w-md">
+          <p className="font-medium mb-2">Error loading tasks</p>
+          <p className="text-sm">{error}</p>
           <button
             onClick={() => fetchTasksData(false)}
-            className=" mt-4 py-2 px-4 bg-red-100 text-red-700 rounded-lg text-sm font-medium hover:bg-red-200 transition-colors"
+            className="mt-4 py-2 px-4 bg-red-100 text-red-700 rounded-lg text-sm font-medium hover:bg-red-200 transition-colors"
           >
             Try Again
           </button>
@@ -61,10 +103,8 @@ const Layout: React.FC<LayoutProps> = ({ user, onLogout }) => {
       </div>
     );
 
-  const hasSidebar = user?.role === "org_admin" || user?.role === "member";
-
   return (
-    <div className=" min-h-screen bg-gray-50 dark:bg-gray-950 transition-colors duration-300">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 transition-colors duration-300">
       <Navbar
         user={user || undefined}
         onLogout={onLogout}
@@ -77,21 +117,23 @@ const Layout: React.FC<LayoutProps> = ({ user, onLogout }) => {
           tasks={tasks}
           mobileOpen={mobileMenuOpen}
           setMobileOpen={setMobileMenuOpen}
+          isCollapsed={isCollapsed}
+          onToggleCollapse={handleToggleCollapse}
         />
       )}
 
       <main
         className={`${
-          hasSidebar ? "pl-0 md:pl-20 lg:pl-60" : "pl-0"
-        } transition-all duration-300 min-h-screen w-full overflow-x-hidden`}
+          hasSidebar ? (isCollapsed ? "pl-0 md:pl-16" : "pl-0 md:pl-60") : "pl-0"
+        } transition-all duration-300 ease-in-out min-h-screen w-full overflow-x-hidden`}
       >
-        <div className="px-3.5 sm:px-6 md:px-8 pt-4 sm:pt-6 md:pt-8 pb-6 w-full transition-all duration-300 text-gray-900 dark:text-gray-100">
+        <div className="px-3.5 sm:px-6 md:px-8 pt-3 sm:pt-5 pb-6 w-full transition-all duration-300 text-gray-900 dark:text-gray-100">
           {error && (
-            <div className=" mb-4 bg-red-50 text-red-600 p-3 rounded-lg border border-red-100 flex justify-between items-center text-sm animate-fadeIn">
+            <div className="mb-4 bg-red-50 text-red-600 p-3 rounded-lg border border-red-100 flex justify-between items-center text-sm animate-fadeIn">
               <span>Failed to sync tasks: {error}</span>
               <button
                 onClick={() => fetchTasksData(true)}
-                className=" underline text-red-700 hover:text-red-900 font-medium"
+                className="underline text-red-700 hover:text-red-900 font-medium"
               >
                 Retry
               </button>

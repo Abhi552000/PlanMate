@@ -232,8 +232,8 @@ const TaskModal: React.FC<TaskModalProps> = ({
           setParentTask={setParentTask}
         />
         <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0 space-y-5 overflow-hidden">
-          <div className="flex-1 overflow-y-auto pr-2 min-h-0 py-2 scrollbar-thin">
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-12">
+          <div className="flex-1 overflow-y-auto px-1.5 pr-2.5 min-h-0 py-3 scrollbar-thin">
+            <div className="grid grid-cols-1 gap-5 md:grid-cols-12">
               {/* Left side: Main text fields and subtasks */}
               <div className="md:col-span-7 space-y-4">
                 <TaskFormGeneral

@@ -8,6 +8,7 @@ import { ROUTES } from "../../constants/routeConstant";
 import { TaskDetailsHeader } from "./components/TaskDetailsHeader";
 import { TaskDescriptionSection } from "./components/TaskDescriptionSection";
 import { SubtaskListSection } from "./components/SubtaskListSection";
+import { IssueLinkingSection } from "./components/IssueLinkingSection";
 import { ActivityTimelineSection } from "./components/ActivityTimelineSection";
 import { CommentsSection } from "./components/CommentsSection";
 import { TaskMetaSidebar } from "./components/TaskMetaSidebar";
@@ -20,7 +21,7 @@ const TaskDetailPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
-  
+
   const subtaskIndexParam = searchParams.get("subtask");
   const subtaskIndex = subtaskIndexParam !== null ? parseInt(subtaskIndexParam, 10) : null;
   const [activeBottomTab, setActiveBottomTab] = useState<"comments" | "timeline">("comments");
@@ -58,6 +59,7 @@ const TaskDetailPage = () => {
     handleChange,
     handleSave,
     handleAddSubtask,
+    handleInlineTitleUpdate,
   } = useTaskDetail(id, subtaskIndex);
 
   const today = new Date().toISOString().split("T")[0];
@@ -66,8 +68,8 @@ const TaskDetailPage = () => {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-sky-500" />
-        <span className="text-sm font-semibold text-gray-500 mt-4">Loading ticket details...</span>
+        <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-sky-500" />
+        <span className="text-xs font-semibold text-gray-400 mt-3">Loading ticket details...</span>
       </div>
     );
   }
@@ -75,28 +77,44 @@ const TaskDetailPage = () => {
   if (error || !parentTaskData) {
     return (
       <div className={WRAPPER}>
-        <div className="text-sm text-red-650 bg-red-50 p-4 rounded-xl border border-red-100">{error || "Task not found"}</div>
+        <div className="text-sm text-red-650 bg-red-50 p-4 rounded-xl border border-red-100">
+          {error || "Task not found"}
+        </div>
       </div>
     );
   }
 
   const isEditingSubtask = subtaskIndex !== null;
-  const projectKey = parentTaskData.key || "PM";
+  const projectName = currentUser?.organization?.name || "PlanMate";
+  const issueKey = parentTaskData.key || (parentTaskData._id ? `PM-${parentTaskData._id.slice(-4).toUpperCase()}` : "PM-1");
 
   return (
     <div className={WRAPPER}>
       <TaskDetailsHeader
         isEditingSubtask={isEditingSubtask}
-        projectKey={projectKey}
+        projectKey={projectName}
+        issueKey={issueKey}
+        issueType={taskData.issueType || "Task"}
+        title={taskData.title}
+        onTitleChange={handleInlineTitleUpdate}
         subtaskIndex={subtaskIndex}
         onBackToParent={() => setSearchParams({})}
         onBackToBoard={() => navigate(ROUTES.DASHBOARD)}
         onSave={handleSave}
         saving={saving}
+        onAddSubtaskClick={() => {
+          const el = document.getElementById("new-subtask-input");
+          el?.focus();
+          el?.scrollIntoView({ behavior: "smooth", block: "center" });
+        }}
+        onLinkIssueClick={() => {
+          const el = document.getElementById("issue-linking-section");
+          el?.scrollIntoView({ behavior: "smooth", block: "center" });
+        }}
       />
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start mt-6">
-        <div className="lg:col-span-8 space-y-5 bg-white dark:bg-gray-900 p-5 sm:p-6 rounded-2xl border border-sky-100/50 dark:border-gray-800 shadow-sm">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start mt-5">
+        <div className="lg:col-span-8 space-y-6 bg-white dark:bg-gray-900 p-5 sm:p-6 rounded-2xl border border-sky-100/50 dark:border-gray-800 shadow-xs">
           <TaskDescriptionSection
             title={taskData.title}
             description={taskData.description}
@@ -108,7 +126,7 @@ const TaskDetailPage = () => {
           {!isEditingSubtask && (
             <SubtaskListSection
               subtasks={parentTaskData.subtasks || []}
-              projectKey={projectKey}
+              projectKey={issueKey}
               newSubtaskTitle={newSubtaskTitle}
               setNewSubtaskTitle={setNewSubtaskTitle}
               editingSubtaskIdx={editingSubtaskIdx}
@@ -119,6 +137,22 @@ const TaskDetailPage = () => {
               setParentTaskData={setParentTaskData}
               onOpenSubtask={(idx) => setSearchParams({ subtask: String(idx) })}
               handleAddSubtask={handleAddSubtask}
+            />
+          )}
+
+          {!isEditingSubtask && (
+            <IssueLinkingSection
+              linkType={linkType}
+              setLinkType={setLinkType}
+              targetTaskId={targetTaskId}
+              setTargetTaskId={setTargetTaskId}
+              workspaceTasks={workspaceTasks}
+              linking={linking}
+              links={parentTaskData.links || []}
+              onAddLink={handleAddLink}
+              onRemoveLink={handleRemoveLink}
+              baseControlClasses={baseControlClasses}
+              onNavigateToTask={(taskId) => navigate(`/task/${taskId}`)}
             />
           )}
 

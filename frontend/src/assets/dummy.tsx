@@ -18,12 +18,15 @@ import {
 
 // FRONTEND CONSTANTS
 export const baseControlClasses =
-  "w-full px-3 py-2 border border-sky-100 dark:border-gray-800 rounded-lg text-xs focus:ring-2 focus:ring-sky-500 focus:outline-none bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 font-medium transition-all duration-200";
+  "w-full h-[38px] px-3 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-medium bg-white dark:bg-gray-800 text-slate-800 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 hover:border-slate-300 dark:hover:border-slate-600 focus:border-sky-500 focus:ring-2 focus:ring-sky-500/15 focus:outline-none transition-colors duration-150";
+
+export const selectControlClasses =
+  "w-full h-[38px] pl-3 pr-8 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-medium bg-white dark:bg-gray-800 text-slate-800 dark:text-slate-100 hover:border-slate-300 dark:hover:border-slate-600 focus:border-sky-500 focus:ring-2 focus:ring-sky-500/15 focus:outline-none transition-colors duration-150 cursor-pointer appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2020%2020%22%20fill%3D%22%2364748b%22%3E%3Cpath%20fill-rule%3D%22evenodd%22%20d%3D%22M5.23%207.21a.75.75%200%20011.06.02L10%2011.168l3.71-3.938a.75.75%200%20111.08%201.04l-4.25%204.5a.75.75%200%2001-1.08%200l-4.25-4.5a.75.75%200%2001.02-1.06z%22%20clip-rule%3D%22evenodd%22%2F%3E%3C%2Fsvg%3E')] bg-[length:16px_16px] bg-[right_10px_center] bg-no-repeat";
 
 export const priorityStyles: Record<string, string> = {
-  Low: "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-900/50",
-  Medium: "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/40 dark:text-amber-400 dark:border-amber-900/50",
-  High: "bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/40 dark:text-rose-400 dark:border-rose-900/50",
+  Low: "!bg-emerald-50/80 !text-emerald-700 !border-emerald-200 dark:!bg-emerald-950/30 dark:!text-emerald-400 dark:!border-emerald-800/80",
+  Medium: "!bg-amber-50/80 !text-amber-700 !border-amber-200 dark:!bg-amber-950/30 dark:!text-amber-400 dark:!border-amber-800/80",
+  High: "!bg-rose-50/80 !text-rose-700 !border-rose-200 dark:!bg-rose-950/30 dark:!text-rose-400 dark:!border-rose-800/80",
 };
 
 // data/defaultTask.js
@@ -79,7 +82,7 @@ export const menuItems = [
 
 export const SIDEBAR_CLASSES = {
   desktop:
-    "hidden md:flex flex-col fixed top-16 left-0 h-[calc(100vh-4rem)] w-20 lg:w-60 bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm border-r border-sky-100 dark:border-gray-800 shadow-sm z-20 transition-all duration-300",
+    "hidden md:flex flex-col fixed top-[52px] left-0 h-[calc(100vh-52px)] bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm border-r border-gray-200 dark:border-gray-800 shadow-xs z-30 transition-all duration-300",
   mobileButton:
     "fixed md:hidden top-20 left-4 z-40 bg-sky-600 text-white p-2.5 rounded-full shadow-lg hover:bg-sky-700 transition-all duration-200",
   mobileDrawerBackdrop: "fixed inset-0 bg-black/40 backdrop-blur-sm",

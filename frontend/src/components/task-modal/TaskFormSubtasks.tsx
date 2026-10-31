@@ -17,8 +17,9 @@ export const TaskFormSubtasks: React.FC<TaskFormSubtasksProps> = ({
 }) => {
   return (
     <div>
-      <label className=" flex items-center gap-1 text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-        <CheckCircle className=" w-4 h-4 text-sky-500" /> Subtasks Checklist
+      <label className="flex items-center gap-1.5 text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+        <CheckCircle className="w-3.5 h-3.5 text-sky-500" />
+        <span>Subtasks Checklist</span>
       </label>
       
       {/* Scrollable subtasks container */}
@@ -53,7 +54,7 @@ export const TaskFormSubtasks: React.FC<TaskFormSubtasksProps> = ({
                         setEditingSubtaskIdx(null);
                       }
                     }}
-                    className="flex-1 px-2 py-0.5 border border-sky-100 rounded text-xs focus:ring-1 focus:ring-sky-500 focus:outline-none text-gray-850 bg-white"
+                    className="flex-1 h-[30px] px-2.5 border border-slate-200 dark:border-slate-700 rounded text-xs bg-white dark:bg-gray-800 text-slate-800 dark:text-slate-100 focus:border-sky-500 focus:ring-2 focus:ring-sky-500/15 focus:outline-none transition-colors"
                     autoFocus
                   />
                 ) : (
@@ -123,7 +124,7 @@ export const TaskFormSubtasks: React.FC<TaskFormSubtasksProps> = ({
           placeholder="Add a new checklist item..."
           value={newSubtaskTitle}
           onChange={(e) => setNewSubtaskTitle(e.target.value)}
-          className="flex-1 px-3 py-2 border border-sky-100 dark:border-gray-700 rounded-lg text-xs focus:ring-2 focus:ring-sky-500 focus:outline-none bg-white dark:bg-gray-900"
+          className="flex-1 h-[38px] px-3.5 border border-slate-200 dark:border-slate-700 rounded-lg text-xs text-slate-800 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 bg-white dark:bg-gray-800 hover:border-slate-300 dark:hover:border-slate-600 focus:border-sky-500 focus:ring-2 focus:ring-sky-500/15 focus:outline-none transition-colors duration-150"
           onKeyDown={(e) => {
             if (e.key === 'Enter') {
               e.preventDefault();
@@ -134,7 +135,7 @@ export const TaskFormSubtasks: React.FC<TaskFormSubtasksProps> = ({
         <button
           type="button"
           onClick={onAddSubtask}
-          className="w-full sm:w-auto px-4 py-2 bg-sky-100 hover:bg-sky-200 text-sky-700 rounded-lg text-xs font-bold transition-colors cursor-pointer"
+          className="h-[38px] px-4 bg-slate-100 hover:bg-slate-200 dark:bg-gray-700 dark:hover:bg-gray-650 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-650 rounded-lg text-xs font-semibold transition-colors duration-150 cursor-pointer shrink-0"
         >
           Add
         </button>

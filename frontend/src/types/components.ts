@@ -73,8 +73,8 @@ export interface ConfirmDeleteStatusModalProps {
 }
 
 export interface IssueLinkingSectionProps {
-  linkType: "blocks" | "blocked by" | "relates to";
-  setLinkType: (val: "blocks" | "blocked by" | "relates to") => void;
+  linkType: string;
+  setLinkType: (val: any) => void;
   targetTaskId: string;
   setTargetTaskId: (val: string) => void;
   workspaceTasks: any[];
@@ -82,7 +82,8 @@ export interface IssueLinkingSectionProps {
   links: any[];
   onAddLink: (e: React.FormEvent) => Promise<void> | void;
   onRemoveLink: (linkId: string) => Promise<void> | void;
-  baseControlClasses: string;
+  baseControlClasses?: string;
+  onNavigateToTask?: (taskId: string) => void;
 }
 
 export interface BacklogModalsProps {

@@ -4,46 +4,26 @@ import { TaskDescriptionSectionProps } from "../../../types";
 import { MentionInput } from "../../../components/MentionInput";
 
 export const TaskDescriptionSection: React.FC<TaskDescriptionSectionProps> = ({
-  title,
   description,
   onChange,
   baseControlClasses,
   members,
 }) => {
   return (
-    <div className="space-y-5">
-      <div>
-        <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1">
-          Summary
-        </label>
-        <div className="flex items-center border border-sky-100 dark:border-gray-800 rounded-lg px-3 py-2 bg-white dark:bg-gray-900 focus-within:ring-2 focus-within:ring-sky-500 transition-all duration-200">
-          <input
-            type="text"
-            name="title"
-            required
-            value={title}
-            onChange={onChange}
-            className="w-full focus:outline-none text-xs text-gray-700 dark:text-gray-300 font-medium bg-transparent"
-            placeholder="Summary title of the issue"
-          />
-        </div>
-      </div>
-
-      <div>
-        <label className="flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-gray-400 mb-1">
-          <AlignLeft className="w-4 h-4 text-sky-500" /> Description
-        </label>
-        <MentionInput
-          type="textarea"
-          rows={8}
-          name="description"
-          value={description}
-          onChange={onChange}
-          members={members}
-          className={`${baseControlClasses} resize-none text-gray-800 dark:text-gray-300 text-sm`}
-          placeholder="Add comprehensive details about this issue..."
-        />
-      </div>
+    <div className="space-y-2">
+      <label className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+        <AlignLeft className="w-3.5 h-3.5 text-sky-500" /> Description
+      </label>
+      <MentionInput
+        type="textarea"
+        rows={6}
+        name="description"
+        value={description}
+        onChange={onChange}
+        members={members}
+        className={`${baseControlClasses} !h-auto min-h-[140px] p-3 resize-y text-slate-800 dark:text-slate-100 text-sm leading-relaxed`}
+        placeholder="Add a detailed description... Type @ to mention team members"
+      />
     </div>
   );
 };

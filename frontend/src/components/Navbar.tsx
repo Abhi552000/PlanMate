@@ -130,40 +130,40 @@ const Navbar: React.FC<NavbarProps> = ({
 
   return (
     <header
-      className="sticky top-0 z-50 bg-white/90 dark:bg-gray-900/90 backdrop-blur-md shadow-sm 
+      className="sticky top-0 z-40 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md shadow-xs 
     border-b border-gray-200 dark:border-gray-800 font-sans"
     >
-      <div className="flex flex-row items-center justify-between gap-2 md:gap-4 px-4 sm:px-6 md:px-8 py-3 w-full">
+      <div className="flex flex-row items-center justify-between gap-2 md:gap-4 px-3 sm:px-5 md:px-6 h-[52px] w-full">
         {/* LOGO & ORG BADGE */}
-        <div className="flex items-center gap-2 sm:gap-3">
+        <div className="flex items-center gap-2 sm:gap-2.5">
           {hasSidebar && onToggleMobileMenu && (
             <button
               onClick={onToggleMobileMenu}
               className="md:hidden p-1.5 -ml-1 text-gray-600 dark:text-gray-300 hover:text-sky-600 dark:hover:text-sky-400 hover:bg-sky-50 dark:hover:bg-gray-800 rounded-lg transition-colors cursor-pointer"
               aria-label="Open navigation menu"
             >
-              <Menu className="w-5 h-5" />
+              <Menu className="w-4.5 h-4.5" />
             </button>
           )}
 
           <div
-            className="flex items-center gap-2.5 cursor-pointer group"
+            className="flex items-center gap-2 cursor-pointer group"
             onClick={() => {
               navigate(ROUTES.DASHBOARD);
             }}
           >
-            <PlanMateLogo size="sm" showText textClassName="text-xl sm:text-2xl" />
+            <PlanMateLogo size={28} showText textClassName="text-lg sm:text-xl font-bold tracking-tight" />
           </div>
 
           {orgName && (
-            <span className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 text-xs font-black uppercase bg-sky-50 dark:bg-gray-800 text-sky-600 dark:text-sky-400 rounded-full border border-sky-100 dark:border-gray-700 tracking-wider shadow-xs">
+            <span className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-0.5 text-[11px] font-bold uppercase bg-sky-50 dark:bg-gray-800 text-sky-600 dark:text-sky-400 rounded-full border border-sky-100 dark:border-gray-700 tracking-wider shadow-2xs">
               {orgName} Workspace
             </span>
           )}
         </div>
 
         {/* RIGHT SIDE */}
-        <div className="flex items-center gap-2 md:gap-4 ml-auto">
+        <div className="flex items-center gap-1.5 sm:gap-2.5 ml-auto">
           {/* Dark mode toggle */}
           <button
             onClick={() => {
@@ -177,18 +177,18 @@ const Navbar: React.FC<NavbarProps> = ({
               }
               setIsDark(html.classList.contains("dark"));
             }}
-            className="p-2 text-gray-600 dark:text-gray-400 hover:text-sky-500 dark:hover:text-sky-400 transition-colors duration-300 rounded-full cursor-pointer"
+            className="p-1.5 text-gray-600 dark:text-gray-400 hover:text-sky-500 dark:hover:text-sky-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200 rounded-full cursor-pointer text-sm"
             aria-label="Toggle dark mode"
           >
             {isDark ? "☀️" : "🌙"}
           </button>
 
           <button
-            className="p-2 text-gray-600 dark:text-gray-400 hover:text-sky-500 dark:hover:text-sky-400 transition-colors duration-300 hover:bg-sky-50 dark:hover:bg-gray-800 rounded-full cursor-pointer"
+            className="p-1.5 text-gray-600 dark:text-gray-400 hover:text-sky-500 dark:hover:text-sky-400 transition-colors duration-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full cursor-pointer"
             onClick={() => navigate(ROUTES.PROFILE)}
             aria-label="Settings"
           >
-            <Settings className="w-5 h-5" />
+            <Settings className="w-4.5 h-4.5" />
           </button>
 
           {/* Notifications Dropdown */}

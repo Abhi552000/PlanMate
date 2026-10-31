@@ -33,9 +33,19 @@ export interface ITaskComment {
   createdAt: string | Date;
 }
 
+export type LinkRelationType =
+  | "blocks"
+  | "is blocked by"
+  | "blocked by"
+  | "relates to"
+  | "duplicates"
+  | "is duplicated by"
+  | "clones"
+  | "is cloned by";
+
 export interface ITaskLink {
   _id?: string;
-  linkType: "blocks" | "blocked by" | "relates to";
+  linkType: LinkRelationType | string;
   targetTask: ITask | string | any;
 }
 
@@ -141,11 +151,20 @@ export interface TaskFormSubtasksProps {
 export interface TaskDetailsHeaderProps {
   isEditingSubtask: boolean;
   projectKey: string;
+  issueKey?: string;
+  issueType?: string;
+  title: string;
+  onTitleChange?: (newTitle: string) => void;
   subtaskIndex: number | null;
   onBackToParent: () => void;
   onBackToBoard: () => void;
-  onSave: () => void;
-  saving: boolean;
+  onSave?: () => void;
+  saving?: boolean;
+  isModal?: boolean;
+  onClose?: () => void;
+  onOpenFullPage?: () => void;
+  onAddSubtaskClick?: () => void;
+  onLinkIssueClick?: () => void;
 }
 
 export interface SubtaskListSectionProps {
@@ -184,8 +203,8 @@ export interface TaskMetaSidebarProps {
   today: string;
   baseControlClasses: string;
   handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => void;
-  linkType: "blocks" | "blocked by" | "relates to";
-  setLinkType: (val: "blocks" | "blocked by" | "relates to") => void;
+  linkType: LinkRelationType | string;
+  setLinkType: (val: any) => void;
   targetTaskId: string;
   setTargetTaskId: (val: string) => void;
   workspaceTasks: any[];

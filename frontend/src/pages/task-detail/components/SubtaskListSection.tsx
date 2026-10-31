@@ -125,6 +125,7 @@ export const SubtaskListSection: React.FC<SubtaskListSectionProps> = ({
       {/* Add Subtask form */}
       <div className="flex gap-2 mt-3.5">
         <input
+          id="new-subtask-input"
           type="text"
           placeholder="Create sub-task..."
           value={newSubtaskTitle}

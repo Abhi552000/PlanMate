@@ -38,6 +38,8 @@ export interface SidebarProps {
   tasks?: ITask[];
   mobileOpen?: boolean;
   setMobileOpen?: React.Dispatch<React.SetStateAction<boolean>>;
+  isCollapsed?: boolean;
+  onToggleCollapse?: () => void;
 }
 
 export interface NavbarProps {

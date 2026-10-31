@@ -1,4 +1,32 @@
+import React from "react";
+import { Bug, BookOpen, Award, CheckSquare, CornerDownRight } from "lucide-react";
 import { ITask } from "../types";
+
+export const getIssueTypeIcon = (type?: string, className: string = "w-4 h-4") => {
+  switch (type?.toLowerCase()) {
+    case "bug":
+      return React.createElement(Bug, {
+        className: `${className} text-rose-500 fill-rose-500/20 shrink-0`,
+      });
+    case "story":
+      return React.createElement(BookOpen, {
+        className: `${className} text-emerald-500 fill-emerald-500/20 shrink-0`,
+      });
+    case "epic":
+      return React.createElement(Award, {
+        className: `${className} text-purple-500 fill-purple-500/20 shrink-0`,
+      });
+    case "sub-task":
+    case "subtask":
+      return React.createElement(CornerDownRight, {
+        className: `${className} text-sky-500 shrink-0`,
+      });
+    default:
+      return React.createElement(CheckSquare, {
+        className: `${className} text-sky-500 fill-sky-500/20 shrink-0`,
+      });
+  }
+};
 
 export const getPriorityStyle = (priority?: string) => {
   switch (priority?.toLowerCase()) {
