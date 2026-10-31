@@ -51,12 +51,36 @@ export const orgService = {
     const { data } = await axiosInstance.put(API_ROUTES.ORGANIZATION.STATUS_BY_ID(orgId), statusData);
     return data;
   },
+  resetAdminPassword: async (orgId: string) => {
+    const { data } = await axiosInstance.post(API_ROUTES.ORGANIZATION.RESET_ADMIN_PASSWORD(orgId));
+    return data;
+  },
   deleteOrg: async (orgId: string) => {
     const { data } = await axiosInstance.delete(API_ROUTES.ORGANIZATION.DELETE_BY_ID(orgId));
     return data;
   },
   getPublicOrgs: async () => {
     const { data } = await axiosInstance.get(API_ROUTES.ORGANIZATION.PUBLIC_LIST);
+    return data;
+  },
+  getSubscription: async () => {
+    const { data } = await axiosInstance.get(API_ROUTES.ORGANIZATION.SUBSCRIPTION);
+    return data;
+  },
+  subscribeToPlan: async (payload: { planId: string; billingCycle?: string; paymentDetails?: any }) => {
+    const { data } = await axiosInstance.post(API_ROUTES.ORGANIZATION.SUBSCRIBE, payload);
+    return data;
+  },
+  updateTenantSubscription: async (orgId: string, payload: { planId: string; maxMembers?: number }) => {
+    const { data } = await axiosInstance.put(API_ROUTES.ORGANIZATION.SUBSCRIPTION_BY_ID(orgId), payload);
+    return data;
+  },
+  getBillingHistory: async () => {
+    const { data } = await axiosInstance.get(API_ROUTES.ORGANIZATION.BILLING_HISTORY);
+    return data;
+  },
+  getAllPaymentsForAdmin: async () => {
+    const { data } = await axiosInstance.get(API_ROUTES.ORGANIZATION.ALL_PAYMENTS);
     return data;
   },
 };

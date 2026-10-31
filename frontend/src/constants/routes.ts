@@ -16,11 +16,22 @@ export const API_ROUTES = {
     PUBLIC_LIST: "/api/organization/public-list",
     ADMIN_BY_ID: (id: string) => `/api/organization/${id}/admin`,
     STATUS_BY_ID: (id: string) => `/api/organization/${id}/status`,
+    SUBSCRIPTION_BY_ID: (id: string) => `/api/organization/${id}/subscription`,
+    RESET_ADMIN_PASSWORD: (id: string) => `/api/organization/${id}/reset-admin-password`,
     DELETE_BY_ID: (id: string) => `/api/organization/${id}`,
     STATUS_DELETE: (statusName: string) =>
       `/api/organization/statuses/${encodeURIComponent(statusName)}`,
     USER_STATUS_UPDATE: (userId: string) =>
       `/api/organization/users/${userId}/status`,
+    SUBSCRIPTION: "/api/organization/subscription",
+    SUBSCRIBE: "/api/organization/subscribe",
+    BILLING_HISTORY: "/api/organization/billing-history",
+    ALL_PAYMENTS: "/api/organization/admin/payments",
+  },
+  PLANS: {
+    BASE: "/api/plans",
+    ADMIN_ALL: "/api/plans/admin/all",
+    BY_ID: (id: string) => `/api/plans/${id}`,
   },
   TASKS: {
     BASE: "/api/tasks/gp",

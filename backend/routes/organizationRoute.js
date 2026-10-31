@@ -9,11 +9,18 @@ import {
   deleteOrganization,
   updateOrganizationAdmin,
   updateOrganizationStatus,
+  resetAdminPassword,
   getPublicOrganizations,
   getOrganizationUsers,
   updateUserStatus,
   addCustomStatus,
   deleteCustomStatus,
+  getOrganizationSubscription,
+  subscribeToPlan,
+  previewPlanUpgrade,
+  updateTenantPlanBySysAdmin,
+  getOrganizationBillingHistory,
+  getAllPaymentsForSysAdmin,
 } from "../controllers/organizationController.js";
 import authMiddleware from "../middleware/auth.js";
 
@@ -28,10 +35,19 @@ orgRouter.get("/all", authMiddleware, getAllOrganizations);
 orgRouter.delete("/:id", authMiddleware, deleteOrganization);
 orgRouter.put("/:id/admin", authMiddleware, updateOrganizationAdmin);
 orgRouter.put("/:id/status", authMiddleware, updateOrganizationStatus);
+orgRouter.put("/:id/subscription", authMiddleware, updateTenantPlanBySysAdmin);
+orgRouter.post("/:id/reset-admin-password", authMiddleware, resetAdminPassword);
+orgRouter.get("/admin/payments", authMiddleware, getAllPaymentsForSysAdmin);
 
 // Scoped organization details (Requires login)
 orgRouter.get("/", authMiddleware, getOrganizationInfo);
 orgRouter.put("/", authMiddleware, updateOrganizationInfo);
+
+// Scoped subscription & plan billing (Org Admin only)
+orgRouter.get("/subscription", authMiddleware, getOrganizationSubscription);
+orgRouter.get("/subscription-preview", authMiddleware, previewPlanUpgrade);
+orgRouter.post("/subscribe", authMiddleware, subscribeToPlan);
+orgRouter.get("/billing-history", authMiddleware, getOrganizationBillingHistory);
 
 // Scoped members management & approvals
 orgRouter.get("/users", authMiddleware, getOrganizationUsers);

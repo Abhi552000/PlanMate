@@ -11,4 +11,5 @@ export const ROUTES = {
   ACTIVE_SPRINT: "/active-sprint",
   CALENDAR: "/calendar",
   REPORTS: "/reports",
+  SUBSCRIPTION: "/subscription",
 };

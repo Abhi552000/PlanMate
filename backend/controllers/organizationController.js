@@ -1,6 +1,12 @@
 import Organization from "../models/organizationModel.js";
 import User from "../models/userModel.js";
 import Task from "../models/taskModel.js";
+import Plan from "../models/planModel.js";
+import Payment from "../models/paymentModel.js";
+import {
+  calculateProrationUpgrade,
+  getSeatUsageSummary,
+} from "../utils/subscriptionHelper.js";
 import bcrypt from "bcrypt";
 import validator from "validator";
 import { HttpStatus } from "../constants/httpStatus.js";
@@ -178,6 +184,29 @@ export const addOrganizationMember = async (req, res) => {
   }
 
   try {
+    // Check Organization Plan Member Limit
+    const org = await Organization.findById(req.user.organization);
+    if (!org) {
+      return res
+        .status(HttpStatus.NOT_FOUND)
+        .json({ success: false, message: MESSAGES.ORG.NOT_FOUND });
+    }
+
+    const maxAllowed = org.subscription?.maxMembers || 5;
+    const currentActive = await User.countDocuments({
+      organization: req.user.organization,
+      status: "active",
+    });
+
+    if (currentActive >= maxAllowed) {
+      return res.status(HttpStatus.FORBIDDEN).json({
+        success: false,
+        message: `Team size limit reached (${currentActive}/${maxAllowed} members) for your ${
+          org.subscription?.planName || "Starter"
+        } plan. Please upgrade your subscription to add more members.`,
+      });
+    }
+
     const existing = await User.findOne({ email });
     if (existing) {
       return res
@@ -230,7 +259,7 @@ export const getOrganizationMembers = async (req, res) => {
   }
 };
 
-// Get all organizations (System admin only)
+// Get all organizations (System admin only with resource aggregations)
 export const getAllOrganizations = async (req, res) => {
   if (req.user?.role !== "system_admin") {
     return res
@@ -238,10 +267,94 @@ export const getAllOrganizations = async (req, res) => {
       .json({ success: false, message: MESSAGES.ORG.SYS_ADMIN_REQUIRED });
   }
   try {
-    const orgs = await Organization.find({}).populate("admin", "name email");
-    res.json({ success: true, organizations: orgs });
+    const orgs = await Organization.find({}).populate("admin", "name email").lean();
+
+    const orgIds = orgs.map((o) => o._id);
+    const [userCounts, taskCounts, totalPlatformUsers, totalPlatformTasks] = await Promise.all([
+      User.aggregate([
+        { $match: { organization: { $in: orgIds } } },
+        { $group: { _id: "$organization", count: { $sum: 1 } } },
+      ]),
+      Task.aggregate([
+        { $match: { organization: { $in: orgIds } } },
+        { $group: { _id: "$organization", count: { $sum: 1 } } },
+      ]),
+      User.countDocuments({ role: { $ne: "system_admin" } }),
+      Task.countDocuments({}),
+    ]);
+
+    const userCountMap = new Map(userCounts.map((u) => [u._id.toString(), u.count]));
+    const taskCountMap = new Map(taskCounts.map((t) => [t._id.toString(), t.count]));
+
+    const enrichedOrgs = orgs.map((org) => ({
+      ...org,
+      memberCount: userCountMap.get(org._id.toString()) || 0,
+      taskCount: taskCountMap.get(org._id.toString()) || org.taskCounter || 0,
+    }));
+
+    res.json({
+      success: true,
+      organizations: enrichedOrgs,
+      systemMetrics: {
+        totalPlatformUsers,
+        totalPlatformTasks,
+        totalOrganizations: orgs.length,
+        activeOrganizations: orgs.filter((o) => o.isActive).length,
+        inactiveOrganizations: orgs.filter((o) => !o.isActive).length,
+        dbStatus: "connected",
+        nodeEnv: process.env.NODE_ENV || "development",
+      },
+    });
   } catch (error) {
     console.error("Error fetching organizations:", error);
+    res
+      .status(HttpStatus.INTERNAL_SERVER_ERROR)
+      .json({ success: false, message: MESSAGES.COMMON.SERVER_ERROR });
+  }
+};
+
+// Reset Organization Admin Password (System Admin support tool)
+export const resetAdminPassword = async (req, res) => {
+  if (req.user?.role !== "system_admin") {
+    return res
+      .status(HttpStatus.FORBIDDEN)
+      .json({ success: false, message: MESSAGES.ORG.SYS_ADMIN_REQUIRED });
+  }
+
+  const { id } = req.params;
+
+  try {
+    const org = await Organization.findById(id);
+    if (!org) {
+      return res
+        .status(HttpStatus.NOT_FOUND)
+        .json({ success: false, message: MESSAGES.ORG.NOT_FOUND });
+    }
+
+    const adminUser = await User.findById(org.admin);
+    if (!adminUser) {
+      return res
+        .status(HttpStatus.NOT_FOUND)
+        .json({ success: false, message: MESSAGES.ORG.ADMIN_NOT_FOUND });
+    }
+
+    const tempPassword = "PM#" + Math.random().toString(36).slice(-6) + "!" + Math.floor(10 + Math.random() * 90);
+    const hashedPassword = await bcrypt.hash(tempPassword, 10);
+    adminUser.password = hashedPassword;
+    await adminUser.save();
+
+    res.json({
+      success: true,
+      message: "Admin password successfully reset",
+      admin: {
+        id: adminUser._id,
+        name: adminUser.name,
+        email: adminUser.email,
+        temporaryPassword: tempPassword,
+      },
+    });
+  } catch (error) {
+    console.error("Reset admin password error:", error);
     res
       .status(HttpStatus.INTERNAL_SERVER_ERROR)
       .json({ success: false, message: MESSAGES.COMMON.SERVER_ERROR });
@@ -518,6 +631,25 @@ export const updateUserStatus = async (req, res) => {
         .json({ success: false, message: MESSAGES.ORG.MEMBER_NOT_FOUND });
     }
 
+    // If activating a member, enforce plan member quota
+    if (status === "active" && userToUpdate.status !== "active") {
+      const org = await Organization.findById(req.user.organization);
+      const maxAllowed = org?.subscription?.maxMembers || 5;
+      const currentActive = await User.countDocuments({
+        organization: req.user.organization,
+        status: "active",
+      });
+
+      if (currentActive >= maxAllowed) {
+        return res.status(HttpStatus.FORBIDDEN).json({
+          success: false,
+          message: `Cannot activate user. Plan member limit of ${maxAllowed} reached for ${
+            org?.subscription?.planName || "Starter"
+          }. Upgrade your subscription to allow more members.`,
+        });
+      }
+    }
+
     userToUpdate.status = status;
     userToUpdate.statusRemark = remark || "";
     await userToUpdate.save();
@@ -641,6 +773,324 @@ export const deleteCustomStatus = async (req, res) => {
     res.json({ success: true, message: MESSAGES.ORG.STATUS_DELETED, statuses: org.statuses });
   } catch (error) {
     console.error("Delete custom status error:", error);
+    res
+      .status(HttpStatus.INTERNAL_SERVER_ERROR)
+      .json({ success: false, message: MESSAGES.COMMON.SERVER_ERROR });
+  }
+};
+
+// GET /api/organization/subscription - Org Admin: Get subscription details and quota metrics
+export const getOrganizationSubscription = async (req, res) => {
+  if (req.user?.role !== "org_admin" && req.user?.role !== "system_admin") {
+    return res
+      .status(HttpStatus.FORBIDDEN)
+      .json({ success: false, message: MESSAGES.ORG.NOT_AUTHORIZED });
+  }
+
+  const orgId = req.user.organization;
+  if (!orgId) {
+    return res
+      .status(HttpStatus.NOT_FOUND)
+      .json({ success: false, message: MESSAGES.ORG.NOT_FOUND });
+  }
+
+  try {
+    const org = await Organization.findById(orgId);
+    if (!org) {
+      return res
+        .status(HttpStatus.NOT_FOUND)
+        .json({ success: false, message: MESSAGES.ORG.NOT_FOUND });
+    }
+
+    const activeMembersCount = await User.countDocuments({
+      organization: orgId,
+      status: "active",
+    });
+
+    const totalMembersCount = await User.countDocuments({
+      organization: orgId,
+    });
+
+    const maxMembers = org.subscription?.maxMembers || 5;
+    const metrics = getSeatUsageSummary(activeMembersCount, totalMembersCount, maxMembers);
+
+    res.json({
+      success: true,
+      subscription: {
+        planId: org.subscription?.planId || "free",
+        planName: org.subscription?.planName || "Starter",
+        maxMembers: metrics.maxMembers,
+        status: org.subscription?.status || "active",
+        billingCycle: org.subscription?.billingCycle || "monthly",
+        amountPaid: org.subscription?.amountPaid || 0,
+        currency: org.subscription?.currency || "INR",
+        paymentMethod: org.subscription?.paymentMethod || "dummy_gateway",
+        transactionId: org.subscription?.transactionId || "",
+        subscribedAt: org.subscription?.subscribedAt || org.createdAt,
+        validUntil: org.subscription?.validUntil || null,
+      },
+      metrics,
+    });
+  } catch (error) {
+    console.error("Get subscription error:", error);
+    res
+      .status(HttpStatus.INTERNAL_SERVER_ERROR)
+      .json({ success: false, message: MESSAGES.COMMON.SERVER_ERROR });
+  }
+};
+
+// GET /api/organization/subscription-preview - Org Admin: Preview proration and upgrade calculation
+export const previewPlanUpgrade = async (req, res) => {
+  if (req.user?.role !== "org_admin") {
+    return res
+      .status(HttpStatus.FORBIDDEN)
+      .json({ success: false, message: MESSAGES.ORG.NOT_AUTHORIZED });
+  }
+
+  const { planId, billingCycle } = req.query;
+  if (!planId) {
+    return res
+      .status(HttpStatus.BAD_REQUEST)
+      .json({ success: false, message: "Plan ID is required" });
+  }
+
+  try {
+    const org = await Organization.findById(req.user.organization);
+    if (!org) {
+      return res
+        .status(HttpStatus.NOT_FOUND)
+        .json({ success: false, message: MESSAGES.ORG.NOT_FOUND });
+    }
+
+    const plan = await Plan.findOne({ planId: planId.toLowerCase() });
+    if (!plan) {
+      return res
+        .status(HttpStatus.NOT_FOUND)
+        .json({ success: false, message: "Selected plan does not exist" });
+    }
+
+    const proration = calculateProrationUpgrade(
+      org.subscription,
+      plan,
+      billingCycle || "monthly"
+    );
+
+    res.json({
+      success: true,
+      preview: proration,
+    });
+  } catch (error) {
+    console.error("Subscription preview error:", error);
+    res
+      .status(HttpStatus.INTERNAL_SERVER_ERROR)
+      .json({ success: false, message: MESSAGES.COMMON.SERVER_ERROR });
+  }
+};
+
+// POST /api/organization/subscribe - Org Admin: Process dummy payment & upgrade subscription
+export const subscribeToPlan = async (req, res) => {
+  if (req.user?.role !== "org_admin") {
+    return res
+      .status(HttpStatus.FORBIDDEN)
+      .json({ success: false, message: MESSAGES.ORG.NOT_AUTHORIZED });
+  }
+
+  const { planId, billingCycle, paymentDetails } = req.body;
+  if (!planId) {
+    return res
+      .status(HttpStatus.BAD_REQUEST)
+      .json({ success: false, message: "Plan ID is required" });
+  }
+
+  try {
+    const org = await Organization.findById(req.user.organization);
+    if (!org) {
+      return res
+        .status(HttpStatus.NOT_FOUND)
+        .json({ success: false, message: MESSAGES.ORG.NOT_FOUND });
+    }
+
+    const plan = await Plan.findOne({ planId: planId.toLowerCase() });
+    if (!plan) {
+      return res
+        .status(HttpStatus.NOT_FOUND)
+        .json({ success: false, message: "Selected subscription plan does not exist" });
+    }
+
+    // Calculate mid-cycle upgrade proration credit & new cycle duration
+    const proration = calculateProrationUpgrade(
+      org.subscription,
+      plan,
+      billingCycle
+    );
+
+    const transactionId = `TXN_${Date.now().toString(36).toUpperCase()}_${Math.random()
+      .toString(36)
+      .substring(2, 6)
+      .toUpperCase()}`;
+
+    const invoiceNumber = `INV-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
+
+    // 1. Create durable Payment record for history
+    const payment = await Payment.create({
+      organization: org._id,
+      organizationName: org.name,
+      user: req.user._id,
+      userName: req.user.name || "",
+      userEmail: req.user.email || "",
+      planId: plan.planId,
+      planName: plan.name,
+      amount: proration.payableAmount,
+      currency: plan.currency || "INR",
+      billingCycle: proration.billingCycle,
+      paymentMethod: paymentDetails?.method || "Card",
+      transactionId,
+      invoiceNumber,
+      status: "Paid",
+      maxMembers: plan.maxMembers,
+      prorationCredit: proration.unusedCredit,
+      previousPlanName: proration.previousPlanName,
+      paidAt: new Date(),
+    });
+
+    // 2. Update current active organization subscription
+    org.subscription = {
+      planId: plan.planId,
+      planName: plan.name,
+      maxMembers: plan.maxMembers,
+      status: "active",
+      billingCycle: proration.billingCycle,
+      amountPaid: proration.payableAmount,
+      currency: plan.currency || "INR",
+      paymentMethod: paymentDetails?.method || "Card",
+      transactionId,
+      subscribedAt: new Date(),
+      validUntil: proration.newValidUntil,
+    };
+
+    await org.save();
+
+    res.json({
+      success: true,
+      message: `Successfully upgraded to ${plan.name} plan!`,
+      subscription: org.subscription,
+      receipt: {
+        transactionId,
+        invoiceNumber,
+        amount: proration.payableAmount,
+        basePrice: proration.basePrice,
+        prorationCredit: proration.unusedCredit,
+        currency: plan.currency || "INR",
+        paidAt: payment.paidAt,
+        status: "Paid",
+        plan: plan.name,
+        maxMembers: plan.maxMembers,
+        explanation: proration.explanation,
+      },
+    });
+  } catch (error) {
+    console.error("Subscribe to plan error:", error);
+    res
+      .status(HttpStatus.INTERNAL_SERVER_ERROR)
+      .json({ success: false, message: MESSAGES.COMMON.SERVER_ERROR });
+  }
+};
+
+// GET /api/organization/billing-history - Org Admin: Get all payment transactions for organization
+export const getOrganizationBillingHistory = async (req, res) => {
+  try {
+    if (!req.user?.organization) {
+      return res
+        .status(HttpStatus.BAD_REQUEST)
+        .json({ success: false, message: "Organization is required" });
+    }
+
+    const payments = await Payment.find({ organization: req.user.organization })
+      .sort({ paidAt: -1 })
+      .lean();
+
+    res.json({ success: true, payments });
+  } catch (error) {
+    console.error("Billing history error:", error);
+    res
+      .status(HttpStatus.INTERNAL_SERVER_ERROR)
+      .json({ success: false, message: MESSAGES.COMMON.SERVER_ERROR });
+  }
+};
+
+// GET /api/organization/all-payments - System Admin: Get all payment history across all organizations
+export const getAllPaymentsForSysAdmin = async (req, res) => {
+  if (req.user?.role !== "system_admin") {
+    return res
+      .status(HttpStatus.FORBIDDEN)
+      .json({ success: false, message: MESSAGES.ORG.SYS_ADMIN_REQUIRED });
+  }
+
+  try {
+    const payments = await Payment.find()
+      .populate("organization", "name slug")
+      .sort({ paidAt: -1 })
+      .lean();
+
+    res.json({ success: true, payments });
+  } catch (error) {
+    console.error("All payments error:", error);
+    res
+      .status(HttpStatus.INTERNAL_SERVER_ERROR)
+      .json({ success: false, message: MESSAGES.COMMON.SERVER_ERROR });
+  }
+};
+
+// PUT /api/organization/:id/subscription - System Admin: Override an organization's plan
+export const updateTenantPlanBySysAdmin = async (req, res) => {
+  if (req.user?.role !== "system_admin") {
+    return res
+      .status(HttpStatus.FORBIDDEN)
+      .json({ success: false, message: MESSAGES.ORG.SYS_ADMIN_REQUIRED });
+  }
+
+  const { id } = req.params;
+  const { planId, maxMembers } = req.body;
+
+  try {
+    const org = await Organization.findById(id);
+    if (!org) {
+      return res
+        .status(HttpStatus.NOT_FOUND)
+        .json({ success: false, message: MESSAGES.ORG.NOT_FOUND });
+    }
+
+    let plan = null;
+    if (planId) {
+      plan = await Plan.findOne({ planId: planId.toLowerCase() });
+    }
+
+    org.subscription = {
+      planId: plan?.planId || planId || org.subscription?.planId || "free",
+      planName: plan?.name || org.subscription?.planName || "Starter",
+      maxMembers:
+        maxMembers !== undefined
+          ? Number(maxMembers)
+          : plan?.maxMembers || org.subscription?.maxMembers || 5,
+      status: "active",
+      billingCycle: "monthly",
+      amountPaid: plan?.price || 0,
+      currency: plan?.currency || "INR",
+      paymentMethod: "sys_admin_override",
+      transactionId: `TXN_ADMIN_OVERRIDE_${Date.now()}`,
+      subscribedAt: new Date(),
+      validUntil: null,
+    };
+
+    await org.save();
+
+    res.json({
+      success: true,
+      message: `Organization subscription updated to ${org.subscription.planName}`,
+      organization: org,
+    });
+  } catch (error) {
+    console.error("SysAdmin update tenant plan error:", error);
     res
       .status(HttpStatus.INTERNAL_SERVER_ERROR)
       .json({ success: false, message: MESSAGES.COMMON.SERVER_ERROR });

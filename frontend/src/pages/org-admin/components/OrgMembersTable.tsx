@@ -43,24 +43,24 @@ export const OrgMembersTable: React.FC<OrgMembersTableProps> = ({
       <div className="p-4 sm:p-5 border-b border-sky-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/50 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
         <div>
           <h3 className="text-sm font-bold text-gray-800 dark:text-gray-200 flex items-center gap-2">
-            <Users className="w-4.5 h-4.5 text-sky-500" /> User Access & Approval Management
+            <Users className="w-4.5 h-4.5 text-sky-500" /> Team Members
           </h3>
           <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
-            Manage member credentials, assign roles, and approve workspace access
+            Manage workspace members, assign roles, and control access
           </p>
         </div>
 
         {/* Backend Filters */}
         <div className="flex flex-wrap items-center gap-2.5">
           {/* Search Input */}
-          <div className="relative min-w-[190px] flex-1 sm:flex-initial">
+          <div className="relative min-w-[200px] flex-1 sm:flex-initial">
             <Search className="w-3.5 h-3.5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
             <input
               type="text"
               placeholder="Search by name or email..."
               value={searchQuery}
               onChange={(e) => onSearchChange(e.target.value)}
-              className="w-full h-8 pl-8.5 pr-3 text-xs bg-white dark:bg-gray-800 border border-sky-100 dark:border-gray-700 rounded-lg text-gray-750 dark:text-gray-200 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-sky-500/40"
+              className="w-full h-[38px] pl-9 pr-3 text-xs bg-white dark:bg-gray-950 border border-slate-200 dark:border-gray-700 rounded-lg text-gray-800 dark:text-gray-200 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-sky-500 shadow-2xs"
             />
           </div>
 
@@ -69,7 +69,7 @@ export const OrgMembersTable: React.FC<OrgMembersTableProps> = ({
             <select
               value={selectedRole}
               onChange={(e) => onRoleChange(e.target.value)}
-              className="h-8 px-3 text-xs font-semibold bg-white dark:bg-gray-800 border border-sky-100 dark:border-gray-700 rounded-lg text-gray-750 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-sky-500/40 cursor-pointer"
+              className="h-[38px] px-3 text-xs font-semibold bg-white dark:bg-gray-950 border border-slate-200 dark:border-gray-700 rounded-lg text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-1 focus:ring-sky-500 cursor-pointer shadow-2xs"
             >
               <option value="all">All Roles</option>
               <option value="org_admin">Org Admin</option>
@@ -82,7 +82,7 @@ export const OrgMembersTable: React.FC<OrgMembersTableProps> = ({
             <select
               value={selectedStatus}
               onChange={(e) => onStatusChange(e.target.value)}
-              className="h-8 px-3 text-xs font-semibold bg-white dark:bg-gray-800 border border-sky-100 dark:border-gray-700 rounded-lg text-gray-750 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-sky-500/40 cursor-pointer"
+              className="h-[38px] px-3 text-xs font-semibold bg-white dark:bg-gray-950 border border-slate-200 dark:border-gray-700 rounded-lg text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-1 focus:ring-sky-500 cursor-pointer shadow-2xs"
             >
               <option value="all">All Statuses</option>
               <option value="active">Approved (Active)</option>
@@ -95,7 +95,7 @@ export const OrgMembersTable: React.FC<OrgMembersTableProps> = ({
           {hasActiveFilters && (
             <button
               onClick={onResetFilters}
-              className="h-8 px-2.5 text-xs font-bold text-gray-500 hover:text-sky-600 hover:bg-sky-50 dark:hover:bg-gray-800 rounded-lg flex items-center gap-1 cursor-pointer"
+              className="h-[38px] px-3 text-xs font-bold text-gray-500 hover:text-sky-600 hover:bg-sky-50 dark:hover:bg-gray-800 rounded-lg flex items-center gap-1.5 cursor-pointer border border-transparent hover:border-sky-100 dark:hover:border-gray-700"
               title="Reset all filters"
             >
               <X className="w-3.5 h-3.5" />

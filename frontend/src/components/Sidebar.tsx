@@ -5,6 +5,7 @@ import {
   X,
   Users,
   Building,
+  CreditCard,
   PanelLeftClose,
   PanelLeftOpen,
 } from "lucide-react";
@@ -143,6 +144,38 @@ const Sidebar: React.FC<SidebarProps> = ({
                 {collapsedMode && (
                   <div className="pointer-events-none fixed left-[68px] px-2.5 py-1 rounded-md bg-gray-900 dark:bg-gray-800 text-white text-xs font-medium whitespace-nowrap shadow-md opacity-0 group-hover:opacity-100 transition-opacity z-50">
                     Manage Team
+                  </div>
+                )}
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to="/subscription"
+                className={({ isActive }) =>
+                  [
+                    "group relative flex items-center h-10 px-2.5 rounded-lg transition-colors overflow-hidden",
+                    isActive
+                      ? "bg-sky-50 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300 font-semibold border-l-[3px] border-sky-500 pl-[7px]"
+                      : "text-gray-600 dark:text-gray-400 hover:text-sky-600 dark:hover:text-sky-300 hover:bg-gray-100/70 dark:hover:bg-gray-800/70",
+                  ].join(" ")
+                }
+                onClick={() => isMobile && setMobileOpen(false)}
+              >
+                <div className="w-6 h-6 shrink-0 flex items-center justify-center text-sky-500 transition-transform duration-200 group-hover:scale-110">
+                  <CreditCard className="w-5 h-5" />
+                </div>
+                <span
+                  className={`text-sm font-medium whitespace-nowrap overflow-hidden transition-all duration-300 ease-in-out ${
+                    collapsedMode
+                      ? "max-w-0 opacity-0 -translate-x-2 pointer-events-none"
+                      : "max-w-[150px] opacity-100 translate-x-0 ml-3"
+                  }`}
+                >
+                  Plans & Billing
+                </span>
+                {collapsedMode && (
+                  <div className="pointer-events-none fixed left-[68px] px-2.5 py-1 rounded-md bg-gray-900 dark:bg-gray-800 text-white text-xs font-medium whitespace-nowrap shadow-md opacity-0 group-hover:opacity-100 transition-opacity z-50">
+                    Plans & Billing
                   </div>
                 )}
               </NavLink>
