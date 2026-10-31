@@ -31,10 +31,13 @@ export const MentionInput: React.FC<MentionInputProps> = ({
   const inputRef = useRef<HTMLInputElement | HTMLTextAreaElement>(null);
 
   // Filter members based on searchQuery
-  const filteredMembers = members.filter((member) =>
-    member.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    member.email.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredMembers = (members || []).filter((member) => {
+    if (!member) return false;
+    const name = (member.name || "").toLowerCase();
+    const email = (member.email || "").toLowerCase();
+    const query = (searchQuery || "").toLowerCase();
+    return name.includes(query) || email.includes(query);
+  });
 
   // Close dropdown on click outside
   useEffect(() => {
@@ -172,11 +175,11 @@ export const MentionInput: React.FC<MentionInputProps> = ({
               }`}
             >
               <div className="w-5 h-5 rounded-full bg-sky-100 dark:bg-sky-900 text-sky-700 dark:text-sky-300 flex items-center justify-center font-bold text-[9px] uppercase shrink-0">
-                {member.name[0]}
+                {(member.name || "U")[0]?.toUpperCase() || "U"}
               </div>
               <div className="min-w-0 flex-1">
-                <p className="truncate text-xs font-semibold">{member.name}</p>
-                <p className="truncate text-[9px] text-gray-400 dark:text-gray-500">{member.email}</p>
+                <p className="truncate text-xs font-semibold">{member.name || "Member"}</p>
+                {member.email && <p className="truncate text-[9px] text-gray-400 dark:text-gray-500">{member.email}</p>}
               </div>
             </button>
           ))}

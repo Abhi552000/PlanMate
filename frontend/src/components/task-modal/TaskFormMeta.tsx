@@ -477,11 +477,11 @@ export const TaskFormMeta: React.FC<TaskFormMetaProps> = ({
                     className="col-span-2 px-2 py-1 border border-sky-100 dark:border-gray-600 bg-white dark:bg-gray-900 rounded text-xs focus:ring-1 focus:ring-sky-500 dark:text-gray-200"
                   >
                     <option value="">Select task...</option>
-                    {allTasks
-                      .filter((t: any) => t._id !== (taskData.id || taskData._id))
+                    {(allTasks || [])
+                      .filter((t: any) => t && t._id && t._id !== (taskData.id || taskData._id))
                       .map((t: any) => (
                         <option key={t._id} value={t._id}>
-                          {t.key || `PM-${t._id.slice(-4).toUpperCase()}`} - {t.title}
+                          {t.key || `PM-${t._id.slice(-4).toUpperCase()}`} - {t.title || "Untitled"}
                         </option>
                       ))}
                   </select>
@@ -507,20 +507,25 @@ export const TaskFormMeta: React.FC<TaskFormMetaProps> = ({
             )}
 
             {/* List of active issue links */}
-            {taskData.links && taskData.links.length > 0 ? (
+            {Array.isArray(taskData.links) && taskData.links.length > 0 ? (
               <div className="space-y-1.5 pt-1">
                 {taskData.links.map((link: any) => {
+                  if (!link) return null;
                   const target = link.targetTask;
                   if (!target) return null;
                   const isDone = target.status === "Done" || target.completed === true || target.completed === "Yes";
+                  const targetId = typeof target === "object" ? target._id : (typeof target === "string" ? target : link._id || "");
+                  const targetKey = target.key || (targetId ? `PM-${targetId.slice(-4).toUpperCase()}` : "PM");
+                  const targetTitle = target.title || "Linked Task";
+
                   return (
                     <div
-                      key={link._id}
+                      key={link._id || Math.random()}
                       className="p-1.5 bg-white/50 dark:bg-gray-800/40 rounded border border-sky-100/30 dark:border-gray-800/50 text-[10px] text-gray-600 dark:text-gray-400 flex items-center justify-between gap-2"
                     >
                       <div className="flex items-center gap-1.5 min-w-0">
                         <span className="font-bold text-sky-600 dark:text-sky-400 capitalize shrink-0">
-                          {link.linkType}
+                          {link.linkType || "relates to"}
                         </span>
                         <span
                           className={`truncate text-gray-700 dark:text-gray-300 font-semibold ${
@@ -528,9 +533,9 @@ export const TaskFormMeta: React.FC<TaskFormMetaProps> = ({
                           }`}
                         >
                           <span className="font-mono text-[9px] text-gray-400 dark:text-gray-500 mr-1">
-                            [{target.key || `PM-${target._id.slice(-4).toUpperCase()}`}]
+                            [{targetKey}]
                           </span>
-                          {target.title}
+                          {targetTitle}
                         </span>
                       </div>
                       <button

@@ -91,19 +91,28 @@ const taskSlice = createSlice({
         state.error = action.payload;
       })
       // Create Task
-      .addCase(createTask.fulfilled, (state, action: PayloadAction<ITask>) => {
-        state.tasks.unshift(action.payload);
+      .addCase(createTask.fulfilled, (state, action: PayloadAction<any>) => {
+        const newTask = action.payload?.task || action.payload;
+        if (newTask && newTask._id) {
+          state.tasks.unshift(newTask);
+        }
       })
       // Update Task
-      .addCase(updateTask.fulfilled, (state, action: PayloadAction<ITask>) => {
-        const idx = state.tasks.findIndex((t) => t._id === action.payload._id);
-        if (idx !== -1) {
-          state.tasks[idx] = action.payload;
+      .addCase(updateTask.fulfilled, (state, action: PayloadAction<any>) => {
+        const updatedTask = action.payload?.task || action.payload;
+        if (updatedTask && updatedTask._id) {
+          const idx = state.tasks.findIndex((t) => t._id === updatedTask._id);
+          if (idx !== -1) {
+            state.tasks[idx] = updatedTask;
+          }
         }
       })
       // Delete Task
-      .addCase(deleteTask.fulfilled, (state, action: PayloadAction<string>) => {
-        state.tasks = state.tasks.filter((t) => t._id !== action.payload);
+      .addCase(deleteTask.fulfilled, (state, action: PayloadAction<any>) => {
+        const idToDelete = action.payload?.id || action.payload?._id || action.payload;
+        if (idToDelete) {
+          state.tasks = state.tasks.filter((t) => t && t._id !== idToDelete);
+        }
       });
   },
 });
