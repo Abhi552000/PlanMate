@@ -164,7 +164,7 @@ export const ReportsPage: React.FC = () => {
             Reports
           </h1>
           <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-0.5">
-            Overview of team throughput, cycle times, work distribution, and issue breakdown.
+            Project insights and performance metrics.
           </p>
         </div>
 

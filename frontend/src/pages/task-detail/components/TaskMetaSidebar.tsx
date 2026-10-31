@@ -2,7 +2,8 @@ import React, { useState } from "react";
 import { CheckCircle, AlignLeft, Flag, User, UserCheck, Calendar, Clock, Tag, X, Plus } from "lucide-react";
 import { TaskMetaSidebarProps } from "../../../types";
 import { getPriorityStyle } from "../../../utils";
-import { IssueLinkingSection } from "./IssueLinkingSection";
+import { selectControlClasses } from "../../../assets/dummy";
+
 
 export const TaskMetaSidebar: React.FC<TaskMetaSidebarProps> = ({
   taskData,
@@ -46,10 +47,10 @@ export const TaskMetaSidebar: React.FC<TaskMetaSidebarProps> = ({
               completed: newStatus.toLowerCase() === "done" ? "Yes" : "No",
             }));
           }}
-          className={`${baseControlClasses} font-semibold`}
+          className={selectControlClasses}
         >
           {statuses.map(s => (
-            <option key={s} value={s}>{s}</option>
+            <option key={s} value={s} className="bg-white dark:bg-gray-800 text-slate-800 dark:text-slate-100 py-1.5">{s}</option>
           ))}
         </select>
       </div>
@@ -63,13 +64,13 @@ export const TaskMetaSidebar: React.FC<TaskMetaSidebarProps> = ({
           value={taskData.issueType || (isEditingSubtask ? "Sub-task" : "Task")}
           onChange={handleChange}
           disabled={isEditingSubtask}
-          className={`${baseControlClasses} font-semibold disabled:bg-gray-50 disabled:text-gray-400`}
+          className={`${selectControlClasses} disabled:opacity-60 disabled:cursor-not-allowed`}
         >
-          <option value="Task">Task</option>
-          <option value="Story">Story</option>
-          <option value="Bug">Bug</option>
-          <option value="Epic">Epic</option>
-          {isEditingSubtask && <option value="Sub-task">Sub-task</option>}
+          <option value="Task" className="bg-white dark:bg-gray-800 text-slate-800 dark:text-slate-100 py-1.5">Task</option>
+          <option value="Story" className="bg-white dark:bg-gray-800 text-slate-800 dark:text-slate-100 py-1.5">Story</option>
+          <option value="Bug" className="bg-white dark:bg-gray-800 text-slate-800 dark:text-slate-100 py-1.5">Bug</option>
+          <option value="Epic" className="bg-white dark:bg-gray-800 text-slate-800 dark:text-slate-100 py-1.5">Epic</option>
+          {isEditingSubtask && <option value="Sub-task" className="bg-white dark:bg-gray-800 text-slate-800 dark:text-slate-100 py-1.5">Sub-task</option>}
         </select>
       </div>
 
@@ -81,13 +82,13 @@ export const TaskMetaSidebar: React.FC<TaskMetaSidebarProps> = ({
           name="priority"
           value={taskData.priority}
           onChange={handleChange}
-          className={`${baseControlClasses} ${
+          className={`${selectControlClasses} ${
             getPriorityStyle(taskData.priority)
-          } font-semibold`}
+          }`}
         >
-          <option>Low</option>
-          <option>Medium</option>
-          <option>High</option>
+          <option value="Low" className="bg-white dark:bg-gray-800 text-slate-800 dark:text-slate-100 py-1.5">Low</option>
+          <option value="Medium" className="bg-white dark:bg-gray-800 text-slate-800 dark:text-slate-100 py-1.5">Medium</option>
+          <option value="High" className="bg-white dark:bg-gray-800 text-slate-800 dark:text-slate-100 py-1.5">High</option>
         </select>
       </div>
 
@@ -115,11 +116,11 @@ export const TaskMetaSidebar: React.FC<TaskMetaSidebarProps> = ({
               name="assignee"
               value={taskData.assignee || ""}
               onChange={handleChange}
-              className={`${baseControlClasses} font-semibold`}
+              className={selectControlClasses}
             >
-              <option value="">Unassigned</option>
+              <option value="" className="bg-white dark:bg-gray-800 text-slate-800 dark:text-slate-100 py-1.5">Unassigned</option>
               {members.map(member => (
-                <option key={member._id} value={member._id}>
+                <option key={member._id} value={member._id} className="bg-white dark:bg-gray-800 text-slate-800 dark:text-slate-100 py-1.5">
                   {member.name}
                 </option>
               ))}
@@ -138,11 +139,11 @@ export const TaskMetaSidebar: React.FC<TaskMetaSidebarProps> = ({
             name="reporter"
             value={taskData.reporter || ""}
             onChange={handleChange}
-            className={`${baseControlClasses} font-semibold`}
+            className={selectControlClasses}
           >
-            <option value="">Select Reporter</option>
+            <option value="" className="bg-white dark:bg-gray-800 text-slate-800 dark:text-slate-100 py-1.5">Select Reporter</option>
             {members.map(member => (
-              <option key={member._id} value={member._id}>
+              <option key={member._id} value={member._id} className="bg-white dark:bg-gray-800 text-slate-800 dark:text-slate-100 py-1.5">
                 {member.name}
               </option>
             ))}
@@ -277,21 +278,7 @@ export const TaskMetaSidebar: React.FC<TaskMetaSidebarProps> = ({
         </div>
       </div>
 
-      {/* Issue Linking Section (Only parent task) */}
-      {!isEditingSubtask && (
-        <IssueLinkingSection
-          linkType={linkType}
-          setLinkType={setLinkType}
-          targetTaskId={targetTaskId}
-          setTargetTaskId={setTargetTaskId}
-          workspaceTasks={workspaceTasks}
-          linking={linking}
-          links={links}
-          onAddLink={onAddLink}
-          onRemoveLink={onRemoveLink}
-          baseControlClasses={baseControlClasses}
-        />
-      )}
+
 
       {/* Creation Timestamp info */}
       <div className="border-t border-sky-100/50 dark:border-gray-800 pt-4 mt-6 space-y-2 text-xs text-gray-450 font-medium">

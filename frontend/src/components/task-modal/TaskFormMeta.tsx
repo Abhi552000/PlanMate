@@ -12,7 +12,7 @@ import {
   Link2,
   Trash2,
 } from "lucide-react";
-import { priorityStyles } from "../../assets/dummy";
+import { priorityStyles, selectControlClasses } from "../../assets/dummy";
 import { TaskFormMetaProps } from "../../types";
 import { taskService } from "../../services/taskService";
 import { toast } from "react-toastify";
@@ -122,10 +122,10 @@ export const TaskFormMeta: React.FC<TaskFormMetaProps> = ({
   };
 
   return (
-    <div className="md:col-span-5 mt-4 md:mt-0 space-y-4 bg-sky-50/20 dark:bg-gray-900/50 p-4 rounded-xl border border-sky-100/50 dark:border-gray-800 self-start">
+    <div className="md:col-span-5 mt-4 md:mt-0 space-y-3.5 bg-slate-50/60 dark:bg-gray-900/40 p-4 rounded-xl border border-slate-200/80 dark:border-gray-800/80 self-start">
       <div>
-        <label className=" flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-gray-500 mb-1">
-          <CheckCircle className=" w-3.5 h-3.5 text-sky-500" /> Status
+        <label className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">
+          <CheckCircle className="w-3.5 h-3.5 text-sky-500" /> Status
         </label>
         <select
           name="status"
@@ -138,10 +138,10 @@ export const TaskFormMeta: React.FC<TaskFormMetaProps> = ({
               completed: newStatus.toLowerCase() === "done" ? "Yes" : "No",
             }));
           }}
-          className={`${baseControlClasses} font-semibold`}
+          className={selectControlClasses}
         >
           {statuses.map((s) => (
-            <option key={s} value={s}>
+            <option key={s} value={s} className="bg-white dark:bg-gray-800 text-slate-800 dark:text-slate-100 py-1.5">
               {s}
             </option>
           ))}
@@ -149,48 +149,48 @@ export const TaskFormMeta: React.FC<TaskFormMetaProps> = ({
       </div>
 
       <div>
-        <label className=" flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-gray-500 mb-1">
-          <AlignLeft className=" w-3.5 h-3.5 text-sky-500" /> Issue Type
+        <label className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">
+          <AlignLeft className="w-3.5 h-3.5 text-sky-500" /> Issue Type
         </label>
         <select
           name="issueType"
           value={taskData.issueType || (parentTask ? "Sub-task" : "Task")}
           onChange={handleChange}
           disabled={parentTask !== null}
-          className={`${baseControlClasses} font-semibold disabled:bg-gray-55 disabled:text-gray-400`}
+          className={`${selectControlClasses} disabled:opacity-60 disabled:cursor-not-allowed`}
         >
-          <option value="Task">Task</option>
-          <option value="Story">Story</option>
-          <option value="Bug">Bug</option>
-          <option value="Epic">Epic</option>
-          {parentTask !== null && <option value="Sub-task">Sub-task</option>}
+          <option value="Task" className="bg-white dark:bg-gray-800 text-slate-800 dark:text-slate-100 py-1.5">Task</option>
+          <option value="Story" className="bg-white dark:bg-gray-800 text-slate-800 dark:text-slate-100 py-1.5">Story</option>
+          <option value="Bug" className="bg-white dark:bg-gray-800 text-slate-800 dark:text-slate-100 py-1.5">Bug</option>
+          <option value="Epic" className="bg-white dark:bg-gray-800 text-slate-800 dark:text-slate-100 py-1.5">Epic</option>
+          {parentTask !== null && <option value="Sub-task" className="bg-white dark:bg-gray-800 text-slate-800 dark:text-slate-100 py-1.5">Sub-task</option>}
         </select>
       </div>
 
       <div>
-        <label className=" flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-gray-500 mb-1">
-          <Flag className=" w-3.5 h-3.5 text-sky-500" /> Priority
+        <label className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">
+          <Flag className="w-3.5 h-3.5 text-sky-500" /> Priority
         </label>
         <select
           name="priority"
           value={taskData.priority}
           onChange={handleChange}
-          className={`${baseControlClasses} ${
+          className={`${selectControlClasses} ${
             priorityStyles[taskData.priority] || ""
-          } font-semibold`}
+          }`}
         >
-          <option>Low</option>
-          <option>Medium</option>
-          <option>High</option>
+          <option value="Low" className="bg-white dark:bg-gray-800 text-slate-800 dark:text-slate-100 py-1.5">Low</option>
+          <option value="Medium" className="bg-white dark:bg-gray-800 text-slate-800 dark:text-slate-100 py-1.5">Medium</option>
+          <option value="High" className="bg-white dark:bg-gray-800 text-slate-800 dark:text-slate-100 py-1.5">High</option>
         </select>
       </div>
 
       {/* Assignee selection */}
-      <div className="flex flex-col gap-2">
-        <label className="flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-gray-500 mb-1">
-          <User className="w-3.5 h-3.5 text-sky-500" /> Assignee
-        </label>
-        <div className="flex items-center gap-2">
+      <div className="flex flex-col gap-1.5">
+        <div className="flex items-center justify-between">
+          <label className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+            <User className="w-3.5 h-3.5 text-sky-500" /> Assignee
+          </label>
           <button
             type="button"
             onClick={() => {
@@ -205,29 +205,29 @@ export const TaskFormMeta: React.FC<TaskFormMetaProps> = ({
                 }));
               }
             }}
-            className="text-[10px] text-sky-600 hover:text-sky-700 hover:underline font-bold transition-all cursor-pointer shrink-0"
+            className="text-[11px] text-sky-600 hover:text-sky-700 font-medium transition-colors cursor-pointer"
           >
             Assign to me
           </button>
-          <select
-            name="assignee"
-            value={taskData.assignee || ""}
-            onChange={handleChange}
-            className={`${baseControlClasses} font-semibold`}
-          >
-            <option value="">Unassigned</option>
-            {members.map((member) => (
-              <option key={member._id} value={member._id}>
-                {member.name}
-              </option>
-            ))}
-          </select>
         </div>
+        <select
+          name="assignee"
+          value={taskData.assignee || ""}
+          onChange={handleChange}
+          className={selectControlClasses}
+        >
+          <option value="" className="bg-white dark:bg-gray-800 text-slate-800 dark:text-slate-100 py-1.5">Unassigned</option>
+          {members.map((member) => (
+            <option key={member._id} value={member._id} className="bg-white dark:bg-gray-800 text-slate-800 dark:text-slate-100 py-1.5">
+              {member.name}
+            </option>
+          ))}
+        </select>
       </div>
 
       <div>
-        <label className=" flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-gray-500 mb-1">
-          <Calendar className=" w-3.5 h-3.5 text-sky-500" /> Due Date
+        <label className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">
+          <Calendar className="w-3.5 h-3.5 text-sky-500" /> Due Date
         </label>
         <input
           type="date"
@@ -236,25 +236,25 @@ export const TaskFormMeta: React.FC<TaskFormMetaProps> = ({
           min={today}
           value={taskData.dueDate}
           onChange={handleChange}
-          className={baseControlClasses}
+          className={`${baseControlClasses} cursor-pointer`}
         />
       </div>
 
       {parentTask === null && (
         <>
           <div>
-            <label className="flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-gray-500 mb-1">
+            <label className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">
               <Layers className="w-3.5 h-3.5 text-sky-500" /> Epic Link
             </label>
             <select
               name="epic"
               value={taskData.epic || ""}
               onChange={handleChange}
-              className={`${baseControlClasses} font-semibold`}
+              className={selectControlClasses}
             >
-              <option value="">No Epic</option>
+              <option value="" className="bg-white dark:bg-gray-800 text-slate-800 dark:text-slate-100 py-1.5">No Epic</option>
               {epics.map((epic: any) => (
-                <option key={epic._id} value={epic._id}>
+                <option key={epic._id} value={epic._id} className="bg-white dark:bg-gray-800 text-slate-800 dark:text-slate-100 py-1.5">
                   {epic.name}
                 </option>
               ))}
@@ -262,18 +262,18 @@ export const TaskFormMeta: React.FC<TaskFormMetaProps> = ({
           </div>
 
           <div>
-            <label className="flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-gray-500 mb-1">
+            <label className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">
               <Calendar className="w-3.5 h-3.5 text-sky-500" /> Sprint
             </label>
             <select
               name="sprint"
               value={taskData.sprint || ""}
               onChange={handleChange}
-              className={`${baseControlClasses} font-semibold`}
+              className={selectControlClasses}
             >
-              <option value="">Backlog</option>
+              <option value="" className="bg-white dark:bg-gray-800 text-slate-800 dark:text-slate-100 py-1.5">Backlog</option>
               {sprints.map((sprint: any) => (
-                <option key={sprint._id} value={sprint._id}>
+                <option key={sprint._id} value={sprint._id} className="bg-white dark:bg-gray-800 text-slate-800 dark:text-slate-100 py-1.5">
                   {sprint.name} ({sprint.status})
                 </option>
               ))}
@@ -284,7 +284,7 @@ export const TaskFormMeta: React.FC<TaskFormMetaProps> = ({
 
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className=" flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-gray-500 mb-1">
+          <label className="flex items-center gap-1 text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">
             Story Points
           </label>
           <input
@@ -302,7 +302,7 @@ export const TaskFormMeta: React.FC<TaskFormMetaProps> = ({
         </div>
 
         <div>
-          <label className=" flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-gray-500 mb-1">
+          <label className="flex items-center gap-1 text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">
             Estimate (h)
           </label>
           <input

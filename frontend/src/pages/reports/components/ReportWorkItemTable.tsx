@@ -30,7 +30,7 @@ export const ReportWorkItemTable: React.FC<ReportWorkItemTableProps> = ({
   const [selectedPriority, setSelectedPriority] = useState("all");
   const [selectedStatus, setSelectedStatus] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
-  const pageSize = 15;
+  const pageSize = 10;
 
   // Filter tasks
   const filteredTasks = useMemo(() => {
@@ -123,9 +123,6 @@ export const ReportWorkItemTable: React.FC<ReportWorkItemTableProps> = ({
           <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
             Work item details
           </h3>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-            Tabular list of work items with status, type, and priority
-          </p>
         </div>
 
         {/* Action Controls & Filters */}

@@ -1,5 +1,26 @@
 import React, { Suspense, lazy } from "react";
-import { Navigate, Route, Routes, useNavigate } from "react-router-dom";
+import { Navigate, Route, Routes, useNavigate, useParams } from "react-router-dom";
+
+const TicketRedirectHandler: React.FC = () => {
+  const { ticketKey } = useParams<{ ticketKey: string }>();
+
+  if (ticketKey) {
+    // Check if subtask format: e.g. PM-104-2
+    const subtaskMatch = ticketKey.match(/^([A-Za-z0-9]+-\d+)-(\d+)$/i);
+    if (subtaskMatch) {
+      const parentKey = subtaskMatch[1];
+      const subtaskIdx = Math.max(0, parseInt(subtaskMatch[2], 10) - 1);
+      return <Navigate to={`/task/${parentKey}?subtask=${subtaskIdx}`} replace />;
+    }
+
+    // Check if standard parent ticket key format: e.g. PM-104 or TASK-12
+    if (/^[A-Za-z0-9]+-\d+$/i.test(ticketKey)) {
+      return <Navigate to={`/task/${ticketKey}`} replace />;
+    }
+  }
+
+  return <Navigate to={ROUTES.DASHBOARD} replace />;
+};
 
 const Login = lazy(() => import("../components/Login"));
 const Signup = lazy(() => import("../components/Signup"));
@@ -94,6 +115,8 @@ export const AppRoutes: React.FC = () => {
             />
           }
         />
+        <Route path="/browse/:id" element={<TaskDetailPage />} />
+        <Route path="/:ticketKey" element={<TicketRedirectHandler />} />
       </Route>
 
       {/* System Admin Routes */}

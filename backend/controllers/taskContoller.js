@@ -11,6 +11,16 @@ export const cleanMentions = (text) => {
   return text.replace(/@\[([^\]]+)\]\(user:[^)]+\)/g, "@$1");
 };
 
+// HELPER TO FIND TASK BY OBJECTID OR TICKET KEY
+export const buildTaskFilter = (identifier, baseQuery = {}) => {
+  if (!identifier) return baseQuery;
+  const isObjectId = mongoose.Types.ObjectId.isValid(identifier);
+  if (isObjectId) {
+    return { $or: [{ _id: identifier }, { key: identifier }], ...baseQuery };
+  }
+  return { key: identifier, ...baseQuery };
+};
+
 // HELPER TO CREATE NOTIFICATIONS FOR USER MENTIONS
 export const handleMentions = async (text, task, sender, type = "comment") => {
   if (!text) return;
@@ -96,11 +106,13 @@ export const createTask = async (req, res) => {
             .toUpperCase();
         } else if (words.length === 1) {
           prefix = words[0].slice(0, 3).toUpperCase();
-        } else {
-          prefix = "TASK";
         }
         generatedKey = `${prefix}-${org.taskCounter}`;
       }
+    }
+
+    if (!generatedKey) {
+      generatedKey = `PM-${Math.floor(1000 + Math.random() * 9000)}`;
     }
 
     const task = new Task({
@@ -257,11 +269,17 @@ export const getTasks = async (req, res) => {
         .populate("owner", "name email")
         .populate("reporter", "name email")
         .populate("assignee", "name email")
-        .populate("links.targetTask", "title key status priority completed")
+        .populate("links.targetTask", "title key status priority completed issueType")
         .sort(sortQuery)
         .skip(skip)
         .limit(l)
         .lean();
+
+      tasks.forEach((t) => {
+        if (!t.key) {
+          t.key = `PM-${t._id.toString().slice(-4).toUpperCase()}`;
+        }
+      });
 
       return res.json({
         success: true,
@@ -280,9 +298,15 @@ export const getTasks = async (req, res) => {
       .populate("owner", "name email")
       .populate("reporter", "name email")
       .populate("assignee", "name email")
-      .populate("links.targetTask", "title key status priority completed")
+      .populate("links.targetTask", "title key status priority completed issueType")
       .sort(sortQuery)
       .lean();
+
+    tasks.forEach((t) => {
+      if (!t.key) {
+        t.key = `PM-${t._id.toString().slice(-4).toUpperCase()}`;
+      }
+    });
 
     res.json({ success: true, tasks });
   } catch (error) {
@@ -298,13 +322,13 @@ export const getTaskById = async (req, res) => {
     const query = req.user.organization
       ? { organization: req.user.organization }
       : { owner: req.user.id };
-    const task = await Task.findOne({ _id: req.params.id, ...query })
+    const task = await Task.findOne(buildTaskFilter(req.params.id, query))
       .populate("owner", "name email")
       .populate("reporter", "name email")
       .populate("assignee", "name email")
       .populate("history.updatedBy", "name email")
       .populate("comments.user", "name email avatar")
-      .populate("links.targetTask", "title key status priority completed")
+      .populate("links.targetTask", "title key status priority completed issueType")
       .populate("workLogs.user", "name email")
       .lean();
     if (!task)
@@ -312,6 +336,13 @@ export const getTaskById = async (req, res) => {
         success: false,
         message: MESSAGES.TASK.NOT_FOUND,
       });
+
+    if (!task.key) {
+      const fallbackKey = `PM-${task._id.toString().slice(-4).toUpperCase()}`;
+      task.key = fallbackKey;
+      Task.updateOne({ _id: task._id }, { $set: { key: fallbackKey } }).exec();
+    }
+
     res.json({ success: true, task });
   } catch (error) {
     res
@@ -347,10 +378,7 @@ export const updateTask = async (req, res) => {
       ? { organization: req.user.organization }
       : { owner: req.user.id };
 
-    const task = await Task.findOne({
-      _id: req.params.id,
-      ...query,
-    });
+    const task = await Task.findOne(buildTaskFilter(req.params.id, query));
     if (!task) {
       return res.status(HttpStatus.NOT_FOUND).json({
         success: false,
@@ -486,7 +514,7 @@ export const updateTask = async (req, res) => {
       .populate("assignee", "name email")
       .populate("history.updatedBy", "name email")
       .populate("comments.user", "name email avatar")
-      .populate("links.targetTask", "title key status priority completed")
+      .populate("links.targetTask", "title key status priority completed issueType")
       .populate("workLogs.user", "name email")
       .lean();
 
@@ -505,10 +533,7 @@ export const deleteTask = async (req, res) => {
       ? { organization: req.user.organization }
       : { owner: req.user.id };
 
-    const deleted = await Task.findOneAndDelete({
-      _id: req.params.id,
-      ...query,
-    });
+    const deleted = await Task.findOneAndDelete(buildTaskFilter(req.params.id, query));
     if (!deleted)
       return res
         .status(HttpStatus.NOT_FOUND)
@@ -534,7 +559,7 @@ export const addTaskComment = async (req, res) => {
       ? { organization: req.user.organization }
       : { owner: req.user.id };
 
-    const task = await Task.findOne({ _id: req.params.id, ...query });
+    const task = await Task.findOne(buildTaskFilter(req.params.id, query));
     if (!task) {
       return res
         .status(HttpStatus.NOT_FOUND)
@@ -557,7 +582,7 @@ export const addTaskComment = async (req, res) => {
       .populate("assignee", "name email")
       .populate("history.updatedBy", "name email")
       .populate("comments.user", "name email avatar")
-      .populate("links.targetTask", "title key status priority completed")
+      .populate("links.targetTask", "title key status priority completed issueType")
       .populate("workLogs.user", "name email")
       .lean();
 
@@ -576,7 +601,7 @@ export const deleteTaskComment = async (req, res) => {
       ? { organization: req.user.organization }
       : { owner: req.user.id };
 
-    const task = await Task.findOne({ _id: req.params.id, ...query });
+    const task = await Task.findOne(buildTaskFilter(req.params.id, query));
     if (!task) {
       return res
         .status(HttpStatus.NOT_FOUND)
@@ -609,7 +634,7 @@ export const deleteTaskComment = async (req, res) => {
       .populate("assignee", "name email")
       .populate("history.updatedBy", "name email")
       .populate("comments.user", "name email avatar")
-      .populate("links.targetTask", "title key status priority completed")
+      .populate("links.targetTask", "title key status priority completed issueType")
       .populate("workLogs.user", "name email")
       .lean();
 
@@ -743,7 +768,7 @@ export const logWork = async (req, res) => {
       ? { organization: req.user.organization }
       : { owner: req.user.id };
 
-    const task = await Task.findOne({ _id: req.params.id, ...query });
+    const task = await Task.findOne(buildTaskFilter(req.params.id, query));
     if (!task) {
       return res
         .status(HttpStatus.NOT_FOUND)
@@ -783,7 +808,7 @@ export const logWork = async (req, res) => {
       .populate("assignee", "name email")
       .populate("history.updatedBy", "name email")
       .populate("comments.user", "name email avatar")
-      .populate("links.targetTask", "title key status priority completed")
+      .populate("links.targetTask", "title key status priority completed issueType")
       .populate("workLogs.user", "name email")
       .lean();
 
@@ -812,8 +837,8 @@ export const linkTask = async (req, res) => {
       ? { organization: req.user.organization }
       : { owner: req.user.id };
 
-    const sourceTask = await Task.findOne({ _id: taskId, ...query });
-    const targetTask = await Task.findOne({ _id: targetTaskId, ...query });
+    const sourceTask = await Task.findOne(buildTaskFilter(taskId, query));
+    const targetTask = await Task.findOne(buildTaskFilter(targetTaskId, query));
 
     if (!sourceTask || !targetTask) {
       return res.status(HttpStatus.NOT_FOUND).json({
@@ -835,8 +860,13 @@ export const linkTask = async (req, res) => {
 
     // Determine opposite link type
     let oppositeType = "relates to";
-    if (linkType === "blocks") oppositeType = "blocked by";
-    if (linkType === "blocked by") oppositeType = "blocks";
+    if (linkType === "blocks") oppositeType = "is blocked by";
+    else if (linkType === "blocked by" || linkType === "is blocked by") oppositeType = "blocks";
+    else if (linkType === "duplicates") oppositeType = "is duplicated by";
+    else if (linkType === "is duplicated by") oppositeType = "duplicates";
+    else if (linkType === "clones") oppositeType = "is cloned by";
+    else if (linkType === "is cloned by") oppositeType = "clones";
+    else oppositeType = "relates to";
 
     // Add source-to-target link
     sourceTask.links.push({ linkType, targetTask: targetTaskId });
@@ -867,7 +897,7 @@ export const linkTask = async (req, res) => {
       .populate("assignee", "name email")
       .populate("history.updatedBy", "name email")
       .populate("comments.user", "name email avatar")
-      .populate("links.targetTask", "title key status priority completed")
+      .populate("links.targetTask", "title key status priority completed issueType")
       .populate("workLogs.user", "name email")
       .lean();
 
@@ -887,7 +917,7 @@ export const unlinkTask = async (req, res) => {
       ? { organization: req.user.organization }
       : { owner: req.user.id };
 
-    const sourceTask = await Task.findOne({ _id: taskId, ...query });
+    const sourceTask = await Task.findOne(buildTaskFilter(taskId, query));
     if (!sourceTask) {
       return res.status(HttpStatus.NOT_FOUND).json({
         success: false,
@@ -940,7 +970,7 @@ export const unlinkTask = async (req, res) => {
       .populate("assignee", "name email")
       .populate("history.updatedBy", "name email")
       .populate("comments.user", "name email avatar")
-      .populate("links.targetTask", "title key status priority completed")
+      .populate("links.targetTask", "title key status priority completed issueType")
       .populate("workLogs.user", "name email")
       .lean();
 

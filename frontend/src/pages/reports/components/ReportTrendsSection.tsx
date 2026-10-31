@@ -48,14 +48,9 @@ export const ReportTrendsSection: React.FC<ReportTrendsSectionProps> = ({
         {/* Work Item Lead Time */}
         <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-5 rounded-lg space-y-4 hover:border-gray-300 dark:hover:border-gray-700 transition-colors">
           <div className="flex items-center justify-between border-b border-gray-100 dark:border-gray-800 pb-3">
-            <div>
-              <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
-                Lead Time by Issue Type
-              </h3>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                Average elapsed days from creation to resolution
-              </p>
-            </div>
+            <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+              Lead Time by Issue Type
+            </h3>
             <span className="text-[11px] font-medium px-2 py-0.5 rounded bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400">
               Resolution Speed
             </span>
@@ -108,14 +103,9 @@ export const ReportTrendsSection: React.FC<ReportTrendsSectionProps> = ({
         {/* Work Item Completion Trend */}
         <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-5 rounded-lg space-y-4 hover:border-gray-300 dark:hover:border-gray-700 transition-colors">
           <div className="flex items-center justify-between border-b border-gray-100 dark:border-gray-800 pb-3">
-            <div>
-              <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
-                Completed Work Velocity
-              </h3>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                Resolved work items stacked by issue type
-              </p>
-            </div>
+            <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+              Completed Work Velocity
+            </h3>
             <span className="text-[11px] font-medium px-2 py-0.5 rounded bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400">
               Throughput
             </span>
@@ -162,14 +152,9 @@ export const ReportTrendsSection: React.FC<ReportTrendsSectionProps> = ({
         {/* Work Item Creation Trend */}
         <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-5 rounded-lg space-y-4 hover:border-gray-300 dark:hover:border-gray-700 transition-colors">
           <div className="flex items-center justify-between border-b border-gray-100 dark:border-gray-800 pb-3">
-            <div>
-              <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
-                Created vs Status Intake
-              </h3>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                New work intake categorized by current status
-              </p>
-            </div>
+            <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+              Created vs Status Intake
+            </h3>
             <span className="text-[11px] font-medium px-2 py-0.5 rounded bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400">
               Intake
             </span>
@@ -207,14 +192,9 @@ export const ReportTrendsSection: React.FC<ReportTrendsSectionProps> = ({
         {/* Work Item Cycle Time */}
         <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-5 rounded-lg space-y-4 hover:border-gray-300 dark:hover:border-gray-700 transition-colors">
           <div className="flex items-center justify-between border-b border-gray-100 dark:border-gray-800 pb-3">
-            <div>
-              <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
-                Resolution Cycle Time
-              </h3>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                Elapsed days from start to completion per issue
-              </p>
-            </div>
+            <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+              Resolution Cycle Time
+            </h3>
             <span className="text-[11px] font-medium px-2 py-0.5 rounded bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400">
               Cycle Efficiency
             </span>

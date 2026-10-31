@@ -138,7 +138,7 @@ export const MentionInput: React.FC<MentionInputProps> = ({
           placeholder={placeholder}
           required={required}
           rows={rows}
-          className={`${className} focus:outline-none w-full bg-transparent`}
+          className={`w-full focus:outline-none ${className}`}
         />
       ) : (
         <input
@@ -150,7 +150,7 @@ export const MentionInput: React.FC<MentionInputProps> = ({
           onKeyDown={handleKeyDown}
           placeholder={placeholder}
           required={required}
-          className={`${className} focus:outline-none w-full bg-transparent`}
+          className={`w-full focus:outline-none ${className}`}
         />
       )}
 

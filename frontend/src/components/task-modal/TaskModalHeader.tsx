@@ -1,6 +1,9 @@
 import React from "react";
-import { BookOpen, Save, PlusCircle, X } from "lucide-react";
+import { BookOpen, Save, PlusCircle, X, ExternalLink, Copy } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import { TaskModalHeaderProps } from "../../types";
+import { getIssueTypeIcon } from "../../utils";
 
 export const TaskModalHeader: React.FC<TaskModalHeaderProps> = ({
   parentTask,
@@ -9,6 +12,26 @@ export const TaskModalHeader: React.FC<TaskModalHeaderProps> = ({
   onClose,
   setParentTask,
 }) => {
+  const navigate = useNavigate();
+
+  const handleOpenFullPage = () => {
+    if (taskData.id) {
+      onClose();
+      navigate(`/task/${taskData.id}`);
+    }
+  };
+
+  const ticketKey =
+    taskData.key || (taskData.id ? `PM-${taskData.id.slice(-4).toUpperCase()}` : null);
+  const ticketLink = ticketKey ? `${window.location.origin}/${ticketKey}` : "";
+
+  const handleCopyLink = () => {
+    if (ticketLink) {
+      navigator.clipboard.writeText(ticketLink);
+      toast.success(`Copied ticket link (${ticketLink})`);
+    }
+  };
+
   return (
     <>
       {parentTask && (
@@ -20,37 +43,59 @@ export const TaskModalHeader: React.FC<TaskModalHeaderProps> = ({
           ← Parent Issue: {parentTask.title}
         </button>
       )}
-      <div className="flex justify-between items-center mb-6 border-b border-sky-100/50 pb-4">
+      <div className="flex justify-between items-center mb-5 border-b border-sky-100/60 dark:border-gray-700/60 pb-3.5">
         <div className="space-y-1">
-          {taskData.key && (
-            <span className="text-[10px] font-black uppercase tracking-wider bg-sky-100 text-sky-700 px-2 py-0.5 rounded border border-sky-200 select-all mb-1 inline-block">
-              {taskData.key}
-            </span>
+          {ticketKey && (
+            <div
+              onClick={handleCopyLink}
+              className="group/key flex items-center gap-1.5 bg-sky-50 dark:bg-sky-950/50 hover:bg-sky-100 dark:hover:bg-sky-900/60 px-2 py-0.5 rounded border border-sky-200/60 dark:border-sky-800 transition-colors cursor-pointer w-fit"
+              title={`Click to copy ticket link (${ticketLink})`}
+            >
+              {getIssueTypeIcon(taskData.issueType, "w-3.5 h-3.5")}
+              <span className="text-[11px] font-bold tracking-wider text-sky-700 dark:text-sky-300 select-all inline-block">
+                {ticketKey}
+              </span>
+              <Copy className="w-3 h-3 text-sky-400 group-hover/key:text-sky-700 dark:group-hover/key:text-sky-200 transition-colors" />
+            </div>
           )}
-          <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-255 flex items-center gap-2">
+          <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2">
             {parentTask ? (
               <>
-                <BookOpen className="text-sky-505 w-6 h-6" />
+                <BookOpen className="text-sky-500 w-5 h-5" />
                 Sub-task Detail
               </>
             ) : taskData.id ? (
-              <Save className="text-sky-505 w-6 h-6" />
+              <Save className="text-sky-500 w-5 h-5" />
             ) : (
-              <PlusCircle className="text-sky-505 w-6 h-6" />
+              <PlusCircle className="text-sky-500 w-5 h-5" />
             )}
             {!parentTask && (taskData.id ? "Edit Issue" : "Create New Issue")}
           </h2>
         </div>
-        <button
-          onClick={() => {
-            onClose();
-            setParentTask(null);
-          }}
-          type="button"
-          className="p-2 hover:bg-sky-50 rounded-lg transition-colors text-gray-400 hover:text-sky-700 cursor-pointer"
-        >
-          <X className="w-5 h-5" />
-        </button>
+
+        <div className="flex items-center gap-1.5">
+          {taskData.id && (
+            <button
+              type="button"
+              onClick={handleOpenFullPage}
+              className="p-2 hover:bg-sky-50 dark:hover:bg-gray-700 rounded-lg transition-colors text-gray-500 dark:text-gray-400 hover:text-sky-700 dark:hover:text-sky-300 cursor-pointer"
+              title="Open full page"
+            >
+              <ExternalLink className="w-4 h-4" />
+            </button>
+          )}
+          <button
+            onClick={() => {
+              onClose();
+              setParentTask(null);
+            }}
+            type="button"
+            className="p-2 hover:bg-sky-50 dark:hover:bg-gray-700 rounded-lg transition-colors text-gray-400 hover:text-sky-700 dark:hover:text-gray-200 cursor-pointer"
+            title="Close"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
       </div>
     </>
   );

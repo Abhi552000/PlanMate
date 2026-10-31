@@ -181,8 +181,16 @@ const taskSchema = new mongoose.Schema({
     {
       linkType: {
         type: String,
-        enum: ["blocks", "blocked by", "relates to"],
-        required: true,
+        enum: [
+          "blocks",
+          "blocked by",
+          "is blocked by",
+          "relates to",
+          "duplicates",
+          "is duplicated by",
+          "clones",
+          "is cloned by",
+        ],
       },
       targetTask: {
         type: mongoose.Schema.Types.ObjectId,

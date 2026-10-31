@@ -38,7 +38,7 @@ export const useTaskDetail = (id: string | undefined, subtaskIndex: number | nul
   const [deletingCommentId, setDeletingCommentId] = useState<string | null>(null);
 
   const [workspaceTasks, setWorkspaceTasks] = useState<ITask[]>([]);
-  const [linkType, setLinkType] = useState<"blocks" | "blocked by" | "relates to">("relates to");
+  const [linkType, setLinkType] = useState<string>("relates to");
   const [targetTaskId, setTargetTaskId] = useState("");
   const [linking, setLinking] = useState(false);
 
@@ -93,46 +93,61 @@ export const useTaskDetail = (id: string | undefined, subtaskIndex: number | nul
 
   const handleAddLink = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!targetTaskId) return;
+    if (!targetTaskId || !id) return;
     setLinking(true);
     try {
-      const currentLinks = parentTaskData?.links || [];
-      if (currentLinks.some((l: any) => l.targetTask?._id === targetTaskId && l.linkType === linkType)) {
-        toast.warn(TOAST_MESSAGES.LINK_EXISTS_WARN);
-        setLinking(false);
-        return;
-      }
-      const updatedLinks = [...currentLinks, { linkType, targetTask: targetTaskId }];
-      const data = await taskService.updateTask(id!, {
-        ...parentTaskData,
-        links: updatedLinks
-      });
-      if (data?.task) {
+      const data = await taskService.linkTask(id, linkType, targetTaskId);
+      if (data?.success && data?.task) {
         setParentTaskData(data.task);
         setTargetTaskId("");
-        toast.success(TOAST_MESSAGES.LINK_ADD_SUCCESS);
+        toast.success(TOAST_MESSAGES.LINK_ADD_SUCCESS || "Issue linked successfully");
       }
     } catch (err: any) {
-      toast.error(err?.response?.data?.message || TOAST_MESSAGES.LINK_ADD_ERROR);
+      toast.error(err?.response?.data?.message || TOAST_MESSAGES.LINK_ADD_ERROR || "Failed to link issue");
     } finally {
       setLinking(false);
     }
   };
 
   const handleRemoveLink = async (linkId: string) => {
+    if (!id || !linkId) return;
     try {
-      const currentLinks = parentTaskData?.links || [];
-      const updatedLinks = currentLinks.filter((l: any) => l._id !== linkId);
-      const data = await taskService.updateTask(id!, {
-        ...parentTaskData,
-        links: updatedLinks
-      });
-      if (data?.task) {
+      const data = await taskService.unlinkTask(id, linkId);
+      if (data?.success && data?.task) {
         setParentTaskData(data.task);
-        toast.success(TOAST_MESSAGES.LINK_REMOVE_SUCCESS);
+        toast.success(TOAST_MESSAGES.LINK_REMOVE_SUCCESS || "Issue link removed");
       }
     } catch (err: any) {
-      toast.error(err?.response?.data?.message || TOAST_MESSAGES.LINK_REMOVE_ERROR);
+      toast.error(err?.response?.data?.message || TOAST_MESSAGES.LINK_REMOVE_ERROR || "Failed to remove issue link");
+    }
+  };
+
+  const handleInlineTitleUpdate = async (newTitle: string) => {
+    if (!newTitle.trim() || newTitle.trim() === taskData.title) return;
+    const trimmed = newTitle.trim();
+    setTaskData((prev: any) => ({ ...prev, title: trimmed }));
+
+    if (subtaskIndex !== null && parentTaskData?.subtasks?.[subtaskIndex]) {
+      const updatedSubtasks = [...parentTaskData.subtasks];
+      updatedSubtasks[subtaskIndex] = {
+        ...updatedSubtasks[subtaskIndex],
+        title: trimmed,
+      };
+      setParentTaskData((prev: any) => ({ ...prev, subtasks: updatedSubtasks }));
+      try {
+        await taskService.updateTask(id!, { ...parentTaskData, subtasks: updatedSubtasks });
+        toast.success("Summary updated");
+      } catch (err: any) {
+        toast.error(err?.response?.data?.message || "Failed to update summary");
+      }
+    } else {
+      setParentTaskData((prev: any) => ({ ...prev, title: trimmed }));
+      try {
+        await taskService.updateTask(id!, { title: trimmed });
+        toast.success("Summary updated");
+      } catch (err: any) {
+        toast.error(err?.response?.data?.message || "Failed to update summary");
+      }
     }
   };
 
@@ -319,5 +334,6 @@ export const useTaskDetail = (id: string | undefined, subtaskIndex: number | nul
     handleChange,
     handleSave,
     handleAddSubtask,
+    handleInlineTitleUpdate,
   };
 };

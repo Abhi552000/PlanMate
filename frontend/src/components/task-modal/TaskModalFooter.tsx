@@ -10,21 +10,21 @@ export const TaskModalFooter: React.FC<TaskModalFooterProps> = ({
   setParentTask,
 }) => {
   return (
-    <div className="flex flex-col sm:flex-row gap-3 justify-end pt-4 border-t border-sky-100 dark:border-gray-800 mt-6">
+    <div className="flex flex-col sm:flex-row gap-2.5 justify-end pt-1">
       <button
         type="button"
         onClick={() => {
           onClose();
           setParentTask(null);
         }}
-        className="w-full sm:w-auto px-5 py-2.5 border border-sky-200 dark:border-gray-800 text-gray-600 dark:text-gray-300 hover:bg-sky-50 dark:hover:bg-gray-800 font-bold rounded-lg text-sm transition-colors cursor-pointer bg-white dark:bg-gray-900"
+        className="w-full sm:w-auto px-4 py-2 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-gray-800 font-medium rounded-lg text-xs sm:text-sm transition-colors cursor-pointer bg-white dark:bg-gray-800"
       >
         Cancel
       </button>
       <button
         type="submit"
         disabled={loading}
-        className="w-full sm:w-auto bg-gradient-to-r from-cyan-500 to-sky-600 text-white font-bold py-2.5 px-6 rounded-lg flex items-center justify-center gap-2 disabled:opacity-50 hover:shadow-md transition-all duration-200 cursor-pointer text-sm"
+        className="w-full sm:w-auto bg-sky-600 hover:bg-sky-700 active:bg-sky-800 text-white font-medium py-2 px-5 rounded-lg flex items-center justify-center gap-2 disabled:opacity-50 transition-colors cursor-pointer text-xs sm:text-sm"
       >
         {loading ? (
           "Saving..."
