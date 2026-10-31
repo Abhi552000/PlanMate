@@ -15,6 +15,7 @@ import { TaskFormMeta } from "./task-modal/TaskFormMeta";
 import { TaskFormSubtasks } from "./task-modal/TaskFormSubtasks";
 import { TaskModalHeader } from "./task-modal/TaskModalHeader";
 import { TaskModalFooter } from "./task-modal/TaskModalFooter";
+import { TaskModalSkeleton } from "./task-modal/TaskModalSkeleton";
 
 const TaskModal: React.FC<TaskModalProps> = ({
   isOpen,
@@ -43,24 +44,31 @@ const TaskModal: React.FC<TaskModalProps> = ({
   const [editingSubtaskVal, setEditingSubtaskVal] = useState("");
   const [parentTask, setParentTask] = useState<any | null>(null);
   const [loading, setLoading] = useState(false);
+  const [loadingDependencies, setLoadingDependencies] = useState(false);
   const today = new Date().toISOString().split("T")[0];
 
   const fetchMembersAndAgile = useCallback(async () => {
+    setLoadingDependencies(true);
     try {
-      const memberData = await orgService.getOrgMembers();
-      if (memberData?.success && memberData?.members) {
-        setMembers(memberData.members);
+      const [memberData, sprintData, epicData] = await Promise.allSettled([
+        orgService.getOrgMembers(),
+        backlogService.getSprints(),
+        backlogService.getEpics(),
+      ]);
+
+      if (memberData.status === "fulfilled" && memberData.value?.success && Array.isArray(memberData.value?.members)) {
+        setMembers(memberData.value.members);
       }
-      const sprintData = await backlogService.getSprints();
-      if (sprintData?.success && sprintData?.sprints) {
-        setSprints(sprintData.sprints);
+      if (sprintData.status === "fulfilled" && sprintData.value?.success && Array.isArray(sprintData.value?.sprints)) {
+        setSprints(sprintData.value.sprints);
       }
-      const epicData = await backlogService.getEpics();
-      if (epicData?.success && epicData?.epics) {
-        setEpics(epicData.epics);
+      if (epicData.status === "fulfilled" && epicData.value?.success && Array.isArray(epicData.value?.epics)) {
+        setEpics(epicData.value.epics);
       }
     } catch (err) {
       console.error(CONSOLE_ERRORS.FETCH_DEPENDENCIES_MODAL, err);
+    } finally {
+      setLoadingDependencies(false);
     }
   }, []);
 
@@ -233,47 +241,51 @@ const TaskModal: React.FC<TaskModalProps> = ({
         />
         <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0 space-y-5 overflow-hidden">
           <div className="flex-1 overflow-y-auto px-1.5 pr-2.5 min-h-0 py-3 scrollbar-thin">
-            <div className="grid grid-cols-1 gap-5 md:grid-cols-12">
-              {/* Left side: Main text fields and subtasks */}
-              <div className="md:col-span-7 space-y-4">
-                <TaskFormGeneral
-                  title={taskData.title}
-                  description={taskData.description}
-                  onChange={handleChange}
-                  baseControlClasses={baseControlClasses}
-                  members={members}
-                />
-
-                {parentTask === null && (
-                  <TaskFormSubtasks
-                    subtasks={taskData.subtasks || []}
-                    setTaskData={setTaskData}
-                    newSubtaskTitle={newSubtaskTitle}
-                    setNewSubtaskTitle={setNewSubtaskTitle}
-                    editingSubtaskIdx={editingSubtaskIdx}
-                    setEditingSubtaskIdx={setEditingSubtaskIdx}
-                    editingSubtaskVal={editingSubtaskVal}
-                    setEditingSubtaskVal={setEditingSubtaskVal}
-                    statuses={statuses}
-                    onOpenSubtaskDetail={handleOpenSubtaskDetail}
-                    onAddSubtask={handleAddSubtask}
+            {loadingDependencies ? (
+              <TaskModalSkeleton />
+            ) : (
+              <div className="grid grid-cols-1 gap-5 md:grid-cols-12">
+                {/* Left side: Main text fields and subtasks */}
+                <div className="md:col-span-7 space-y-4">
+                  <TaskFormGeneral
+                    title={taskData?.title || ""}
+                    description={taskData?.description || ""}
+                    onChange={handleChange}
+                    baseControlClasses={baseControlClasses}
+                    members={Array.isArray(members) ? members : []}
                   />
-                )}
+
+                  {parentTask === null && (
+                    <TaskFormSubtasks
+                      subtasks={Array.isArray(taskData?.subtasks) ? taskData.subtasks : []}
+                      setTaskData={setTaskData}
+                      newSubtaskTitle={newSubtaskTitle}
+                      setNewSubtaskTitle={setNewSubtaskTitle}
+                      editingSubtaskIdx={editingSubtaskIdx}
+                      setEditingSubtaskIdx={setEditingSubtaskIdx}
+                      editingSubtaskVal={editingSubtaskVal}
+                      setEditingSubtaskVal={setEditingSubtaskVal}
+                      statuses={Array.isArray(statuses) && statuses.length > 0 ? statuses : ["To Do", "In Progress", "Done"]}
+                      onOpenSubtaskDetail={handleOpenSubtaskDetail}
+                      onAddSubtask={handleAddSubtask}
+                    />
+                  )}
+                </div>
+                {/* Right side: Jira metadata layout */}
+                <TaskFormMeta
+                  taskData={taskData || {}}
+                  setTaskData={setTaskData}
+                  statuses={Array.isArray(statuses) && statuses.length > 0 ? statuses : ["To Do", "In Progress", "Done"]}
+                  members={Array.isArray(members) ? members : []}
+                  sprints={Array.isArray(sprints) ? sprints : []}
+                  epics={Array.isArray(epics) ? epics : []}
+                  parentTask={parentTask}
+                  today={today}
+                  baseControlClasses={baseControlClasses}
+                  handleChange={handleChange}
+                />
               </div>
-              {/* Right side: Jira metadata layout */}
-              <TaskFormMeta
-                taskData={taskData}
-                setTaskData={setTaskData}
-                statuses={statuses}
-                members={members}
-                sprints={sprints}
-                epics={epics}
-                parentTask={parentTask}
-                today={today}
-                baseControlClasses={baseControlClasses}
-                handleChange={handleChange}
-              />
-            </div>
+            )}
           </div>
 
           <div className="shrink-0 pt-2 border-t border-sky-50 dark:border-gray-700">

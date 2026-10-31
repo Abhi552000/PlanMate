@@ -23,53 +23,63 @@ export const TaskFormSubtasks: React.FC<TaskFormSubtasksProps> = ({
       </label>
       
       {/* Scrollable subtasks container */}
-      <div className=" space-y-2 max-h-48 overflow-y-auto pr-1">
-        {subtasks.map((st: any, index: number) => {
-          const currentStatus = st.status || (st.completed ? "Done" : "To Do");
-          
-          return (
-            <div key={index} className="flex items-center justify-between gap-3 bg-sky-50/30 p-2.5 rounded-lg border border-sky-100/50 text-xs">
-              <div className="flex items-center gap-2 flex-1 min-w-0">
-                {editingSubtaskIdx === index ? (
-                  <input
-                    type="text"
-                    value={editingSubtaskVal}
-                    onChange={(e) => setEditingSubtaskVal(e.target.value)}
-                    onBlur={() => {
-                      if (editingSubtaskVal.trim()) {
-                        const updated = [...subtasks];
-                        updated[index].title = editingSubtaskVal.trim();
-                        setTaskData((prev: any) => ({ ...prev, subtasks: updated }));
-                      }
-                      setEditingSubtaskIdx(null);
-                    }}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') {
-                        e.preventDefault();
+      <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
+        {(!Array.isArray(subtasks) || subtasks.length === 0) ? (
+          <p className="text-xs text-slate-400 dark:text-gray-500 italic py-1">
+            No checklist items yet. Add one below.
+          </p>
+        ) : (
+          subtasks.map((st: any, index: number) => {
+            if (!st) return null;
+            const currentStatus = st?.status || (st?.completed ? "Done" : "To Do");
+            
+            return (
+              <div key={index} className="flex items-center justify-between gap-3 bg-sky-50/30 dark:bg-gray-800/40 p-2.5 rounded-lg border border-sky-100/50 dark:border-gray-750 text-xs">
+                <div className="flex items-center gap-2 flex-1 min-w-0">
+                  {editingSubtaskIdx === index ? (
+                    <input
+                      type="text"
+                      value={editingSubtaskVal}
+                      onChange={(e) => setEditingSubtaskVal(e.target.value)}
+                      onBlur={() => {
                         if (editingSubtaskVal.trim()) {
-                          const updated = [...subtasks];
-                          updated[index].title = editingSubtaskVal.trim();
-                          setTaskData((prev: any) => ({ ...prev, subtasks: updated }));
+                          const updated = [...(subtasks || [])];
+                          if (updated[index]) {
+                            updated[index] = { ...updated[index], title: editingSubtaskVal.trim() };
+                            setTaskData((prev: any) => ({ ...prev, subtasks: updated }));
+                          }
                         }
                         setEditingSubtaskIdx(null);
-                      }
-                    }}
-                    className="flex-1 h-[30px] px-2.5 border border-slate-200 dark:border-slate-700 rounded text-xs bg-white dark:bg-gray-800 text-slate-800 dark:text-slate-100 focus:border-sky-500 focus:ring-2 focus:ring-sky-500/15 focus:outline-none transition-colors"
-                    autoFocus
-                  />
-                ) : (
-                  <span 
-                    onClick={() => {
-                      setEditingSubtaskIdx(index);
-                      setEditingSubtaskVal(st.title);
-                    }}
-                    className={`truncate text-gray-750 dark:text-gray-300 font-medium cursor-pointer hover:bg-sky-50 dark:hover:bg-gray-800 px-1 rounded flex-1 ${currentStatus === "Done" ? 'line-through text-gray-400' : ''}`}
-                    title="Click to edit summary"
-                  >
-                    {st.title}
-                  </span>
-                )}
-              </div>
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault();
+                          if (editingSubtaskVal.trim()) {
+                            const updated = [...(subtasks || [])];
+                            if (updated[index]) {
+                              updated[index] = { ...updated[index], title: editingSubtaskVal.trim() };
+                              setTaskData((prev: any) => ({ ...prev, subtasks: updated }));
+                            }
+                          }
+                          setEditingSubtaskIdx(null);
+                        }
+                      }}
+                      className="flex-1 h-[30px] px-2.5 border border-slate-200 dark:border-slate-700 rounded text-xs bg-white dark:bg-gray-800 text-slate-800 dark:text-slate-100 focus:border-sky-500 focus:ring-2 focus:ring-sky-500/15 focus:outline-none transition-colors"
+                      autoFocus
+                    />
+                  ) : (
+                    <span 
+                      onClick={() => {
+                        setEditingSubtaskIdx(index);
+                        setEditingSubtaskVal(st?.title || "");
+                      }}
+                      className={`truncate text-gray-750 dark:text-gray-300 font-medium cursor-pointer hover:bg-sky-50 dark:hover:bg-gray-800 px-1 rounded flex-1 ${currentStatus === "Done" ? 'line-through text-gray-400' : ''}`}
+                      title="Click to edit summary"
+                    >
+                      {st?.title || "Untitled"}
+                    </span>
+                  )}
+                </div>
               
               <div className="flex items-center gap-2">
                 <button
@@ -114,7 +124,7 @@ export const TaskFormSubtasks: React.FC<TaskFormSubtasksProps> = ({
               </div>
             </div>
           );
-        })}
+        }))}
       </div>
 
       {/* Subtask addition form row */}
