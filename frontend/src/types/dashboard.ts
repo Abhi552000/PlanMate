@@ -5,6 +5,7 @@ export interface DashboardContext {
   refreshTasks: (silent?: boolean) => void;
   viewMode: string;
   setViewMode: (val: string) => void;
+  loading?: boolean;
 }
 
 export interface KanbanBoardProps {

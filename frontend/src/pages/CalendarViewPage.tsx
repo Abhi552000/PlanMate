@@ -15,6 +15,7 @@ import { orgService } from "../services/orgService";
 import { priorityStyles } from "../assets/dummy";
 import { CALENDAR_TEXTS } from "../constants/uiTexts";
 import { isSameDay, generateCalendarDays } from "../utils";
+import { getCachedStatuses, setCachedStatuses } from "../utils/statusUtils";
 import { CONSOLE_ERRORS, TOAST_MESSAGES } from "../constants/messages";
 
 export const CalendarViewPage: React.FC = () => {
@@ -23,20 +24,18 @@ export const CalendarViewPage: React.FC = () => {
 
   // Calendar Date State
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [statuses, setStatuses] = useState<string[]>([
-    "To Do",
-    "In Progress",
-    "Done",
-  ]);
+  const [statuses, setStatuses] = useState<string[]>(getCachedStatuses);
   const [selectedTask, setSelectedTask] = useState<any>(null);
   const [showModal, setShowModal] = useState(false);
 
   // Fetch Custom Statuses from Org context
   useEffect(() => {
+    let isMounted = true;
     const fetchOrgDetails = async () => {
       try {
         const data = await orgService.getOrgDetails();
-        if (data?.success && data?.organization?.statuses) {
+        if (isMounted && data?.success && Array.isArray(data?.organization?.statuses) && data.organization.statuses.length > 0) {
+          setCachedStatuses(data.organization.statuses);
           setStatuses(data.organization.statuses);
         }
       } catch (err) {
@@ -44,6 +43,9 @@ export const CalendarViewPage: React.FC = () => {
       }
     };
     fetchOrgDetails();
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const currentYear = currentDate.getFullYear();

@@ -68,8 +68,9 @@ const Layout: React.FC<LayoutProps> = ({ user, onLogout }) => {
       refreshTasks: fetchTasksData,
       viewMode,
       setViewMode,
+      loading,
     }),
-    [tasks, fetchTasksData, viewMode]
+    [tasks, fetchTasksData, viewMode, loading]
   );
 
   useEffect(() => {
@@ -77,14 +78,6 @@ const Layout: React.FC<LayoutProps> = ({ user, onLogout }) => {
   }, [fetchTasksData]);
 
   const hasSidebar = user?.role === "org_admin" || user?.role === "member";
-
-  // Loading state (rendered AFTER all hooks)
-  if (loading && tasks.length === 0)
-    return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-sky-500" />
-      </div>
-    );
 
   // Error state (rendered AFTER all hooks)
   if (error && tasks.length === 0)

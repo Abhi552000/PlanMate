@@ -16,6 +16,7 @@ import { TaskFormSubtasks } from "./task-modal/TaskFormSubtasks";
 import { TaskModalHeader } from "./task-modal/TaskModalHeader";
 import { TaskModalFooter } from "./task-modal/TaskModalFooter";
 import { TaskModalSkeleton } from "./task-modal/TaskModalSkeleton";
+import { DEFAULT_STATUSES } from "../utils/statusUtils";
 
 const TaskModal: React.FC<TaskModalProps> = ({
   isOpen,
@@ -44,7 +45,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
   const [editingSubtaskVal, setEditingSubtaskVal] = useState("");
   const [parentTask, setParentTask] = useState<any | null>(null);
   const [loading, setLoading] = useState(false);
-  const [loadingDependencies, setLoadingDependencies] = useState(false);
+  const [loadingDependencies, setLoadingDependencies] = useState(true);
   const today = new Date().toISOString().split("T")[0];
 
   const fetchMembersAndAgile = useCallback(async () => {
@@ -74,8 +75,11 @@ const TaskModal: React.FC<TaskModalProps> = ({
 
   useEffect(() => {
     if (!isOpen) return;
+    if (members.length === 0 || sprints.length === 0) {
+      setLoadingDependencies(true);
+    }
     fetchMembersAndAgile();
-  }, [isOpen, fetchMembersAndAgile]);
+  }, [isOpen, fetchMembersAndAgile, members.length, sprints.length]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -265,7 +269,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
                       setEditingSubtaskIdx={setEditingSubtaskIdx}
                       editingSubtaskVal={editingSubtaskVal}
                       setEditingSubtaskVal={setEditingSubtaskVal}
-                      statuses={Array.isArray(statuses) && statuses.length > 0 ? statuses : ["To Do", "In Progress", "Done"]}
+                      statuses={Array.isArray(statuses) && statuses.length > 0 ? statuses : DEFAULT_STATUSES}
                       onOpenSubtaskDetail={handleOpenSubtaskDetail}
                       onAddSubtask={handleAddSubtask}
                     />
@@ -275,7 +279,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
                 <TaskFormMeta
                   taskData={taskData || {}}
                   setTaskData={setTaskData}
-                  statuses={Array.isArray(statuses) && statuses.length > 0 ? statuses : ["To Do", "In Progress", "Done"]}
+                  statuses={Array.isArray(statuses) && statuses.length > 0 ? statuses : DEFAULT_STATUSES}
                   members={Array.isArray(members) ? members : []}
                   sprints={Array.isArray(sprints) ? sprints : []}
                   epics={Array.isArray(epics) ? epics : []}
