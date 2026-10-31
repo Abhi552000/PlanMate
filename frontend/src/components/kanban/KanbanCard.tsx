@@ -4,27 +4,27 @@ import { ITask, KanbanCardProps } from "../../types";
 import { getPriorityStyle } from "../../utils";
 import { MentionText } from "../MentionText";
 
-const getIssueTypeIcon = (type: string) => {
+const getIssueTypeIcon = (type?: string) => {
   switch (type?.toLowerCase()) {
     case "bug":
-      return <Bug className="w-4 h-4 text-red-500 fill-red-50" />;
+      return <Bug className="w-3.5 h-3.5 text-rose-500 fill-rose-500/20" />;
     case "story":
-      return <BookOpen className="w-4 h-4 text-green-500 fill-green-50" />;
+      return <BookOpen className="w-3.5 h-3.5 text-emerald-500 fill-emerald-500/20" />;
     case "epic":
-      return <Award className="w-4 h-4 text-purple-600 fill-purple-50" />;
+      return <Award className="w-3.5 h-3.5 text-purple-500 fill-purple-500/20" />;
     default:
-      return <CheckSquare className="w-4 h-4 text-sky-500 fill-sky-50" />;
+      return <CheckSquare className="w-3.5 h-3.5 text-sky-500 fill-sky-500/20" />;
   }
 };
 
-const getIssueTypeLeftBorder = (type: string) => {
+const getIssueTypeLeftBorder = (type?: string) => {
   switch (type?.toLowerCase()) {
     case "bug":
-      return "border-l-4 border-l-red-500 border-y-sky-100 dark:border-y-gray-800 border-r-sky-100 dark:border-r-gray-800";
+      return "border-l-4 border-l-rose-500 border-y-sky-100 dark:border-y-gray-800 border-r-sky-100 dark:border-r-gray-800";
     case "story":
-      return "border-l-4 border-l-green-500 border-y-sky-100 dark:border-y-gray-800 border-r-sky-100 dark:border-r-gray-800";
+      return "border-l-4 border-l-emerald-500 border-y-sky-100 dark:border-y-gray-800 border-r-sky-100 dark:border-r-gray-800";
     case "epic":
-      return "border-l-4 border-l-purple-600 border-y-sky-100 dark:border-y-gray-800 border-r-sky-100 dark:border-r-gray-800";
+      return "border-l-4 border-l-purple-500 border-y-sky-100 dark:border-y-gray-800 border-r-sky-100 dark:border-r-gray-800";
     default:
       return "border-l-4 border-l-sky-500 border-y-sky-100 dark:border-y-gray-800 border-r-sky-100 dark:border-r-gray-800";
   }
@@ -38,7 +38,7 @@ export const KanbanCard: React.FC<KanbanCardProps> = React.memo(({
   handleDragStart,
   handleStatusTransition,
 }) => {
-  const type = "Task";
+  const type = task.issueType || "Task";
 
   return (
     <div
@@ -58,7 +58,7 @@ export const KanbanCard: React.FC<KanbanCardProps> = React.memo(({
         <div className="flex items-center justify-between mb-1.5">
           <div className="flex items-center gap-1.5">
             {getIssueTypeIcon(type)}
-            <span className="text-[10px] font-black tracking-wider uppercase text-sky-700 bg-sky-100/50 px-1.5 py-0.5 rounded border border-sky-200 dark:border-gray-800">
+            <span className="text-[11px] font-bold tracking-wider uppercase text-sky-700 dark:text-sky-300 bg-sky-100/80 dark:bg-sky-950/80 px-2 py-0.5 rounded border border-sky-200 dark:border-sky-800 select-all">
               {task.key || `PM-${task._id ? task._id.slice(-4).toUpperCase() : "TASK"}`}
             </span>
           </div>
@@ -92,7 +92,7 @@ export const KanbanCard: React.FC<KanbanCardProps> = React.memo(({
             {task.labels.map((lbl, idx) => (
               <span
                 key={idx}
-                className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-sky-50 dark:bg-sky-950/40 text-sky-600 dark:text-sky-400 border border-sky-100 dark:border-sky-900/40"
+                className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-sky-50 dark:bg-sky-950/40 text-sky-600 dark:text-sky-400 border border-sky-100 dark:border-sky-900/40"
               >
                 {lbl}
               </span>

@@ -277,9 +277,9 @@ export const CalendarViewPage: React.FC = () => {
                   <div className="flex md:hidden flex-wrap gap-1 justify-center items-center mt-1">
                     {dateTasks.slice(0, 4).map((task) => {
                       const priority = task.priority || "Low";
-                      let dotColor = "bg-green-500";
-                      if (priority === "Medium") dotColor = "bg-sky-500";
-                      if (priority === "High") dotColor = "bg-cyan-500";
+                      let dotColor = "bg-emerald-500";
+                      if (priority === "Medium") dotColor = "bg-amber-500";
+                      if (priority === "High") dotColor = "bg-rose-500";
                       if (task.completed) dotColor = "bg-green-500/40 dark:bg-green-500/20";
 
                       return (

@@ -14,6 +14,7 @@ const ActiveSprint = lazy(() => import("../pages/dashboard/ActiveSprint"));
 const CalendarViewPage = lazy(() =>
   import("../pages/CalendarViewPage").then((m) => ({ default: m.CalendarViewPage }))
 );
+const ReportsPage = lazy(() => import("../pages/reports/ReportsPage"));
 
 import { PublicRoute } from "./PublicRoute";
 import { ProtectedRoute } from "./ProtectedRoute";
@@ -82,6 +83,7 @@ export const AppRoutes: React.FC = () => {
         <Route path={ROUTES.BACKLOG} element={<Backlog />} />
         <Route path={ROUTES.ACTIVE_SPRINT} element={<ActiveSprint />} />
         <Route path={ROUTES.CALENDAR} element={<CalendarViewPage />} />
+        <Route path={ROUTES.REPORTS} element={<ReportsPage />} />
         <Route
           path={ROUTES.PROFILE}
           element={

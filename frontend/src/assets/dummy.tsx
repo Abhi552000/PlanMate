@@ -13,6 +13,7 @@ import {
   Award,
   Edit2,
   Calendar,
+  BarChart2,
 } from "lucide-react";
 
 // FRONTEND CONSTANTS
@@ -20,9 +21,9 @@ export const baseControlClasses =
   "w-full px-3 py-2 border border-sky-100 dark:border-gray-800 rounded-lg text-xs focus:ring-2 focus:ring-sky-500 focus:outline-none bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 font-medium transition-all duration-200";
 
 export const priorityStyles: Record<string, string> = {
-  Low: "bg-green-100 text-green-700 border-green-200 dark:bg-green-950/30 dark:text-green-400 dark:border-green-900/40",
-  Medium: "bg-gray-100 text-gray-700 border-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700",
-  High: "bg-red-100 text-red-700 border-red-200 dark:bg-red-950/30 dark:text-red-400 dark:border-red-900/40",
+  Low: "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-900/50",
+  Medium: "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/40 dark:text-amber-400 dark:border-amber-900/50",
+  High: "bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/40 dark:text-rose-400 dark:border-rose-900/50",
 };
 
 // data/defaultTask.js
@@ -73,6 +74,7 @@ export const menuItems = [
   { text: "Backlog", path: "/backlog", icon: <ListChecks className="w-5 h-5" /> },
   { text: "Active Sprint", path: "/active-sprint", icon: <Flame className="w-5 h-5" /> },
   { text: "Calendar", path: "/calendar", icon: <Calendar className="w-5 h-5" /> },
+  { text: "Reports", path: "/reports", icon: <BarChart2 className="w-5 h-5" /> },
 ];
 
 export const SIDEBAR_CLASSES = {
@@ -150,7 +152,7 @@ export const ADD_BUTTON =
 export const STATS_GRID =
   "grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-4 md:mb-6";
 export const STAT_CARD =
-  "p-3 md:p-4 rounded-xl bg-white shadow-sm border border-sky-100 hover:shadow-md transition-all duration-300 min-w-0";
+  "p-3 md:p-4 rounded-xl bg-white shadow-sm border hover:shadow-md transition-all duration-300 min-w-0";
 export const ICON_WRAPPER = "p-1.5 md:p-2 rounded-lg";
 export const VALUE_CLASS = "text-lg md:text-2xl font-bold truncate";
 export const LABEL_CLASS = "text-xs text-gray-500 truncate";

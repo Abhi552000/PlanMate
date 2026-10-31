@@ -116,39 +116,39 @@ export const AUTH_TEXTS = {
   ERROR_REGISTRATION_FAILED: "Registration failed. Please try again.",
 };
 
-import { Inbox, Flame } from "lucide-react";
+import { Layers, ArrowDownCircle, Clock, Flame } from "lucide-react";
 
 export const STATS_CONFIG = [
   {
     key: "total",
     label: "Total Tasks",
-    icon: Inbox,
-    iconColor: "bg-sky-50 dark:bg-sky-950/40 text-sky-600 dark:text-sky-400",
-    borderColor: "border-sky-100/50 dark:border-gray-800",
+    icon: Layers,
+    iconColor: "bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400",
+    borderColor: "border-sky-200/80 dark:border-sky-800/60",
     valueKey: "total" as const,
   },
   {
     key: "lowPriority",
     label: "Low Priority",
-    icon: Flame,
-    iconColor: "bg-gray-50 dark:bg-gray-800/60 text-gray-500 dark:text-gray-400",
-    borderColor: "border-sky-100/50 dark:border-gray-800",
+    icon: ArrowDownCircle,
+    iconColor: "bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400",
+    borderColor: "border-emerald-200/80 dark:border-emerald-800/60",
     valueKey: "lowPriority" as const,
   },
   {
     key: "mediumPriority",
     label: "Medium Priority",
-    icon: Flame,
-    iconColor: "bg-gray-50 dark:bg-gray-800/60 text-gray-500 dark:text-gray-400",
-    borderColor: "border-sky-100/50 dark:border-gray-800",
+    icon: Clock,
+    iconColor: "bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400",
+    borderColor: "border-amber-200/80 dark:border-amber-800/60",
     valueKey: "mediumPriority" as const,
   },
   {
     key: "highPriority",
     label: "High Priority",
     icon: Flame,
-    iconColor: "bg-gray-50 dark:bg-gray-800/60 text-gray-500 dark:text-gray-400",
-    borderColor: "border-sky-100/50 dark:border-gray-800",
+    iconColor: "bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400",
+    borderColor: "border-rose-200/80 dark:border-rose-800/60",
     valueKey: "highPriority" as const,
   },
 ];

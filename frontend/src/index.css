@@ -134,6 +134,18 @@ html.dark ::-webkit-scrollbar-thumb:hover,
 /* Animation utilities */
 @import "./assets/animations.css";
 
+/* Remove Recharts svg and sector focus blue outline */
+.recharts-wrapper,
+.recharts-wrapper *:focus,
+.recharts-surface:focus,
+.recharts-sector:focus,
+.recharts-pie:focus,
+.recharts-pie-sector:focus,
+svg:focus {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
 /* Custom Premium Design for React-Toastify */
 .Toastify__toast-container {
   padding: 16px;
