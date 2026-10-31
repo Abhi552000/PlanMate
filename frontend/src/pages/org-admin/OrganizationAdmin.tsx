@@ -173,15 +173,34 @@ const OrganizationAdmin = () => {
   const handleAddMember = async (e: React.FormEvent) => {
     e.preventDefault();
     const { name, email, password } = newMember;
-    if (!name || !email || !password) {
-      toast.error(TOAST_MESSAGES.MEMBER_FIELDS_REQUIRED);
+    const trimmedName = name.trim();
+    const trimmedEmail = email.trim();
+
+    if (!trimmedName) {
+      toast.error("Please enter the member's full name");
       return;
     }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(trimmedEmail)) {
+      toast.error("Please enter a valid email address");
+      return;
+    }
+
+    if (!password || password.length < 8) {
+      toast.error("Password must be at least 8 characters long");
+      return;
+    }
+
     setAddingMember(true);
     try {
-      const data = await orgService.addOrgMember(newMember);
+      const data = await orgService.addOrgMember({
+        name: trimmedName,
+        email: trimmedEmail,
+        password,
+      });
       if (data?.success) {
-        toast.success(TOAST_MESSAGES.MEMBER_ONBOARD_SUCCESS(name));
+        toast.success(TOAST_MESSAGES.MEMBER_ONBOARD_SUCCESS(trimmedName));
         setNewMember({ name: "", email: "", password: "" });
         setShowOnboardModal(false);
         await fetchTeamUsers();
@@ -225,11 +244,32 @@ const OrganizationAdmin = () => {
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[400px] space-y-3">
-        <div className="w-10 h-10 border-4 border-sky-200 border-t-sky-600 rounded-full animate-spin"></div>
-        <p className="text-gray-500 text-sm font-semibold">
-          Loading team members...
-        </p>
+      <div className="w-full space-y-6 font-sans animate-pulse select-none">
+        {/* Header Skeleton */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-sky-100/50 dark:border-gray-800 pb-4">
+          <div className="space-y-2">
+            <div className="h-7 w-48 rounded-lg bg-slate-200 dark:bg-slate-800" />
+            <div className="h-4 w-72 rounded bg-slate-100 dark:bg-slate-800/60" />
+          </div>
+          <div className="h-[38px] w-36 rounded-lg bg-slate-200 dark:bg-slate-800" />
+        </div>
+
+        {/* Filters Skeleton */}
+        <div className="p-3 sm:p-4 rounded-xl border border-sky-100 dark:border-gray-800 bg-white dark:bg-gray-900 flex flex-col md:flex-row gap-3 justify-between">
+          <div className="flex flex-wrap gap-2 flex-1">
+            <div className="h-[38px] w-56 rounded-lg bg-slate-100 dark:bg-slate-800" />
+            <div className="h-[38px] w-28 rounded-lg bg-slate-100 dark:bg-slate-800" />
+            <div className="h-[38px] w-28 rounded-lg bg-slate-100 dark:bg-slate-800" />
+          </div>
+          <div className="h-[38px] w-20 rounded-lg bg-slate-100 dark:bg-slate-800" />
+        </div>
+
+        {/* Table Skeleton */}
+        <div className="bg-white dark:bg-gray-900 rounded-2xl border border-slate-200 dark:border-gray-800 p-5 space-y-3">
+          {[1, 2, 3, 4, 5].map((i) => (
+            <div key={i} className="h-10 w-full rounded-lg bg-slate-100 dark:bg-slate-800/50" />
+          ))}
+        </div>
       </div>
     );
   }

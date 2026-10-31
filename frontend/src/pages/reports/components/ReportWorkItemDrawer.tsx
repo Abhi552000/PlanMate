@@ -1,16 +1,8 @@
 import React from "react";
 import { X, ArrowRight, Bug, BookOpen, Award, CheckSquare } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { ITask } from "../../../types";
+import { ITask, ReportWorkItemDrawerProps } from "../../../types";
 import { getPriorityStyle } from "../../../utils";
-
-interface ReportWorkItemDrawerProps {
-  isOpen: boolean;
-  onClose: () => void;
-  title: string;
-  subtitle?: string;
-  tasks: ITask[];
-}
 
 export const ReportWorkItemDrawer: React.FC<ReportWorkItemDrawerProps> = ({
   isOpen,

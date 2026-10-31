@@ -12,12 +12,8 @@ import {
 } from "lucide-react";
 import { toast } from "react-toastify";
 import { planService } from "../../../services/planService";
-import { IPlan } from "../../../types/organization";
-
-interface SysAdminPlansViewProps {
-  organizations?: any[];
-  onOrgPlanUpdated?: () => void;
-}
+import { IPlan, SysAdminPlansViewProps } from "../../../types";
+import { SYSADMIN_PLANS_TEXTS } from "../../../constants/billingTexts";
 
 export const SysAdminPlansView: React.FC<SysAdminPlansViewProps> = () => {
   const [plans, setPlans] = useState<IPlan[]>([]);
@@ -96,7 +92,19 @@ export const SysAdminPlansView: React.FC<SysAdminPlansViewProps> = () => {
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formName.trim() || !formPlanId.trim()) {
-      toast.error("Plan Name and Plan ID are required");
+      toast.error(SYSADMIN_PLANS_TEXTS.ERR_REQUIRED_FIELDS);
+      return;
+    }
+
+    const numPrice = Number(formPrice);
+    if (isNaN(numPrice) || numPrice < 0) {
+      toast.error(SYSADMIN_PLANS_TEXTS.ERR_INVALID_PRICE);
+      return;
+    }
+
+    const numMembers = Number(formMaxMembers);
+    if (isNaN(numMembers) || numMembers < 1) {
+      toast.error(SYSADMIN_PLANS_TEXTS.ERR_INVALID_MEMBERS);
       return;
     }
 
@@ -121,7 +129,7 @@ export const SysAdminPlansView: React.FC<SysAdminPlansViewProps> = () => {
         });
 
         if (res?.success) {
-          toast.success("New subscription tier created!");
+          toast.success(SYSADMIN_PLANS_TEXTS.SUCCESS_CREATED);
           handleCancelForm();
           loadPlans(true);
         }
@@ -137,7 +145,7 @@ export const SysAdminPlansView: React.FC<SysAdminPlansViewProps> = () => {
         });
 
         if (res?.success) {
-          toast.success("Plan updated successfully!");
+          toast.success(SYSADMIN_PLANS_TEXTS.SUCCESS_UPDATED);
           handleCancelForm();
           loadPlans(true);
         }
@@ -155,7 +163,7 @@ export const SysAdminPlansView: React.FC<SysAdminPlansViewProps> = () => {
     try {
       const res = await planService.deletePlan(planToDelete._id);
       if (res?.success) {
-        toast.success("Plan deleted successfully");
+        toast.success(SYSADMIN_PLANS_TEXTS.SUCCESS_DELETED);
         setPlanToDelete(null);
         loadPlans(true);
       }
@@ -166,6 +174,50 @@ export const SysAdminPlansView: React.FC<SysAdminPlansViewProps> = () => {
     }
   };
 
+  if (loading) {
+    return (
+      <div className="space-y-6 animate-pulse select-none">
+        <div className="p-5 rounded-2xl bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-800 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="space-y-1.5">
+            <div className="h-5 w-40 rounded-lg bg-slate-200 dark:bg-slate-800" />
+            <div className="h-3.5 w-64 rounded bg-slate-100 dark:bg-slate-800/60" />
+          </div>
+          <div className="flex gap-2">
+            <div className="h-[38px] w-20 rounded-lg bg-slate-200 dark:bg-slate-800" />
+            <div className="h-[38px] w-28 rounded-lg bg-slate-200 dark:bg-slate-800" />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          {[1, 2, 3].map((i) => (
+            <div
+              key={i}
+              className="p-5 rounded-2xl border border-slate-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-2xs space-y-4"
+            >
+              <div className="flex justify-between items-center">
+                <div className="h-5 w-28 rounded-lg bg-slate-200 dark:bg-slate-800" />
+                <div className="flex gap-1.5">
+                  <div className="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-800" />
+                  <div className="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-800" />
+                </div>
+              </div>
+              <div className="h-3 w-4/5 rounded bg-slate-100 dark:bg-slate-800/60" />
+              <div className="py-3 border-y border-gray-100 dark:border-gray-800 space-y-1">
+                <div className="h-7 w-24 rounded-lg bg-slate-200 dark:bg-slate-800" />
+              </div>
+              <div className="h-8 rounded-xl bg-slate-100 dark:bg-slate-800/60" />
+              <div className="space-y-2 pt-1">
+                {[1, 2, 3].map((f) => (
+                  <div key={f} className="h-3 w-3/4 rounded bg-slate-100 dark:bg-slate-800" />
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       {/* SIMPLE HEADER */}
@@ -173,10 +225,10 @@ export const SysAdminPlansView: React.FC<SysAdminPlansViewProps> = () => {
         <div>
           <h2 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
             <CreditCard className="w-5 h-5 text-sky-500" />
-            Plans & Pricing
+            {SYSADMIN_PLANS_TEXTS.HEADER_TITLE}
           </h2>
           <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-            Manage subscription plans, pricing, and member limits.
+            {SYSADMIN_PLANS_TEXTS.HEADER_SUBTITLE}
           </p>
         </div>
 
@@ -185,10 +237,10 @@ export const SysAdminPlansView: React.FC<SysAdminPlansViewProps> = () => {
             onClick={() => loadPlans(true)}
             disabled={refreshing}
             className="h-[38px] px-3 bg-white dark:bg-gray-950 border border-slate-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg text-xs font-semibold transition-colors flex items-center gap-1.5 cursor-pointer shadow-2xs disabled:opacity-50"
-            title="Refresh Plans"
+            title={SYSADMIN_PLANS_TEXTS.BTN_REFRESH_TITLE}
           >
             <RotateCw className={`w-3.5 h-3.5 text-sky-500 ${refreshing ? "animate-spin" : ""}`} />
-            <span>Refresh</span>
+            <span>{SYSADMIN_PLANS_TEXTS.BTN_REFRESH_TITLE}</span>
           </button>
 
           {!isCreatingNew && !editingPlan && (
@@ -197,7 +249,7 @@ export const SysAdminPlansView: React.FC<SysAdminPlansViewProps> = () => {
               className="h-[38px] px-4 rounded-lg bg-sky-500 hover:bg-sky-600 text-white text-xs font-bold transition-all shadow-2xs flex items-center gap-1.5 cursor-pointer"
             >
               <Plus className="w-4 h-4" />
-              <span>Create Plan Tier</span>
+              <span>{SYSADMIN_PLANS_TEXTS.BTN_NEW_TIER}</span>
             </button>
           )}
         </div>
@@ -212,27 +264,29 @@ export const SysAdminPlansView: React.FC<SysAdminPlansViewProps> = () => {
           <div className="flex items-center justify-between border-b border-sky-100 dark:border-gray-800 pb-3">
             <h4 className="font-black text-sm text-gray-900 dark:text-white flex items-center gap-2">
               <Sparkles className="w-4 h-4 text-sky-500" />
-              {isCreatingNew ? "Create New Subscription Plan" : `Edit Plan: ${editingPlan?.name}`}
+              {isCreatingNew
+                ? SYSADMIN_PLANS_TEXTS.FORM_TITLE_CREATE
+                : `${SYSADMIN_PLANS_TEXTS.FORM_TITLE_EDIT}: ${editingPlan?.name}`}
             </h4>
             <button
               type="button"
               onClick={handleCancelForm}
               className="text-xs text-gray-400 hover:text-gray-600 cursor-pointer"
             >
-              Cancel
+              {SYSADMIN_PLANS_TEXTS.BTN_CANCEL}
             </button>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <div>
               <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">
-                Plan Name
+                {SYSADMIN_PLANS_TEXTS.LABEL_NAME}
               </label>
               <input
                 type="text"
                 value={formName}
                 onChange={(e) => setFormName(e.target.value)}
-                placeholder="e.g. Pro Growth"
+                placeholder={SYSADMIN_PLANS_TEXTS.PLACEHOLDER_NAME}
                 className="w-full h-[38px] px-3 bg-white dark:bg-gray-950 border border-slate-200 dark:border-gray-700 rounded-lg text-xs font-semibold text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-1 focus:ring-sky-500"
                 required
               />
@@ -240,14 +294,14 @@ export const SysAdminPlansView: React.FC<SysAdminPlansViewProps> = () => {
 
             <div>
               <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">
-                Plan ID / Slug (Unique)
+                {SYSADMIN_PLANS_TEXTS.LABEL_PLAN_ID}
               </label>
               <input
                 type="text"
                 value={formPlanId}
                 onChange={(e) => setFormPlanId(e.target.value)}
                 disabled={!isCreatingNew}
-                placeholder="e.g. pro"
+                placeholder={SYSADMIN_PLANS_TEXTS.PLACEHOLDER_PLAN_ID}
                 className="w-full h-[38px] px-3 bg-white dark:bg-gray-950 border border-slate-200 dark:border-gray-700 rounded-lg text-xs font-mono font-semibold text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-1 focus:ring-sky-500 disabled:opacity-50"
                 required
               />
@@ -255,7 +309,7 @@ export const SysAdminPlansView: React.FC<SysAdminPlansViewProps> = () => {
 
             <div>
               <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">
-                Price (INR ₹)
+                {SYSADMIN_PLANS_TEXTS.LABEL_PRICE}
               </label>
               <input
                 type="number"
@@ -269,7 +323,7 @@ export const SysAdminPlansView: React.FC<SysAdminPlansViewProps> = () => {
 
             <div>
               <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">
-                Max Team Members
+                {SYSADMIN_PLANS_TEXTS.LABEL_MAX_MEMBERS}
               </label>
               <input
                 type="number"
@@ -284,26 +338,26 @@ export const SysAdminPlansView: React.FC<SysAdminPlansViewProps> = () => {
 
           <div>
             <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">
-              Short Description
+              {SYSADMIN_PLANS_TEXTS.LABEL_DESCRIPTION}
             </label>
             <input
               type="text"
               value={formDescription}
               onChange={(e) => setFormDescription(e.target.value)}
-              placeholder="Target audience or key value proposition"
+              placeholder={SYSADMIN_PLANS_TEXTS.PLACEHOLDER_DESC}
               className="w-full h-[38px] px-3 bg-white dark:bg-gray-950 border border-slate-200 dark:border-gray-700 rounded-lg text-xs text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-1 focus:ring-sky-500"
             />
           </div>
 
           <div>
             <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">
-              Facilities & Features (1 feature per line)
+              {SYSADMIN_PLANS_TEXTS.LABEL_FEATURES}
             </label>
             <textarea
               rows={3}
               value={formFeaturesText}
               onChange={(e) => setFormFeaturesText(e.target.value)}
-              placeholder="Up to 25 team members&#10;Unlimited active sprints&#10;Custom workflows"
+              placeholder={SYSADMIN_PLANS_TEXTS.PLACEHOLDER_FEATURES}
               className="w-full p-2.5 bg-white dark:bg-gray-950 border border-slate-200 dark:border-gray-700 rounded-lg text-xs font-medium text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-1 focus:ring-sky-500 resize-none font-sans"
             />
           </div>
@@ -320,7 +374,7 @@ export const SysAdminPlansView: React.FC<SysAdminPlansViewProps> = () => {
               htmlFor="popularCheckSuper"
               className="text-xs font-semibold text-gray-700 dark:text-gray-300 cursor-pointer"
             >
-              Highlight as &quot;Most Popular&quot; tier in Org Admin subscription view
+              {SYSADMIN_PLANS_TEXTS.LABEL_POPULAR_BADGE}
             </label>
           </div>
 
@@ -330,7 +384,7 @@ export const SysAdminPlansView: React.FC<SysAdminPlansViewProps> = () => {
               onClick={handleCancelForm}
               className="px-3.5 py-2 border border-slate-200 dark:border-gray-700 rounded-lg text-xs font-semibold text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer"
             >
-              Cancel
+              {SYSADMIN_PLANS_TEXTS.BTN_CANCEL}
             </button>
             <button
               type="submit"
@@ -338,7 +392,7 @@ export const SysAdminPlansView: React.FC<SysAdminPlansViewProps> = () => {
               className="px-4 py-2 bg-sky-500 hover:bg-sky-600 text-white rounded-lg text-xs font-bold flex items-center gap-1.5 shadow-2xs cursor-pointer disabled:opacity-50"
             >
               <Save className="w-3.5 h-3.5" />
-              <span>{saving ? "Saving..." : "Save Plan Configuration"}</span>
+              <span>{saving ? SYSADMIN_PLANS_TEXTS.BTN_SAVING : SYSADMIN_PLANS_TEXTS.BTN_SAVE}</span>
             </button>
           </div>
         </form>
@@ -347,7 +401,7 @@ export const SysAdminPlansView: React.FC<SysAdminPlansViewProps> = () => {
       {/* PLAN TIERS GRID */}
       <div>
         <h3 className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-3">
-          Subscription Plans
+          {SYSADMIN_PLANS_TEXTS.HEADER_TITLE}
         </h3>
 
         {loading ? (
@@ -365,7 +419,7 @@ export const SysAdminPlansView: React.FC<SysAdminPlansViewProps> = () => {
                       {p.name}
                     </span>
                     {p.isPopular && (
-                      <span className="px-2 py-0.5 rounded text-[10px] font-black uppercase bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-400 border border-amber-200 dark:border-amber-800">
+                      <span className="px-2 py-0.5 rounded text-[10px] font-black uppercase bg-sky-50 text-sky-700 dark:bg-sky-950 dark:text-sky-300 border border-sky-200 dark:border-sky-800">
                         Popular
                       </span>
                     )}
@@ -376,12 +430,12 @@ export const SysAdminPlansView: React.FC<SysAdminPlansViewProps> = () => {
                     <span className="text-2xl font-black text-gray-900 dark:text-white">
                       ₹{p.price.toLocaleString()}
                     </span>
-                    <span className="text-xs text-gray-400">/ {p.billingCycle || "month"}</span>
+                    <span className="text-xs text-gray-400">{SYSADMIN_PLANS_TEXTS.CARD_MONTH_SUFFIX}</span>
                   </div>
 
                   <div className="mb-3 p-2.5 rounded-xl bg-sky-50/60 dark:bg-sky-950/40 border border-sky-100 dark:border-sky-900 text-xs font-bold text-sky-700 dark:text-sky-300 flex items-center gap-2">
                     <Users className="w-3.5 h-3.5 text-sky-500" />
-                    <span>Up to {p.maxMembers} Team Members</span>
+                    <span>{SYSADMIN_PLANS_TEXTS.CARD_MEMBERS_CAPACITY(p.maxMembers)}</span>
                   </div>
 
                   <ul className="space-y-1.5 text-xs text-gray-600 dark:text-gray-300">
@@ -399,7 +453,7 @@ export const SysAdminPlansView: React.FC<SysAdminPlansViewProps> = () => {
                     <button
                       onClick={() => setPlanToDelete(p)}
                       className="p-1.5 text-gray-400 hover:text-rose-600 dark:hover:text-rose-400 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors cursor-pointer"
-                      title="Delete Plan Tier"
+                      title={SYSADMIN_PLANS_TEXTS.BTN_DELETE}
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -434,7 +488,7 @@ export const SysAdminPlansView: React.FC<SysAdminPlansViewProps> = () => {
               </div>
               <div>
                 <h3 className="font-bold text-gray-900 dark:text-white text-base">
-                  Delete Subscription Plan
+                  {SYSADMIN_PLANS_TEXTS.DELETE_MODAL_TITLE}
                 </h3>
                 <p className="text-xs text-gray-400">
                   This action cannot be undone.
@@ -443,7 +497,7 @@ export const SysAdminPlansView: React.FC<SysAdminPlansViewProps> = () => {
             </div>
 
             <p className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed">
-              Are you sure you want to permanently delete the <strong>&quot;{planToDelete.name}&quot;</strong> tier?
+              {SYSADMIN_PLANS_TEXTS.DELETE_CONFIRM_QUESTION(planToDelete.name)}
             </p>
 
             <div className="flex justify-end gap-2 pt-2 border-t border-gray-100 dark:border-gray-800">
@@ -453,7 +507,7 @@ export const SysAdminPlansView: React.FC<SysAdminPlansViewProps> = () => {
                 onClick={() => setPlanToDelete(null)}
                 className="px-4 py-2 border border-slate-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 font-bold rounded-lg text-xs transition-colors cursor-pointer"
               >
-                Cancel
+                {SYSADMIN_PLANS_TEXTS.BTN_CANCEL}
               </button>
               <button
                 type="button"
@@ -461,7 +515,7 @@ export const SysAdminPlansView: React.FC<SysAdminPlansViewProps> = () => {
                 onClick={handleConfirmDeletePlan}
                 className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-lg text-xs shadow-2xs transition-all cursor-pointer disabled:opacity-50"
               >
-                {deleting ? "Deleting..." : "Confirm Delete"}
+                {deleting ? SYSADMIN_PLANS_TEXTS.BTN_DELETING : SYSADMIN_PLANS_TEXTS.BTN_DELETE}
               </button>
             </div>
           </div>
@@ -470,3 +524,5 @@ export const SysAdminPlansView: React.FC<SysAdminPlansViewProps> = () => {
     </div>
   );
 };
+
+export default SysAdminPlansView;

@@ -14,12 +14,7 @@ import {
 } from "lucide-react";
 import { toast } from "react-toastify";
 import { planService } from "../../../services/planService";
-import { IPlan } from "../../../types/organization";
-
-interface PlanManagementModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-}
+import { IPlan, PlanManagementModalProps } from "../../../types";
 
 export const PlanManagementModal: React.FC<PlanManagementModalProps> = ({
   isOpen,
@@ -361,7 +356,7 @@ export const PlanManagementModal: React.FC<PlanManagementModalProps> = ({
                           {p.name}
                         </span>
                         {p.isPopular && (
-                          <span className="px-1.5 py-0.5 rounded text-[9px] font-black uppercase bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-400 border border-amber-200 dark:border-amber-800">
+                          <span className="px-1.5 py-0.5 rounded text-[9px] font-black uppercase bg-sky-50 text-sky-700 dark:bg-sky-950 dark:text-sky-300 border border-sky-200 dark:border-sky-800">
                             Popular
                           </span>
                         )}

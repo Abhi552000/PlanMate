@@ -194,8 +194,13 @@ export const useTaskDetail = (id: string | undefined, subtaskIndex: number | nul
         description: cleanMentionsForEditing(parentTaskData.description || ""),
         priority: parentTaskData.priority || "Low",
         dueDate: parentTaskData.dueDate ? new Date(parentTaskData.dueDate).toISOString().split("T")[0] : "",
-        assignee: parentTaskData.assignee?._id || parentTaskData.assignee || "",
-        reporter: parentTaskData.reporter?._id || parentTaskData.reporter || parentTaskData.owner?._id || parentTaskData.owner || "",
+        assignee: (parentTaskData.assignee as any)?._id || parentTaskData.assignee || "",
+        reporter:
+          (parentTaskData.reporter as any)?._id ||
+          parentTaskData.reporter ||
+          (parentTaskData.owner as any)?._id ||
+          parentTaskData.owner ||
+          "",
         status: parentTaskData.status || "To Do",
         storyPoints: parentTaskData.storyPoints !== undefined ? parentTaskData.storyPoints : 1,
         originalEstimate: parentTaskData.originalEstimate !== undefined ? parentTaskData.originalEstimate : 0,

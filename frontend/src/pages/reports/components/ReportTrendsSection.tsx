@@ -16,14 +16,8 @@ import {
   ICompletionTrendPoint,
   ICycleTimePoint,
   ICreationTrendPoint,
-} from "../utils/reportCalculations";
-
-interface ReportTrendsSectionProps {
-  leadTimeData: ILeadTimePoint[];
-  completionTrendData: ICompletionTrendPoint[];
-  cycleTimeData: ICycleTimePoint[];
-  creationTrendData: ICreationTrendPoint[];
-}
+  ReportTrendsSectionProps,
+} from "../../../types";
 
 export const ReportTrendsSection: React.FC<ReportTrendsSectionProps> = ({
   leadTimeData,

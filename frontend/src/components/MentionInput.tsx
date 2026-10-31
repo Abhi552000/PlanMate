@@ -1,16 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-
-interface MentionInputProps {
-  value: string;
-  onChange: (e: any) => void;
-  name: string;
-  placeholder?: string;
-  required?: boolean;
-  className?: string;
-  members: any[];
-  rows?: number;
-  type?: "text" | "textarea";
-}
+import { MentionInputProps } from "../types";
 
 export const MentionInput: React.FC<MentionInputProps> = ({
   value,

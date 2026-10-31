@@ -26,7 +26,7 @@ import { OnboardOrgModal } from "./components/OnboardOrgModal";
 import { EditOrgModal } from "./components/EditOrgModal";
 import { DeactivateOrgModal } from "./components/DeactivateOrgModal";
 import { ResetPasswordModal } from "./components/ResetPasswordModal";
-import { TenantDetailDrawer } from "./components/TenantDetailDrawer";
+import { TenantDetailModal } from "./components/TenantDetailModal";
 import { PlanManagementModal } from "./components/PlanManagementModal";
 import { useSystemAdmin } from "./hooks/useSystemAdmin";
 
@@ -60,6 +60,13 @@ const SystemAdminDashboard: React.FC<SystemAdminDashboardProps> = ({ onLogout, u
     copiedReset,
     searchQuery,
     setSearchQuery,
+    statusFilter,
+    setStatusFilter,
+    currentPage,
+    setCurrentPage,
+    totalPages,
+    totalCount,
+    tableLoading,
     onboarding,
     updating,
     togglingStatus,
@@ -86,9 +93,9 @@ const SystemAdminDashboard: React.FC<SystemAdminDashboardProps> = ({ onLogout, u
   const [showPlansModal, setShowPlansModal] = useState(false);
 
   const stats = useMemo(() => {
-    const total = organizations.length;
-    const active = organizations.filter((o) => o.isActive).length;
-    const inactive = total - active;
+    const total = systemMetrics?.totalOrganizations ?? organizations.length;
+    const active = systemMetrics?.activeOrganizations ?? organizations.filter((o) => o.isActive).length;
+    const inactive = systemMetrics?.inactiveOrganizations ?? (total - active);
     const totalMembers =
       systemMetrics?.totalPlatformUsers !== undefined
         ? systemMetrics.totalPlatformUsers
@@ -214,7 +221,7 @@ const SystemAdminDashboard: React.FC<SystemAdminDashboardProps> = ({ onLogout, u
 
                 <div className={`${STAT_CARD} border-sky-100 dark:border-gray-800 dark:bg-gray-900/60 backdrop-blur-sm`}>
                   <div className="flex items-center gap-2 md:gap-3">
-                    <div className={`${ICON_WRAPPER} bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400`}>
+                    <div className={`${ICON_WRAPPER} bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400`}>
                       <XCircle className="w-4 h-4 md:w-5 md:h-5" />
                     </div>
                     <div className="min-w-0">
@@ -242,6 +249,13 @@ const SystemAdminDashboard: React.FC<SystemAdminDashboardProps> = ({ onLogout, u
                 organizations={organizations}
                 searchQuery={searchQuery}
                 setSearchQuery={setSearchQuery}
+                statusFilter={statusFilter}
+                setStatusFilter={setStatusFilter}
+                currentPage={currentPage}
+                totalPages={totalPages}
+                totalCount={totalCount}
+                onPageChange={setCurrentPage}
+                tableLoading={tableLoading}
                 togglingStatus={togglingStatus}
                 onToggleActive={handleToggleActive}
                 onEditClick={handleEditClick}
@@ -280,8 +294,8 @@ const SystemAdminDashboard: React.FC<SystemAdminDashboardProps> = ({ onLogout, u
         copied={copiedReset}
       />
 
-      {/* Tenant Detail & Workflows Drawer */}
-      <TenantDetailDrawer
+      {/* Organization View Modal */}
+      <TenantDetailModal
         org={inspectingOrg}
         onClose={() => setInspectingOrg(null)}
         onResetPassword={handleResetPassword}

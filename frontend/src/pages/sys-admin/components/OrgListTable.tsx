@@ -15,11 +15,19 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { OrgListTableProps } from "../../../types";
+import { ORG_TABLE_TEXTS } from "../../../constants/billingTexts";
 
 export const OrgListTable: React.FC<OrgListTableProps> = ({
   organizations,
   searchQuery,
   setSearchQuery,
+  statusFilter,
+  setStatusFilter,
+  currentPage,
+  totalPages,
+  totalCount,
+  onPageChange,
+  tableLoading,
   togglingStatus,
   onToggleActive,
   onEditClick,
@@ -28,38 +36,6 @@ export const OrgListTable: React.FC<OrgListTableProps> = ({
   onInspectClick,
   onExportCSV,
 }) => {
-  const [statusFilter, setStatusFilter] = useState<"all" | "active" | "inactive">("all");
-  const [currentPage, setCurrentPage] = useState<number>(1);
-  const [itemsPerPage, setItemsPerPage] = useState<number>(10);
-
-  // Reset to page 1 when search or filter changes
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [searchQuery, statusFilter]);
-
-  const filteredOrgs = useMemo(() => {
-    return organizations.filter((org) => {
-      // 1. Status Filter
-      if (statusFilter === "active" && !org.isActive) return false;
-      if (statusFilter === "inactive" && org.isActive) return false;
-
-      // 2. Search Query
-      if (!searchQuery.trim()) return true;
-      const q = searchQuery.toLowerCase();
-      return (
-        org.name.toLowerCase().includes(q) ||
-        (org.admin?.name && org.admin.name.toLowerCase().includes(q)) ||
-        (org.admin?.email && org.admin.email.toLowerCase().includes(q)) ||
-        (org.slug && org.slug.toLowerCase().includes(q))
-      );
-    });
-  }, [organizations, statusFilter, searchQuery]);
-
-  const totalPages = Math.max(1, Math.ceil(filteredOrgs.length / itemsPerPage));
-  const paginatedOrgs = useMemo(() => {
-    const start = (currentPage - 1) * itemsPerPage;
-    return filteredOrgs.slice(start, start + itemsPerPage);
-  }, [filteredOrgs, currentPage, itemsPerPage]);
 
   return (
     <div className="bg-white dark:bg-gray-900 rounded-2xl border border-sky-100 dark:border-gray-800 shadow-sm overflow-hidden transition-colors">
@@ -68,10 +44,10 @@ export const OrgListTable: React.FC<OrgListTableProps> = ({
         <div>
           <h3 className="text-sm font-bold text-gray-800 dark:text-gray-200 flex items-center gap-2">
             <Building className="w-4.5 h-4.5 text-sky-500" />
-            Organizations Directory
+            {ORG_TABLE_TEXTS.DIRECTORY_TITLE}
           </h3>
           <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
-            Manage organization instances, representatives, and access
+            {ORG_TABLE_TEXTS.DIRECTORY_SUBTITLE}
           </p>
         </div>
 
@@ -83,9 +59,9 @@ export const OrgListTable: React.FC<OrgListTableProps> = ({
             onChange={(e) => setStatusFilter(e.target.value as any)}
             className="h-[38px] px-3 bg-white dark:bg-gray-950 border border-slate-200 dark:border-gray-700 rounded-lg text-xs font-semibold text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-1 focus:ring-sky-500 cursor-pointer shadow-2xs"
           >
-            <option value="all">All Statuses</option>
-            <option value="active">Active Only</option>
-            <option value="inactive">Inactive Only</option>
+            <option value="all">{ORG_TABLE_TEXTS.FILTER_ALL_STATUS}</option>
+            <option value="active">{ORG_TABLE_TEXTS.FILTER_ACTIVE}</option>
+            <option value="inactive">{ORG_TABLE_TEXTS.FILTER_INACTIVE}</option>
           </select>
 
           {/* Search Input */}
@@ -93,7 +69,7 @@ export const OrgListTable: React.FC<OrgListTableProps> = ({
             <Search className="w-3.5 h-3.5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
             <input
               type="text"
-              placeholder="Search by name, email..."
+              placeholder={ORG_TABLE_TEXTS.SEARCH_PLACEHOLDER}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="h-[38px] w-full pl-9 pr-8 bg-white dark:bg-gray-950 border border-slate-200 dark:border-gray-700 rounded-lg text-xs font-medium text-gray-800 dark:text-gray-200 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-sky-500 shadow-2xs"
@@ -113,10 +89,10 @@ export const OrgListTable: React.FC<OrgListTableProps> = ({
             <button
               onClick={onExportCSV}
               className="h-[38px] px-3 bg-white dark:bg-gray-950 border border-slate-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg text-xs font-semibold transition-colors flex items-center gap-1.5 cursor-pointer shadow-2xs"
-              title="Export Organizations Directory to CSV"
+              title={ORG_TABLE_TEXTS.BTN_EXPORT_CSV}
             >
               <Download className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400" />
-              <span className="hidden sm:inline">Export CSV</span>
+              <span className="hidden sm:inline">{ORG_TABLE_TEXTS.BTN_EXPORT_CSV}</span>
             </button>
           )}
         </div>
@@ -127,28 +103,65 @@ export const OrgListTable: React.FC<OrgListTableProps> = ({
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="border-b border-gray-200 dark:border-gray-800 text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider bg-gray-50/70 dark:bg-gray-950/40">
-              <th className="px-5 py-3.5">Organization</th>
-              <th className="px-5 py-3.5">Admin Representative</th>
-              <th className="px-5 py-3.5">Subscription Plan</th>
-              <th className="px-5 py-3.5">Status</th>
-              <th className="px-5 py-3.5">Created</th>
-              <th className="px-5 py-3.5 text-right">Actions</th>
+              <th className="px-5 py-3.5">{ORG_TABLE_TEXTS.COL_ORGANIZATION}</th>
+              <th className="px-5 py-3.5">{ORG_TABLE_TEXTS.COL_ADMIN}</th>
+              <th className="px-5 py-3.5">{ORG_TABLE_TEXTS.COL_PLAN}</th>
+              <th className="px-5 py-3.5">{ORG_TABLE_TEXTS.COL_PLAN_TYPE}</th>
+              <th className="px-5 py-3.5">{ORG_TABLE_TEXTS.COL_STATUS}</th>
+              <th className="px-5 py-3.5">{ORG_TABLE_TEXTS.COL_CREATED}</th>
+              <th className="px-5 py-3.5 text-right">{ORG_TABLE_TEXTS.COL_ACTIONS}</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100 dark:divide-gray-800/80 text-sm">
-            {paginatedOrgs.map((org) => (
-              <tr
-                key={org._id}
-                className={`hover:bg-sky-50/30 dark:hover:bg-gray-800/30 transition-colors ${
-                  !org.isActive ? "bg-red-50/[0.04]" : ""
-                }`}
-              >
+            {tableLoading ? (
+              Array.from({ length: 5 }).map((_, i) => (
+                <tr key={i} className="animate-pulse">
+                  <td className="px-5 py-4">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-8 h-8 rounded-lg bg-slate-200 dark:bg-slate-800 shrink-0" />
+                      <div className="space-y-1.5 flex-1">
+                        <div className="h-4 w-32 rounded bg-slate-200 dark:bg-slate-800" />
+                        <div className="h-3 w-16 rounded bg-slate-100 dark:bg-slate-800/60" />
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-5 py-4">
+                    <div className="space-y-1.5">
+                      <div className="h-4 w-28 rounded bg-slate-200 dark:bg-slate-800" />
+                      <div className="h-3 w-36 rounded bg-slate-100 dark:bg-slate-800/60" />
+                    </div>
+                  </td>
+                  <td className="px-5 py-4">
+                    <div className="h-6 w-16 rounded-full bg-slate-200 dark:bg-slate-800" />
+                  </td>
+                  <td className="px-5 py-4">
+                    <div className="h-5 w-16 rounded-md bg-slate-200 dark:bg-slate-800" />
+                  </td>
+                  <td className="px-5 py-4">
+                    <div className="h-6 w-20 rounded-full bg-slate-200 dark:bg-slate-800" />
+                  </td>
+                  <td className="px-5 py-4">
+                    <div className="h-4 w-20 rounded bg-slate-100 dark:bg-slate-800/60" />
+                  </td>
+                  <td className="px-5 py-4 text-right">
+                    <div className="h-7 w-24 rounded-lg bg-slate-200 dark:bg-slate-800 ml-auto" />
+                  </td>
+                </tr>
+              ))
+            ) : (
+              organizations.map((org) => (
+                <tr
+                  key={org._id}
+                  className={`hover:bg-sky-50/30 dark:hover:bg-gray-800/30 transition-colors ${
+                    !org.isActive ? "bg-red-50/[0.04]" : ""
+                  }`}
+                >
                 {/* Org Name (clickable to inspect) */}
                 <td className="px-5 py-3.5">
                   <div
                     onClick={() => onInspectClick?.(org)}
                     className="flex items-center gap-2.5 cursor-pointer group"
-                    title="Click to view tenant details"
+                    title={ORG_TABLE_TEXTS.TOOLTIP_INSPECT}
                   >
                     <div className="w-8 h-8 rounded-lg bg-sky-50 dark:bg-sky-950/60 border border-sky-100 dark:border-sky-900 flex items-center justify-center font-bold text-xs text-sky-600 dark:text-sky-400 shrink-0 group-hover:scale-105 transition-transform">
                       {org.name?.[0]?.toUpperCase() || "O"}
@@ -167,7 +180,7 @@ export const OrgListTable: React.FC<OrgListTableProps> = ({
                 {/* Admin Representative */}
                 <td className="px-5 py-3.5">
                   <p className="font-medium text-gray-800 dark:text-gray-200 text-sm leading-tight">
-                    {org.admin?.name || "Unassigned"}
+                    {org.admin?.name || ORG_TABLE_TEXTS.UNASSIGNED}
                   </p>
                   <p className="text-xs text-gray-400 dark:text-gray-500 font-mono">
                     {org.admin?.email || "—"}
@@ -181,18 +194,25 @@ export const OrgListTable: React.FC<OrgListTableProps> = ({
                   </span>
                 </td>
 
+                {/* Plan Type (Billing Cycle: Monthly / Yearly) */}
+                <td className="px-5 py-3.5">
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-md text-[11px] font-semibold bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 capitalize border border-gray-200/80 dark:border-gray-700">
+                    {org.subscription?.billingCycle || "Monthly"}
+                  </span>
+                </td>
+
                 {/* Status Badge */}
                 <td className="px-5 py-3.5">
                   {org.isActive ? (
                     <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 text-[11px] font-semibold rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                      Active
+                      {ORG_TABLE_TEXTS.BADGE_ACTIVE}
                     </span>
                   ) : (
                     <div className="flex flex-col gap-0.5">
                       <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 text-[11px] font-semibold rounded-full bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800 self-start">
                         <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
-                        Inactive
+                        {ORG_TABLE_TEXTS.BADGE_INACTIVE}
                       </span>
                       {org.remark && (
                         <span
@@ -220,13 +240,13 @@ export const OrgListTable: React.FC<OrgListTableProps> = ({
                 {/* Action Controls */}
                 <td className="px-5 py-3.5 text-right">
                   <div className="flex items-center justify-end gap-1">
-                    {/* 1-Click Reset Password Key */}
+                    {/* 1-Click Reset Password Key with project sky color */}
                     {onResetPasswordClick && (
                       <button
                         onClick={() => onResetPasswordClick(org)}
-                        className="p-1.5 text-amber-500 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-950/30 rounded-lg transition-colors border border-transparent hover:border-amber-200 cursor-pointer"
-                        title="Reset Admin Credentials"
-                        aria-label="Reset Admin Credentials"
+                        className="p-1.5 text-sky-500 hover:text-sky-600 hover:bg-sky-50 dark:hover:bg-sky-950/30 rounded-lg transition-colors border border-transparent hover:border-sky-200 cursor-pointer"
+                        title={ORG_TABLE_TEXTS.TOOLTIP_RESET_PASSWORD}
+                        aria-label={ORG_TABLE_TEXTS.TOOLTIP_RESET_PASSWORD}
                       >
                         <KeyRound className="w-4 h-4" />
                       </button>
@@ -281,15 +301,16 @@ export const OrgListTable: React.FC<OrgListTableProps> = ({
                   </div>
                 </td>
               </tr>
-            ))}
+            )))
+          }
 
-            {filteredOrgs.length === 0 && (
+            {!tableLoading && organizations.length === 0 && (
               <tr>
                 <td
                   colSpan={7}
                   className="text-center py-16 text-xs text-gray-400 dark:text-gray-500 font-semibold bg-gray-50/20 dark:bg-gray-950/20"
                 >
-                  No organizations found matching search criteria
+                  {ORG_TABLE_TEXTS.EMPTY_MATCH_SUBTITLE}
                 </td>
               </tr>
             )}
@@ -298,35 +319,20 @@ export const OrgListTable: React.FC<OrgListTableProps> = ({
       </div>
 
       {/* PAGINATION CONTROLS */}
-      {filteredOrgs.length > 0 && (
+      {totalCount > 0 && (
         <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-5 py-3.5 border-t border-sky-100 dark:border-gray-800 bg-gray-50/30 dark:bg-gray-950/20 text-xs">
           <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
             <span>
-              Showing {(currentPage - 1) * itemsPerPage + 1} to{" "}
-              {Math.min(currentPage * itemsPerPage, filteredOrgs.length)} of{" "}
-              {filteredOrgs.length} organizations
+              Showing <span className="font-bold text-gray-800 dark:text-gray-200">{(currentPage - 1) * 10 + 1}</span> to{" "}
+              <span className="font-bold text-gray-800 dark:text-gray-200">{Math.min(currentPage * 10, totalCount)}</span> of{" "}
+              <span className="font-bold text-gray-800 dark:text-gray-200">{totalCount}</span> organizations (Page {currentPage} of {totalPages})
             </span>
-            <span className="text-gray-300 dark:text-gray-700">|</span>
-            <span className="text-gray-500 dark:text-gray-400">Rows:</span>
-            <select
-              value={itemsPerPage}
-              onChange={(e) => {
-                setItemsPerPage(Number(e.target.value));
-                setCurrentPage(1);
-              }}
-              className="h-7 px-2 bg-white dark:bg-gray-950 border border-slate-200 dark:border-gray-700 rounded text-xs font-medium text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-1 focus:ring-sky-500 cursor-pointer shadow-2xs"
-            >
-              <option value={5}>5</option>
-              <option value={10}>10</option>
-              <option value={20}>20</option>
-              <option value={50}>50</option>
-            </select>
           </div>
 
           <div className="flex items-center gap-1.5">
             <button
-              disabled={currentPage === 1}
-              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+              disabled={currentPage <= 1 || tableLoading}
+              onClick={() => onPageChange(Math.max(1, currentPage - 1))}
               className="h-8 px-2.5 rounded-lg border border-slate-200 dark:border-gray-800 bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-300 font-semibold hover:bg-sky-50 dark:hover:bg-gray-800 disabled:opacity-40 disabled:pointer-events-none transition-colors cursor-pointer flex items-center gap-1 shadow-2xs"
             >
               <ChevronLeft className="w-3.5 h-3.5" />
@@ -336,7 +342,8 @@ export const OrgListTable: React.FC<OrgListTableProps> = ({
             {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
               <button
                 key={pageNum}
-                onClick={() => setCurrentPage(pageNum)}
+                disabled={tableLoading}
+                onClick={() => onPageChange(pageNum)}
                 className={`w-8 h-8 rounded-lg border text-xs font-bold flex items-center justify-center transition-colors cursor-pointer shadow-2xs ${
                   currentPage === pageNum
                     ? "bg-sky-500 border-sky-500 text-white"
@@ -348,8 +355,8 @@ export const OrgListTable: React.FC<OrgListTableProps> = ({
             ))}
 
             <button
-              disabled={currentPage === totalPages}
-              onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+              disabled={currentPage >= totalPages || tableLoading}
+              onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
               className="h-8 px-2.5 rounded-lg border border-slate-200 dark:border-gray-800 bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-300 font-semibold hover:bg-sky-50 dark:hover:bg-gray-800 disabled:opacity-40 disabled:pointer-events-none transition-colors cursor-pointer flex items-center gap-1 shadow-2xs"
             >
               <span>Next</span>

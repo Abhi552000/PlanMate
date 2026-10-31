@@ -19,7 +19,7 @@ import { getCachedStatuses, setCachedStatuses } from "../utils/statusUtils";
 import { CONSOLE_ERRORS, TOAST_MESSAGES } from "../constants/messages";
 
 export const CalendarViewPage: React.FC = () => {
-  const { tasks, refreshTasks } = useOutletContext<DashboardContext>();
+  const { tasks, refreshTasks, loading } = useOutletContext<DashboardContext>();
   const navigate = useNavigate();
 
   // Calendar Date State
@@ -123,6 +123,48 @@ export const CalendarViewPage: React.FC = () => {
       setShowMobileAgendaModal(true);
     }
   };
+
+  if (loading && (!tasks || tasks.length === 0)) {
+    return (
+      <div className="w-full flex flex-col xl:flex-row gap-6 font-sans select-none animate-pulse">
+        <div className="flex-1 bg-white dark:bg-gray-900 border border-sky-100 dark:border-gray-800 rounded-2xl shadow-sm p-4 md:p-6 space-y-6">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div className="flex items-center gap-3">
+              <div className="w-11 h-11 rounded-xl bg-slate-200 dark:bg-slate-800 shrink-0" />
+              <div className="space-y-1.5">
+                <div className="h-6 w-36 rounded-lg bg-slate-200 dark:bg-slate-800" />
+                <div className="h-3.5 w-56 rounded bg-slate-100 dark:bg-slate-800/60" />
+              </div>
+            </div>
+            <div className="h-9 w-48 rounded-lg bg-slate-200 dark:bg-slate-800" />
+          </div>
+
+          <div className="grid grid-cols-7 gap-px bg-slate-100 dark:bg-gray-800 rounded-xl overflow-hidden border border-slate-200 dark:border-gray-800">
+            {CALENDAR_TEXTS.WEEKDAY_NAMES.map((name) => (
+              <div key={name} className="bg-slate-50 dark:bg-gray-900 py-3 text-center text-xs font-semibold text-gray-400">
+                {name}
+              </div>
+            ))}
+            {Array.from({ length: 35 }).map((_, idx) => (
+              <div key={idx} className="bg-white dark:bg-gray-900 min-h-[4.5rem] md:min-h-[7rem] p-2 flex flex-col justify-between">
+                <div className="w-5 h-5 rounded bg-slate-100 dark:bg-slate-800" />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Sidebar Skeleton */}
+        <div className="w-full xl:w-80 bg-white dark:bg-gray-900 border border-sky-100 dark:border-gray-800 rounded-2xl p-4 md:p-5 shadow-sm space-y-4">
+          <div className="h-5 w-32 rounded bg-slate-200 dark:bg-slate-800" />
+          <div className="space-y-2.5">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="h-16 w-full rounded-xl bg-slate-100 dark:bg-slate-800/60" />
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col xl:flex-row gap-6 w-full animate-fadeIn min-h-[calc(100vh-8rem)]">

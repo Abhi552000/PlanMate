@@ -257,3 +257,27 @@ export interface UserMenuDropdownProps {
   navigate: (path: string) => void;
   menuref: React.RefObject<HTMLDivElement | null>;
 }
+
+export interface MentionInputProps {
+  value: string;
+  onChange: (e: any) => void;
+  name: string;
+  placeholder?: string;
+  required?: boolean;
+  className?: string;
+  members: any[];
+  rows?: number;
+  type?: "text" | "textarea";
+}
+
+export interface MentionTextProps {
+  text: string;
+  className?: string;
+}
+
+export interface PlanMateLogoProps {
+  size?: "xs" | "sm" | "md" | "lg" | "xl" | number;
+  className?: string;
+  showText?: boolean;
+  textClassName?: string;
+}

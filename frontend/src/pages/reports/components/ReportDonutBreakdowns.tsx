@@ -1,14 +1,6 @@
 import React from "react";
 import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip } from "recharts";
-import { IDonutItem } from "../utils/reportCalculations";
-
-interface ReportDonutBreakdownsProps {
-  statusData: IDonutItem[];
-  typeData: IDonutItem[];
-  assigneeData: IDonutItem[];
-  totalTasks: number;
-  onSliceClick?: (category: "status" | "type" | "assignee", value: string) => void;
-}
+import { IDonutItem, ReportDonutBreakdownsProps } from "../../../types";
 
 export const ReportDonutBreakdowns: React.FC<ReportDonutBreakdownsProps> = ({
   statusData,

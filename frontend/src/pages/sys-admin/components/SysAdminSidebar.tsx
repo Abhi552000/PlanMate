@@ -7,18 +7,10 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
 } from "lucide-react";
+import { SysAdminTab, SysAdminSidebarProps, SysAdminNavItem } from "../../../types";
+import { SYSADMIN_SIDEBAR_TEXTS } from "../../../constants/billingTexts";
 
-export type SysAdminTab = "organizations" | "plans" | "payments";
-
-interface SysAdminSidebarProps {
-  activeTab: SysAdminTab;
-  onTabChange: (tab: SysAdminTab) => void;
-  orgCount?: number;
-  plansCount?: number;
-  isCollapsed?: boolean;
-  onToggleCollapse?: () => void;
-  onOnboardClick: () => void;
-}
+export type { SysAdminTab, SysAdminSidebarProps };
 
 export const SysAdminSidebar: React.FC<SysAdminSidebarProps> = ({
   activeTab,
@@ -27,24 +19,20 @@ export const SysAdminSidebar: React.FC<SysAdminSidebarProps> = ({
   onToggleCollapse,
   onOnboardClick,
 }) => {
-  const navItems: {
-    id: SysAdminTab;
-    label: string;
-    icon: React.ComponentType<{ className?: string }>;
-  }[] = [
+  const navItems: SysAdminNavItem[] = [
     {
       id: "organizations",
-      label: "Organizations",
+      label: SYSADMIN_SIDEBAR_TEXTS.TAB_ORGANIZATIONS,
       icon: Building,
     },
     {
       id: "plans",
-      label: "Plans & Pricing",
+      label: SYSADMIN_SIDEBAR_TEXTS.TAB_PLANS,
       icon: CreditCard,
     },
     {
       id: "payments",
-      label: "Payment History",
+      label: SYSADMIN_SIDEBAR_TEXTS.TAB_PAYMENTS,
       icon: Receipt,
     },
   ];
@@ -66,7 +54,7 @@ export const SysAdminSidebar: React.FC<SysAdminSidebarProps> = ({
               }`}
             >
               <span className="text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500 truncate">
-                Navigation
+                {SYSADMIN_SIDEBAR_TEXTS.TITLE_NAVIGATION}
               </span>
             </div>
 
@@ -75,8 +63,16 @@ export const SysAdminSidebar: React.FC<SysAdminSidebarProps> = ({
               className={`p-1.5 rounded-lg text-gray-400 hover:text-sky-600 dark:hover:text-sky-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all cursor-pointer ${
                 isCollapsed ? "mx-auto" : "ml-auto"
               }`}
-              title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
-              aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+              title={
+                isCollapsed
+                  ? SYSADMIN_SIDEBAR_TEXTS.EXPAND_SIDEBAR
+                  : SYSADMIN_SIDEBAR_TEXTS.COLLAPSE_SIDEBAR
+              }
+              aria-label={
+                isCollapsed
+                  ? SYSADMIN_SIDEBAR_TEXTS.EXPAND_SIDEBAR
+                  : SYSADMIN_SIDEBAR_TEXTS.COLLAPSE_SIDEBAR
+              }
             >
               {isCollapsed ? (
                 <PanelLeftOpen className="w-4.5 h-4.5" />
@@ -134,10 +130,12 @@ export const SysAdminSidebar: React.FC<SysAdminSidebarProps> = ({
           className={`w-full h-10 rounded-lg bg-sky-500 hover:bg-sky-600 text-white text-xs font-bold transition-all shadow-2xs flex items-center justify-center gap-2 cursor-pointer ${
             isCollapsed ? "px-0" : "px-3"
           }`}
-          title="Onboard Organization"
+          title={SYSADMIN_SIDEBAR_TEXTS.BTN_ONBOARD_ORG}
         >
           <Plus className="w-4.5 h-4.5 shrink-0" />
-          {!isCollapsed && <span className="truncate">Onboard Organization</span>}
+          {!isCollapsed && (
+            <span className="truncate">{SYSADMIN_SIDEBAR_TEXTS.BTN_ONBOARD_ORG}</span>
+          )}
         </button>
       </div>
     </aside>

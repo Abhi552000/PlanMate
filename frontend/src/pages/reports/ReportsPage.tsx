@@ -19,7 +19,7 @@ import { ReportWorkItemTable } from "./components/ReportWorkItemTable";
 import { ReportWorkItemDrawer } from "./components/ReportWorkItemDrawer";
 
 export const ReportsPage: React.FC = () => {
-  const { tasks, refreshTasks } = useOutletContext<DashboardContext>();
+  const { tasks, refreshTasks, loading } = useOutletContext<DashboardContext>();
   const navigate = useNavigate();
 
   const [timeframe, setTimeframe] = useState<"all" | "30d" | "7d">("all");
@@ -154,6 +154,44 @@ export const ReportsPage: React.FC = () => {
     setDrawerTasks(matching);
     setDrawerOpen(true);
   };
+
+  if (loading && (!tasks || tasks.length === 0)) {
+    return (
+      <div className="w-full space-y-6 pb-12 font-sans select-none animate-pulse">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-gray-200 dark:border-gray-800">
+          <div className="space-y-1.5">
+            <div className="h-7 w-32 rounded-lg bg-slate-200 dark:bg-slate-800" />
+            <div className="h-4 w-64 rounded bg-slate-100 dark:bg-slate-800/60" />
+          </div>
+          <div className="h-9 w-44 rounded-lg bg-slate-200 dark:bg-slate-800" />
+        </div>
+
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+          {[1, 2, 3, 4].map((i) => (
+            <div
+              key={i}
+              className="p-4 rounded-xl border border-slate-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-2xs space-y-2"
+            >
+              <div className="h-3.5 w-24 rounded bg-slate-100 dark:bg-slate-800" />
+              <div className="h-7 w-16 rounded bg-slate-200 dark:bg-slate-800" />
+            </div>
+          ))}
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {[1, 2, 3].map((i) => (
+            <div
+              key={i}
+              className="p-5 rounded-2xl border border-slate-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-2xs space-y-4"
+            >
+              <div className="h-5 w-32 rounded bg-slate-200 dark:bg-slate-800" />
+              <div className="w-36 h-36 rounded-full bg-slate-100 dark:bg-slate-800 mx-auto" />
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full space-y-6 pb-12 font-sans">

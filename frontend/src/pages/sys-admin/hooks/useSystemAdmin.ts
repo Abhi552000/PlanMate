@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { orgService } from "../../../services/orgService";
 import { SystemMetrics } from "../../../types";
 
@@ -41,29 +41,75 @@ export const useSystemAdmin = () => {
   const [copiedReset, setCopiedReset] = useState(false);
 
   const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState<"all" | "active" | "inactive">("all");
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [totalPages, setTotalPages] = useState<number>(1);
+  const [totalCount, setTotalCount] = useState<number>(0);
+  const [itemsPerPage] = useState<number>(10);
+  const [tableLoading, setTableLoading] = useState(false);
+
   const [onboarding, setOnboarding] = useState(false);
   const [updating, setUpdating] = useState(false);
   const [togglingStatus, setTogglingStatus] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
-  const fetchOrganizations = useCallback(async () => {
-    setLoading(true);
-    try {
-      const data = await orgService.getSystemAdminOrgs();
-      if (data?.success && data?.organizations) {
-        setOrganizations(data.organizations);
-        if (data.systemMetrics) {
-          setSystemMetrics(data.systemMetrics);
-        }
+  // Debounce search query to prevent unnecessary backend calls
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchQuery);
+      setCurrentPage(1);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  const handleStatusFilterChange = (status: "all" | "active" | "inactive") => {
+    setStatusFilter(status);
+    setCurrentPage(1);
+  };
+
+  const isInitialLoadRef = useRef(true);
+
+  const fetchOrganizations = useCallback(
+    async () => {
+      // Only show full dashboard skeleton on initial first mount
+      if (isInitialLoadRef.current) {
+        setLoading(true);
+      } else {
+        setTableLoading(true);
       }
-    } catch (err) {
-      console.error(err);
-      setError("Failed to fetch organizations.");
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+      try {
+        const params: Record<string, any> = {
+          status: statusFilter,
+          page: currentPage,
+          limit: itemsPerPage,
+        };
+        if (debouncedSearch.trim()) {
+          params.search = debouncedSearch.trim();
+        }
+        const data = await orgService.getSystemAdminOrgs(params);
+        if (data?.success && data?.organizations) {
+          setOrganizations(data.organizations);
+          if (data.systemMetrics) {
+            setSystemMetrics(data.systemMetrics);
+          }
+          if (data.pagination) {
+            setTotalCount(data.pagination.total);
+            setTotalPages(data.pagination.totalPages);
+          }
+        }
+      } catch (err) {
+        console.error(err);
+        setError("Failed to fetch organizations.");
+      } finally {
+        isInitialLoadRef.current = false;
+        setLoading(false);
+        setTableLoading(false);
+      }
+    },
+    [statusFilter, debouncedSearch, currentPage, itemsPerPage]
+  );
 
   useEffect(() => {
     fetchOrganizations();
@@ -72,8 +118,13 @@ export const useSystemAdmin = () => {
   const handleOnboardSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const { orgName, adminName, adminEmail } = newOrg;
-    if (!orgName || !adminName || !adminEmail) {
+    if (!orgName?.trim() || !adminName?.trim() || !adminEmail?.trim()) {
       setError("Please fill in organization name, admin name, and admin email.");
+      return;
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(adminEmail.trim())) {
+      setError("Please enter a valid admin email address.");
       return;
     }
     setOnboarding(true);
@@ -82,10 +133,15 @@ export const useSystemAdmin = () => {
     setOnboardedResult(null);
 
     try {
-      const data = await orgService.onboardOrg(newOrg);
+      const data = await orgService.onboardOrg({
+        ...newOrg,
+        orgName: orgName.trim(),
+        adminName: adminName.trim(),
+        adminEmail: adminEmail.trim(),
+      });
       if (data?.success) {
         setOnboardedResult({
-          orgName: orgName,
+          orgName: orgName.trim(),
           email: data.admin?.email,
           password: data.admin?.password,
         });
@@ -114,12 +170,26 @@ export const useSystemAdmin = () => {
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingOrg) return;
+    if (!editForm.orgName?.trim()) {
+      setError("Organization name cannot be empty.");
+      return;
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (editForm.adminEmail && !emailRegex.test(editForm.adminEmail.trim())) {
+      setError("Please enter a valid admin email address.");
+      return;
+    }
     setUpdating(true);
     setError(null);
     setSuccess(null);
 
     try {
-      const data = await orgService.updateOrgAdmin(editingOrg._id, editForm);
+      const data = await orgService.updateOrgAdmin(editingOrg._id, {
+        ...editForm,
+        orgName: editForm.orgName.trim(),
+        adminName: editForm.adminName?.trim(),
+        adminEmail: editForm.adminEmail?.trim(),
+      });
       if (data?.success) {
         setSuccess(`Successfully updated organization details!`);
         setEditingOrg(null);
@@ -247,52 +317,70 @@ export const useSystemAdmin = () => {
   };
 
   // Export CSV
-  const exportOrganizationsCSV = () => {
-    if (!organizations.length) return;
-    const headers = [
-      "Organization Name",
-      "Slug",
-      "Admin Name",
-      "Admin Email",
-      "Members Count",
-      "Tasks Count",
-      "Status",
-      "Created Date",
-      "Deactivation Remark",
-    ];
+  const exportOrganizationsCSV = async () => {
+    try {
+      const params: Record<string, any> = {
+        status: statusFilter,
+      };
+      if (debouncedSearch.trim()) {
+        params.search = debouncedSearch.trim();
+      }
+      const data = await orgService.getSystemAdminOrgs(params);
+      const orgsToExport = data?.organizations?.length ? data.organizations : organizations;
+      if (!orgsToExport.length) return;
 
-    const rows = organizations.map((o) => [
-      `"${(o.name || "").replace(/"/g, '""')}"`,
-      `"${(o.slug || "").replace(/"/g, '""')}"`,
-      `"${(o.admin?.name || "").replace(/"/g, '""')}"`,
-      `"${(o.admin?.email || "").replace(/"/g, '""')}"`,
-      o.memberCount || 0,
-      o.taskCount || o.taskCounter || 0,
-      o.isActive ? "Active" : "Inactive",
-      o.createdAt ? new Date(o.createdAt).toISOString().split("T")[0] : "",
-      `"${(o.remark || "").replace(/"/g, '""')}"`,
-    ]);
+      const headers = [
+        "Organization Name",
+        "Slug",
+        "Admin Name",
+        "Admin Email",
+        "Plan",
+        "Billing Cycle",
+        "Members Count",
+        "Tasks Count",
+        "Status",
+        "Created Date",
+        "Deactivation Remark",
+      ];
 
-    const csvContent =
-      "data:text/csv;charset=utf-8," +
-      [headers.join(","), ...rows.map((e) => e.join(","))].join("\n");
+      const rows = orgsToExport.map((o: any) => [
+        `"${(o.name || "").replace(/"/g, '""')}"`,
+        `"${(o.slug || "").replace(/"/g, '""')}"`,
+        `"${(o.admin?.name || "").replace(/"/g, '""')}"`,
+        `"${(o.admin?.email || "").replace(/"/g, '""')}"`,
+        `"${(o.subscription?.planName || "Starter").replace(/"/g, '""')}"`,
+        `"${(o.subscription?.billingCycle || "Monthly").replace(/"/g, '""')}"`,
+        o.memberCount || 0,
+        o.taskCount || o.taskCounter || 0,
+        o.isActive ? "Active" : "Inactive",
+        o.createdAt ? new Date(o.createdAt).toISOString().split("T")[0] : "",
+        `"${(o.remark || "").replace(/"/g, '""')}"`,
+      ]);
 
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute(
-      "download",
-      `planmate_tenants_${new Date().toISOString().split("T")[0]}.csv`
-    );
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+      const csvContent =
+        "data:text/csv;charset=utf-8," +
+        [headers.join(","), ...rows.map((e: any) => e.join(","))].join("\n");
+
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute(
+        "download",
+        `planmate_tenants_${new Date().toISOString().split("T")[0]}.csv`
+      );
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (err) {
+      console.error("Export CSV error:", err);
+    }
   };
 
   return {
     organizations,
     systemMetrics,
     loading,
+    tableLoading,
     showOnboardModal,
     setShowOnboardModal,
     newOrg,
@@ -318,6 +406,12 @@ export const useSystemAdmin = () => {
     copiedReset,
     searchQuery,
     setSearchQuery,
+    statusFilter,
+    setStatusFilter: handleStatusFilterChange,
+    currentPage,
+    setCurrentPage,
+    totalPages,
+    totalCount,
     onboarding,
     updating,
     togglingStatus,

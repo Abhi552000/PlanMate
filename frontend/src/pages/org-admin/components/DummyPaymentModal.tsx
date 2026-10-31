@@ -3,27 +3,13 @@ import {
   X,
   CreditCard,
   CheckCircle2,
-  Building,
   Check,
   Copy,
   Smartphone,
   Landmark,
 } from "lucide-react";
-import { IPlan } from "../../../types/organization";
-
-interface DummyPaymentModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  plan: IPlan | null;
-  currentSubscription?: any;
-  billingCycle?: "monthly" | "yearly";
-  onSuccess: () => void;
-  subscribeToPlan: (payload: {
-    planId: string;
-    billingCycle?: string;
-    paymentDetails?: any;
-  }) => Promise<any>;
-}
+import { DummyPaymentModalProps, PaymentMethodOption, IPaymentReceipt } from "../../../types";
+import { PAYMENT_MODAL_TEXTS } from "../../../constants/billingTexts";
 
 export const DummyPaymentModal: React.FC<DummyPaymentModalProps> = ({
   isOpen,
@@ -36,9 +22,9 @@ export const DummyPaymentModal: React.FC<DummyPaymentModalProps> = ({
 }) => {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [paymentReceipt, setPaymentReceipt] = useState<any | null>(null);
+  const [paymentReceipt, setPaymentReceipt] = useState<IPaymentReceipt | null>(null);
   const [copiedTxn, setCopiedTxn] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState<"card" | "upi" | "netbanking">("card");
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethodOption>("card");
 
   if (!isOpen || !plan) return null;
 
@@ -77,7 +63,12 @@ export const DummyPaymentModal: React.FC<DummyPaymentModalProps> = ({
         planId: plan.planId,
         billingCycle,
         paymentDetails: {
-          method: paymentMethod === "card" ? "Credit Card" : paymentMethod === "upi" ? "UPI" : "Net Banking",
+          method:
+            paymentMethod === "card"
+              ? PAYMENT_MODAL_TEXTS.METHOD_CARD
+              : paymentMethod === "upi"
+              ? PAYMENT_MODAL_TEXTS.METHOD_UPI
+              : PAYMENT_MODAL_TEXTS.METHOD_NETBANKING,
         },
       });
 
@@ -85,10 +76,10 @@ export const DummyPaymentModal: React.FC<DummyPaymentModalProps> = ({
         setPaymentReceipt(res.receipt);
         onSuccess();
       } else {
-        setError(res?.message || "Failed to process payment");
+        setError(res?.message || PAYMENT_MODAL_TEXTS.ERR_PAYMENT_PROCESS);
       }
     } catch (err: any) {
-      setError(err?.response?.data?.message || "Failed to process payment. Please try again.");
+      setError(err?.response?.data?.message || PAYMENT_MODAL_TEXTS.ERR_PAYMENT_PROCESS);
     } finally {
       setSubmitting(false);
     }
@@ -115,10 +106,14 @@ export const DummyPaymentModal: React.FC<DummyPaymentModalProps> = ({
         <div className="flex items-center justify-between p-5 border-b border-gray-100 dark:border-gray-800">
           <div>
             <h3 className="font-bold text-base text-gray-900 dark:text-white">
-              {paymentReceipt ? "Payment Confirmed" : `Subscribe to ${plan.name}`}
+              {paymentReceipt
+                ? PAYMENT_MODAL_TEXTS.TITLE_ACTIVE
+                : `${PAYMENT_MODAL_TEXTS.TITLE_SUBSCRIBE_PREFIX} ${plan.name}`}
             </h3>
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-              {paymentReceipt ? "Your workspace tier is now active" : "Select a payment method to complete activation"}
+              {paymentReceipt
+                ? PAYMENT_MODAL_TEXTS.SUBTITLE_ACTIVE
+                : PAYMENT_MODAL_TEXTS.SUBTITLE_SUBSCRIBE}
             </p>
           </div>
           <button
@@ -135,34 +130,42 @@ export const DummyPaymentModal: React.FC<DummyPaymentModalProps> = ({
             <div className="flex items-center gap-3 p-3.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300">
               <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0" />
               <div className="text-xs">
-                <p className="font-bold">{paymentReceipt.plan} Plan Activated</p>
+                <p className="font-bold">
+                  {paymentReceipt.plan} {PAYMENT_MODAL_TEXTS.RECEIPT_ACTIVATED_SUFFIX}
+                </p>
                 <p className="text-[11px] text-emerald-700 dark:text-emerald-400">
-                  Your workspace can now support up to {paymentReceipt.maxMembers} team members.
+                  {PAYMENT_MODAL_TEXTS.RECEIPT_MAX_MEMBERS_TEXT(paymentReceipt.maxMembers)}
                 </p>
               </div>
             </div>
 
+            {paymentReceipt.explanation && (
+              <p className="text-[11px] text-emerald-700 dark:text-emerald-300 bg-emerald-50/50 dark:bg-emerald-950/20 p-2.5 rounded-lg border border-emerald-100 dark:border-emerald-800/40">
+                {paymentReceipt.explanation}
+              </p>
+            )}
+
             <div className="p-4 rounded-xl border border-slate-200 dark:border-gray-800 bg-gray-50/60 dark:bg-gray-950/40 space-y-2 text-xs">
               <div className="flex justify-between">
-                <span className="text-gray-500">Invoice Number</span>
+                <span className="text-gray-500">{PAYMENT_MODAL_TEXTS.LABEL_INVOICE_NUMBER}</span>
                 <span className="font-semibold text-gray-900 dark:text-white">
-                  {paymentReceipt.invoiceNumber || "INV-2026"}
+                  {paymentReceipt.invoiceNumber}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-500">Amount</span>
+                <span className="text-gray-500">{PAYMENT_MODAL_TEXTS.LABEL_AMOUNT}</span>
                 <span className="font-bold text-gray-900 dark:text-white">
                   ₹{paymentReceipt.amount?.toLocaleString()} {paymentReceipt.currency}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-500">Status</span>
+                <span className="text-gray-500">{PAYMENT_MODAL_TEXTS.LABEL_STATUS}</span>
                 <span className="font-bold text-emerald-600 dark:text-emerald-400">
-                  Paid
+                  {paymentReceipt.status || PAYMENT_MODAL_TEXTS.STATUS_PAID}
                 </span>
               </div>
               <div className="flex justify-between items-center pt-1 border-t border-gray-200/50 dark:border-gray-800">
-                <span className="text-gray-500">Transaction ID</span>
+                <span className="text-gray-500">{PAYMENT_MODAL_TEXTS.LABEL_TXN_ID}</span>
                 <button
                   type="button"
                   onClick={handleCopyTxn}
@@ -179,7 +182,7 @@ export const DummyPaymentModal: React.FC<DummyPaymentModalProps> = ({
               onClick={handleClose}
               className="w-full h-10 bg-sky-500 hover:bg-sky-600 text-white rounded-xl text-xs font-bold transition-all shadow-2xs cursor-pointer"
             >
-              Done
+              {PAYMENT_MODAL_TEXTS.BTN_DONE}
             </button>
           </div>
         ) : (
@@ -195,12 +198,14 @@ export const DummyPaymentModal: React.FC<DummyPaymentModalProps> = ({
             <div className="p-4 rounded-xl border border-slate-200 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-950/40 space-y-2.5">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs text-gray-400 font-semibold uppercase">Target Tier</p>
+                  <p className="text-xs text-gray-400 font-semibold uppercase">
+                    {PAYMENT_MODAL_TEXTS.LABEL_TARGET_TIER}
+                  </p>
                   <h4 className="font-bold text-gray-900 dark:text-white text-base">
                     {plan.name}
                   </h4>
                   <p className="text-xs text-gray-500 dark:text-gray-400">
-                    Up to {plan.maxMembers} team members
+                    {PAYMENT_MODAL_TEXTS.RECEIPT_MAX_MEMBERS_TEXT(plan.maxMembers)}
                   </p>
                 </div>
 
@@ -217,13 +222,11 @@ export const DummyPaymentModal: React.FC<DummyPaymentModalProps> = ({
               {unusedCredit > 0 && (
                 <div className="pt-2 border-t border-gray-200/60 dark:border-gray-800 space-y-1 text-xs">
                   <div className="flex justify-between text-emerald-600 dark:text-emerald-400 font-semibold">
-                    <span>
-                      Upgrade Credit ({remainingDays} unused day{remainingDays > 1 ? "s" : ""})
-                    </span>
+                    <span>{PAYMENT_MODAL_TEXTS.UPGRADE_CREDIT_LABEL(remainingDays)}</span>
                     <span>-₹{unusedCredit.toLocaleString()}</span>
                   </div>
                   <div className="flex justify-between font-bold text-gray-900 dark:text-white pt-1 border-t border-dashed border-gray-200 dark:border-gray-800">
-                    <span>Net Payable Today</span>
+                    <span>{PAYMENT_MODAL_TEXTS.NET_PAYABLE_TODAY}</span>
                     <span>₹{finalPayable.toLocaleString()}</span>
                   </div>
                 </div>
@@ -233,7 +236,7 @@ export const DummyPaymentModal: React.FC<DummyPaymentModalProps> = ({
             {/* Payment Method Selector */}
             <div className="space-y-2">
               <label className="text-xs font-bold text-gray-700 dark:text-gray-300">
-                Payment Option
+                {PAYMENT_MODAL_TEXTS.PAYMENT_OPTION_LABEL}
               </label>
               <div className="grid grid-cols-3 gap-2">
                 <button
@@ -246,7 +249,7 @@ export const DummyPaymentModal: React.FC<DummyPaymentModalProps> = ({
                   }`}
                 >
                   <CreditCard className="w-4 h-4" />
-                  <span className="text-[11px] font-bold">Card</span>
+                  <span className="text-[11px] font-bold">{PAYMENT_MODAL_TEXTS.METHOD_CARD}</span>
                 </button>
 
                 <button
@@ -259,7 +262,7 @@ export const DummyPaymentModal: React.FC<DummyPaymentModalProps> = ({
                   }`}
                 >
                   <Smartphone className="w-4 h-4" />
-                  <span className="text-[11px] font-bold">UPI</span>
+                  <span className="text-[11px] font-bold">{PAYMENT_MODAL_TEXTS.METHOD_UPI}</span>
                 </button>
 
                 <button
@@ -272,13 +275,13 @@ export const DummyPaymentModal: React.FC<DummyPaymentModalProps> = ({
                   }`}
                 >
                   <Landmark className="w-4 h-4" />
-                  <span className="text-[11px] font-bold">Net Banking</span>
+                  <span className="text-[11px] font-bold">{PAYMENT_MODAL_TEXTS.METHOD_NETBANKING}</span>
                 </button>
               </div>
             </div>
 
             <p className="text-[11px] text-gray-400">
-              This checkout simulates payment for your workspace and activates the plan immediately.
+              {PAYMENT_MODAL_TEXTS.CHECKOUT_NOTE}
             </p>
 
             <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-gray-100 dark:border-gray-800">
@@ -287,14 +290,16 @@ export const DummyPaymentModal: React.FC<DummyPaymentModalProps> = ({
                 onClick={handleClose}
                 className="px-4 py-2 border border-slate-200 dark:border-gray-700 rounded-lg text-xs font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer"
               >
-                Cancel
+                {PAYMENT_MODAL_TEXTS.BTN_CANCEL}
               </button>
               <button
                 type="submit"
                 disabled={submitting}
                 className="px-5 py-2 bg-sky-500 hover:bg-sky-600 text-white rounded-lg text-xs font-bold transition-all shadow-2xs flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
               >
-                {submitting ? "Processing..." : `Pay ₹${finalPayable.toLocaleString()}`}
+                {submitting
+                  ? PAYMENT_MODAL_TEXTS.BTN_PROCESSING
+                  : `${PAYMENT_MODAL_TEXTS.BTN_PAY_PREFIX} ₹${finalPayable.toLocaleString()}`}
               </button>
             </div>
           </form>

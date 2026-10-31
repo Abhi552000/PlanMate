@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import {
   Receipt,
   Search,
@@ -11,98 +11,114 @@ import {
 } from "lucide-react";
 import { toast } from "react-toastify";
 import { orgService } from "../../../services/orgService";
-
-interface IPaymentRecord {
-  _id: string;
-  organization?: {
-    _id: string;
-    name: string;
-    email?: string;
-  } | string;
-  organizationName?: string;
-  user?: {
-    _id: string;
-    name: string;
-    email: string;
-  } | string;
-  userName?: string;
-  userEmail?: string;
-  planId: string;
-  planName: string;
-  amount: number;
-  currency: string;
-  billingCycle: string;
-  paymentMethod: string;
-  transactionId: string;
-  invoiceNumber: string;
-  status: string;
-  maxMembers?: number;
-  paidAt: string;
-}
+import { IPaymentRecord } from "../../../types";
+import { SYSADMIN_PAYMENTS_TEXTS } from "../../../constants/billingTexts";
 
 export const SysAdminPaymentsView: React.FC = () => {
   const [payments, setPayments] = useState<IPaymentRecord[]>([]);
   const [loading, setLoading] = useState(true);
+  const [tableLoading, setTableLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [cycleFilter, setCycleFilter] = useState<string>("all");
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const isInitialLoadRef = useRef(true);
 
-  const fetchPayments = async (isRefresh = false) => {
-    if (isRefresh) setRefreshing(true);
-    else setLoading(true);
+  // Debounce search query to trigger backend API efficiently
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchQuery);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
 
-    try {
-      const res = await orgService.getAllPaymentsForAdmin();
-      if (res?.success) {
-        setPayments(res.payments || []);
+  const fetchPayments = useCallback(
+    async (isRefresh = false) => {
+      if (isRefresh) {
+        setRefreshing(true);
+      } else if (isInitialLoadRef.current) {
+        setLoading(true);
+      } else {
+        setTableLoading(true);
       }
-    } catch (err: any) {
-      toast.error(err?.response?.data?.message || "Failed to load payment history");
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
-    }
-  };
+
+      try {
+        const params: Record<string, any> = {};
+        if (debouncedSearch.trim()) params.search = debouncedSearch.trim();
+        if (cycleFilter !== "all") params.billingCycle = cycleFilter;
+
+        const res = await orgService.getAllPaymentsForAdmin(params);
+        if (res?.success) {
+          setPayments(res.payments || []);
+        }
+      } catch (err: any) {
+        toast.error(err?.response?.data?.message || SYSADMIN_PAYMENTS_TEXTS.ERR_LOAD_PAYMENTS);
+      } finally {
+        isInitialLoadRef.current = false;
+        setLoading(false);
+        setTableLoading(false);
+        setRefreshing(false);
+      }
+    },
+    [debouncedSearch, cycleFilter]
+  );
 
   useEffect(() => {
     fetchPayments();
-  }, []);
+  }, [fetchPayments]);
 
   const handleCopy = (text: string) => {
     navigator.clipboard.writeText(text);
     setCopiedId(text);
-    toast.success("Transaction ID copied");
+    toast.success(SYSADMIN_PAYMENTS_TEXTS.MSG_TXN_COPIED);
     setTimeout(() => setCopiedId(null), 2000);
   };
-
-  const filteredPayments = useMemo(() => {
-    if (!searchQuery.trim()) return payments;
-    const q = searchQuery.toLowerCase();
-    return payments.filter((p) => {
-      const orgName = (
-        typeof p.organization === "object" && p.organization?.name
-          ? p.organization.name
-          : p.organizationName || ""
-      ).toLowerCase();
-      const plan = (p.planName || "").toLowerCase();
-      const invoice = (p.invoiceNumber || "").toLowerCase();
-      const txn = (p.transactionId || "").toLowerCase();
-      const user = (p.userName || p.userEmail || "").toLowerCase();
-
-      return (
-        orgName.includes(q) ||
-        plan.includes(q) ||
-        invoice.includes(q) ||
-        txn.includes(q) ||
-        user.includes(q)
-      );
-    });
-  }, [payments, searchQuery]);
 
   // Aggregate stats
   const totalRevenue = useMemo(() => {
     return payments.reduce((acc, p) => acc + (p.amount || 0), 0);
   }, [payments]);
+
+  if (loading) {
+    return (
+      <div className="space-y-6 animate-pulse select-none">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <div className="w-6 h-6 rounded-lg bg-slate-200 dark:bg-slate-800 shrink-0" />
+              <div className="h-6 w-44 rounded-lg bg-slate-200 dark:bg-slate-800" />
+            </div>
+            <div className="h-4 w-72 ml-8 rounded bg-slate-100 dark:bg-slate-800/60" />
+          </div>
+          <div className="h-[38px] w-24 rounded-lg bg-slate-200 dark:bg-slate-800 self-start sm:self-auto" />
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4">
+          {[1, 2, 3].map((i) => (
+            <div
+              key={i}
+              className="p-4 rounded-xl bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-800 shadow-2xs flex items-center justify-between"
+            >
+              <div className="space-y-2">
+                <div className="h-3 w-28 rounded bg-slate-100 dark:bg-slate-800" />
+                <div className="h-6 w-16 rounded bg-slate-200 dark:bg-slate-800" />
+              </div>
+              <div className="w-9 h-9 rounded-lg bg-slate-100 dark:bg-slate-800" />
+            </div>
+          ))}
+        </div>
+
+        <div className="h-[38px] w-72 rounded-lg bg-slate-100 dark:bg-slate-800" />
+
+        <div className="bg-white dark:bg-gray-900 rounded-2xl border border-slate-200 dark:border-gray-800 shadow-2xs p-5 space-y-3">
+          {[1, 2, 3, 4, 5].map((i) => (
+            <div key={i} className="h-10 w-full rounded-lg bg-slate-100 dark:bg-slate-800/50" />
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -111,10 +127,10 @@ export const SysAdminPaymentsView: React.FC = () => {
         <div>
           <h1 className="text-lg md:text-2xl font-black text-gray-900 dark:text-white tracking-tight flex items-center gap-2">
             <Receipt className="w-5 h-5 md:w-6 md:h-6 text-sky-500 shrink-0" />
-            <span>Payment History</span>
+            <span>{SYSADMIN_PAYMENTS_TEXTS.PAGE_TITLE}</span>
           </h1>
           <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1 ml-7">
-            Transaction and subscription records across all organizations
+            {SYSADMIN_PAYMENTS_TEXTS.PAGE_SUBTITLE}
           </p>
         </div>
 
@@ -125,7 +141,7 @@ export const SysAdminPaymentsView: React.FC = () => {
             className="h-[38px] px-3.5 bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg text-xs font-semibold transition-colors flex items-center gap-1.5 cursor-pointer shadow-2xs disabled:opacity-50"
           >
             <RotateCw className={`w-3.5 h-3.5 text-sky-500 ${refreshing ? "animate-spin" : ""}`} />
-            <span>Refresh</span>
+            <span>{SYSADMIN_PAYMENTS_TEXTS.BTN_REFRESH}</span>
           </button>
         </div>
       </div>
@@ -134,7 +150,9 @@ export const SysAdminPaymentsView: React.FC = () => {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4">
         <div className="p-4 rounded-xl bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-800 shadow-2xs flex items-center justify-between">
           <div>
-            <p className="text-xs font-semibold text-gray-500 dark:text-gray-400">Total Transactions</p>
+            <p className="text-xs font-semibold text-gray-500 dark:text-gray-400">
+              {SYSADMIN_PAYMENTS_TEXTS.STAT_TOTAL_TXNS}
+            </p>
             <p className="text-xl font-bold text-gray-900 dark:text-white mt-0.5">{payments.length}</p>
           </div>
           <div className="w-9 h-9 rounded-lg bg-sky-50 dark:bg-sky-950/50 flex items-center justify-center text-sky-500">
@@ -144,7 +162,9 @@ export const SysAdminPaymentsView: React.FC = () => {
 
         <div className="p-4 rounded-xl bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-800 shadow-2xs flex items-center justify-between">
           <div>
-            <p className="text-xs font-semibold text-gray-500 dark:text-gray-400">Total Subscriptions Value</p>
+            <p className="text-xs font-semibold text-gray-500 dark:text-gray-400">
+              {SYSADMIN_PAYMENTS_TEXTS.STAT_TOTAL_VALUE}
+            </p>
             <p className="text-xl font-bold text-emerald-600 dark:text-emerald-400 mt-0.5">
               ₹{totalRevenue.toLocaleString()}
             </p>
@@ -156,8 +176,10 @@ export const SysAdminPaymentsView: React.FC = () => {
 
         <div className="p-4 rounded-xl bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-800 shadow-2xs flex items-center justify-between">
           <div>
-            <p className="text-xs font-semibold text-gray-500 dark:text-gray-400">Showing Records</p>
-            <p className="text-xl font-bold text-gray-900 dark:text-white mt-0.5">{filteredPayments.length}</p>
+            <p className="text-xs font-semibold text-gray-500 dark:text-gray-400">
+              {SYSADMIN_PAYMENTS_TEXTS.STAT_SHOWING_RECORDS}
+            </p>
+            <p className="text-xl font-bold text-gray-900 dark:text-white mt-0.5">{payments.length}</p>
           </div>
           <div className="w-9 h-9 rounded-lg bg-gray-50 dark:bg-gray-800 flex items-center justify-center text-gray-500">
             <Building className="w-5 h-5" />
@@ -167,15 +189,29 @@ export const SysAdminPaymentsView: React.FC = () => {
 
       {/* FILTER & SEARCH */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-        <div className="relative flex-1 max-w-md">
-          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-          <input
-            type="text"
-            placeholder="Search by organization, plan, invoice, or txn..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full h-[38px] pl-9 pr-3.5 bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-700 rounded-lg text-xs text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:border-sky-500 shadow-2xs transition-colors"
-          />
+        <div className="flex flex-wrap items-center gap-2.5 flex-1">
+          {/* Billing Cycle Filter Dropdown */}
+          <select
+            value={cycleFilter}
+            onChange={(e) => setCycleFilter(e.target.value)}
+            className="h-[38px] px-3 bg-white dark:bg-gray-950 border border-slate-200 dark:border-gray-700 rounded-lg text-xs font-semibold text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-1 focus:ring-sky-500 cursor-pointer shadow-2xs"
+          >
+            <option value="all">{SYSADMIN_PAYMENTS_TEXTS.FILTER_ALL_CYCLES}</option>
+            <option value="monthly">{SYSADMIN_PAYMENTS_TEXTS.FILTER_MONTHLY}</option>
+            <option value="yearly">{SYSADMIN_PAYMENTS_TEXTS.FILTER_YEARLY}</option>
+          </select>
+
+          {/* Search Input */}
+          <div className="relative flex-1 min-w-[200px] max-w-md">
+            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+            <input
+              type="text"
+              placeholder={SYSADMIN_PAYMENTS_TEXTS.SEARCH_PLACEHOLDER}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full h-[38px] pl-9 pr-3.5 bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-700 rounded-lg text-xs text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:border-sky-500 shadow-2xs transition-colors"
+            />
+          </div>
         </div>
       </div>
 
@@ -185,34 +221,58 @@ export const SysAdminPaymentsView: React.FC = () => {
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="border-b border-gray-100 dark:border-gray-800 text-[11px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider bg-gray-50/60 dark:bg-gray-950/40">
-                <th className="px-5 py-3">Invoice & Date</th>
-                <th className="px-5 py-3">Organization</th>
-                <th className="px-5 py-3">Plan</th>
-                <th className="px-5 py-3">Amount</th>
-                <th className="px-5 py-3">Method</th>
-                <th className="px-5 py-3">Status</th>
-                <th className="px-5 py-3 text-right">Transaction ID</th>
+                <th className="px-5 py-3">{SYSADMIN_PAYMENTS_TEXTS.COL_INVOICE_DATE}</th>
+                <th className="px-5 py-3">{SYSADMIN_PAYMENTS_TEXTS.COL_ORGANIZATION}</th>
+                <th className="px-5 py-3">{SYSADMIN_PAYMENTS_TEXTS.COL_PLAN}</th>
+                <th className="px-5 py-3">{SYSADMIN_PAYMENTS_TEXTS.COL_PLAN_TYPE}</th>
+                <th className="px-5 py-3">{SYSADMIN_PAYMENTS_TEXTS.COL_AMOUNT}</th>
+                <th className="px-5 py-3">{SYSADMIN_PAYMENTS_TEXTS.COL_METHOD}</th>
+                <th className="px-5 py-3">{SYSADMIN_PAYMENTS_TEXTS.COL_STATUS}</th>
+                <th className="px-5 py-3 text-right">{SYSADMIN_PAYMENTS_TEXTS.COL_TRANSACTION_ID}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100 dark:divide-gray-800 text-xs">
-              {loading ? (
+              {tableLoading ? (
+                Array.from({ length: 5 }).map((_, i) => (
+                  <tr key={i} className="animate-pulse">
+                    <td className="px-5 py-4">
+                      <div className="h-4 w-28 rounded bg-slate-200 dark:bg-slate-800" />
+                    </td>
+                    <td className="px-5 py-4">
+                      <div className="h-4 w-32 rounded bg-slate-200 dark:bg-slate-800" />
+                    </td>
+                    <td className="px-5 py-4">
+                      <div className="h-5 w-16 rounded-full bg-slate-200 dark:bg-slate-800" />
+                    </td>
+                    <td className="px-5 py-4">
+                      <div className="h-5 w-16 rounded-md bg-slate-200 dark:bg-slate-800" />
+                    </td>
+                    <td className="px-5 py-4">
+                      <div className="h-4 w-16 rounded bg-slate-200 dark:bg-slate-800" />
+                    </td>
+                    <td className="px-5 py-4">
+                      <div className="h-4 w-14 rounded bg-slate-200 dark:bg-slate-800" />
+                    </td>
+                    <td className="px-5 py-4">
+                      <div className="h-5 w-16 rounded-full bg-slate-200 dark:bg-slate-800" />
+                    </td>
+                    <td className="px-5 py-4 text-right">
+                      <div className="h-4 w-28 rounded bg-slate-200 dark:bg-slate-800 ml-auto" />
+                    </td>
+                  </tr>
+                ))
+              ) : payments.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-5 py-12 text-center text-gray-400 text-xs">
-                    Loading payments...
-                  </td>
-                </tr>
-              ) : filteredPayments.length === 0 ? (
-                <tr>
-                  <td colSpan={7} className="px-5 py-12 text-center text-gray-400 text-xs">
-                    No payment records found.
+                  <td colSpan={8} className="px-5 py-12 text-center text-gray-400 text-xs">
+                    {SYSADMIN_PAYMENTS_TEXTS.EMPTY_PAYMENTS}
                   </td>
                 </tr>
               ) : (
-                filteredPayments.map((p) => {
+                payments.map((p) => {
                   const orgName =
                     typeof p.organization === "object" && p.organization?.name
                       ? p.organization.name
-                      : p.organizationName || "Unknown Org";
+                      : p.organizationName || SYSADMIN_PAYMENTS_TEXTS.UNKNOWN_ORG;
                   const dateStr = p.paidAt
                     ? new Date(p.paidAt).toLocaleDateString("en-IN", {
                         day: "numeric",
@@ -252,9 +312,12 @@ export const SysAdminPaymentsView: React.FC = () => {
                         <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-sky-50 dark:bg-sky-950/50 text-sky-700 dark:text-sky-300 border border-sky-100 dark:border-sky-800">
                           {p.planName}
                         </span>
-                        <div className="text-[10px] text-gray-400 mt-0.5 capitalize">
+                      </td>
+
+                      <td className="px-5 py-3.5">
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-md text-[11px] font-semibold bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 capitalize border border-gray-200/80 dark:border-gray-700">
                           {p.billingCycle || "Monthly"}
-                        </div>
+                        </span>
                       </td>
 
                       <td className="px-5 py-3.5">
@@ -278,7 +341,7 @@ export const SysAdminPaymentsView: React.FC = () => {
                         <button
                           onClick={() => handleCopy(txn)}
                           className="inline-flex items-center gap-1 hover:text-sky-600 cursor-pointer ml-auto"
-                          title="Copy Transaction ID"
+                          title={SYSADMIN_PAYMENTS_TEXTS.MSG_TXN_COPIED}
                         >
                           <span>{txn.length > 16 ? `${txn.substring(0, 16)}...` : txn}</span>
                           {copiedId === txn ? (

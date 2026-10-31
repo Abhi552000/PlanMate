@@ -54,10 +54,18 @@ const WorkspaceSettings = () => {
 
   const handleAddStatus = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newStatus.trim()) return;
+    const trimmed = newStatus.trim();
+    if (!trimmed) {
+      toast.error("Status name cannot be empty");
+      return;
+    }
+    if (statuses.some((s) => s.toLowerCase() === trimmed.toLowerCase())) {
+      toast.error("This status already exists in your workspace");
+      return;
+    }
     setAddingStatus(true);
     try {
-      const data = await orgService.addCustomStatus(newStatus.trim());
+      const data = await orgService.addCustomStatus(trimmed);
       if (data?.success) {
         setStatuses(data.statuses);
         setNewStatus("");
@@ -134,6 +142,10 @@ const WorkspaceSettings = () => {
 
   const handleUpdateOrg = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!orgData.name.trim()) {
+      toast.error("Workspace name cannot be empty");
+      return;
+    }
     setSavingOrg(true);
     try {
       const data = await orgService.updateOrgDetails(orgData);
@@ -159,11 +171,34 @@ const WorkspaceSettings = () => {
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[400px] space-y-3">
-        <div className="w-10 h-10 border-4 border-sky-200 border-t-sky-600 rounded-full animate-spin"></div>
-        <p className="text-gray-500 text-sm font-semibold">
-          Loading settings...
-        </p>
+      <div className="w-full space-y-6 font-sans animate-pulse select-none">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-sky-100/50 dark:border-gray-800 pb-4">
+          <div className="flex items-center gap-3">
+            <div className="w-11 h-11 rounded-xl bg-slate-200 dark:bg-slate-800 shrink-0" />
+            <div className="space-y-1.5">
+              <div className="h-6 w-48 rounded-lg bg-slate-200 dark:bg-slate-800" />
+              <div className="h-3.5 w-72 rounded bg-slate-100 dark:bg-slate-800/60" />
+            </div>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="bg-white dark:bg-gray-900 border border-sky-100/60 dark:border-gray-800 p-6 rounded-2xl shadow-xs space-y-4">
+            <div className="h-5 w-40 rounded bg-slate-200 dark:bg-slate-800" />
+            <div className="space-y-3">
+              <div className="h-10 w-full rounded-lg bg-slate-100 dark:bg-slate-800" />
+              <div className="h-24 w-full rounded-lg bg-slate-100 dark:bg-slate-800" />
+            </div>
+          </div>
+          <div className="bg-white dark:bg-gray-900 border border-sky-100/60 dark:border-gray-800 p-6 rounded-2xl shadow-xs space-y-4">
+            <div className="h-5 w-36 rounded bg-slate-200 dark:bg-slate-800" />
+            <div className="space-y-2">
+              {[1, 2, 3].map((s) => (
+                <div key={s} className="h-10 w-full rounded-lg bg-slate-100 dark:bg-slate-800/60" />
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
