@@ -28,6 +28,7 @@ const Dashboard = lazy(() => import("../pages/dashboard/Dashboard"));
 const Profile = lazy(() => import("../pages/Profile"));
 const TaskDetailPage = lazy(() => import("../pages/task-detail/TaskDetailPage"));
 const OrganizationAdmin = lazy(() => import("../pages/org-admin/OrganizationAdmin"));
+const PlansBillingPage = lazy(() => import("../pages/org-admin/PlansBillingPage"));
 const SystemAdminDashboard = lazy(() => import("../pages/sys-admin/SystemAdminDashboard"));
 const WorkspaceSettings = lazy(() => import("../pages/WorkspaceSettings"));
 const Backlog = lazy(() => import("../pages/dashboard/Backlog"));
@@ -100,6 +101,7 @@ export const AppRoutes: React.FC = () => {
         <Route path={ROUTES.DASHBOARD} element={<Dashboard />} />
         <Route path={ROUTES.TASK_DETAIL} element={<TaskDetailPage />} />
         <Route path={ROUTES.ORGANIZATION} element={<OrganizationAdmin />} />
+        <Route path={ROUTES.SUBSCRIPTION} element={<PlansBillingPage />} />
         <Route path={ROUTES.WORKSPACE_SETTINGS} element={<WorkspaceSettings />} />
         <Route path={ROUTES.BACKLOG} element={<Backlog />} />
         <Route path={ROUTES.ACTIVE_SPRINT} element={<ActiveSprint />} />

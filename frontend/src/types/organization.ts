@@ -5,10 +5,69 @@ export interface IOrganization {
   _id: string;
   name: string;
   description?: string;
-  owner: string;
+  owner?: string;
   taskCounter?: number;
+  taskCount?: number;
+  memberCount?: number;
   createdAt?: string;
   statuses?: string[];
+  isActive?: boolean;
+  remark?: string;
+  slug?: string;
+  subscription?: IOrganizationSubscription;
+  admin?: {
+    _id: string;
+    name: string;
+    email: string;
+  };
+}
+
+export interface IPlan {
+  _id?: string;
+  planId: string;
+  name: string;
+  price: number;
+  currency: string;
+  billingCycle: "monthly" | "yearly";
+  maxMembers: number;
+  description: string;
+  features: string[];
+  isPopular?: boolean;
+  isActive?: boolean;
+}
+
+export interface IOrganizationSubscription {
+  planId: string;
+  planName: string;
+  maxMembers: number;
+  status: "active" | "cancelled" | "past_due";
+  billingCycle: string;
+  amountPaid: number;
+  currency: string;
+  paymentMethod: string;
+  transactionId?: string;
+  subscribedAt: string;
+  validUntil: string | null;
+}
+
+export interface ISubscriptionMetrics {
+  activeMembersCount: number;
+  activeMembers?: number;
+  totalMembersCount: number;
+  maxMembers: number;
+  remainingSeats: number;
+  usagePercent: number;
+  isQuotaExceeded: boolean;
+}
+
+export interface SystemMetrics {
+  totalPlatformUsers: number;
+  totalPlatformTasks: number;
+  totalOrganizations: number;
+  activeOrganizations: number;
+  inactiveOrganizations: number;
+  dbStatus: string;
+  nodeEnv: string;
 }
 
 export interface ExtendedUser extends IUser {
@@ -25,6 +84,9 @@ export interface OrgListTableProps {
   onToggleActive: (org: any) => void;
   onEditClick: (org: any) => void;
   onDeleteClick: (org: any) => void;
+  onResetPasswordClick?: (org: any) => void;
+  onInspectClick?: (org: any) => void;
+  onExportCSV?: () => void;
 }
 
 export interface SysAdminHeaderProps {

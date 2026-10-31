@@ -17,6 +17,7 @@ const ITEMS_PER_PAGE = 5;
 
 const OrganizationAdmin = () => {
   const navigate = useNavigate();
+
   const [currentUser] = useState<IUser | null>(() => {
     const stored = localStorage.getItem("currentUser");
     return stored ? JSON.parse(stored) : null;
@@ -28,6 +29,7 @@ const OrganizationAdmin = () => {
     name: "",
     description: "",
   });
+
   const [teamUsers, setTeamUsers] = useState<any[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -129,16 +131,16 @@ const OrganizationAdmin = () => {
     fetchTeamUsers(1, selectedStatus, selectedRole, debouncedSearch);
   }, [debouncedSearch, selectedStatus, selectedRole, fetchTeamUsers]);
 
-  const handleStatusChange = (newStatus: string) => {
-    setSelectedStatus(newStatus);
+  const handleStatusChange = (newStatusVal: string) => {
+    setSelectedStatus(newStatusVal);
   };
 
-  const handleRoleChange = (newRole: string) => {
-    setSelectedRole(newRole);
+  const handleRoleChange = (newRoleVal: string) => {
+    setSelectedRole(newRoleVal);
   };
 
-  const handleSearchChange = (newSearch: string) => {
-    setSearchQuery(newSearch);
+  const handleSearchChange = (newSearchVal: string) => {
+    setSearchQuery(newSearchVal);
   };
 
   const handleResetFilters = () => {
@@ -155,7 +157,10 @@ const OrganizationAdmin = () => {
       }
       setLoading(true);
       try {
-        await Promise.all([fetchOrgDetails(), fetchTeamUsers(1, "all", "all", "")]);
+        await Promise.all([
+          fetchOrgDetails(),
+          fetchTeamUsers(1, "all", "all", ""),
+        ]);
       } catch (err) {
         console.error(CONSOLE_ERRORS.LOAD_ROSTER, err);
       } finally {
@@ -188,17 +193,17 @@ const OrganizationAdmin = () => {
     }
   };
 
-  const handleUpdateUserStatus = async (targetUser: any, newStatus: string, remark?: string) => {
+  const handleUpdateUserStatus = async (targetUser: any, newStatusVal: string, remark?: string) => {
     setTogglingStatus(true);
     try {
-      const data = await orgService.updateUserStatus(targetUser._id, newStatus, remark);
+      const data = await orgService.updateUserStatus(targetUser._id, newStatusVal, remark);
       if (data?.success) {
         toast.success(
-          TOAST_MESSAGES.MEMBER_STATUS_GRANT_SUCCESS(targetUser.name, newStatus)
+          TOAST_MESSAGES.MEMBER_STATUS_GRANT_SUCCESS(targetUser.name, newStatusVal)
         );
         await fetchTeamUsers();
         if (inspectingUser && inspectingUser._id === targetUser._id) {
-          setInspectingUser((prev: any) => ({ ...prev, status: newStatus, statusRemark: remark || "" }));
+          setInspectingUser((prev: any) => ({ ...prev, status: newStatusVal, statusRemark: remark || "" }));
         }
         setRemarkModalOpen(false);
         setSelectedUserForStatusChange(null);
@@ -223,7 +228,7 @@ const OrganizationAdmin = () => {
       <div className="flex flex-col items-center justify-center min-h-[400px] space-y-3">
         <div className="w-10 h-10 border-4 border-sky-200 border-t-sky-600 rounded-full animate-spin"></div>
         <p className="text-gray-500 text-sm font-semibold">
-          Loading workspace roster...
+          Loading team members...
         </p>
       </div>
     );
@@ -272,24 +277,30 @@ const OrganizationAdmin = () => {
         onAddMember={handleAddMember}
       />
 
-      {remarkModalOpen && selectedUserForStatusChange && pendingNewStatus && (
-        <AccessRemarkModal
-          isOpen={remarkModalOpen}
-          onClose={() => {
-            setRemarkModalOpen(false);
-            setSelectedUserForStatusChange(null);
-            setPendingNewStatus(null);
-          }}
-          onConfirm={(remark) => handleUpdateUserStatus(selectedUserForStatusChange, pendingNewStatus, remark)}
-          title={pendingNewStatus === "active" ? "Approve & Grant Workspace Access" : "Revoke / Deactivate Access"}
-          description={
-            pendingNewStatus === "active"
-              ? `Are you sure you want to approve access for ${selectedUserForStatusChange.name}? Please provide a brief note or remark for this approval.`
-              : `Are you sure you want to revoke / deactivate workspace access for ${selectedUserForStatusChange.name}? Please enter the reason for this deactivation.`
+      <AccessRemarkModal
+        isOpen={remarkModalOpen}
+        onClose={() => {
+          setRemarkModalOpen(false);
+          setSelectedUserForStatusChange(null);
+          setPendingNewStatus(null);
+        }}
+        onConfirm={(remark) => {
+          if (selectedUserForStatusChange && pendingNewStatus) {
+            handleUpdateUserStatus(selectedUserForStatusChange, pendingNewStatus, remark);
           }
-          loading={togglingStatus}
-        />
-      )}
+        }}
+        title={
+          pendingNewStatus === "active"
+            ? "Approve & Grant Workspace Access"
+            : "Reject / Deactivate User Access"
+        }
+        description={
+          pendingNewStatus === "active"
+            ? `Are you sure you want to approve and grant workspace privileges to ${selectedUserForStatusChange?.name}?`
+            : `Please provide a reason or administrative note for rejecting/deactivating ${selectedUserForStatusChange?.name}.`
+        }
+        loading={togglingStatus}
+      />
     </div>
   );
 };

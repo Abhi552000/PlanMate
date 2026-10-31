@@ -1,8 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { orgService } from "../../../services/orgService";
+import { SystemMetrics } from "../../../types";
 
 export const useSystemAdmin = () => {
   const [organizations, setOrganizations] = useState<any[]>([]);
+  const [systemMetrics, setSystemMetrics] = useState<SystemMetrics | null>(null);
   const [loading, setLoading] = useState(true);
 
   // Onboard Modal states
@@ -11,7 +13,7 @@ export const useSystemAdmin = () => {
     orgName: "",
     adminName: "",
     adminEmail: "",
-    adminPassword: ""
+    adminPassword: "",
   });
   const [onboardedResult, setOnboardedResult] = useState<any | null>(null);
   const [copied, setCopied] = useState(false);
@@ -22,12 +24,21 @@ export const useSystemAdmin = () => {
     orgName: "",
     adminName: "",
     adminEmail: "",
-    adminPassword: ""
+    adminPassword: "",
   });
 
   // Deactivate Modal State
   const [deactivatingOrg, setDeactivatingOrg] = useState<any | null>(null);
   const [deactivateRemark, setDeactivateRemark] = useState("");
+
+  // Inspect Drawer State
+  const [inspectingOrg, setInspectingOrg] = useState<any | null>(null);
+
+  // 1-Click Reset Password Modal State
+  const [resetPasswordOrg, setResetPasswordOrg] = useState<any | null>(null);
+  const [resetResult, setResetResult] = useState<any | null>(null);
+  const [resettingPassword, setResettingPassword] = useState(false);
+  const [copiedReset, setCopiedReset] = useState(false);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [onboarding, setOnboarding] = useState(false);
@@ -36,12 +47,15 @@ export const useSystemAdmin = () => {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
-  const fetchOrganizations = async () => {
+  const fetchOrganizations = useCallback(async () => {
     setLoading(true);
     try {
       const data = await orgService.getSystemAdminOrgs();
       if (data?.success && data?.organizations) {
         setOrganizations(data.organizations);
+        if (data.systemMetrics) {
+          setSystemMetrics(data.systemMetrics);
+        }
       }
     } catch (err) {
       console.error(err);
@@ -49,11 +63,11 @@ export const useSystemAdmin = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchOrganizations();
-  }, []);
+  }, [fetchOrganizations]);
 
   const handleOnboardSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -73,7 +87,7 @@ export const useSystemAdmin = () => {
         setOnboardedResult({
           orgName: orgName,
           email: data.admin?.email,
-          password: data.admin?.password
+          password: data.admin?.password,
         });
         setNewOrg({ orgName: "", adminName: "", adminEmail: "", adminPassword: "" });
         await fetchOrganizations();
@@ -91,7 +105,7 @@ export const useSystemAdmin = () => {
       orgName: org.name || "",
       adminName: org.admin?.name || "",
       adminEmail: org.admin?.email || "",
-      adminPassword: ""
+      adminPassword: "",
     });
     setError(null);
     setSuccess(null);
@@ -132,7 +146,7 @@ export const useSystemAdmin = () => {
     try {
       const data = await orgService.updateOrgStatus(org._id, {
         isActive: true,
-        remark: ""
+        remark: "",
       });
       if (data?.success) {
         setSuccess(`Successfully activated organization "${org.name}".`);
@@ -155,7 +169,7 @@ export const useSystemAdmin = () => {
     try {
       const data = await orgService.updateOrgStatus(deactivatingOrg._id, {
         isActive: false,
-        remark: deactivateRemark.trim() || "Deactivated by System Admin"
+        remark: deactivateRemark.trim() || "Deactivated by System Admin",
       });
       if (data?.success) {
         setSuccess(`Successfully deactivated organization "${deactivatingOrg.name}".`);
@@ -170,7 +184,11 @@ export const useSystemAdmin = () => {
   };
 
   const handleDelete = async (org: any) => {
-    if (!window.confirm(`WARNING: Are you sure you want to delete organization "${org.name}"?\n\nThis will PERMANENTLY delete all users and tasks associated with it. This action cannot be undone.`)) {
+    if (
+      !window.confirm(
+        `WARNING: Are you sure you want to delete organization "${org.name}"?\n\nThis will PERMANENTLY delete all users and tasks associated with it. This action cannot be undone.`
+      )
+    ) {
       return;
     }
 
@@ -180,11 +198,45 @@ export const useSystemAdmin = () => {
       const data = await orgService.deleteOrg(org._id);
       if (data?.success) {
         setSuccess(`Successfully deleted organization "${org.name}".`);
+        if (inspectingOrg?._id === org._id) setInspectingOrg(null);
         await fetchOrganizations();
       }
     } catch (err: any) {
       setError(err?.response?.data?.message || "Failed to delete organization.");
     }
+  };
+
+  // 1-Click Reset Password Action
+  const handleResetPassword = async (org: any) => {
+    setResetPasswordOrg(org);
+    setResetResult(null);
+    setError(null);
+    setSuccess(null);
+  };
+
+  const handleResetPasswordConfirm = async () => {
+    if (!resetPasswordOrg) return;
+    setResettingPassword(true);
+    setError(null);
+    try {
+      const data = await orgService.resetAdminPassword(resetPasswordOrg._id);
+      if (data?.success && data?.admin) {
+        setResetResult(data.admin);
+        setSuccess(`Successfully generated temporary credentials for "${resetPasswordOrg.name}".`);
+        await fetchOrganizations();
+      }
+    } catch (err: any) {
+      setError(err?.response?.data?.message || "Failed to reset admin credentials.");
+    } finally {
+      setResettingPassword(false);
+    }
+  };
+
+  const handleCopyResetPassword = () => {
+    if (!resetResult?.temporaryPassword) return;
+    navigator.clipboard.writeText(resetResult.temporaryPassword);
+    setCopiedReset(true);
+    setTimeout(() => setCopiedReset(false), 2000);
   };
 
   const handleCopyPassword = () => {
@@ -194,8 +246,52 @@ export const useSystemAdmin = () => {
     setTimeout(() => setCopied(false), 2000);
   };
 
+  // Export CSV
+  const exportOrganizationsCSV = () => {
+    if (!organizations.length) return;
+    const headers = [
+      "Organization Name",
+      "Slug",
+      "Admin Name",
+      "Admin Email",
+      "Members Count",
+      "Tasks Count",
+      "Status",
+      "Created Date",
+      "Deactivation Remark",
+    ];
+
+    const rows = organizations.map((o) => [
+      `"${(o.name || "").replace(/"/g, '""')}"`,
+      `"${(o.slug || "").replace(/"/g, '""')}"`,
+      `"${(o.admin?.name || "").replace(/"/g, '""')}"`,
+      `"${(o.admin?.email || "").replace(/"/g, '""')}"`,
+      o.memberCount || 0,
+      o.taskCount || o.taskCounter || 0,
+      o.isActive ? "Active" : "Inactive",
+      o.createdAt ? new Date(o.createdAt).toISOString().split("T")[0] : "",
+      `"${(o.remark || "").replace(/"/g, '""')}"`,
+    ]);
+
+    const csvContent =
+      "data:text/csv;charset=utf-8," +
+      [headers.join(","), ...rows.map((e) => e.join(","))].join("\n");
+
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute(
+      "download",
+      `planmate_tenants_${new Date().toISOString().split("T")[0]}.csv`
+    );
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return {
     organizations,
+    systemMetrics,
     loading,
     showOnboardModal,
     setShowOnboardModal,
@@ -212,6 +308,14 @@ export const useSystemAdmin = () => {
     setDeactivatingOrg,
     deactivateRemark,
     setDeactivateRemark,
+    inspectingOrg,
+    setInspectingOrg,
+    resetPasswordOrg,
+    setResetPasswordOrg,
+    resetResult,
+    setResetResult,
+    resettingPassword,
+    copiedReset,
     searchQuery,
     setSearchQuery,
     onboarding,
@@ -228,5 +332,10 @@ export const useSystemAdmin = () => {
     submitDeactivation,
     handleDelete,
     handleCopyPassword,
+    handleResetPassword,
+    handleResetPasswordConfirm,
+    handleCopyResetPassword,
+    exportOrganizationsCSV,
+    fetchOrganizations,
   };
 };
