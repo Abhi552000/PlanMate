@@ -24,6 +24,7 @@ Think of **PlanMate** as a smart digital command center for building software pr
 - [Project Architecture & Directory Structure](#-project-architecture--directory-structure)
 - [Core Services & Methods](#-core-services--methods)
 - [API Endpoints Reference](#-api-endpoints-reference)
+- [Security, Privacy & Safe Architecture](#-security-privacy--safe-architecture)
 - [Coding Standards & Architectural Best Practices](#-coding-standards--architectural-best-practices)
 - [Getting Started & Installation](#-getting-started--installation)
 - [Deployment](#-deployment)
@@ -42,6 +43,7 @@ PlanMate adopts a decoupled client-server architecture with a **React 19 + TypeS
                            +-----------------+-----------------+
                                              |
                                   REST API / HTTP Requests
+                                  (JWT Bearer Authenticated)
                                              |
                                              v
                            +-----------------+-----------------+
@@ -65,9 +67,11 @@ PlanMate adopts a decoupled client-server architecture with a **React 19 + TypeS
 - **Sprint Management**: Create, start, complete, and soft-close sprints with start/end dates and sprint goals. Sprints are preserved historically without destructive DB deletion.
 - **Backlog Management**: Drag-and-drop/structured sprint assignment, story point estimations, and backlog task prioritization.
 - **Epic Grouping**: Color-coded Epics with dedicated progress tracking and task association.
+- **Collapsible Sprints & Backlog**: Clean, collapsed-by-default view for compact backlog planning.
 
-### 2. 📋 Interactive Kanban Board
+### 2. 📋 Interactive Kanban Board with Zero "No Data" Flash
 - **Multi-Column Status Pipeline**: Configurable columns (`To Do`, `In Progress`, `In Review`, `Done`, and custom organization statuses).
+- **Anti-Flash Loading Architecture**: Smooth pulse skeleton cards display inside columns while data is fetching; empty state placeholders only render after API confirmation.
 - **Interactive Board Filters**: Real-time filtering by assignee, priority (`High`, `Medium`, `Low`), Epic, and keyword search.
 
 ### 3. 📝 Comprehensive Task Lifecycle & Subtask System
@@ -79,7 +83,8 @@ PlanMate adopts a decoupled client-server architecture with a **React 19 + TypeS
 - **Rich Comments with `@mentions`**: Interactive task comments with user mention suggestions and notification triggers.
 
 ### 4. 📅 Interactive Calendar View
-- Visual month/week grid displaying task due dates, sprint deadlines, and delivery milestones.
+- Visual month grid displaying task due dates, sprint deadlines, and delivery milestones.
+- Side panels for selected day tasks and unscheduled task inbox with smooth skeleton loaders.
 
 ### 5. 📊 Analytics & Burndown Dashboard
 - **Sprint Burndown Charts**: Visual comparison of ideal vs. actual remaining story points/work.
@@ -87,17 +92,34 @@ PlanMate adopts a decoupled client-server architecture with a **React 19 + TypeS
 - **Workload Distribution**: Visual distribution breakdown by assignee and task priority using **Recharts**.
 - **Epic Progress Visualization**: Percentage completion tracking per Epic.
 
-### 6. 🏢 Multi-Tenant Organization & Role-Based Access Control (RBAC)
-- **Role Hierarchy**: System Administrator (`system-admin`), Organization Administrator (`org-admin`), and Organization Member (`member`).
+### 6. 📈 Executive Reports & Delivery Insights
+- **KPI Summary Cards**: Total work items, completed issues, average lead time, and cycle time.
+- **Donut Breakdowns**: Interactive breakdown by Status, Issue Type, and Assignee.
+- **Delivery Trends**: Completion throughput, issue creation trends, and lead time vs. cycle time comparison.
+- **Drilldown Work Item Table**: Searchable, filterable work items table with CSV export and slide-over task inspector drawer.
+
+### 7. 💳 Multi-Tier Subscription, Plans & Billing Engine
+- **Flexible Plans**: Starter, Growth, and Scale plans with monthly/yearly billing toggle (including 20% annual discount).
+- **Seat Limit Enforcer**: Real-time quota validation preventing over-allocation of organization members.
+- **Simulated Checkout & Payment Modal**: Seamless subscription activation with transaction generation.
+- **Invoice & Billing History**: Complete payment records and invoice tracking.
+
+### 8. 🛡️ System Administration (Super Admin Platform Portal)
+- **Tenant Management**: Global directory of all platform organizations with activation, deactivation, and editing capabilities.
+- **System-Wide Billing Audit**: Consolidated revenue statistics and transaction logs across all tenants.
+- **Plan Catalog Editor**: Create, update, or remove subscription tiers directly from the UI.
+
+### 9. 🏢 Multi-Tenant Organization & Role-Based Access Control (RBAC)
+- **Role Hierarchy**: System Administrator (`system_admin`), Organization Administrator (`org-admin`), and Member (`member`).
 - **Custom Workflows**: Define and manage custom task statuses per organization.
 - **Member Onboarding**: Organization signup, member invitation, user activation/deactivation.
 
-### 7. 🔔 Real-Time Notification Center
-- Notifications for task assignments, `@mentions`, status changes, and administrative actions.
-- Mark individual notifications as read or bulk mark all as read.
-
-### 8. 👤 User Profile & Workspace Settings
-- Profile avatar updates, contact info management, and secure password changes.
+### 10. 🎨 Unified Design System & UX Standards
+- **Standardized UI Primitives**: Reusable `Button`, `Input`, `Select`, `FilterSelect`, `SearchInput`, `Pagination`, `TableCard`, and `Table` components across every page.
+- **Smart Windowed Pagination**: Ellipsis windowing (`1, 2, 3 ... 10`) consistent throughout user, org admin, and super admin tables.
+- **Mobile-Optimized Toast Alerts**: Compact, non-intrusive notification cards styled with PlanMate theme accents.
+- **Centralized Constants**: 100% centralized strings and error messages (`uiTexts.ts`, `messages.ts`, `billingTexts.ts`, `routes.ts`).
+- **Jira Keyboard Shortcut**: Press `[` to toggle the collapsible navigation sidebar.
 
 ---
 
@@ -274,8 +296,17 @@ PlanMate follows a strict **Centralized Service Layer Pattern**. Components and 
 - `updateOrgStatus(statusData)`: Adds or modifies custom workflow statuses.
 - `inviteMember(email, role)`: Invites new team members to the organization.
 - `updateUserStatus(userId, status)`: Manages user account status (active/disabled).
+- `getSubscription()`: Fetches current subscription plan and seat usage metrics.
+- `subscribeToPlan(planId, billingCycle)`: Simulates plan activation and payment processing.
+- `getBillingHistory()`: Fetches invoices and transaction history.
+- `getAllPaymentsForAdmin(params)`: System admin platform-wide transaction auditor.
 
-### 5. `notificationService` (`src/services/notificationService.ts`)
+### 5. `planService` (`src/services/planService.ts`)
+- `getActivePlans()`: Retrieves active subscription tiers for organization workspace upgrades.
+- `getAllPlansForAdmin()`: Super admin retrieval of the complete plan catalog.
+- `createPlan(planData)` / `updatePlan(planId, planData)` / `deletePlan(planId)`: Admin management of pricing, features, and quotas.
+
+### 6. `notificationService` (`src/services/notificationService.ts`)
 - `getNotifications()`: Fetches unread and historical notifications for the current user.
 - `markAsRead(notificationId)`: Marks a specific notification as read.
 - `markAllAsRead()`: Bulk updates all unread notifications to read.
@@ -284,30 +315,63 @@ PlanMate follows a strict **Centralized Service Layer Pattern**. Components and 
 
 ## 🔗 API Endpoints Reference
 
-| Module | Endpoint | Method | Description |
-| :--- | :--- | :--- | :--- |
-| **Auth** | `/api/user/login` | `POST` | User Login & Token generation |
-| | `/api/user/register` | `POST` | Account registration |
-| | `/api/user/me` | `GET` | Get active user session |
-| | `/api/user/profile` | `PUT` | Update profile details |
-| | `/api/user/password` | `PUT` | Change account password |
-| **Organization**| `/api/organization` | `GET` | Get current user's organization |
-| | `/api/organization/members` | `GET` | Get organization team members |
-| | `/api/organization/statuses` | `POST / DELETE` | Add or delete custom workflow statuses |
-| | `/api/organization/all` | `GET` | List all organizations (System Admin) |
-| **Sprints** | `/api/sprints` | `GET / POST` | List sprints / Create new sprint |
-| | `/api/sprints/:id` | `GET / PUT / DELETE` | Sprint detail, start/complete/soft-close sprint |
-| **Epics** | `/api/epics` | `GET / POST` | List epics / Create new epic |
-| | `/api/epics/:id` | `GET / PUT / DELETE` | Epic detail & update |
-| **Tasks** | `/api/tasks/gp` | `GET / POST` | List workspace tasks / Create task |
-| | `/api/tasks/:id/gp` | `GET / PUT / DELETE` | Fetch, update, or remove task |
-| | `/api/tasks/gp/analytics` | `GET` | Retrieve burndown & velocity analytics |
-| | `/api/tasks/:id/comments` | `POST / DELETE` | Add or delete task comments |
-| | `/api/tasks/:id/worklogs` | `POST` | Log time spent on task |
-| | `/api/tasks/:id/links` | `POST / DELETE` | Link or unlink task dependencies |
-| **Notifications**| `/api/notifications` | `GET` | Fetch user notifications |
-| | `/api/notifications/read-all` | `PUT` | Mark all notifications as read |
-| | `/api/notifications/:id/read` | `PUT` | Mark single notification as read |
+All non-public endpoints require an `Authorization: Bearer <token>` header verified by backend middleware.
+
+| Module | Endpoint | Method | Access Level | Description |
+| :--- | :--- | :--- | :--- | :--- |
+| **Auth** | `/api/user/login` | `POST` | Public | User Login & JWT token issuance |
+| | `/api/user/register` | `POST` | Public | Account registration & organization association |
+| | `/api/user/me` | `GET` | Authenticated | Retrieve active user session profile |
+| | `/api/user/profile` | `PUT` | Authenticated | Update user display profile |
+| | `/api/user/password` | `PUT` | Authenticated | Update account password |
+| **Organization**| `/api/organization` | `GET / PUT` | Authenticated | Get or update current user's organization profile |
+| | `/api/organization/members` | `GET` | Authenticated | List organization team members |
+| | `/api/organization/public-list`| `GET` | Public | Public organization list for registration dropdown |
+| | `/api/organization/statuses` | `POST / DELETE` | Org Admin | Add or delete custom workflow statuses |
+| | `/api/organization/all` | `GET` | Super Admin | List all tenant organizations |
+| | `/api/organization/:id/status` | `PUT` | Super Admin | Activate or deactivate organization instance |
+| | `/api/organization/onboard` | `POST` | Super Admin | Direct onboarding of a new organization instance |
+| **Billing & Plans** | `/api/plans` | `GET` | Authenticated | List available active subscription tiers |
+| | `/api/plans/admin/all` | `GET` | Super Admin | Retrieve all platform plans |
+| | `/api/plans` | `POST / PUT / DELETE` | Super Admin | Create, edit, or delete platform plans |
+| | `/api/organization/subscription` | `GET` | Org Admin | Fetch active subscription tier & seat quotas |
+| | `/api/organization/subscribe` | `POST` | Org Admin | Activate or upgrade subscription tier |
+| | `/api/organization/billing-history`| `GET` | Org Admin | Retrieve organization invoice history |
+| | `/api/organization/admin/payments` | `GET` | Super Admin | Platform-wide payment records audit |
+| **Sprints** | `/api/sprints` | `GET / POST` | Authenticated | List sprints / Create new sprint |
+| | `/api/sprints/:id` | `GET / PUT / DELETE` | Authenticated | Sprint details, start, complete, or soft-close |
+| **Epics** | `/api/epics` | `GET / POST` | Authenticated | List epics / Create new epic |
+| | `/api/epics/:id` | `GET / PUT / DELETE` | Authenticated | Epic details, update, or remove |
+| **Tasks** | `/api/tasks/gp` | `GET / POST` | Authenticated | List workspace tasks / Create new issue |
+| | `/api/tasks/:id/gp` | `GET / PUT / DELETE` | Authenticated | Fetch, update, or remove task |
+| | `/api/tasks/gp/analytics` | `GET` | Authenticated | Burndown, velocity, and workload metrics |
+| | `/api/tasks/:id/comments` | `POST / DELETE` | Authenticated | Comment management with `@mention` triggers |
+| | `/api/tasks/:id/worklogs` | `POST` | Authenticated | Log time worked against estimates |
+| | `/api/tasks/:id/links` | `POST / DELETE` | Authenticated | Link or unlink task dependencies |
+| **Notifications**| `/api/notifications` | `GET` | Authenticated | Fetch user notifications |
+| | `/api/notifications/read-all` | `PUT` | Authenticated | Mark all notifications as read |
+| | `/api/notifications/:id/read` | `PUT` | Authenticated | Mark single notification as read |
+
+---
+
+## 🔒 Security, Privacy & Safe Architecture
+
+A common question is: ***"Is it safe to document backend endpoints in a project README?"***
+
+**Yes, absolutely.** In enterprise development, documenting high-level API route endpoints is standard practice (e.g. Stripe, GitHub, Swagger). The security of a system does not rely on hiding route names (which is merely "security through obscurity"); it relies on **robust defense-in-depth backend protections**:
+
+1. **Strict JWT Bearer Authentication**: 
+   - All private routes enforce `authMiddleware`. Requests without a valid, cryptographically signed JSON Web Token are immediately rejected with `401 Unauthorized`.
+2. **Tenant Isolation (Multi-Tenancy Guard)**:
+   - Data is strictly partitioned by Organization ID. The backend verifies that `req.user.organization` matches the target resources, preventing users from ever querying or modifying data belonging to another tenant.
+3. **Role-Based Access Control (RBAC)**:
+   - Administrative endpoints (e.g., plan creation, tenant suspension, custom status deletion) enforce explicit role checks (`org-admin` or `system_admin`). Standard members cannot execute privileged operations.
+4. **Password Protection**:
+   - User passwords are automatically salted and hashed using **Bcrypt** before saving to MongoDB. Plaintext passwords never touch logs or databases.
+5. **No Secrets in Version Control**:
+   - Database credentials, JWT secrets, port numbers, and payment keys are strictly kept in ignored `.env` files. Documentation only provides generic placeholders (`<username>`, `<password>`).
+6. **Input Sanitization & Validation**:
+   - Request bodies are validated using `validator` and Mongoose schema constraints to guard against injection attacks.
 
 ---
 
