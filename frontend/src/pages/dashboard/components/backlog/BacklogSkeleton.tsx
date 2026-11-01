@@ -13,7 +13,7 @@ export const BacklogSkeleton: React.FC = () => {
       </div>
 
       {/* Epic Filters Skeleton */}
-      <div className="flex flex-wrap items-center gap-2 mb-6 pb-3 border-b border-sky-100/50 dark:border-gray-800">
+      <div className="flex items-center gap-2 mb-6 pb-3 border-b border-slate-200/80 dark:border-slate-800/80 overflow-x-auto no-scrollbar">
         <div className="h-4 w-24 rounded bg-slate-200 dark:bg-slate-800 mr-2" />
         <div className="h-7 w-16 rounded-lg bg-slate-200 dark:bg-slate-800" />
         <div className="h-7 w-24 rounded-lg bg-slate-100 dark:bg-slate-800/60" />

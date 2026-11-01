@@ -133,8 +133,10 @@ export interface BacklogTaskRowProps {
 
 export interface BacklogSprintAccordionProps {
   sprint: any;
-  expandedSprintId: string | null;
-  setExpandedSprintId: (val: string | null) => void;
+  expandedSprintId?: string | null;
+  setExpandedSprintId?: (val: string | null) => void;
+  isCollapsed?: boolean;
+  onToggleCollapse?: () => void;
   filteredTasks: any[];
   todo: number;
   progress: number;
@@ -157,8 +159,10 @@ export interface BacklogSprintAccordionProps {
 }
 
 export interface BacklogTasksSectionProps {
-  expandedSprintId: string | null;
-  setExpandedSprintId: (val: string | null) => void;
+  expandedSprintId?: string | null;
+  setExpandedSprintId?: (val: string | null) => void;
+  isCollapsed?: boolean;
+  onToggleCollapse?: () => void;
   backlogTasks: any[];
   filterByEpic: (tasks: any[]) => any[];
   handleMoveTask: (taskId: string, targetSprintId: string | null) => void;

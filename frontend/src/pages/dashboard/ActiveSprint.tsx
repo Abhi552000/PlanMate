@@ -107,15 +107,15 @@ export const ActiveSprint: React.FC = () => {
               return (
                 <div
                   key={epic._id}
-                  className="space-y-2.5 border-b border-sky-100/30 pb-4"
+                  className="space-y-3 border-b border-slate-200/80 dark:border-slate-800/80 pb-5"
                 >
                   {/* Swimlane Title banner */}
-                  <div className="flex items-center gap-2 bg-gray-50 dark:bg-gray-900 px-3 py-2 rounded-xl border border-sky-100/30">
+                  <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-900/90 px-3.5 py-2.5 rounded-xl border border-slate-200/80 dark:border-slate-800/80 shadow-2xs">
                     <Layers className="w-4 h-4 text-sky-500" />
-                    <span className="text-xs font-extrabold text-gray-800 dark:text-gray-200">
+                    <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
                       {ACTIVE_SPRINT_TEXTS.SWIMLANE_EPIC}: {epic.name}
                     </span>
-                    <span className="text-[10px] text-gray-400 font-bold bg-white dark:bg-gray-950 px-2 py-0.5 rounded-lg border">
+                    <span className="text-[10px] text-slate-500 dark:text-slate-400 font-semibold bg-white dark:bg-slate-800 px-2 py-0.5 rounded-md border border-slate-200 dark:border-slate-700">
                       {epicTasks.length} {ACTIVE_SPRINT_TEXTS.SWIMLANE_ISSUES}
                     </span>
                   </div>
@@ -132,13 +132,13 @@ export const ActiveSprint: React.FC = () => {
 
             {/* 2. Fallback Swimlane (Unassigned Issues) */}
             {tasksByEpic.unassigned.length > 0 && (
-              <div className="space-y-2.5">
-                <div className="flex items-center gap-2 bg-gray-50 dark:bg-gray-900 px-3 py-2 rounded-xl border border-sky-100/30">
+              <div className="space-y-3">
+                <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-900/90 px-3.5 py-2.5 rounded-xl border border-slate-200/80 dark:border-slate-800/80 shadow-2xs">
                   <Sparkles className="w-4 h-4 text-amber-500" />
-                  <span className="text-xs font-extrabold text-gray-800 dark:text-gray-200">
+                  <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
                     {ACTIVE_SPRINT_TEXTS.SWIMLANE_UNASSIGNED}
                   </span>
-                  <span className="text-[10px] text-gray-400 font-bold bg-white dark:bg-gray-950 px-2 py-0.5 rounded-lg border">
+                  <span className="text-[10px] text-slate-500 dark:text-slate-400 font-semibold bg-white dark:bg-slate-800 px-2 py-0.5 rounded-md border border-slate-200 dark:border-slate-700">
                     {tasksByEpic.unassigned.length}{" "}
                     {ACTIVE_SPRINT_TEXTS.SWIMLANE_ISSUES}
                   </span>

@@ -78,6 +78,8 @@ export const createTask = async (req, res) => {
       labels,
       links,
       originalEstimate,
+      sprint,
+      epic,
     } = req.body;
 
     let finalCompleted = completed === "Yes" || completed === true;
@@ -133,6 +135,8 @@ export const createTask = async (req, res) => {
       key: generatedKey || undefined,
       organization: req.user.organization || null,
       links: links || [],
+      sprint: sprint || null,
+      epic: epic || null,
     });
 
     const saved = await task.save();

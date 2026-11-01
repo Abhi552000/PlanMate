@@ -44,7 +44,18 @@ export const useBacklog = () => {
   const [inlineTitle, setInlineTitle] = useState("");
   const [inlineIssueType, setInlineIssueType] = useState("Story");
 
-  // Accordion expanded state for Sprints
+  // Accordion open state: individual toggle per Sprint and Backlog
+  // Sprints and backlog are closed by default for a clean, compact overview!
+  const [openSections, setOpenSections] = useState<Record<string, boolean>>({});
+
+  const toggleSection = useCallback((id: string) => {
+    setOpenSections((prev) => ({
+      ...prev,
+      [id]: !prev[id],
+    }));
+  }, []);
+
+  // Backwards-compatibility state
   const [expandedSprintId, setExpandedSprintId] = useState<string | null>(null);
 
   const [confirmCompleteSprintId, setConfirmCompleteSprintId] = useState<string | null>(null);
@@ -231,6 +242,8 @@ export const useBacklog = () => {
       toast.success(TOAST_MESSAGES.ISSUE_CREATE_SUCCESS);
       setInlineTitle("");
       setActiveInlineCreator(null);
+      // Auto-expand this sprint/backlog so the newly created issue is immediately visible
+      setOpenSections((prev) => ({ ...prev, [targetKey]: true }));
       loadData();
     } catch (err: any) {
       toast.error(err.message || TOAST_MESSAGES.ISSUE_CREATE_ERROR);
@@ -251,6 +264,9 @@ export const useBacklog = () => {
     loading,
     selectedEpicFilter,
     setSelectedEpicFilter,
+    openSections,
+    setOpenSections,
+    toggleSection,
     isTaskModalOpen,
     setIsTaskModalOpen,
     selectedTaskToEdit,

@@ -24,11 +24,11 @@ export const ActiveSprintSkeleton: React.FC = () => {
       </div>
 
       {/* Scrum Board Columns Skeleton */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-5 items-start">
+      <div className="flex flex-row overflow-x-auto gap-4 lg:gap-5 pb-4 md:grid md:grid-cols-3 md:items-start select-none max-w-full -mx-3.5 px-3.5 sm:mx-0 sm:px-0">
         {[1, 2, 3].map((col) => (
           <div
             key={col}
-            className="flex flex-col bg-slate-50 dark:bg-gray-900/60 border border-slate-200/80 dark:border-gray-800 rounded-2xl p-3.5 space-y-3"
+            className="flex flex-col bg-slate-50 dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-3.5 space-y-3 w-[270px] sm:w-[300px] md:w-auto shrink-0 md:shrink"
           >
             {/* Column Header */}
             <div className="flex items-center justify-between px-1">

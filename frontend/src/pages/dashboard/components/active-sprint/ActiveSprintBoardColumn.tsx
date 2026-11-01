@@ -16,17 +16,17 @@ export const ActiveSprintBoardColumn: React.FC<
   const navigate = useNavigate();
   return (
     <div
-      className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-4"
       style={{
         gridTemplateColumns: `repeat(${statuses.length}, minmax(0, 1fr))`,
       }}
+      className="flex flex-row overflow-x-auto gap-4 lg:gap-5 pb-4 md:grid md:items-start select-none max-w-full snap-x snap-mandatory scroll-smooth -mx-3.5 px-3.5 sm:mx-0 sm:px-0"
     >
       {statuses.map((colName) => {
         const colTasks = sprintTasks.filter((t) => t.status === colName);
         return (
           <div
             key={colName}
-            className="bg-sky-50/20 dark:bg-gray-900 border border-sky-100/50 dark:border-gray-800 rounded-2xl p-3 flex flex-col min-h-[160px] max-h-[500px] overflow-y-auto animate-fadeIn"
+            className="bg-slate-50/70 dark:bg-slate-900/80 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl p-3 sm:p-3.5 flex flex-col min-h-[220px] max-h-[600px] overflow-y-auto w-[270px] sm:w-[300px] md:w-auto shrink-0 md:shrink snap-center transition-all shadow-2xs"
             onDragOver={(e) => e.preventDefault()}
             onDrop={(e) => {
               const taskId = e.dataTransfer.getData("text/plain");
@@ -34,17 +34,17 @@ export const ActiveSprintBoardColumn: React.FC<
             }}
           >
             {/* Column Header */}
-            <div className="flex items-center justify-between mb-3 shrink-0 border-b border-sky-50 dark:border-gray-800/80 pb-1.5">
-              <span className="text-xs font-black uppercase text-gray-400 dark:text-gray-500 tracking-wider">
+            <div className="flex items-center justify-between mb-3 shrink-0 border-b border-slate-200/70 dark:border-slate-800/70 pb-2">
+              <span className="text-xs font-bold uppercase text-slate-500 dark:text-slate-400 tracking-wider">
                 {colName}
               </span>
-              <span className="text-[10px] font-black bg-sky-50 text-sky-750 px-2 py-0.5 rounded border dark:bg-gray-850 dark:border-gray-800 dark:text-gray-400">
+              <span className="text-[10px] font-bold bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-2 py-0.5 rounded-md border border-slate-200 dark:border-slate-700 shadow-2xs">
                 {colTasks.length}
               </span>
             </div>
 
             {/* Column Tasks */}
-            <div className="space-y-2 flex-1 overflow-y-auto">
+            <div className="space-y-2.5 flex-1 overflow-y-auto">
               {colTasks.map((task) => (
                 <div
                   key={task._id}
@@ -55,24 +55,24 @@ export const ActiveSprintBoardColumn: React.FC<
                   onClick={() => {
                     navigate(`/task/${task._id}`);
                   }}
-                  className="bg-white dark:bg-gray-955 border border-sky-100/40 dark:border-gray-855/60 rounded-xl p-3 shadow-xs hover:border-sky-305 dark:hover:border-sky-850 hover:shadow-xs transition-all cursor-pointer group space-y-2.5 relative"
+                  className="bg-white dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 rounded-xl p-3 shadow-2xs hover:border-sky-300 dark:hover:border-sky-500/60 hover:shadow-xs transition-all cursor-pointer group space-y-2 relative"
                 >
                   <div className="space-y-1">
                     {task.key && (
-                      <span className="text-[8px] font-black uppercase tracking-wider bg-gray-50 text-gray-500 px-1.5 py-0.5 rounded border border-gray-150 select-all inline-block dark:bg-gray-900 dark:border-gray-800">
+                      <span className="text-[9px] font-bold uppercase tracking-wider bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 px-1.5 py-0.5 rounded border border-sky-200/60 dark:border-sky-800/60 select-all inline-block">
                         {task.key}
                       </span>
                     )}
-                    <h4 className="text-xs font-bold text-gray-805 dark:text-gray-200 group-hover:text-sky-600 line-clamp-2">
+                    <h4 className="text-xs font-semibold text-slate-800 dark:text-slate-200 group-hover:text-sky-600 dark:group-hover:text-sky-400 line-clamp-2 transition-colors">
                       {task.title}
                     </h4>
                   </div>
 
-                  <div className="flex items-center justify-between gap-2 pt-1.5 border-t border-sky-50/20">
+                  <div className="flex items-center justify-between gap-2 pt-2 border-t border-slate-100 dark:border-slate-700/60">
                     {/* Epic Badge */}
                     {task.epic && typeof task.epic === "object" ? (
                       <span
-                        className={`text-[8px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded border shrink-0 ${
+                        className={`text-[8px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-md border shrink-0 ${
                           EPIC_COLORS[(task.epic as any).color] ||
                           EPIC_COLORS.sky
                         }`}
@@ -86,7 +86,10 @@ export const ActiveSprintBoardColumn: React.FC<
                     <div className="flex items-center gap-1.5 shrink-0">
                       {/* Story Points */}
                       {task.storyPoints !== undefined && (
-                        <span className="w-5 h-5 rounded-full bg-gray-100 dark:bg-gray-850 flex items-center justify-center text-[9px] font-black text-gray-500">
+                        <span
+                          className="w-5 h-5 rounded-full bg-slate-100 dark:bg-slate-700/80 text-slate-600 dark:text-slate-300 flex items-center justify-center text-[10px] font-bold border border-slate-200/80 dark:border-slate-600"
+                          title={`${task.storyPoints} Story Points`}
+                        >
                           {task.storyPoints}
                         </span>
                       )}
@@ -94,7 +97,7 @@ export const ActiveSprintBoardColumn: React.FC<
                       {/* Assignee Avatar */}
                       {task.assignee ? (
                         <div
-                          className="w-5 h-5 rounded-full bg-sky-50 dark:bg-sky-950 flex items-center justify-center text-[8px] font-black text-sky-700 dark:text-sky-400 border border-sky-200"
+                          className="w-5 h-5 rounded-full bg-sky-100 dark:bg-sky-900/60 flex items-center justify-center text-[9px] font-bold text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800 uppercase"
                           title={
                             typeof task.assignee === "object"
                               ? (task.assignee as any).name
@@ -106,7 +109,10 @@ export const ActiveSprintBoardColumn: React.FC<
                             : "A"}
                         </div>
                       ) : (
-                        <div className="w-5 h-5 rounded-full border border-dashed border-gray-300 flex items-center justify-center text-[8px] text-gray-400">
+                        <div
+                          className="w-5 h-5 rounded-full border border-dashed border-slate-300 dark:border-slate-600 flex items-center justify-center text-[8px] text-slate-400"
+                          title="Unassigned"
+                        >
                           <User className="w-2.5 h-2.5" />
                         </div>
                       )}
