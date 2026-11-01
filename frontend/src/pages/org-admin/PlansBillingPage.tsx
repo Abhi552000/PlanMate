@@ -455,7 +455,19 @@ export const PlansBillingPage: React.FC = () => {
             </tr>
           </TableHeader>
           <TableBody>
-            {invoices.length === 0 ? (
+            {(loading || refreshing) && invoices.length === 0 ? (
+              Array.from({ length: 3 }).map((_, i) => (
+                <tr key={i} className="animate-pulse border-b border-gray-100 dark:border-gray-800">
+                  <td className="px-3 sm:px-6 py-4"><div className="h-4 w-24 bg-slate-200 dark:bg-slate-800 rounded" /></td>
+                  <td className="hidden sm:table-cell px-3 sm:px-6 py-4"><div className="h-3.5 w-20 bg-slate-100 dark:bg-slate-800/60 rounded" /></td>
+                  <td className="px-3 sm:px-6 py-4"><div className="h-4 w-16 bg-slate-200 dark:bg-slate-800 rounded" /></td>
+                  <td className="hidden md:table-cell px-3 sm:px-6 py-4"><div className="h-4 w-14 bg-slate-200 dark:bg-slate-800 rounded" /></td>
+                  <td className="px-3 sm:px-6 py-4"><div className="h-4 w-16 bg-slate-200 dark:bg-slate-800 rounded" /></td>
+                  <td className="px-3 sm:px-6 py-4"><div className="h-5 w-16 bg-slate-200 dark:bg-slate-800 rounded-full" /></td>
+                  <td className="hidden lg:table-cell px-3 sm:px-6 py-4 text-right"><div className="h-3.5 w-24 bg-slate-100 dark:bg-slate-800/60 rounded ml-auto" /></td>
+                </tr>
+              ))
+            ) : invoices.length === 0 ? (
               <TableEmpty colSpan={7} message={PLANS_BILLING_TEXTS.EMPTY_INVOICES} />
             ) : (
                 invoices

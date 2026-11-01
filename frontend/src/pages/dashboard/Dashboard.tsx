@@ -11,6 +11,7 @@ import { taskService } from "../../services/taskService";
 import { orgService } from "../../services/orgService";
 import { ITask, IUser, DashboardContext } from "../../types";
 import { CONSOLE_ERRORS } from "../../constants/messages";
+import { KANBAN_TEXTS } from "../../constants/uiTexts";
 import { getCachedStatuses, setCachedStatuses } from "../../utils/statusUtils";
 
 const AnalyticsDashboard = React.lazy(() =>
@@ -52,7 +53,7 @@ const Dashboard = () => {
   const [members, setMembers] = useState<IUser[]>([]);
   const [paginatedTasks, setPaginatedTasks] = useState<ITask[]>([]);
   const [boardTasks, setBoardTasks] = useState<ITask[]>([]);
-  const [loadingBoard, setLoadingBoard] = useState(false);
+  const [loadingBoard, setLoadingBoard] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalTasksCount, setTotalTasksCount] = useState(0);
@@ -205,7 +206,7 @@ const Dashboard = () => {
     fetchPaginatedListTasks(1, false);
   }, [refreshTasks, fetchPaginatedListTasks, fetchBackendBoardTasks]);
 
-  if (loading && tasks.length === 0) {
+  if ((loading && tasks.length === 0) || (loadingBoard && boardTasks.length === 0)) {
     return (
       <div className={WRAPPER}>
         <DashboardSkeleton />
@@ -261,7 +262,7 @@ const Dashboard = () => {
               fallback={
                 <div className="flex flex-col items-center justify-center p-12 bg-white dark:bg-gray-900 rounded-2xl border border-sky-100 dark:border-gray-800">
                   <div className="w-8 h-8 border-3 border-sky-200 border-t-sky-500 rounded-full animate-spin" />
-                  <span className="text-xs text-gray-400 mt-2 font-medium">Loading analytics...</span>
+                  <span className="text-xs text-gray-400 mt-2 font-medium">{KANBAN_TEXTS.LOADING_ANALYTICS}</span>
                 </div>
               }
             >

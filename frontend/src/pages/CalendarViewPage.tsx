@@ -16,7 +16,7 @@ import { ITask, DashboardContext } from "../types";
 import TaskModal from "../components/TaskModal";
 import { orgService } from "../services/orgService";
 import { priorityStyles } from "../assets/dummy";
-import { CALENDAR_TEXTS } from "../constants/uiTexts";
+import { CALENDAR_TEXTS, CALENDAR_UI_TEXTS } from "../constants/uiTexts";
 import { isSameDay, generateCalendarDays } from "../utils";
 import { getCachedStatuses, setCachedStatuses } from "../utils/statusUtils";
 import { CONSOLE_ERRORS, TOAST_MESSAGES } from "../constants/messages";
@@ -400,7 +400,7 @@ export const CalendarViewPage: React.FC = () => {
                 type="button"
                 onClick={() => handleOpenCreateForDate(selectedDate)}
                 className="p-1 hover:bg-sky-50 dark:hover:bg-gray-800 rounded-lg text-sky-600 dark:text-sky-400 transition cursor-pointer"
-                title="Add task for this day"
+                title={CALENDAR_UI_TEXTS.ADD_TASK_FOR_DAY}
               >
                 <Plus className="w-4 h-4" />
               </button>
@@ -408,9 +408,15 @@ export const CalendarViewPage: React.FC = () => {
           </div>
 
           <div className="space-y-2 overflow-y-auto max-h-[15rem] xl:max-h-[18rem] scrollbar-thin">
-            {selectedDateTasks.length === 0 ? (
+            {loading && selectedDateTasks.length === 0 ? (
+              <div className="space-y-2 animate-pulse p-1">
+                {[1, 2].map((i) => (
+                  <div key={i} className="h-14 rounded-xl bg-slate-100 dark:bg-slate-800/60" />
+                ))}
+              </div>
+            ) : selectedDateTasks.length === 0 ? (
               <div className="text-center py-6 text-xs text-gray-500 dark:text-gray-600">
-                No tasks scheduled for this day.
+                {CALENDAR_UI_TEXTS.NO_TASKS_SCHEDULED}
               </div>
             ) : (
               selectedDateTasks.map((task) => (
@@ -420,7 +426,7 @@ export const CalendarViewPage: React.FC = () => {
                   className={`p-2.5 border rounded-xl cursor-pointer transition-all duration-205 flex flex-col gap-1.5 shadow-sm group ${
                     task.completed
                       ? "bg-gray-50/50 border-gray-100 dark:bg-gray-900/50 dark:border-gray-800 opacity-70"
-                      : "bg-sky-50/10 border-sky-50 hover:bg-sky-50/30 dark:bg-gray-850 dark:border-gray-800/80 dark:hover:bg-gray-800"
+                      : "bg-sky-50/10 border-sky-50 hover:bg-sky-50/30 dark:bg-gray-855 dark:border-gray-800/80 dark:hover:bg-gray-800"
                   }`}
                 >
                   <div className="flex items-center justify-between">
@@ -456,18 +462,24 @@ export const CalendarViewPage: React.FC = () => {
             </div>
             <div>
               <h2 className="text-sm font-bold text-gray-800 dark:text-gray-200">
-                Unscheduled Tasks
+                {CALENDAR_UI_TEXTS.INBOX_TITLE}
               </h2>
               <p className="text-[10px] text-gray-550">
-                Inbox ({unscheduledTasks.length})
+                {CALENDAR_UI_TEXTS.INBOX_SUBTITLE} ({unscheduledTasks.length})
               </p>
             </div>
           </div>
 
           <div className="space-y-2 overflow-y-auto max-h-[15rem] xl:max-h-[18rem] scrollbar-thin">
-            {unscheduledTasks.length === 0 ? (
+            {loading && unscheduledTasks.length === 0 ? (
+              <div className="space-y-2 animate-pulse p-1">
+                {[1, 2].map((i) => (
+                  <div key={i} className="h-14 rounded-xl bg-slate-100 dark:bg-slate-800/60" />
+                ))}
+              </div>
+            ) : unscheduledTasks.length === 0 ? (
               <div className="text-center py-6 text-xs text-gray-500 dark:text-gray-600">
-                All tasks have deadlines!
+                {CALENDAR_UI_TEXTS.ALL_TASKS_DEADLINES}
               </div>
             ) : (
               unscheduledTasks.map((task) => (

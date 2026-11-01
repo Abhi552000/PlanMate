@@ -101,6 +101,12 @@ export const SysAdminPaymentsView: React.FC = () => {
     return payments.reduce((acc, p) => acc + (p.amount || 0), 0);
   }, [payments]);
 
+  const totalPages = Math.max(1, Math.ceil(payments.length / ITEMS_PER_PAGE));
+  const paginatedPayments = useMemo(() => {
+    const start = (currentPage - 1) * ITEMS_PER_PAGE;
+    return payments.slice(start, start + ITEMS_PER_PAGE);
+  }, [payments, currentPage]);
+
   if (loading) {
     return (
       <div className="space-y-6 animate-pulse select-none">
@@ -140,12 +146,6 @@ export const SysAdminPaymentsView: React.FC = () => {
       </div>
     );
   }
-
-  const totalPages = Math.max(1, Math.ceil(payments.length / ITEMS_PER_PAGE));
-  const paginatedPayments = useMemo(() => {
-    const start = (currentPage - 1) * ITEMS_PER_PAGE;
-    return payments.slice(start, start + ITEMS_PER_PAGE);
-  }, [payments, currentPage]);
 
   return (
     <div className="space-y-6">

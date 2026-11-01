@@ -148,6 +148,7 @@ export interface OrgMembersTableProps {
   totalPages: number;
   totalCount: number;
   togglingStatus: boolean;
+  tableLoading?: boolean;
   onPageChange: (page: number) => void;
   onInspectUser: (user: any) => void;
   onUpdateUserStatusClick: (user: any, actionType: "activate" | "deactivate") => void;

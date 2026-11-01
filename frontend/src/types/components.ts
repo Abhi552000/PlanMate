@@ -230,6 +230,7 @@ export interface KanbanColumnProps {
   col: string;
   columns: string[];
   colTasks: ITask[];
+  loading?: boolean;
   activeOverColumn: string | null;
   handleDragOver: (e: React.DragEvent, col: string) => void;
   handleDragEnter: (e: React.DragEvent, col: string) => void;

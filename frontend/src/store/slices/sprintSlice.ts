@@ -6,7 +6,7 @@ const initialState: SprintState = {
   sprints: [],
   backlogTasks: [],
   activeSprint: null,
-  loading: false,
+  loading: true,
   error: null,
 };
 

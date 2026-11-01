@@ -4,6 +4,7 @@ import Sidebar from "./Sidebar";
 import { Outlet } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../store";
 import { fetchTasks } from "../store/slices/taskSlice";
+import { toast } from "react-toastify";
 import { LayoutProps } from "../types";
 
 const Layout: React.FC<LayoutProps> = ({ user, onLogout }) => {
@@ -79,22 +80,11 @@ const Layout: React.FC<LayoutProps> = ({ user, onLogout }) => {
 
   const hasSidebar = Boolean(user && user.role !== "system_admin");
 
-  // Error state (rendered AFTER all hooks)
-  if (error && tasks.length === 0)
-    return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-950 p-6 flex items-center justify-center">
-        <div className="bg-red-50 dark:bg-red-950/20 text-red-600 dark:text-red-400 p-4 rounded-xl border border-red-100 dark:border-red-900/50 max-w-md">
-          <p className="font-medium mb-2">Error loading tasks</p>
-          <p className="text-sm">{error}</p>
-          <button
-            onClick={() => fetchTasksData(false)}
-            className="mt-4 py-2 px-4 bg-red-100 text-red-700 rounded-lg text-sm font-medium hover:bg-red-200 transition-colors"
-          >
-            Try Again
-          </button>
-        </div>
-      </div>
-    );
+  useEffect(() => {
+    if (error) {
+      toast.error(error, { toastId: "sync-tasks-error" });
+    }
+  }, [error]);
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 transition-colors duration-300">
@@ -122,17 +112,6 @@ const Layout: React.FC<LayoutProps> = ({ user, onLogout }) => {
         } transition-all duration-300 ease-in-out min-h-screen w-full overflow-x-hidden`}
       >
         <div className="px-3.5 sm:px-6 md:px-8 pt-3 sm:pt-5 pb-6 w-full transition-all duration-300 text-gray-900 dark:text-gray-100">
-          {error && (
-            <div className="mb-4 bg-red-50 text-red-600 p-3 rounded-lg border border-red-100 flex justify-between items-center text-sm animate-fadeIn">
-              <span>Failed to sync tasks: {error}</span>
-              <button
-                onClick={() => fetchTasksData(true)}
-                className="underline text-red-700 hover:text-red-900 font-medium"
-              >
-                Retry
-              </button>
-            </div>
-          )}
           <div className="w-full">
             <Outlet context={outletContext} />
           </div>

@@ -25,7 +25,7 @@ export const ReportsPage: React.FC = () => {
 
   const [timeframe, setTimeframe] = useState<"all" | "30d" | "7d">("all");
   const [reportTasks, setReportTasks] = useState<ITask[]>([]);
-  const [loadingReport, setLoadingReport] = useState<boolean>(false);
+  const [loadingReport, setLoadingReport] = useState<boolean>(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   // Drawer state for drilldowns
@@ -265,6 +265,7 @@ export const ReportsPage: React.FC = () => {
       {/* 4. Tabular Work Item Details with CSV Export & Search */}
       <ReportWorkItemTable
         tasks={reportTasks}
+        loading={loadingReport}
         onSelectTask={(task) => navigate(`/task/${task._id}`)}
       />
 

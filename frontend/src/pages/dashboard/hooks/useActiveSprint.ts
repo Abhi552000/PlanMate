@@ -18,6 +18,7 @@ export const useActiveSprint = () => {
   const epics = useAppSelector((state) => state.epics.epics);
   const loading = useAppSelector((state) => state.sprints.loading || state.epics.loading);
   const [statuses, setStatuses] = useState<string[]>(getCachedStatuses);
+  const [hasInitialLoaded, setHasInitialLoaded] = useState(false);
   const [showConfirmComplete, setShowConfirmComplete] = useState(false);
   const [completingSprint, setCompletingSprint] = useState(false);
 
@@ -32,8 +33,10 @@ export const useActiveSprint = () => {
 
   const loadData = useCallback(async () => {
     try {
-      await dispatch(fetchSprints()).unwrap();
-      await dispatch(fetchEpics()).unwrap();
+      await Promise.all([
+        dispatch(fetchSprints()).unwrap(),
+        dispatch(fetchEpics()).unwrap(),
+      ]);
       const orgRes = await orgService.getOrgDetails();
       if (orgRes?.success && Array.isArray(orgRes?.organization?.statuses) && orgRes.organization.statuses.length > 0) {
         setCachedStatuses(orgRes.organization.statuses);
@@ -42,6 +45,8 @@ export const useActiveSprint = () => {
     } catch (err: any) {
       console.error(err);
       toast.error(TOAST_MESSAGES.ACTIVE_SPRINT_LOAD_ERROR);
+    } finally {
+      setHasInitialLoaded(true);
     }
   }, [dispatch]);
 
@@ -133,6 +138,7 @@ export const useActiveSprint = () => {
     activeSprint,
     epics,
     loading,
+    hasInitialLoaded,
     statuses,
     showConfirmComplete,
     setShowConfirmComplete,

@@ -36,9 +36,10 @@ export const ActiveSprint: React.FC = () => {
     filteredTasks,
     tasksByEpic,
     remainingDays,
+    hasInitialLoaded,
   } = useActiveSprint();
 
-  if (loading) {
+  if (loading || !hasInitialLoaded) {
     return <ActiveSprintSkeleton />;
   }
 

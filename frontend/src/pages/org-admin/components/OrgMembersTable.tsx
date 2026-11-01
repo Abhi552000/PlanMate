@@ -12,20 +12,21 @@ import {
   TableHead,
   TableEmpty,
 } from "../../../components/ui";
+import { ORG_MEMBERS_TEXTS } from "../../../constants/uiTexts";
 
 const ITEMS_PER_PAGE = 5;
 
 const ROLE_OPTIONS = [
-  { label: "All Roles", value: "all" },
-  { label: "Org Admin", value: "org_admin" },
-  { label: "Member", value: "member" },
+  { label: ORG_MEMBERS_TEXTS.FILTER_ALL_ROLES, value: "all" },
+  { label: ORG_MEMBERS_TEXTS.FILTER_ORG_ADMIN, value: "org_admin" },
+  { label: ORG_MEMBERS_TEXTS.FILTER_MEMBER, value: "member" },
 ];
 
 const STATUS_OPTIONS = [
-  { label: "All Statuses", value: "all" },
-  { label: "Approved (Active)", value: "active" },
-  { label: "Pending Approval", value: "pending" },
-  { label: "Access Rejected", value: "rejected" },
+  { label: ORG_MEMBERS_TEXTS.FILTER_ALL_STATUSES, value: "all" },
+  { label: ORG_MEMBERS_TEXTS.FILTER_ACTIVE, value: "active" },
+  { label: ORG_MEMBERS_TEXTS.FILTER_PENDING, value: "pending" },
+  { label: ORG_MEMBERS_TEXTS.FILTER_REJECTED, value: "rejected" },
 ];
 
 export const OrgMembersTable: React.FC<OrgMembersTableProps> = ({
@@ -34,6 +35,7 @@ export const OrgMembersTable: React.FC<OrgMembersTableProps> = ({
   currentPage,
   totalPages,
   totalCount,
+  tableLoading = false,
   onPageChange,
   onInspectUser,
   onUpdateUserStatusClick,
@@ -117,19 +119,45 @@ export const OrgMembersTable: React.FC<OrgMembersTableProps> = ({
       <Table wrapperClassName="overflow-y-visible min-h-[250px]">
         <TableHeader>
           <tr>
-            <TableHead>User Name</TableHead>
-            <TableHead className="hidden sm:table-cell">Email</TableHead>
-            <TableHead>Role</TableHead>
-            <TableHead className="hidden md:table-cell">Solved Tickets</TableHead>
-            <TableHead>Access Status</TableHead>
-            <TableHead className="text-right">Actions</TableHead>
+            <TableHead>{ORG_MEMBERS_TEXTS.COL_NAME}</TableHead>
+            <TableHead className="hidden sm:table-cell">{ORG_MEMBERS_TEXTS.COL_EMAIL}</TableHead>
+            <TableHead>{ORG_MEMBERS_TEXTS.COL_ROLE}</TableHead>
+            <TableHead className="hidden md:table-cell">{ORG_MEMBERS_TEXTS.COL_SOLVED}</TableHead>
+            <TableHead>{ORG_MEMBERS_TEXTS.COL_STATUS}</TableHead>
+            <TableHead className="text-right">{ORG_MEMBERS_TEXTS.COL_ACTIONS}</TableHead>
           </tr>
         </TableHeader>
         <TableBody className="overflow-y-visible">
-          {teamUsers.length === 0 ? (
+          {tableLoading && teamUsers.length === 0 ? (
+            Array.from({ length: 5 }).map((_, i) => (
+              <tr key={i} className="animate-pulse border-b border-gray-100 dark:border-gray-800">
+                <td className="px-3 sm:px-6 py-4">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-800" />
+                    <div className="h-4 w-28 bg-slate-200 dark:bg-slate-800 rounded" />
+                  </div>
+                </td>
+                <td className="px-3 sm:px-6 py-4 hidden sm:table-cell">
+                  <div className="h-3.5 w-36 bg-slate-100 dark:bg-slate-800/60 rounded" />
+                </td>
+                <td className="px-3 sm:px-6 py-4">
+                  <div className="h-4 w-16 bg-slate-200 dark:bg-slate-800 rounded" />
+                </td>
+                <td className="px-3 sm:px-6 py-4 hidden md:table-cell">
+                  <div className="h-3.5 w-14 bg-slate-100 dark:bg-slate-800/60 rounded" />
+                </td>
+                <td className="px-3 sm:px-6 py-4">
+                  <div className="h-5 w-20 bg-slate-200 dark:bg-slate-800 rounded-full" />
+                </td>
+                <td className="px-3 sm:px-6 py-4 text-right">
+                  <div className="h-7 w-7 bg-slate-200 dark:bg-slate-800 rounded-lg ml-auto" />
+                </td>
+              </tr>
+            ))
+          ) : teamUsers.length === 0 ? (
             <TableEmpty
               colSpan={6}
-              message="No members found"
+              message={ORG_MEMBERS_TEXTS.EMPTY_MEMBERS}
               icon={<Users className="w-8 h-8 text-gray-300 dark:text-gray-600" />}
             />
           ) : (
