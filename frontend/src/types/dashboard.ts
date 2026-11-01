@@ -14,6 +14,7 @@ export interface KanbanBoardProps {
   onEdit?: (task: ITask) => void;
   onLogout?: () => void;
   columns?: string[];
+  loading?: boolean;
 }
 
 export interface AnalyticsDashboardProps {

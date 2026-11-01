@@ -1,7 +1,8 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect, useCallback } from "react";
 import { useOutletContext, useNavigate } from "react-router-dom";
 import { BarChart2, RefreshCw, Layers } from "lucide-react";
 import { DashboardContext, ITask } from "../../types";
+import { taskService } from "../../services/taskService";
 import {
   calculateReportKPIs,
   getWorkItemsByStatus,
@@ -23,6 +24,8 @@ export const ReportsPage: React.FC = () => {
   const navigate = useNavigate();
 
   const [timeframe, setTimeframe] = useState<"all" | "30d" | "7d">("all");
+  const [reportTasks, setReportTasks] = useState<ITask[]>([]);
+  const [loadingReport, setLoadingReport] = useState<boolean>(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   // Drawer state for drilldowns
@@ -31,66 +34,74 @@ export const ReportsPage: React.FC = () => {
   const [drawerSubtitle, setDrawerSubtitle] = useState("");
   const [drawerTasks, setDrawerTasks] = useState<ITask[]>([]);
 
-  // Time-filtered tasks
-  const filteredTasks = useMemo(() => {
-    if (timeframe === "all") return tasks;
-    const now = new Date().getTime();
-    const daysMap = { "7d": 7, "30d": 30 };
-    const cutoff = now - (daysMap[timeframe] || 30) * 24 * 60 * 60 * 1000;
+  // Fetch filtered report tasks directly from backend API
+  const fetchBackendReportTasks = useCallback(async (selectedTimeframe: "all" | "30d" | "7d") => {
+    setLoadingReport(true);
+    try {
+      const params = new URLSearchParams();
+      if (selectedTimeframe !== "all") {
+        params.append("timeframe", selectedTimeframe);
+      }
+      const data = await taskService.getTasks(params);
+      if (data?.success && Array.isArray(data?.tasks)) {
+        setReportTasks(data.tasks);
+      } else if (Array.isArray(data)) {
+        setReportTasks(data);
+      } else {
+        setReportTasks([]);
+      }
+    } catch (err) {
+      console.error("Failed to fetch report tasks from backend:", err);
+    } finally {
+      setLoadingReport(false);
+    }
+  }, []);
 
-    return tasks.filter((t) => {
-      const date = t.createdAt ? new Date(t.createdAt).getTime() : 0;
-      return date >= cutoff;
-    });
-  }, [tasks, timeframe]);
+  useEffect(() => {
+    fetchBackendReportTasks(timeframe);
+  }, [timeframe, fetchBackendReportTasks]);
 
-  // Calculated Metrics (KPIs and trends dynamically adjust with timeframe)
-  const kpis = useMemo(() => calculateReportKPIs(tasks, timeframe), [tasks, timeframe]);
-  const statusDonut = useMemo(() => getWorkItemsByStatus(filteredTasks), [filteredTasks]);
-  const typeDonut = useMemo(() => getWorkItemsByType(filteredTasks), [filteredTasks]);
-  const assigneeDonut = useMemo(() => getWorkItemsByAssignee(filteredTasks), [filteredTasks]);
-  const leadTimeData = useMemo(() => getLeadTimeData(filteredTasks), [filteredTasks]);
-  const cycleTimeData = useMemo(() => getCycleTimeData(filteredTasks), [filteredTasks]);
+  // Calculated Metrics from backend-filtered reportTasks
+  const kpis = useMemo(() => calculateReportKPIs(reportTasks, timeframe), [reportTasks, timeframe]);
+  const statusDonut = useMemo(() => getWorkItemsByStatus(reportTasks), [reportTasks]);
+  const typeDonut = useMemo(() => getWorkItemsByType(reportTasks), [reportTasks]);
+  const assigneeDonut = useMemo(() => getWorkItemsByAssignee(reportTasks), [reportTasks]);
+  const leadTimeData = useMemo(() => getLeadTimeData(reportTasks), [reportTasks]);
+  const cycleTimeData = useMemo(() => getCycleTimeData(reportTasks), [reportTasks]);
   const completionTrendData = useMemo(
-    () => getCompletionTrendData(filteredTasks, timeframe),
-    [filteredTasks, timeframe]
+    () => getCompletionTrendData(reportTasks, timeframe),
+    [reportTasks, timeframe]
   );
   const creationTrendData = useMemo(
-    () => getCreationTrendData(filteredTasks, timeframe),
-    [filteredTasks, timeframe]
+    () => getCreationTrendData(reportTasks, timeframe),
+    [reportTasks, timeframe]
   );
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
-    await refreshTasks();
+    await Promise.all([fetchBackendReportTasks(timeframe), refreshTasks()]);
     setTimeout(() => setIsRefreshing(false), 500);
   };
 
   // KPI card click handler
   const handleKPIClick = (type: string) => {
-    const now = new Date();
-    const days = timeframe === "7d" ? 7 : timeframe === "30d" ? 30 : null;
-    const pastCutoff = days ? new Date(now.getTime() - days * 24 * 60 * 60 * 1000) : null;
-    const futureCutoff = days ? new Date(now.getTime() + days * 24 * 60 * 60 * 1000) : null;
-
     let matching: ITask[] = [];
     let title = "";
 
     if (type === "completed") {
       title = `Resolved Issues (${timeframe === "all" ? "All Time" : timeframe === "30d" ? "Last 30 Days" : "Last 7 Days"})`;
-      matching = tasks.filter((t) => {
+      matching = reportTasks.filter((t) => {
         const isDone =
           t.status === "Done" ||
           t.completed === true ||
           t.completed === "Yes" ||
           (t.status || "").toLowerCase() === "done" ||
           (t.status || "").toLowerCase() === "closed";
-        const d = t.updatedAt ? new Date(t.updatedAt) : t.createdAt ? new Date(t.createdAt) : null;
-        return isDone && (!pastCutoff || (d && d >= pastCutoff && d <= now));
+        return isDone;
       });
     } else if (type === "inProgress" || type === "open") {
       title = `In Progress / Active Issues`;
-      matching = tasks.filter((t) => {
+      matching = reportTasks.filter((t) => {
         const isDone =
           t.status === "Done" ||
           t.completed === true ||
@@ -101,23 +112,18 @@ export const ReportsPage: React.FC = () => {
       });
     } else if (type === "created") {
       title = `Created Issues (${timeframe === "all" ? "All Time" : timeframe === "30d" ? "Last 30 Days" : "Last 7 Days"})`;
-      matching = tasks.filter((t) => {
-        const d = t.createdAt ? new Date(t.createdAt) : null;
-        return !pastCutoff || (d && d >= pastCutoff && d <= now);
-      });
+      matching = reportTasks;
     } else if (type === "due") {
       title =
         timeframe === "all"
           ? "Due & Open Issues"
           : `Due in ${kpis.periodLabel.replace("the last", "the next")}`;
-      matching = tasks.filter((t) => {
+      matching = reportTasks.filter((t) => {
         const isDone =
           t.status === "Done" ||
           t.completed === true ||
           (t.status || "").toLowerCase() === "done";
-        if (!t.dueDate || isDone) return false;
-        const d = new Date(t.dueDate);
-        return !futureCutoff || (d >= now && d <= futureCutoff);
+        return Boolean(t.dueDate) && !isDone;
       });
     }
 
@@ -132,15 +138,15 @@ export const ReportsPage: React.FC = () => {
     let matching: ITask[] = [];
 
     if (category === "status") {
-      matching = filteredTasks.filter(
+      matching = reportTasks.filter(
         (t) => (t.status || (t.completed ? "Done" : "To Do")).toLowerCase() === value.toLowerCase()
       );
     } else if (category === "type") {
-      matching = filteredTasks.filter(
+      matching = reportTasks.filter(
         (t) => (t.issueType || "Task").toLowerCase() === value.toLowerCase()
       );
     } else if (category === "assignee") {
-      matching = filteredTasks.filter((t) => {
+      matching = reportTasks.filter((t) => {
         const name =
           typeof t.assignee === "object" && t.assignee?.name
             ? t.assignee.name
@@ -155,7 +161,7 @@ export const ReportsPage: React.FC = () => {
     setDrawerOpen(true);
   };
 
-  if (loading && (!tasks || tasks.length === 0)) {
+  if ((loading || loadingReport) && reportTasks.length === 0) {
     return (
       <div className="w-full space-y-6 pb-12 font-sans select-none animate-pulse">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-gray-200 dark:border-gray-800">
@@ -244,7 +250,7 @@ export const ReportsPage: React.FC = () => {
         statusData={statusDonut}
         typeData={typeDonut}
         assigneeData={assigneeDonut}
-        totalTasks={filteredTasks.length}
+        totalTasks={reportTasks.length}
         onSliceClick={handleSliceClick}
       />
 
@@ -258,7 +264,7 @@ export const ReportsPage: React.FC = () => {
 
       {/* 4. Tabular Work Item Details with CSV Export & Search */}
       <ReportWorkItemTable
-        tasks={filteredTasks}
+        tasks={reportTasks}
         onSelectTask={(task) => navigate(`/task/${task._id}`)}
       />
 

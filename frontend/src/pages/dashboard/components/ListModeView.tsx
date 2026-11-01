@@ -16,6 +16,31 @@ export const ListModeView: React.FC<ListModeViewProps> = ({
   onRefresh,
   onLoadMore,
 }) => {
+  if (loadingList && paginatedTasks.length === 0) {
+    return (
+      <div className="space-y-3 animate-pulse">
+        {[1, 2, 3, 4].map((i) => (
+          <div
+            key={i}
+            className="flex items-center justify-between p-4 bg-white dark:bg-gray-900 border border-slate-100 dark:border-gray-800 rounded-2xl shadow-xs"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-5 h-5 rounded-md bg-slate-200 dark:bg-slate-800" />
+              <div className="space-y-1.5">
+                <div className="h-4 w-48 sm:w-64 rounded bg-slate-200 dark:bg-slate-800" />
+                <div className="h-3 w-32 rounded bg-slate-100 dark:bg-slate-800/60" />
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="h-6 w-16 rounded-full bg-slate-100 dark:bg-slate-800" />
+              <div className="h-7 w-7 rounded-full bg-slate-200 dark:bg-slate-800" />
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
   if (paginatedTasks.length === 0) {
     return (
       <div className={EMPTY_STATE.wrapper}>

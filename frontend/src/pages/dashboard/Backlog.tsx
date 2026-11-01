@@ -5,6 +5,7 @@ import { Button } from "../../components/ui/Button";
 import { BacklogModals } from "./components/backlog/BacklogModals";
 import { BacklogSprintAccordion } from "./components/backlog/BacklogSprintAccordion";
 import { BacklogTasksSection } from "./components/backlog/BacklogTasksSection";
+import { BacklogSkeleton } from "./components/backlog/BacklogSkeleton";
 import { useBacklog } from "./hooks/useBacklog";
 import { BACKLOG_TEXTS } from "../../constants/uiTexts";
 import { calculateSprintMetrics } from "../../utils";
@@ -71,11 +72,7 @@ export const Backlog: React.FC = () => {
   } = useBacklog();
 
   if (loading && sprints.length === 0) {
-    return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-sky-500" />
-      </div>
-    );
+    return <BacklogSkeleton />;
   }
 
   return (

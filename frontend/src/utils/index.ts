@@ -40,11 +40,12 @@ export const getPriorityStyle = (priority?: string) => {
   }
 };
 
-export const calculateSprintMetrics = (tasks: ITask[]) => {
+export const calculateSprintMetrics = (tasks?: ITask[]) => {
   let todo = 0, progress = 0, done = 0;
-  tasks.forEach((t) => {
+  (tasks || []).forEach((t) => {
+    if (!t) return;
     const sp = t.storyPoints || 0;
-    if (t.status === "Done" || t.status === "Closed") {
+    if (t.status === "Done" || t.status === "Closed" || t.completed === true || t.completed === "Yes") {
       done += sp;
     } else if (t.status === "In Progress" || t.status === "QA Ready" || t.status === "CR Ready") {
       progress += sp;
@@ -57,7 +58,9 @@ export const calculateSprintMetrics = (tasks: ITask[]) => {
 
 export const getRemainingDaysText = (endDate?: string): string | null => {
   if (!endDate) return null;
-  const diff = new Date(endDate).getTime() - new Date().getTime();
+  const parsed = new Date(endDate).getTime();
+  if (isNaN(parsed)) return null;
+  const diff = parsed - new Date().getTime();
   const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
   return days > 0 ? `${days} days remaining` : "Sprint ended";
 };
@@ -106,7 +109,9 @@ export const getNormalizedTaskData = (taskToEdit: any, defaultTask: any) => {
   };
 };
 
-export const isSameDay = (d1: Date, d2: Date) => {
+export const isSameDay = (d1?: Date | null, d2?: Date | null) => {
+  if (!d1 || !d2) return false;
+  if (isNaN(d1.getTime()) || isNaN(d2.getTime())) return false;
   return (
     d1.getFullYear() === d2.getFullYear() &&
     d1.getMonth() === d2.getMonth() &&
