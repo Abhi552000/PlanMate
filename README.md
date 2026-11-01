@@ -24,7 +24,7 @@ Think of **PlanMate** as a smart digital command center for building software pr
 - [Project Architecture & Directory Structure](#-project-architecture--directory-structure)
 - [Core Services & Methods](#-core-services--methods)
 - [API Endpoints Reference](#-api-endpoints-reference)
-- [Security, Privacy & Safe Architecture](#-security-privacy--safe-architecture)
+- [Security & Data Protection](#-security--data-protection)
 - [Coding Standards & Architectural Best Practices](#-coding-standards--architectural-best-practices)
 - [Getting Started & Installation](#-getting-started--installation)
 - [Deployment](#-deployment)
@@ -354,11 +354,9 @@ All non-public endpoints require an `Authorization: Bearer <token>` header verif
 
 ---
 
-## 🔒 Security, Privacy & Safe Architecture
+## 🔒 Security & Data Protection
 
-A common question is: ***"Is it safe to document backend endpoints in a project README?"***
-
-**Yes, absolutely.** In enterprise development, documenting high-level API route endpoints is standard practice (e.g. Stripe, GitHub, Swagger). The security of a system does not rely on hiding route names (which is merely "security through obscurity"); it relies on **robust defense-in-depth backend protections**:
+PlanMate implements industry-standard defense-in-depth security across the full stack:
 
 1. **Strict JWT Bearer Authentication**: 
    - All private routes enforce `authMiddleware`. Requests without a valid, cryptographically signed JSON Web Token are immediately rejected with `401 Unauthorized`.
@@ -366,7 +364,7 @@ A common question is: ***"Is it safe to document backend endpoints in a project 
    - Data is strictly partitioned by Organization ID. The backend verifies that `req.user.organization` matches the target resources, preventing users from ever querying or modifying data belonging to another tenant.
 3. **Role-Based Access Control (RBAC)**:
    - Administrative endpoints (e.g., plan creation, tenant suspension, custom status deletion) enforce explicit role checks (`org-admin` or `system_admin`). Standard members cannot execute privileged operations.
-4. **Password Protection**:
+4. **Password Security**:
    - User passwords are automatically salted and hashed using **Bcrypt** before saving to MongoDB. Plaintext passwords never touch logs or databases.
 5. **No Secrets in Version Control**:
    - Database credentials, JWT secrets, port numbers, and payment keys are strictly kept in ignored `.env` files. Documentation only provides generic placeholders (`<username>`, `<password>`).
