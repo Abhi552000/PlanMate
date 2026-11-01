@@ -40,7 +40,7 @@ export interface IOrganizationSubscription {
   planId: string;
   planName: string;
   maxMembers: number;
-  status: "active" | "cancelled" | "past_due";
+  status: "active" | "cancelled" | "past_due" | "expired";
   billingCycle: string;
   amountPaid: number;
   currency: string;
@@ -48,6 +48,7 @@ export interface IOrganizationSubscription {
   transactionId?: string;
   subscribedAt: string;
   validUntil: string | null;
+  isExpired?: boolean;
 }
 
 export interface ISubscriptionMetrics {

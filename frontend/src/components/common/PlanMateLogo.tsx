@@ -29,12 +29,11 @@ export const PlanMateLogo: React.FC<PlanMateLogoProps> = ({
       >
         <defs>
           <linearGradient id="pmBrandGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#06B6D4" />
-            <stop offset="45%" stopColor="#0284C7" />
-            <stop offset="100%" stopColor="#4F46E5" />
+            <stop offset="0%" stopColor="#0ea5e9" />
+            <stop offset="100%" stopColor="#0284c7" />
           </linearGradient>
           <filter id="pmMarkShadow" x="-10%" y="-10%" width="130%" height="130%">
-            <feDropShadow dx="0" dy="2.5" stdDeviation="3" floodColor="#020617" floodOpacity="0.25" />
+            <feDropShadow dx="0" dy="2" stdDeviation="2" floodColor="#020617" floodOpacity="0.2" />
           </filter>
         </defs>
 
@@ -72,9 +71,9 @@ export const PlanMateLogo: React.FC<PlanMateLogoProps> = ({
 
       {showText && (
         <span
-          className={`text-2xl font-black bg-gradient-to-r from-cyan-500 via-sky-500 to-indigo-500 bg-clip-text text-transparent tracking-wide ${textClassName}`}
+          className={`text-xl font-bold tracking-tight text-slate-900 dark:text-white ${textClassName}`}
         >
-          PlanMate
+          Plan<span className="text-sky-500">Mate</span>
         </span>
       )}
     </div>

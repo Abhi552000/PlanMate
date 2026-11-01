@@ -49,7 +49,7 @@ const organizationSchema = new mongoose.Schema({
     },
     status: {
       type: String,
-      enum: ["active", "cancelled", "past_due"],
+      enum: ["active", "cancelled", "past_due", "expired"],
       default: "active",
     },
     billingCycle: {

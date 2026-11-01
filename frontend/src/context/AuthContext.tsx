@@ -2,6 +2,7 @@ import React, { createContext, useContext, useCallback, useMemo } from "react";
 import { useAppDispatch, useAppSelector } from "../store";
 import { loginSuccess, logoutSuccess } from "../store/slices/authSlice";
 import { IUser, AuthContextType } from "../types";
+import { authService } from "../services/authService";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -23,6 +24,40 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     [dispatch, currentUser]
   );
 
+  const refreshUser = useCallback(async (): Promise<IUser | null> => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) return null;
+      const data = await authService.getMe();
+      if (data?.success && data?.user) {
+        const u = data.user;
+        const updatedUser: IUser = {
+          _id: u.id || u._id || "",
+          email: u.email,
+          name: u.name || "User",
+          role: u.role || "member",
+          status: u.status || "active",
+          organization: u.organization || null,
+          organizationName:
+            u.organization && typeof u.organization === "object"
+              ? u.organization.name
+              : u.organizationName || "",
+          isSubscriptionExpired: Boolean(u.isSubscriptionExpired),
+          avatar:
+            currentUser?.avatar ||
+            `https://ui-avatars.com/api/?name=${encodeURIComponent(
+              u.name || "User"
+            )}&background=random`,
+        };
+        dispatch(loginSuccess(updatedUser));
+        return updatedUser;
+      }
+    } catch (err) {
+      console.error("Failed to refresh user session:", err);
+    }
+    return null;
+  }, [dispatch]);
+
   const login = useCallback(
     (data: any, navigate: (path: string, options?: any) => void) => {
       const user: IUser = {
@@ -32,6 +67,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         role: data.role || "member",
         status: data.status || "active",
         organization: data.organization || null,
+        isSubscriptionExpired: Boolean(data.isSubscriptionExpired),
         avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(
           data.name || "User"
         )}&background=random`,
@@ -55,10 +91,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     () => ({
       currentUser,
       setCurrentUser,
+      refreshUser,
       login,
       logout,
     }),
-    [currentUser, setCurrentUser, login, logout]
+    [currentUser, setCurrentUser, refreshUser, login, logout]
   );
 
   return (

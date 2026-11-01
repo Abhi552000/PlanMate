@@ -5,6 +5,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { HttpStatus } from "../constants/httpStatus.js";
 import { MESSAGES } from "../constants/messages.js";
+import { isSubscriptionExpired } from "../utils/subscriptionHelper.js";
 
 const JWT_SECRET = process.env.JWT_SECRET || "your_jwt_secret_here";
 const TOKEN_EXPIRES = "24h";
@@ -114,7 +115,10 @@ export async function loginUser(req, res) {
   }
 
   try {
-    const user = await User.findOne({ email }).populate("organization");
+    const user = await User.findOne({ email }).populate({
+      path: "organization",
+      populate: { path: "admin", select: "name email" },
+    });
     if (!user) {
       return res
         .status(HttpStatus.UNAUTHORIZED)
@@ -138,6 +142,27 @@ export async function loginUser(req, res) {
         message: MESSAGES.AUTH.REGISTRATION_REJECTED
       });
     }
+
+    const isExpired = user.organization
+      ? isSubscriptionExpired(user.organization.subscription)
+      : false;
+
+    // Normal member: Block login if organization subscription has expired
+    if (user.role === "member" && isExpired) {
+      const adminUser = user.organization?.admin;
+      const adminName = adminUser?.name || "Workspace Administrator";
+      const adminEmail = adminUser?.email || "";
+      return res.status(HttpStatus.FORBIDDEN).json({
+        success: false,
+        code: "SUBSCRIPTION_EXPIRED",
+        message: MESSAGES.AUTH.SUBSCRIPTION_EXPIRED(adminName, adminEmail),
+        admin: {
+          name: adminName,
+          email: adminEmail,
+        },
+      });
+    }
+
     const match = await bcrypt.compare(password, user.password);
     if (!match) {
       return res
@@ -154,7 +179,8 @@ export async function loginUser(req, res) {
         name: user.name, 
         email: user.email, 
         role: user.role || "member",
-        organization: user.organization || null
+        organization: user.organization || null,
+        isSubscriptionExpired: isExpired,
       },
     });
   } catch (err) {
@@ -170,7 +196,10 @@ export async function getCurrentUser(req, res) {
   try {
     const user = await User.findById(req.user.id)
       .select("name email role organization")
-      .populate("organization");
+      .populate({
+        path: "organization",
+        populate: { path: "admin", select: "name email" },
+      });
     if (!user) {
       return res
         .status(HttpStatus.BAD_REQUEST)
@@ -182,7 +211,30 @@ export async function getCurrentUser(req, res) {
         message: MESSAGES.AUTH.ORG_INACTIVE(user.organization.remark)
       });
     }
-    res.json({ success: true, user });
+
+    const isExpired = user.organization
+      ? isSubscriptionExpired(user.organization.subscription)
+      : false;
+
+    // Normal member: Block access if subscription has expired
+    if (user.role === "member" && isExpired) {
+      const adminUser = user.organization?.admin;
+      const adminName = adminUser?.name || "Workspace Administrator";
+      const adminEmail = adminUser?.email || "";
+      return res.status(HttpStatus.FORBIDDEN).json({
+        success: false,
+        code: "SUBSCRIPTION_EXPIRED",
+        message: MESSAGES.AUTH.SUBSCRIPTION_EXPIRED(adminName, adminEmail),
+        admin: {
+          name: adminName,
+          email: adminEmail,
+        },
+      });
+    }
+
+    const userObj = user.toObject();
+    userObj.isSubscriptionExpired = isExpired;
+    res.json({ success: true, user: userObj });
   } catch (err) {
     console.log(err);
     res

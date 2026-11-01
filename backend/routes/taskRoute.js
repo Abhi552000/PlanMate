@@ -1,5 +1,6 @@
 import express from "express";
 import authMiddleware from "../middleware/auth.js";
+import { requireActiveSubscription } from "../middleware/subscriptionCheck.js";
 import {
   createTask,
   deleteTask,
@@ -16,23 +17,25 @@ import {
 
 const taskRouter = express.Router();
 
-taskRouter.route("/gp/analytics").get(authMiddleware, getTaskAnalytics);
+taskRouter.use(authMiddleware, requireActiveSubscription);
+
+taskRouter.route("/gp/analytics").get(getTaskAnalytics);
 
 taskRouter
   .route("/gp")
-  .get(authMiddleware, getTasks)
-  .post(authMiddleware, createTask);
+  .get(getTasks)
+  .post(createTask);
 
 taskRouter
   .route("/:id/gp")
-  .get(authMiddleware, getTaskById)
-  .put(authMiddleware, updateTask)
-  .delete(authMiddleware, deleteTask);
+  .get(getTaskById)
+  .put(updateTask)
+  .delete(deleteTask);
 
-taskRouter.route("/:id/comments").post(authMiddleware, addTaskComment);
-taskRouter.route("/:id/comments/:commentId").delete(authMiddleware, deleteTaskComment);
-taskRouter.route("/:id/worklogs").post(authMiddleware, logWork);
-taskRouter.route("/:id/links").post(authMiddleware, linkTask);
-taskRouter.route("/:id/links/:linkId").delete(authMiddleware, unlinkTask);
+taskRouter.route("/:id/comments").post(addTaskComment);
+taskRouter.route("/:id/comments/:commentId").delete(deleteTaskComment);
+taskRouter.route("/:id/worklogs").post(logWork);
+taskRouter.route("/:id/links").post(linkTask);
+taskRouter.route("/:id/links/:linkId").delete(unlinkTask);
 
 export default taskRouter;

@@ -47,11 +47,11 @@ export const ActiveSprint: React.FC = () => {
   if (!activeSprint) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] max-w-md mx-auto text-center space-y-5 font-sans">
-        <div className="w-16 h-16 rounded-full bg-gradient-to-br from-cyan-500 to-sky-600 flex items-center justify-center shadow-md text-white">
-          <Flame className="w-8 h-8" />
+        <div className="w-14 h-14 rounded-2xl bg-sky-50 dark:bg-sky-950/50 border border-sky-200 dark:border-sky-800 text-sky-600 dark:text-sky-400 flex items-center justify-center">
+          <Flame className="w-7 h-7" />
         </div>
         <div className="space-y-1">
-          <h2 className="text-2xl font-black text-gray-800 dark:text-white">
+          <h2 className="text-xl font-bold text-gray-800 dark:text-white">
             {ACTIVE_SPRINT_TEXTS.EMPTY_ACTIVE_SPRINT_TITLE}
           </h2>
           <p className="text-sm text-gray-500 dark:text-gray-400">
@@ -60,7 +60,7 @@ export const ActiveSprint: React.FC = () => {
         </div>
         <button
           onClick={() => navigate("/backlog")}
-          className="flex items-center gap-1 bg-sky-600 hover:bg-sky-700 text-white font-bold py-2.5 px-6 rounded-xl text-sm shadow-sm transition-all cursor-pointer"
+          className="flex items-center gap-1 bg-sky-500 hover:bg-sky-600 text-white font-bold py-2.5 px-6 rounded-xl text-sm shadow-2xs transition-all cursor-pointer"
         >
           {ACTIVE_SPRINT_TEXTS.BTN_GO_TO_BACKLOG}{" "}
           <ArrowRight className="w-4 h-4" />

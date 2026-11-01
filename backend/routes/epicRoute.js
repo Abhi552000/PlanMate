@@ -1,5 +1,6 @@
 import express from "express";
 import authMiddleware from "../middleware/auth.js";
+import { requireActiveSubscription } from "../middleware/subscriptionCheck.js";
 import {
   getEpics,
   createEpic,
@@ -9,14 +10,16 @@ import {
 
 const epicRouter = express.Router();
 
+epicRouter.use(authMiddleware, requireActiveSubscription);
+
 epicRouter
   .route("/")
-  .get(authMiddleware, getEpics)
-  .post(authMiddleware, createEpic);
+  .get(getEpics)
+  .post(createEpic);
 
 epicRouter
   .route("/:id")
-  .put(authMiddleware, updateEpic)
-  .delete(authMiddleware, deleteEpic);
+  .put(updateEpic)
+  .delete(deleteEpic);
 
 export default epicRouter;

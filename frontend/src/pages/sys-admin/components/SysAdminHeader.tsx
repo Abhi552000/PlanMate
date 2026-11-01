@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { LogOut, Menu } from "lucide-react";
+import { LogOut, Menu, Sun, Moon } from "lucide-react";
 import { SysAdminHeaderProps } from "../../../types";
 import { PlanMateLogo } from "../../../components/common/PlanMateLogo";
 
@@ -54,12 +54,12 @@ export const SysAdminHeader: React.FC<SysAdminHeaderProps> = ({
             className="p-1.5 text-gray-600 dark:text-gray-400 hover:text-sky-500 dark:hover:text-sky-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200 rounded-full cursor-pointer text-sm"
             aria-label="Toggle dark mode"
           >
-            {isDark ? "☀️" : "🌙"}
+            {isDark ? <Sun className="w-4 h-4 text-amber-500" /> : <Moon className="w-4 h-4 text-slate-600 dark:text-slate-300" />}
           </button>
 
           {/* User Representative Info & Logout */}
           <div className="flex items-center gap-2.5 pl-2 border-l border-gray-200 dark:border-gray-800">
-            <div className="w-7.5 h-7.5 flex items-center justify-center rounded-full bg-gradient-to-br from-cyan-500 to-sky-600 text-white font-semibold text-xs shadow-2xs">
+            <div className="w-7.5 h-7.5 flex items-center justify-center rounded-full bg-sky-500 text-white font-semibold text-xs shadow-2xs">
               {user?.name?.[0]?.toUpperCase() || "A"}
             </div>
             <div className="text-left hidden md:block text-xs max-w-[140px]">

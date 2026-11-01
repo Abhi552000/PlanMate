@@ -23,7 +23,7 @@ export const UserMenuDropdown: React.FC<UserMenuDropdownProps> = React.memo(({
           {user?.avatar ? (
             <img src={user.avatar} alt="Avatar" className="w-7.5 h-7.5 rounded-full shadow-2xs" />
           ) : (
-            <div className="w-7.5 h-7.5 flex items-center justify-center rounded-full bg-gradient-to-br from-cyan-500 to-sky-600 text-white font-semibold text-xs shadow-2xs">
+            <div className="w-7.5 h-7.5 flex items-center justify-center rounded-full bg-sky-500 text-white font-semibold text-xs shadow-2xs">
               {user?.name?.[0]?.toUpperCase() || "U"}
             </div>
           )}

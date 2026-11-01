@@ -39,7 +39,7 @@ export const CommentsSection: React.FC<CommentsSectionProps> = ({
       <div className="space-y-3.5">
         {comments.map((comment) => (
           <div key={comment._id} className="flex items-start gap-2.5 bg-gray-50/50 dark:bg-gray-950/20 p-3 rounded-xl border border-sky-100/30 dark:border-gray-800">
-            <div className="w-7 h-7 rounded-full bg-gradient-to-br from-cyan-500 to-sky-600 flex items-center justify-center text-white text-[10px] font-bold shadow-sm">
+            <div className="w-7 h-7 rounded-full bg-sky-500 flex items-center justify-center text-white text-[10px] font-bold shadow-2xs">
               {comment.user?.name ? comment.user.name[0].toUpperCase() : "U"}
             </div>
             <div className="flex-1 min-w-0">

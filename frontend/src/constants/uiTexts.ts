@@ -236,3 +236,24 @@ export const PAGINATION_TEXTS = {
   RESULTS: "results",
 };
 
+export const SUBSCRIPTION_EXPIRED_TEXTS = {
+  MODAL_BADGE: "Subscription Expired",
+  MODAL_TITLE: "Plan Renewal Required",
+  MODAL_DESCRIPTION:
+    "Your organization workspace plan has expired. Project boards, backlogs, sprints, and reports are safely preserved, but board operations are suspended until your subscription is renewed.",
+  BTN_RENEW_PLAN: "Renew Subscription",
+  BTN_GO_PROFILE: "Account Settings",
+  PLAN_LABEL: "Previous Plan",
+  STATUS_LABEL: "Status",
+  STATUS_EXPIRED: "Expired",
+  SIDEBAR_LOCKED_TOOLTIP: "Plan expired — renewal required",
+  BILLING_EXPIRED_BANNER_TITLE: "Your workspace plan is currently expired",
+  BILLING_EXPIRED_BANNER_DESC:
+    "Select a plan below and renew your subscription to instantly unlock all workspace features, boards, and team access.",
+  MEMBER_LOGIN_TITLE: "Workspace Subscription Inactive",
+  MEMBER_LOGIN_SUBTITLE:
+    "Your organization's subscription has expired. Please contact your workspace administrator to renew the plan and restore access.",
+  MEMBER_ADMIN_CONTACT_TITLE: "Workspace Administrator:",
+  MEMBER_DISMISS: "Dismiss",
+};
+

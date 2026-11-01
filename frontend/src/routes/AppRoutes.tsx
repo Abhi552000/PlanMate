@@ -54,9 +54,7 @@ const RouteLoadingFallback = () => (
 );
 
 const AuthWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <div className="fixed inset-0 w-full h-full min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-gray-950 flex items-center justify-center p-4 overflow-y-auto z-50">
-    {/* Subtle, sober ambient glow for depth */}
-    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[520px] h-[520px] bg-sky-500/10 rounded-full blur-[100px] pointer-events-none" />
+  <div className="fixed inset-0 w-full h-full min-h-screen bg-slate-900 dark:bg-slate-950 flex items-center justify-center p-4 overflow-y-auto z-50">
     <div className="relative z-10 w-full flex items-center justify-center my-auto">
       {children}
     </div>

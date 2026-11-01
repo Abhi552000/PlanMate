@@ -354,7 +354,7 @@ export const TaskFormMeta: React.FC<TaskFormMetaProps> = ({
           {/* Progress bar */}
           <div className="w-full bg-gray-200 dark:bg-gray-700 h-2 rounded-full overflow-hidden">
             <div
-              className="bg-gradient-to-r from-sky-500 to-emerald-500 h-full rounded-full transition-all duration-300"
+              className="bg-sky-500 h-full rounded-full transition-all duration-300"
               style={{ width: `${loggedPercent}%` }}
             />
           </div>
@@ -398,7 +398,7 @@ export const TaskFormMeta: React.FC<TaskFormMetaProps> = ({
                   type="button"
                   onClick={handleLogWork}
                   disabled={logging}
-                  className="px-2 py-1 text-[10px] bg-sky-600 text-white hover:bg-sky-700 rounded transition font-bold disabled:opacity-50"
+                  className="px-2 py-1 text-[10px] bg-sky-500 text-white hover:bg-sky-600 rounded transition font-bold disabled:opacity-50"
                 >
                   {logging ? "Logging..." : "Log Time"}
                 </button>
@@ -504,7 +504,7 @@ export const TaskFormMeta: React.FC<TaskFormMetaProps> = ({
                     type="button"
                     onClick={handleLinkIssue}
                     disabled={linkingIssue || !targetTaskId}
-                    className="px-2 py-1 text-[10px] bg-sky-600 text-white hover:bg-sky-700 rounded transition font-bold disabled:opacity-50"
+                    className="px-2 py-1 text-[10px] bg-sky-500 text-white hover:bg-sky-600 rounded transition font-bold disabled:opacity-50"
                   >
                     {linkingIssue ? "Linking..." : "Link"}
                   </button>

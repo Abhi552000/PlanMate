@@ -103,6 +103,12 @@ PlanMate adopts a decoupled client-server architecture with a **React 19 + TypeS
 - **Seat Limit Enforcer**: Real-time quota validation preventing over-allocation of organization members.
 - **Simulated Checkout & Payment Modal**: Seamless subscription activation with transaction generation.
 - **Invoice & Billing History**: Complete payment records and invoice tracking.
+- **Subscription Expiration Lifecycle & Route Protection**:
+  - `requireActiveSubscription` backend middleware blocks task, sprint, and epic modifications when an organization's subscription lapses.
+  - **Role-Based Expiration Handling**:
+    - **Organization Admins**: Operational views display lock badges (`🔒`) and an in-app renewal modal, while Plans & Billing and Profile remain accessible for instant renewal. Payment completion refreshes the session and unlocks features immediately without requiring re-login.
+    - **Team Members**: Sessions are gracefully terminated with a dedicated notice card on the login screen displaying the workspace administrator's contact name and email.
+  - **Live In-Session Heartbeat**: Automatic 30-second background checks and tab-focus listeners detect live expirations without manual page refreshes.
 
 ### 8. 🛡️ System Administration (Super Admin Platform Portal)
 - **Tenant Management**: Global directory of all platform organizations with activation, deactivation, and editing capabilities.
@@ -116,8 +122,13 @@ PlanMate adopts a decoupled client-server architecture with a **React 19 + TypeS
 
 ### 10. 🎨 Unified Design System & UX Standards
 - **Standardized UI Primitives**: Reusable `Button`, `Input`, `Select`, `FilterSelect`, `SearchInput`, `Pagination`, `TableCard`, and `Table` components across every page.
+- **Strict Single-Theme Color System**: Standardized on **Light Sky Blue (`sky-500` / `#0ea5e9`, hover `sky-600`)** across all primary buttons, solid avatars, badge borders, and active navigation items to eliminate dual-blue tone mismatches.
 - **Smart Windowed Pagination**: Ellipsis windowing (`1, 2, 3 ... 10`) consistent throughout user, org admin, and super admin tables.
-- **Mobile-Optimized Toast Alerts**: Compact, non-intrusive notification cards styled with PlanMate theme accents.
+- **Proportioned Semantic Toast System**: Custom `390px` desktop cards and centered floating mobile notifications with distinct semantic color-coding:
+  - **Emerald Green (`#10b981`)** for Success
+  - **PlanMate Sky Blue (`#0ea5e9`)** for Info
+  - **Rose Red (`#ef4444`)** for Error
+  - **Amber (`#f59e0b`)** for Warning
 - **Centralized Constants**: 100% centralized strings and error messages (`uiTexts.ts`, `messages.ts`, `billingTexts.ts`, `routes.ts`).
 - **Jira Keyboard Shortcut**: Press `[` to toggle the collapsible navigation sidebar.
 
@@ -196,7 +207,8 @@ PlanMate/
 │   │   └── userController.js       # Authentication, registration, profile
 │   ├── middleware/                 # Auth verification, error handling, RBAC
 │   │   ├── auth.js                 # JWT token validation
-│   │   └── errorHandler.js         # Centralized error handler
+│   │   ├── errorHandler.js         # Centralized error handler
+│   │   └── subscriptionCheck.js    # Operational route guard enforcing active subscription
 │   ├── models/                     # Mongoose Schemas & Models
 │   │   ├── epicModel.js
 │   │   ├── notificationModel.js
@@ -370,6 +382,8 @@ PlanMate implements industry-standard defense-in-depth security across the full 
    - Database credentials, JWT secrets, port numbers, and payment keys are strictly kept in ignored `.env` files. Documentation only provides generic placeholders (`<username>`, `<password>`).
 6. **Input Sanitization & Validation**:
    - Request bodies are validated using `validator` and Mongoose schema constraints to guard against injection attacks.
+7. **Subscription Validity & Operational Route Guard**:
+   - Critical project routes (`/api/tasks/*`, `/api/sprints/*`, `/api/epics/*`) are guarded by `requireActiveSubscription` middleware. Requests from expired organization accounts are rejected with `403 Forbidden` (`SUBSCRIPTION_EXPIRED`), returning administrative contact details for immediate escalation.
 
 ---
 

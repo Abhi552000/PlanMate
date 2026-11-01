@@ -21,7 +21,7 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = React.m
       >
         <Bell className="w-4.5 h-4.5" />
         {unreadCount > 0 && (
-          <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-[16px] px-1 bg-sky-600 text-white text-[9px] font-bold rounded-full flex items-center justify-center ring-2 ring-white dark:ring-gray-900 shadow-2xs">
+          <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-[16px] px-1 bg-sky-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center ring-2 ring-white dark:ring-gray-900 shadow-2xs">
             {unreadCount > 99 ? "99+" : unreadCount}
           </span>
         )}
@@ -45,8 +45,8 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = React.m
 
           <div className="max-h-64 overflow-y-auto divide-y divide-sky-50/45 dark:divide-gray-800">
             {notifications.length === 0 ? (
-              <div className="p-6 text-center text-xs text-gray-400 dark:text-gray-500 font-semibold">
-                All caught up! 🎉
+              <div className="p-6 text-center text-xs text-gray-400 dark:text-gray-500 font-medium">
+                No new notifications
               </div>
             ) : (
               notifications.map((noti) => (

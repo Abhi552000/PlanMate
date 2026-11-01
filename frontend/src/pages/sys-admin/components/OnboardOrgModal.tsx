@@ -70,7 +70,7 @@ export const OnboardOrgModal: React.FC<OnboardOrgModalProps> = ({
 
             <button
               onClick={onClose}
-              className="w-full bg-gradient-to-r cursor-pointer from-cyan-500 to-sky-600 text-white font-bold py-2 rounded-lg text-xs hover:shadow-md transition-all duration-200"
+              className="w-full bg-sky-500 hover:bg-sky-600 text-white font-bold py-2 rounded-lg text-xs transition-colors cursor-pointer"
             >
               Done
             </button>
@@ -159,7 +159,7 @@ export const OnboardOrgModal: React.FC<OnboardOrgModalProps> = ({
               <button
                 type="submit"
                 disabled={onboarding}
-                className="bg-gradient-to-r from-cyan-500 to-sky-600 text-white font-bold py-2 px-5 rounded-lg flex items-center justify-center gap-1.5 hover:shadow-md transition-all duration-200 cursor-pointer text-xs"
+                className="bg-sky-500 hover:bg-sky-600 disabled:opacity-50 text-white font-bold py-2 px-5 rounded-lg flex items-center justify-center gap-1.5 transition-colors cursor-pointer text-xs"
               >
                 {onboarding ? "Onboarding..." : "Onboard Organization"}
               </button>
