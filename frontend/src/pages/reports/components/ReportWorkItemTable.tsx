@@ -2,8 +2,6 @@ import React, { useState, useMemo } from "react";
 import {
   Download,
   Search,
-  ChevronLeft,
-  ChevronRight,
   Bug,
   BookOpen,
   Award,
@@ -15,6 +13,17 @@ import {
 } from "lucide-react";
 import { ITask, ReportWorkItemTableProps } from "../../../types";
 import { getPriorityStyle } from "../../../utils";
+import {
+  FilterSelect,
+  SearchInput,
+  Pagination,
+  TableCard,
+  Table,
+  TableHeader,
+  TableBody,
+  TableHead,
+  TableEmpty,
+} from "../../../components/ui";
 
 export const ReportWorkItemTable: React.FC<ReportWorkItemTableProps> = ({
   tasks,
@@ -26,6 +35,21 @@ export const ReportWorkItemTable: React.FC<ReportWorkItemTableProps> = ({
   const [selectedStatus, setSelectedStatus] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
+
+  const typeOptions = useMemo(() => [
+    { label: "All Types", value: "all" },
+    { label: "Task", value: "Task" },
+    { label: "Bug", value: "Bug" },
+    { label: "Story", value: "Story" },
+    { label: "Epic", value: "Epic" },
+  ], []);
+
+  const priorityOptions = useMemo(() => [
+    { label: "All Priorities", value: "all" },
+    { label: "High", value: "High" },
+    { label: "Medium", value: "Medium" },
+    { label: "Low", value: "Low" },
+  ], []);
 
   // Filter tasks
   const filteredTasks = useMemo(() => {
@@ -111,7 +135,7 @@ export const ReportWorkItemTable: React.FC<ReportWorkItemTableProps> = ({
   };
 
   return (
-    <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg overflow-hidden">
+    <TableCard>
       {/* Table Header Controls */}
       <div className="p-4 sm:p-5 border-b border-gray-100 dark:border-gray-800 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
@@ -123,50 +147,37 @@ export const ReportWorkItemTable: React.FC<ReportWorkItemTableProps> = ({
         {/* Action Controls & Filters */}
         <div className="flex flex-wrap items-center gap-2.5">
           {/* Search Input */}
-          <div className="relative">
-            <Search className="w-3.5 h-3.5 text-gray-400 absolute left-2.5 top-1/2 -translate-y-1/2" />
-            <input
-              type="text"
-              placeholder="Filter summary or key..."
-              value={search}
-              onChange={(e) => {
-                setSearch(e.target.value);
-                setCurrentPage(1);
-              }}
-              className="pl-8 pr-3 py-1.5 text-xs bg-gray-50 dark:bg-gray-800 border border-sky-100 dark:border-gray-700 rounded-lg text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-1 focus:ring-sky-500 w-44 sm:w-52"
-            />
-          </div>
+          <SearchInput
+            value={search}
+            onChange={(val) => {
+              setSearch(val);
+              setCurrentPage(1);
+            }}
+            placeholder="Filter summary or key..."
+            className="w-44 sm:w-56"
+          />
 
           {/* Type Filter */}
-          <select
+          <FilterSelect
+            label="Type"
             value={selectedType}
-            onChange={(e) => {
-              setSelectedType(e.target.value);
+            options={typeOptions}
+            onChange={(val) => {
+              setSelectedType(val);
               setCurrentPage(1);
             }}
-            className="text-xs bg-gray-50 dark:bg-gray-800 border border-sky-100 dark:border-gray-700 rounded-lg px-2.5 py-1.5 text-gray-700 dark:text-gray-300 focus:outline-none cursor-pointer"
-          >
-            <option value="all">All Types</option>
-            <option value="Task">Task</option>
-            <option value="Bug">Bug</option>
-            <option value="Story">Story</option>
-            <option value="Epic">Epic</option>
-          </select>
+          />
 
           {/* Priority Filter */}
-          <select
+          <FilterSelect
+            label="Priority"
             value={selectedPriority}
-            onChange={(e) => {
-              setSelectedPriority(e.target.value);
+            options={priorityOptions}
+            onChange={(val) => {
+              setSelectedPriority(val);
               setCurrentPage(1);
             }}
-            className="text-xs bg-gray-50 dark:bg-gray-800 border border-sky-100 dark:border-gray-700 rounded-lg px-2.5 py-1.5 text-gray-700 dark:text-gray-300 focus:outline-none cursor-pointer"
-          >
-            <option value="all">All Priorities</option>
-            <option value="High">High</option>
-            <option value="Medium">Medium</option>
-            <option value="Low">Low</option>
-          </select>
+          />
 
           {/* Export Button */}
           <button
@@ -181,26 +192,24 @@ export const ReportWorkItemTable: React.FC<ReportWorkItemTableProps> = ({
       </div>
 
       {/* Table Data */}
-      <div className="overflow-x-auto">
-        <table className="w-full text-left text-xs">
-          <thead className="bg-gray-50/75 dark:bg-gray-800/50 text-gray-500 dark:text-gray-400 font-semibold uppercase tracking-wider text-[11px] border-b border-gray-100 dark:border-gray-800">
-            <tr>
-              <th className="py-3 px-4">Work item key</th>
-              <th className="py-3 px-4">Work type</th>
-              <th className="py-3 px-4">Work item priority</th>
-              <th className="py-3 px-4">Issue summary</th>
-              <th className="py-3 px-4">Status</th>
-              <th className="py-3 px-4">Assignee</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-100 dark:divide-gray-800/60">
-            {paginatedTasks.length === 0 ? (
-              <tr>
-                <td colSpan={6} className="text-center py-10 text-gray-400">
-                  No work items match your report filter criteria
-                </td>
-              </tr>
-            ) : (
+      <Table>
+        <TableHeader>
+          <tr>
+            <TableHead>Work item key</TableHead>
+            <TableHead>Work type</TableHead>
+            <TableHead>Work item priority</TableHead>
+            <TableHead>Issue summary</TableHead>
+            <TableHead>Status</TableHead>
+            <TableHead>Assignee</TableHead>
+          </tr>
+        </TableHeader>
+        <TableBody>
+          {paginatedTasks.length === 0 ? (
+            <TableEmpty
+              colSpan={6}
+              message="No work items match your report filter criteria"
+            />
+          ) : (
               paginatedTasks.map((t) => {
                 const key = t.key || (t._id ? `PM-${t._id.slice(-4).toUpperCase()}` : "TASK");
                 const type = t.issueType || "Task";
@@ -265,69 +274,18 @@ export const ReportWorkItemTable: React.FC<ReportWorkItemTableProps> = ({
                 );
               })
             )}
-          </tbody>
-        </table>
-      </div>
+          </TableBody>
+        </Table>
 
-      {/* Pagination Footer (Matching Screenshot 1) */}
-      <div className="p-3.5 sm:p-4 border-t border-gray-100 dark:border-gray-800 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-gray-500 dark:text-gray-400">
-        <div className="flex items-center gap-1.5">
-          <button
-            disabled={currentPage <= 1}
-            onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-            className="p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-            title="Previous page"
-          >
-            <ChevronLeft className="w-4 h-4" />
-          </button>
-
-          {/* Page numbers */}
-          {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-            const pageNum = i + 1;
-            const isActive = pageNum === currentPage;
-            return (
-              <button
-                key={pageNum}
-                onClick={() => setCurrentPage(pageNum)}
-                className={`w-7 h-7 rounded-md font-bold text-xs transition-colors ${
-                  isActive
-                    ? "bg-sky-500 text-white"
-                    : "hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300"
-                }`}
-              >
-                {pageNum}
-              </button>
-            );
-          })}
-          {totalPages > 5 && <span className="px-1 text-gray-400">...</span>}
-          {totalPages > 5 && (
-            <button
-              onClick={() => setCurrentPage(totalPages)}
-              className={`w-7 h-7 rounded-md font-bold text-xs transition-colors ${
-                totalPages === currentPage
-                  ? "bg-sky-500 text-white"
-                  : "hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300"
-              }`}
-            >
-              {totalPages}
-            </button>
-          )}
-
-          <button
-            disabled={currentPage >= totalPages}
-            onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-            className="p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-            title="Next page"
-          >
-            <ChevronRight className="w-4 h-4" />
-          </button>
-        </div>
-
-        <div>
-          Showing {totalItems > 0 ? (currentPage - 1) * pageSize + 1 : 0}-
-          {Math.min(currentPage * pageSize, totalItems)} of {totalItems} items
-        </div>
-      </div>
-    </div>
+      {/* Pagination Footer */}
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        totalItems={totalItems}
+        pageSize={pageSize}
+        itemLabel="items"
+        onPageChange={setCurrentPage}
+      />
+    </TableCard>
   );
 };

@@ -12,12 +12,13 @@ export const BacklogSkeleton: React.FC = () => {
         <div className="h-9 w-36 rounded-xl bg-slate-200 dark:bg-slate-800" />
       </div>
 
-      {/* Epic Filters Skeleton */}
-      <div className="flex items-center gap-2 mb-6 pb-3 border-b border-slate-200/80 dark:border-slate-800/80 overflow-x-auto no-scrollbar">
-        <div className="h-4 w-24 rounded bg-slate-200 dark:bg-slate-800 mr-2" />
-        <div className="h-7 w-16 rounded-lg bg-slate-200 dark:bg-slate-800" />
-        <div className="h-7 w-24 rounded-lg bg-slate-100 dark:bg-slate-800/60" />
-        <div className="h-7 w-28 rounded-lg bg-slate-100 dark:bg-slate-800/60" />
+      {/* Unified Filters Skeleton */}
+      <div className="flex items-center justify-between gap-3 bg-white dark:bg-slate-900/90 p-3.5 sm:p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 shadow-2xs mb-6">
+        <div className="flex items-center gap-2.5">
+          <div className="h-[38px] w-36 rounded-xl bg-slate-200 dark:bg-slate-800" />
+          <div className="h-[38px] w-28 rounded-xl bg-slate-100 dark:bg-slate-800/60" />
+        </div>
+        <div className="h-4 w-32 rounded bg-slate-100 dark:bg-slate-800/60 hidden sm:block" />
       </div>
 
       {/* Sprint Accordions Skeleton */}

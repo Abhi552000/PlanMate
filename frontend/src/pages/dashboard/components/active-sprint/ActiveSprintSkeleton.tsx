@@ -16,11 +16,11 @@ export const ActiveSprintSkeleton: React.FC = () => {
         <div className="h-9 w-36 rounded-xl bg-slate-200 dark:bg-slate-800 self-start sm:self-auto" />
       </div>
 
-      {/* Filters Skeleton */}
-      <div className="flex flex-wrap items-center gap-2.5 pb-2">
-        <div className="h-8 w-32 rounded-xl bg-slate-100 dark:bg-slate-800" />
-        <div className="h-8 w-32 rounded-xl bg-slate-100 dark:bg-slate-800" />
-        <div className="h-8 w-36 rounded-xl bg-slate-100 dark:bg-slate-800" />
+      {/* Unified Filters Skeleton */}
+      <div className="flex items-center gap-2.5 bg-white dark:bg-slate-900/90 p-3.5 sm:p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 shadow-2xs mb-6">
+        <div className="h-[38px] w-32 rounded-xl bg-slate-200 dark:bg-slate-800" />
+        <div className="h-[38px] w-32 rounded-xl bg-slate-100 dark:bg-slate-800/60" />
+        <div className="h-[38px] w-36 rounded-xl bg-slate-100 dark:bg-slate-800/60" />
       </div>
 
       {/* Scrum Board Columns Skeleton */}

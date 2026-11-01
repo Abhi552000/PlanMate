@@ -15,6 +15,17 @@ import { planService } from "../../services/planService";
 import { IPlan, IOrganizationSubscription, ISubscriptionMetrics, IPaymentRecord } from "../../types";
 import { PLANS_BILLING_TEXTS } from "../../constants/billingTexts";
 import { DummyPaymentModal } from "./components/DummyPaymentModal";
+import {
+  Pagination,
+  TableCard,
+  Table,
+  TableHeader,
+  TableBody,
+  TableHead,
+  TableEmpty,
+} from "../../components/ui";
+
+const INVOICE_PAGE_SIZE = 5;
 
 export const PlansBillingPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
@@ -27,6 +38,7 @@ export const PlansBillingPage: React.FC = () => {
   const [billingCycle, setBillingCycle] = useState<"monthly" | "yearly">("monthly");
   const [copiedTxn, setCopiedTxn] = useState<string | null>(null);
   const [invoices, setInvoices] = useState<IPaymentRecord[]>([]);
+  const [invoicePage, setInvoicePage] = useState(1);
 
   const usedSeats = metrics?.activeMembersCount ?? metrics?.activeMembers ?? 0;
   const maxSeats = subscription?.maxMembers ?? metrics?.maxMembers ?? 5;
@@ -419,7 +431,7 @@ export const PlansBillingPage: React.FC = () => {
       </div>
 
       {/* BILLING HISTORY / INVOICES */}
-      <div className="bg-white dark:bg-gray-900 rounded-2xl border border-slate-200 dark:border-gray-800 shadow-2xs overflow-hidden">
+      <TableCard>
         <div className="p-4 sm:p-5 border-b border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-950/30">
           <h3 className="text-sm font-bold text-gray-900 dark:text-white flex items-center gap-2">
             <History className="w-4 h-4 text-sky-500" />
@@ -430,28 +442,25 @@ export const PlansBillingPage: React.FC = () => {
           </p>
         </div>
 
-        <div className="overflow-x-auto scrollbar-thin">
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="border-b border-gray-100 dark:border-gray-800 text-[10px] sm:text-[11px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider bg-gray-50/60 dark:bg-gray-950/40 whitespace-nowrap">
-                <th className="px-3 sm:px-5 py-3">{PLANS_BILLING_TEXTS.COL_INVOICE}</th>
-                <th className="hidden sm:table-cell px-3 sm:px-5 py-3">{PLANS_BILLING_TEXTS.COL_DATE}</th>
-                <th className="px-3 sm:px-5 py-3">{PLANS_BILLING_TEXTS.COL_PLAN}</th>
-                <th className="hidden md:table-cell px-3 sm:px-5 py-3">{PLANS_BILLING_TEXTS.COL_PLAN_TYPE}</th>
-                <th className="px-3 sm:px-5 py-3">{PLANS_BILLING_TEXTS.COL_AMOUNT}</th>
-                <th className="px-3 sm:px-5 py-3">{PLANS_BILLING_TEXTS.COL_STATUS}</th>
-                <th className="hidden lg:table-cell px-3 sm:px-5 py-3 text-right">{PLANS_BILLING_TEXTS.COL_TRANSACTION}</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100 dark:divide-gray-800 text-[11px] sm:text-xs">
-              {invoices.length === 0 ? (
-                <tr>
-                  <td colSpan={7} className="px-5 py-8 text-center text-xs text-gray-400">
-                    {PLANS_BILLING_TEXTS.EMPTY_INVOICES}
-                  </td>
-                </tr>
-              ) : (
-                invoices.map((inv) => {
+        <Table>
+          <TableHeader>
+            <tr>
+              <TableHead>{PLANS_BILLING_TEXTS.COL_INVOICE}</TableHead>
+              <TableHead className="hidden sm:table-cell">{PLANS_BILLING_TEXTS.COL_DATE}</TableHead>
+              <TableHead>{PLANS_BILLING_TEXTS.COL_PLAN}</TableHead>
+              <TableHead className="hidden md:table-cell">{PLANS_BILLING_TEXTS.COL_PLAN_TYPE}</TableHead>
+              <TableHead>{PLANS_BILLING_TEXTS.COL_AMOUNT}</TableHead>
+              <TableHead>{PLANS_BILLING_TEXTS.COL_STATUS}</TableHead>
+              <TableHead className="hidden lg:table-cell text-right">{PLANS_BILLING_TEXTS.COL_TRANSACTION}</TableHead>
+            </tr>
+          </TableHeader>
+          <TableBody>
+            {invoices.length === 0 ? (
+              <TableEmpty colSpan={7} message={PLANS_BILLING_TEXTS.EMPTY_INVOICES} />
+            ) : (
+                invoices
+                  .slice((invoicePage - 1) * INVOICE_PAGE_SIZE, invoicePage * INVOICE_PAGE_SIZE)
+                  .map((inv) => {
                   const invId =
                     inv.invoiceNumber ||
                     (inv._id ? `INV-${inv._id.toString().slice(-6).toUpperCase()}` : "INV-PLANMATE");
@@ -512,10 +521,19 @@ export const PlansBillingPage: React.FC = () => {
                   );
                 })
               )}
-            </tbody>
-          </table>
-        </div>
-      </div>
+          </TableBody>
+        </Table>
+
+        {/* PAGINATION */}
+        <Pagination
+          currentPage={invoicePage}
+          totalPages={Math.max(1, Math.ceil(invoices.length / INVOICE_PAGE_SIZE))}
+          totalItems={invoices.length}
+          pageSize={INVOICE_PAGE_SIZE}
+          itemLabel="invoices"
+          onPageChange={setInvoicePage}
+        />
+      </TableCard>
 
       {/* Payment Modal */}
       <DummyPaymentModal

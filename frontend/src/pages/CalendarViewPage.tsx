@@ -191,23 +191,23 @@ export const CalendarViewPage: React.FC = () => {
           <div className="flex items-center gap-2 self-stretch sm:self-auto">
             <button
               onClick={handleToday}
-              className="px-3 py-1.5 bg-sky-50 hover:bg-sky-100 dark:bg-gray-880 dark:hover:bg-gray-700 text-sky-700 dark:text-sky-300 rounded-lg text-xs font-semibold shadow-sm transition"
+              className="px-3 py-1.5 bg-sky-50 hover:bg-sky-100 dark:bg-slate-800 dark:hover:bg-slate-700 text-sky-700 dark:text-sky-300 rounded-lg text-xs font-semibold shadow-2xs transition"
             >
               Today
             </button>
-            <div className="flex items-center bg-sky-50/50 dark:bg-gray-800 rounded-lg p-0.5 border border-sky-100 dark:border-gray-750">
+            <div className="flex items-center bg-slate-50 dark:bg-slate-800 rounded-lg p-0.5 border border-slate-200/80 dark:border-slate-700">
               <button
                 onClick={handlePrevMonth}
-                className="p-1.5 hover:bg-white dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-md transition"
+                className="p-1.5 hover:bg-white dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-md transition"
               >
                 <ChevronLeft className="w-4 h-4" />
               </button>
-              <span className="px-3 text-xs md:text-sm font-semibold text-gray-700 dark:text-gray-200 min-w-[7.5rem] text-center">
+              <span className="px-3 text-xs md:text-sm font-semibold text-slate-700 dark:text-slate-200 min-w-[7.5rem] text-center">
                 {CALENDAR_TEXTS.MONTH_NAMES[currentMonth]} {currentYear}
               </span>
               <button
                 onClick={handleNextMonth}
-                className="p-1.5 hover:bg-white dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-md transition"
+                className="p-1.5 hover:bg-white dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-md transition"
               >
                 <ChevronRight className="w-4 h-4" />
               </button>
@@ -217,7 +217,7 @@ export const CalendarViewPage: React.FC = () => {
 
         {/* Calendar Grid Sheet */}
         <div className="overflow-x-auto scrollbar-thin rounded-xl">
-          <div className="grid grid-cols-7 gap-px bg-sky-100 dark:bg-gray-850 min-w-[340px] sm:min-w-0 border border-sky-100 dark:border-gray-800">
+          <div className="grid grid-cols-7 gap-px bg-slate-200/80 dark:bg-slate-800 min-w-[340px] sm:min-w-0 border border-slate-200/80 dark:border-slate-800">
           {/* Weekdays Row */}
           {CALENDAR_TEXTS.WEEKDAY_NAMES.map((name) => (
             <div

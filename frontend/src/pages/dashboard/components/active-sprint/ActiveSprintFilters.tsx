@@ -1,6 +1,5 @@
 import React from "react";
-import { Filter, LayoutGrid } from "lucide-react";
-import { Button } from "../../../../components/ui/Button";
+import { FilterSelect } from "../../../../components/ui/FilterSelect";
 import { ACTIVE_SPRINT_TEXTS } from "../../../../constants/uiTexts";
 import { ActiveSprintFiltersProps } from "../../../../types";
 
@@ -12,44 +11,57 @@ export const ActiveSprintFilters: React.FC<ActiveSprintFiltersProps> = ({
   groupByEpic,
   setGroupByEpic,
 }) => {
-  return (
-    <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 mb-6">
-      {/* Quick Filters */}
-      <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-0.5">
-        <span className="text-xs font-bold text-slate-500 dark:text-slate-400 flex items-center gap-1 mr-1 shrink-0">
-          <Filter className="w-3.5 h-3.5" /> {ACTIVE_SPRINT_TEXTS.FILTER_LABEL}
-        </span>
-        <Button
-          variant={onlyMyIssues ? "primary" : "outline"}
-          size="sm"
-          onClick={() => setOnlyMyIssues(!onlyMyIssues)}
-          className="shrink-0"
-        >
-          {ACTIVE_SPRINT_TEXTS.BTN_ONLY_MY_ISSUES}
-        </Button>
-        <Button
-          variant={highPriorityOnly ? "primary" : "outline"}
-          size="sm"
-          onClick={() => setHighPriorityOnly(!highPriorityOnly)}
-          className="shrink-0"
-        >
-          {ACTIVE_SPRINT_TEXTS.BTN_HIGH_PRIORITY}
-        </Button>
-      </div>
+  const hasActiveFilters = onlyMyIssues || highPriorityOnly || groupByEpic;
 
-      {/* Grouping Dropdown */}
-      <div className="flex items-center gap-2 shrink-0 self-start sm:self-auto">
-        <span className="text-xs font-bold text-slate-500 dark:text-slate-400 flex items-center gap-1">
-          <LayoutGrid className="w-3.5 h-3.5" />{" "}
-          {ACTIVE_SPRINT_TEXTS.GROUP_BY_LABEL}
-        </span>
-        <Button
-          variant={groupByEpic ? "primary" : "outline"}
-          size="sm"
-          onClick={() => setGroupByEpic(!groupByEpic)}
-        >
-          {ACTIVE_SPRINT_TEXTS.BTN_EPIC_SWIMLANES}
-        </Button>
+  const handleClearFilters = () => {
+    setOnlyMyIssues(false);
+    setHighPriorityOnly(false);
+    setGroupByEpic(false);
+  };
+
+  return (
+    <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-white dark:bg-slate-900/90 p-3.5 sm:p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 shadow-2xs mb-6">
+      {/* Filter Dropdowns Matching Dashboard */}
+      <div className="flex flex-wrap items-center gap-2.5">
+        <FilterSelect
+          label="Filter"
+          value={onlyMyIssues ? "my_issues" : "all"}
+          options={[
+            { label: "All Board Issues", value: "all" },
+            { label: ACTIVE_SPRINT_TEXTS.BTN_ONLY_MY_ISSUES, value: "my_issues" },
+          ]}
+          onChange={(val) => setOnlyMyIssues(val === "my_issues")}
+        />
+
+        <FilterSelect
+          label="Priority"
+          value={highPriorityOnly ? "high" : "all"}
+          options={[
+            { label: "All Priorities", value: "all" },
+            { label: ACTIVE_SPRINT_TEXTS.BTN_HIGH_PRIORITY, value: "high" },
+          ]}
+          onChange={(val) => setHighPriorityOnly(val === "high")}
+        />
+
+        <FilterSelect
+          label="Swimlanes"
+          value={groupByEpic ? "epic" : "none"}
+          options={[
+            { label: "Default Columns", value: "none" },
+            { label: ACTIVE_SPRINT_TEXTS.BTN_EPIC_SWIMLANES, value: "epic" },
+          ]}
+          onChange={(val) => setGroupByEpic(val === "epic")}
+        />
+
+        {hasActiveFilters && (
+          <button
+            type="button"
+            onClick={handleClearFilters}
+            className="text-xs font-bold text-sky-600 dark:text-sky-400 hover:text-sky-700 dark:hover:text-sky-300 px-2.5 py-1.5 rounded-xl transition-colors cursor-pointer hover:bg-sky-50 dark:hover:bg-slate-800 border border-transparent hover:border-sky-100 dark:hover:border-slate-700"
+          >
+            Clear Filters
+          </button>
+        )}
       </div>
     </div>
   );
