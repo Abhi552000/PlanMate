@@ -24,7 +24,7 @@ export const TaskModalFooter: React.FC<TaskModalFooterProps> = ({
       <button
         type="submit"
         disabled={loading}
-        className="w-full sm:w-auto bg-sky-600 hover:bg-sky-700 active:bg-sky-800 text-white font-medium py-2 px-5 rounded-lg flex items-center justify-center gap-2 disabled:opacity-50 transition-colors cursor-pointer text-xs sm:text-sm"
+        className="w-full sm:w-auto bg-sky-500 hover:bg-sky-600 active:bg-sky-700 text-white font-medium py-2 px-5 rounded-lg flex items-center justify-center gap-2 disabled:opacity-50 transition-colors cursor-pointer text-xs sm:text-sm shadow-2xs"
       >
         {loading ? (
           "Saving..."

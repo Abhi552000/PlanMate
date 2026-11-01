@@ -140,3 +140,23 @@ export const getSeatUsageSummary = (
     isQuotaExceeded,
   };
 };
+
+/**
+ * Checks whether an organization subscription is expired or past due.
+ * 
+ * @param {Object} subscription - organization.subscription object
+ * @returns {boolean} True if expired
+ */
+export const isSubscriptionExpired = (subscription) => {
+  if (!subscription) return false;
+  if (subscription.status === "expired" || subscription.status === "past_due") {
+    return true;
+  }
+  if (
+    subscription.validUntil &&
+    new Date(subscription.validUntil).getTime() < Date.now()
+  ) {
+    return true;
+  }
+  return false;
+};

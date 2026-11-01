@@ -49,7 +49,7 @@ export const WRAPPER = "w-full space-y-6";
 export const HEADER =
   "flex flex-col md:flex-row justify-between items-start md:items-center mb-4 md:mb-6 gap-3";
 export const ADD_BUTTON =
-  "flex items-center gap-2 cursor-pointer bg-gradient-to-r from-cyan-500 to-sky-600 text-white px-4 py-2 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 w-full md:w-auto justify-center text-sm md:text-base";
+  "flex items-center gap-2 cursor-pointer bg-sky-500 hover:bg-sky-600 active:bg-sky-700 text-white px-4 py-2 rounded-lg shadow-2xs transition-colors w-full md:w-auto justify-center text-sm font-semibold";
 export const STATS_GRID =
   "grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-4 md:mb-6";
 export const STAT_CARD =
@@ -103,7 +103,7 @@ export const EMPTY_STATE = {
     "p-6 bg-white rounded-xl shadow-sm border border-sky-100 text-center",
   iconWrapper:
     "w-16 h-16 bg-sky-100 rounded-full flex items-center justify-center mx-auto mb-4",
-  btn: "px-4 py-2 bg-gradient-to-r from-cyan-500 to-sky-600 text-white rounded-lg text-sm font-medium",
+  btn: "px-4 py-2 bg-sky-500 hover:bg-sky-600 text-white rounded-lg text-sm font-medium transition-colors",
 };
 
 // Task Actions Menu

@@ -125,7 +125,7 @@ export const SysAdminSidebar: React.FC<SysAdminSidebarProps> = ({
                   onClick={() => handleSelectTab(item.id)}
                   className={`w-full group relative flex items-center h-10 px-2.5 rounded-lg transition-colors overflow-hidden cursor-pointer ${
                     isActive
-                      ? "bg-sky-50 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300 font-semibold border-l-[3px] border-sky-500 pl-[7px]"
+                      ? "bg-sky-50 dark:bg-sky-950/40 text-sky-600 dark:text-sky-300 font-semibold border-l-[3px] border-sky-500 pl-[7px]"
                       : "text-gray-600 dark:text-gray-400 hover:text-sky-600 dark:hover:text-sky-300 hover:bg-gray-100/70 dark:hover:bg-gray-800/70"
                   }`}
                   title={isCollapsed ? item.label : undefined}
@@ -206,7 +206,7 @@ export const SysAdminSidebar: React.FC<SysAdminSidebarProps> = ({
                       onClick={() => handleSelectTab(item.id)}
                       className={`w-full flex items-center h-10 px-3 rounded-lg transition-colors cursor-pointer ${
                         isActive
-                          ? "bg-sky-50 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300 font-semibold border-l-[3px] border-sky-500 pl-[9px]"
+                          ? "bg-sky-50 dark:bg-sky-950/40 text-sky-600 dark:text-sky-300 font-semibold border-l-[3px] border-sky-500 pl-[9px]"
                           : "text-gray-600 dark:text-gray-400 hover:text-sky-600 dark:hover:text-sky-300 hover:bg-gray-100 dark:hover:bg-gray-800"
                       }`}
                     >

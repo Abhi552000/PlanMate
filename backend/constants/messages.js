@@ -11,6 +11,10 @@ export const MESSAGES = {
     ORG_INACTIVE: (remark) => `Your organization is inactive: ${remark || "Deactivated by System Admin"}. Please contact your administrator.`,
     REGISTRATION_PENDING: "Your registration request is pending approval by your organization administrator. Please contact your administrator for access.",
     REGISTRATION_REJECTED: "Your access request has been rejected by your organization administrator.",
+    SUBSCRIPTION_EXPIRED: (adminName, adminEmail) =>
+      `Your organization's subscription has expired. Please contact your workspace administrator${
+        adminName ? ` (${adminName}${adminEmail ? ` - ${adminEmail}` : ""})` : ""
+      } to renew the plan.`,
     USER_NOT_FOUND: "User not found",
     VALID_NAME_REQUIRED: "valid name required",
     PASSWORD_INVALID: "Password invalid or too short",

@@ -6,6 +6,7 @@ import Payment from "../models/paymentModel.js";
 import {
   calculateProrationUpgrade,
   getSeatUsageSummary,
+  isSubscriptionExpired,
 } from "../utils/subscriptionHelper.js";
 import bcrypt from "bcrypt";
 import validator from "validator";
@@ -190,6 +191,13 @@ export const addOrganizationMember = async (req, res) => {
       return res
         .status(HttpStatus.NOT_FOUND)
         .json({ success: false, message: MESSAGES.ORG.NOT_FOUND });
+    }
+
+    if (isSubscriptionExpired(org.subscription)) {
+      return res.status(HttpStatus.FORBIDDEN).json({
+        success: false,
+        message: "Your organization subscription has expired. Please renew your plan in Plans & Billing to onboard new members.",
+      });
     }
 
     const maxAllowed = org.subscription?.maxMembers || 5;
@@ -694,9 +702,15 @@ export const updateUserStatus = async (req, res) => {
         .json({ success: false, message: MESSAGES.ORG.MEMBER_NOT_FOUND });
     }
 
-    // If activating a member, enforce plan member quota
+    // If activating a member, enforce plan member quota and active subscription
     if (status === "active" && userToUpdate.status !== "active") {
       const org = await Organization.findById(req.user.organization);
+      if (isSubscriptionExpired(org?.subscription)) {
+        return res.status(HttpStatus.FORBIDDEN).json({
+          success: false,
+          message: "Your organization subscription has expired. Please renew your plan in Plans & Billing to activate members.",
+        });
+      }
       const maxAllowed = org?.subscription?.maxMembers || 5;
       const currentActive = await User.countDocuments({
         organization: req.user.organization,

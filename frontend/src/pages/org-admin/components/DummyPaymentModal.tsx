@@ -194,11 +194,15 @@ export const DummyPaymentModal: React.FC<DummyPaymentModalProps> = React.memo(({
             <h3 className="font-bold text-base text-gray-900 dark:text-white">
               {paymentReceipt
                 ? PAYMENT_MODAL_TEXTS.TITLE_ACTIVE
+                : currentSubscription?.planId?.toLowerCase() === plan?.planId?.toLowerCase()
+                ? `Renew ${plan.name} Plan`
                 : `${PAYMENT_MODAL_TEXTS.TITLE_SUBSCRIBE_PREFIX} ${plan.name}`}
             </h3>
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
               {paymentReceipt
                 ? PAYMENT_MODAL_TEXTS.SUBTITLE_ACTIVE
+                : currentSubscription?.planId?.toLowerCase() === plan?.planId?.toLowerCase()
+                ? "Complete payment to renew and reactivate your workspace"
                 : PAYMENT_MODAL_TEXTS.SUBTITLE_SUBSCRIBE}
             </p>
           </div>

@@ -188,7 +188,7 @@ export const IssueLinkingSection: React.FC<IssueLinkingSectionProps> = ({
             <button
               type="submit"
               disabled={linking || !targetTaskId}
-              className="px-4 py-1.5 text-xs font-bold text-white bg-sky-600 hover:bg-sky-700 disabled:opacity-50 rounded-lg transition-colors shadow-xs cursor-pointer flex items-center gap-1.5"
+              className="px-4 py-1.5 text-xs font-bold text-white bg-sky-500 hover:bg-sky-600 disabled:opacity-50 rounded-lg transition-colors shadow-2xs cursor-pointer flex items-center gap-1.5"
             >
               <Check className="w-3.5 h-3.5" />
               {linking ? "Linking..." : "Link"}

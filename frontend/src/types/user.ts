@@ -7,4 +7,5 @@ export interface IUser {
   avatar?: string;
   organization?: string | any;
   organizationName?: string;
+  isSubscriptionExpired?: boolean;
 }

@@ -4,6 +4,7 @@ import { IUser } from "./user";
 export interface AuthContextType {
   currentUser: IUser | null;
   setCurrentUser: (updater: any) => void;
+  refreshUser: () => Promise<IUser | null>;
   login: (data: any, navigate: (path: string, options?: any) => void) => void;
   logout: (navigate: (path: string, options?: any) => void) => void;
 }

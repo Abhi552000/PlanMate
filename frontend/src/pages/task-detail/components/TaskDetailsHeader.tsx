@@ -190,7 +190,7 @@ export const TaskDetailsHeader: React.FC<TaskDetailsHeaderProps> = ({
               <button
                 type="button"
                 onClick={handleSaveTitle}
-                className="p-2 bg-sky-600 hover:bg-sky-700 text-white rounded-lg transition-colors cursor-pointer shrink-0 shadow-xs"
+                className="p-2 bg-sky-500 hover:bg-sky-600 text-white rounded-lg transition-colors cursor-pointer shrink-0 shadow-2xs"
                 title="Save (Enter)"
               >
                 <Check className="w-4 h-4" />

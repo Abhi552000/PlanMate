@@ -188,7 +188,7 @@ export const OrgListTable: React.FC<OrgListTableProps> = ({
 
                 {/* Subscription Plan */}
                 <td className="px-3 sm:px-5 py-3 sm:py-3.5">
-                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-bold bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 border border-sky-100 dark:border-sky-800">
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-bold bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 border border-sky-100 dark:border-sky-800">
                     {org.subscription?.planName || "Starter"}
                   </span>
                 </td>

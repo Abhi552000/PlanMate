@@ -1,5 +1,6 @@
 import express from "express";
 import authMiddleware from "../middleware/auth.js";
+import { requireActiveSubscription } from "../middleware/subscriptionCheck.js";
 import {
   getSprints,
   createSprint,
@@ -9,14 +10,16 @@ import {
 
 const sprintRouter = express.Router();
 
+sprintRouter.use(authMiddleware, requireActiveSubscription);
+
 sprintRouter
   .route("/")
-  .get(authMiddleware, getSprints)
-  .post(authMiddleware, createSprint);
+  .get(getSprints)
+  .post(createSprint);
 
 sprintRouter
   .route("/:id")
-  .put(authMiddleware, updateSprint)
-  .delete(authMiddleware, deleteSprint);
+  .put(updateSprint)
+  .delete(deleteSprint);
 
 export default sprintRouter;

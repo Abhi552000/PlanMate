@@ -555,7 +555,7 @@ export const CalendarViewPage: React.FC = () => {
                     setShowDayFocusModal(false);
                     handleOpenCreateForDate(selectedDate);
                   }}
-                  className="flex items-center gap-1.5 px-3 py-1.5 bg-sky-600 hover:bg-sky-700 active:bg-sky-800 text-white rounded-lg text-xs font-medium transition cursor-pointer shadow-xs"
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-sky-500 hover:bg-sky-600 active:bg-sky-700 text-white rounded-lg text-xs font-medium transition cursor-pointer shadow-2xs"
                   title="Create issue for this day"
                 >
                   <Plus className="w-3.5 h-3.5" />

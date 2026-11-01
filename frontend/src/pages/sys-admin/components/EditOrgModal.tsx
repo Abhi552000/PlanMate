@@ -113,7 +113,7 @@ export const EditOrgModal: React.FC<EditOrgModalProps> = ({
             <button
               type="submit"
               disabled={updating}
-              className="bg-gradient-to-r from-cyan-500 to-sky-600 text-white font-bold py-2 px-5 rounded-lg flex items-center justify-center gap-1.5 hover:shadow-md transition-all duration-200 cursor-pointer text-xs"
+              className="bg-sky-500 hover:bg-sky-600 disabled:opacity-50 text-white font-bold py-2 px-5 rounded-lg flex items-center justify-center gap-1.5 transition-colors cursor-pointer text-xs"
             >
               <Save className="w-4 h-4" /> {updating ? "Saving..." : "Save Changes"}
             </button>

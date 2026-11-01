@@ -16,7 +16,7 @@ export const ActiveSprintHeader: React.FC<ActiveSprintHeaderProps> = ({
           <h1 className="text-lg md:text-2xl font-black text-gray-900 dark:text-white tracking-tight">
             {activeSprint.name}
           </h1>
-          <span className="text-[9px] font-black uppercase tracking-wider bg-sky-600 text-white px-2 py-0.5 rounded shadow-sm flex items-center gap-1 shrink-0">
+          <span className="text-[9px] font-black uppercase tracking-wider bg-sky-500 text-white px-2 py-0.5 rounded shadow-2xs flex items-center gap-1 shrink-0">
             <Flame className="w-3 h-3" /> {ACTIVE_SPRINT_TEXTS.LABEL_ACTIVE}
           </span>
         </div>

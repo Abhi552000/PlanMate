@@ -37,14 +37,14 @@ export const InspectingUserModal: React.FC<InspectingUserModalProps> = ({
 
         {/* Member Identity Profile */}
         <div className="flex items-center gap-3 bg-sky-50/20 dark:bg-sky-950/10 p-3.5 rounded-xl border border-sky-100/30 dark:border-gray-800">
-          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-cyan-500 to-sky-600 text-white flex items-center justify-center font-bold text-lg shadow-md">
+          <div className="w-12 h-12 rounded-full bg-sky-500 text-white flex items-center justify-center font-bold text-lg shadow-sm">
             {inspectingUser.name.charAt(0).toUpperCase()}
           </div>
           <div>
             <h4 className="font-bold text-gray-800 dark:text-gray-150 text-base">
               {inspectingUser.name}
             </h4>
-            <span className="text-[9px] bg-sky-100 dark:bg-sky-950 text-sky-700 dark:text-sky-400 px-2 py-0.5 rounded font-bold uppercase tracking-wider mt-1 inline-block border border-sky-200/50 dark:border-sky-900/50">
+            <span className="text-[9px] bg-sky-100 dark:bg-sky-950 text-sky-600 dark:text-sky-400 px-2 py-0.5 rounded font-bold uppercase tracking-wider mt-1 inline-block border border-sky-200/50 dark:border-sky-900/50">
               {inspectingUser.role === "org_admin" ? "Org Admin" : "Member"}
             </span>
           </div>

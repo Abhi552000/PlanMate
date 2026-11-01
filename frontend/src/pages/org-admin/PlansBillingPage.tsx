@@ -8,13 +8,19 @@ import {
   History,
   Check,
   Copy,
+  AlertCircle,
 } from "lucide-react";
 import { toast } from "react-toastify";
 import { orgService } from "../../services/orgService";
 import { planService } from "../../services/planService";
 import { IPlan, IOrganizationSubscription, ISubscriptionMetrics, IPaymentRecord } from "../../types";
 import { PLANS_BILLING_TEXTS } from "../../constants/billingTexts";
+import { SUBSCRIPTION_EXPIRED_TEXTS } from "../../constants/uiTexts";
 import { DummyPaymentModal } from "./components/DummyPaymentModal";
+import { useAuth } from "../../context/AuthContext";
+import { useAppDispatch } from "../../store";
+import { fetchTasks } from "../../store/slices/taskSlice";
+import { isOrgSubscriptionExpired } from "../../utils/subscriptionUtils";
 import {
   Pagination,
   TableCard,
@@ -28,6 +34,8 @@ import {
 const INVOICE_PAGE_SIZE = 5;
 
 export const PlansBillingPage: React.FC = () => {
+  const { refreshUser } = useAuth();
+  const dispatch = useAppDispatch();
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [subscription, setSubscription] = useState<IOrganizationSubscription | null>(null);
@@ -51,14 +59,26 @@ export const PlansBillingPage: React.FC = () => {
       ? metrics.usagePercent
       : Math.min(100, Math.round((usedSeats / Math.max(1, maxSeats)) * 100));
   const currentPlanId = (subscription?.planId || "starter").toLowerCase();
+  const isExpired = Boolean(
+    subscription?.status === "expired" ||
+    subscription?.status === "past_due" ||
+    (subscription?.validUntil &&
+      !isNaN(new Date(subscription.validUntil).getTime()) &&
+      new Date(subscription.validUntil).getTime() < Date.now())
+  );
 
   const handleOpenUpgrade = (plan: IPlan) => {
     setSelectedPlanForUpgrade(plan);
     setModalOpen(true);
   };
 
-  const handlePaymentSuccess = () => {
+  const handlePaymentSuccess = async () => {
+    const refreshed = await refreshUser();
+    if (refreshed && !isOrgSubscriptionExpired(refreshed)) {
+      dispatch(fetchTasks());
+    }
     loadData(true);
+    toast.success("Subscription updated successfully! Workspace features are unlocked.");
   };
 
   const handleCopy = (text: string) => {
@@ -73,11 +93,16 @@ export const PlansBillingPage: React.FC = () => {
     else setLoading(true);
 
     try {
-      const [subRes, plansRes, historyRes] = await Promise.all([
+      const [subRes, plansRes, historyRes, refreshedUser] = await Promise.all([
         orgService.getSubscription(),
         planService.getActivePlans(),
         orgService.getBillingHistory(),
+        refreshUser(),
       ]);
+
+      if (refreshedUser && !isOrgSubscriptionExpired(refreshedUser)) {
+        dispatch(fetchTasks());
+      }
 
       if (subRes?.success) {
         setSubscription(subRes.subscription);
@@ -226,6 +251,23 @@ export const PlansBillingPage: React.FC = () => {
         </button>
       </div>
 
+      {/* EXPIRED PLAN BANNER */}
+      {isExpired && (
+        <div className="p-4 sm:p-5 rounded-2xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/50 flex items-start gap-3.5 shadow-2xs animate-in fade-in">
+          <div className="w-9 h-9 rounded-xl bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-800/60 flex items-center justify-center shrink-0 mt-0.5">
+            <AlertCircle className="w-5 h-5" />
+          </div>
+          <div>
+            <h3 className="text-sm font-bold text-amber-900 dark:text-amber-200">
+              {SUBSCRIPTION_EXPIRED_TEXTS.BILLING_EXPIRED_BANNER_TITLE}
+            </h3>
+            <p className="text-xs text-amber-800/90 dark:text-amber-300/90 mt-1 leading-relaxed">
+              {SUBSCRIPTION_EXPIRED_TEXTS.BILLING_EXPIRED_BANNER_DESC}
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* CURRENT ACTIVE PLAN SUMMARY */}
       <div className="p-5 sm:p-6 rounded-2xl bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-800 shadow-2xs space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-gray-100 dark:border-gray-800 pb-4">
@@ -237,10 +279,17 @@ export const PlansBillingPage: React.FC = () => {
               <h3 className="text-xl font-bold text-gray-900 dark:text-white">
                 {subscription?.planName || "Starter"}
               </h3>
-              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                {PLANS_BILLING_TEXTS.BADGE_ACTIVE}
-              </span>
+              {isExpired ? (
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-900/50">
+                  <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
+                  {SUBSCRIPTION_EXPIRED_TEXTS.STATUS_EXPIRED}
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                  {PLANS_BILLING_TEXTS.BADGE_ACTIVE}
+                </span>
+              )}
             </div>
           </div>
 
@@ -334,6 +383,13 @@ export const PlansBillingPage: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {plans.map((plan) => {
             const isCurrent = plan.planId.toLowerCase() === currentPlanId;
+            const currentPlanDoc = plans.find(
+              (p) => p.planId.toLowerCase() === currentPlanId
+            );
+            const currentMaxMembers =
+              subscription?.maxMembers || currentPlanDoc?.maxMembers || 5;
+            const isUpgrade = plan.maxMembers > currentMaxMembers;
+
             const displayPrice =
               billingCycle === "yearly" && plan.price > 0
                 ? Math.round((plan.price * 10) / 12)
@@ -344,7 +400,9 @@ export const PlansBillingPage: React.FC = () => {
                 key={plan.planId}
                 className={`p-6 rounded-2xl border transition-all flex flex-col justify-between bg-white dark:bg-gray-900 shadow-2xs ${
                   isCurrent
-                    ? "border-sky-500 ring-2 ring-sky-500/20"
+                    ? isExpired
+                      ? "border-amber-400 dark:border-amber-600 ring-2 ring-amber-500/20"
+                      : "border-sky-500 ring-2 ring-sky-500/20"
                     : plan.isPopular
                     ? "border-sky-300 dark:border-sky-800"
                     : "border-slate-200 dark:border-gray-800"
@@ -356,9 +414,15 @@ export const PlansBillingPage: React.FC = () => {
                       {plan.name}
                     </h3>
                     {isCurrent ? (
-                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-sky-500 text-white">
-                        {PLANS_BILLING_TEXTS.BADGE_CURRENT}
-                      </span>
+                      isExpired ? (
+                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-rose-500 text-white">
+                          {PLANS_BILLING_TEXTS.BADGE_EXPIRED_CURRENT}
+                        </span>
+                      ) : (
+                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-sky-500 text-white">
+                          {PLANS_BILLING_TEXTS.BADGE_CURRENT}
+                        </span>
+                      )
                     ) : plan.isPopular ? (
                       <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-sky-100 dark:bg-sky-950 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800">
                         {PLANS_BILLING_TEXTS.BADGE_POPULAR}
@@ -405,20 +469,40 @@ export const PlansBillingPage: React.FC = () => {
 
                 <div>
                   {isCurrent ? (
-                    <button
-                      disabled
-                      className="w-full h-10 rounded-xl text-xs font-bold bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-500 cursor-not-allowed flex items-center justify-center gap-1.5"
-                    >
-                      <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                      {PLANS_BILLING_TEXTS.BTN_CURRENT_PLAN}
-                    </button>
+                    isExpired ? (
+                      <button
+                        type="button"
+                        onClick={() => handleOpenUpgrade(plan)}
+                        className="w-full h-10 rounded-xl text-xs font-bold bg-amber-500 hover:bg-amber-600 text-white transition-all shadow-md shadow-amber-500/10 flex items-center justify-center gap-1.5 cursor-pointer"
+                      >
+                        <RotateCw className="w-3.5 h-3.5" />
+                        <span>
+                          {PLANS_BILLING_TEXTS.BTN_RENEW_PREFIX} {plan.name}
+                        </span>
+                      </button>
+                    ) : (
+                      <button
+                        disabled
+                        className="w-full h-10 rounded-xl text-xs font-bold bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-500 cursor-not-allowed flex items-center justify-center gap-1.5"
+                      >
+                        <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                        {PLANS_BILLING_TEXTS.BTN_CURRENT_PLAN}
+                      </button>
+                    )
                   ) : (
                     <button
+                      type="button"
                       onClick={() => handleOpenUpgrade(plan)}
-                      className="w-full h-10 rounded-xl text-xs font-bold bg-sky-500 hover:bg-sky-600 text-white transition-all shadow-2xs flex items-center justify-center gap-1.5 cursor-pointer"
+                      className={`w-full h-10 rounded-xl text-xs font-bold transition-all shadow-2xs flex items-center justify-center gap-1.5 cursor-pointer ${
+                        isUpgrade
+                          ? "bg-sky-500 hover:bg-sky-600 text-white shadow-sky-500/10"
+                          : "bg-slate-800 hover:bg-slate-900 dark:bg-slate-800 dark:hover:bg-slate-700 text-white"
+                      }`}
                     >
                       <span>
-                        {PLANS_BILLING_TEXTS.BTN_UPGRADE_PREFIX} {plan.name}
+                        {isUpgrade
+                          ? `${PLANS_BILLING_TEXTS.BTN_UPGRADE_PREFIX} ${plan.name}`
+                          : `${PLANS_BILLING_TEXTS.BTN_DOWNGRADE_PREFIX} ${plan.name}`}
                       </span>
                       <ArrowRight className="w-3.5 h-3.5" />
                     </button>

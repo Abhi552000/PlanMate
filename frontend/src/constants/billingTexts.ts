@@ -19,9 +19,12 @@ export const PLANS_BILLING_TEXTS = {
   SAVE_YEARLY_BADGE: "Save 20%",
   BADGE_CURRENT: "Current",
   BADGE_POPULAR: "Popular",
+  BADGE_EXPIRED_CURRENT: "Expired (Current)",
   PER_MONTH: "/ month",
   BTN_CURRENT_PLAN: "Current Plan",
   BTN_UPGRADE_PREFIX: "Upgrade to",
+  BTN_DOWNGRADE_PREFIX: "Downgrade to",
+  BTN_RENEW_PREFIX: "Renew",
   UP_TO_MEMBERS: (count: number) => `Up to ${count} team members`,
   SEATS_USED_TEXT: (used: number, max: number, percent: number) =>
     `${used} of ${max} seats used (${percent}%)`,

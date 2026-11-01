@@ -8,7 +8,14 @@ const App = () => {
   return (
     <AuthProvider>
       <ScrollToTop />
-      <ToastContainer position="top-right" autoClose={3000} limit={3} newestOnTop />
+      <ToastContainer
+        position="top-right"
+        autoClose={3200}
+        limit={3}
+        newestOnTop
+        closeOnClick
+        pauseOnHover
+      />
       <AppRoutes />
     </AuthProvider>
   );

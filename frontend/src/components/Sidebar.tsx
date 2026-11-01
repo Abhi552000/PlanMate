@@ -12,11 +12,14 @@ import {
   Settings,
   Sun,
   Moon,
+  Lock,
 } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { SidebarProps } from "../types";
 import { PlanMateLogo } from "./common/PlanMateLogo";
 import { ROUTES } from "../constants/routeConstant";
+import { isOrgSubscriptionExpired } from "../utils/subscriptionUtils";
+import { SUBSCRIPTION_EXPIRED_TEXTS } from "../constants/uiTexts";
 
 const Sidebar: React.FC<SidebarProps> = ({
   user,
@@ -97,6 +100,8 @@ const Sidebar: React.FC<SidebarProps> = ({
       );
     }
 
+    const isExpired = isOrgSubscriptionExpired(user);
+
     return (
       <ul className="space-y-1">
         {menuItems.map(({ text, path, icon }) => (
@@ -106,8 +111,9 @@ const Sidebar: React.FC<SidebarProps> = ({
               className={({ isActive }) =>
                 [
                   "group relative flex items-center h-10 px-2.5 rounded-lg transition-colors overflow-hidden",
+                  isExpired ? "opacity-60 hover:opacity-80" : "",
                   isActive
-                    ? "bg-sky-50 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300 font-semibold border-l-[3px] border-sky-500 pl-[7px]"
+                    ? "bg-sky-50 dark:bg-sky-950/40 text-sky-600 dark:text-sky-300 font-semibold border-l-[3px] border-sky-500 pl-[7px]"
                     : "text-gray-600 dark:text-gray-400 hover:text-sky-600 dark:hover:text-sky-300 hover:bg-gray-100/70 dark:hover:bg-gray-800/70",
                 ].join(" ")
               }
@@ -125,9 +131,13 @@ const Sidebar: React.FC<SidebarProps> = ({
               >
                 {text}
               </span>
+              {isExpired && !collapsedMode && (
+                <Lock className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500 ml-auto shrink-0" />
+              )}
               {collapsedMode && (
-                <div className="pointer-events-none fixed left-[68px] px-2.5 py-1 rounded-md bg-gray-900 dark:bg-gray-800 text-white text-xs font-medium whitespace-nowrap shadow-md opacity-0 group-hover:opacity-100 transition-opacity z-50">
-                  {text}
+                <div className="pointer-events-none fixed left-[68px] px-2.5 py-1 rounded-md bg-gray-900 dark:bg-gray-800 text-white text-xs font-medium whitespace-nowrap shadow-md opacity-0 group-hover:opacity-100 transition-opacity z-50 flex items-center gap-1.5">
+                  <span>{text}</span>
+                  {isExpired && <Lock className="w-3 h-3 text-amber-400" />}
                 </div>
               )}
             </NavLink>
@@ -145,8 +155,9 @@ const Sidebar: React.FC<SidebarProps> = ({
                 className={({ isActive }) =>
                   [
                     "group relative flex items-center h-10 px-2.5 rounded-lg transition-colors overflow-hidden",
+                    isExpired ? "opacity-60 hover:opacity-80" : "",
                     isActive
-                      ? "bg-sky-50 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300 font-semibold border-l-[3px] border-sky-500 pl-[7px]"
+                      ? "bg-sky-50 dark:bg-sky-950/40 text-sky-600 dark:text-sky-300 font-semibold border-l-[3px] border-sky-500 pl-[7px]"
                       : "text-gray-600 dark:text-gray-400 hover:text-sky-600 dark:hover:text-sky-300 hover:bg-gray-100/70 dark:hover:bg-gray-800/70",
                   ].join(" ")
                 }
@@ -164,9 +175,13 @@ const Sidebar: React.FC<SidebarProps> = ({
                 >
                   Manage Team
                 </span>
+                {isExpired && !collapsedMode && (
+                  <Lock className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500 ml-auto shrink-0" />
+                )}
                 {collapsedMode && (
-                  <div className="pointer-events-none fixed left-[68px] px-2.5 py-1 rounded-md bg-gray-900 dark:bg-gray-800 text-white text-xs font-medium whitespace-nowrap shadow-md opacity-0 group-hover:opacity-100 transition-opacity z-50">
-                    Manage Team
+                  <div className="pointer-events-none fixed left-[68px] px-2.5 py-1 rounded-md bg-gray-900 dark:bg-gray-800 text-white text-xs font-medium whitespace-nowrap shadow-md opacity-0 group-hover:opacity-100 transition-opacity z-50 flex items-center gap-1.5">
+                    <span>Manage Team</span>
+                    {isExpired && <Lock className="w-3 h-3 text-amber-400" />}
                   </div>
                 )}
               </NavLink>
@@ -177,8 +192,10 @@ const Sidebar: React.FC<SidebarProps> = ({
                 className={({ isActive }) =>
                   [
                     "group relative flex items-center h-10 px-2.5 rounded-lg transition-colors overflow-hidden",
-                    isActive
-                      ? "bg-sky-50 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300 font-semibold border-l-[3px] border-sky-500 pl-[7px]"
+                    isExpired
+                      ? "bg-amber-500/10 text-amber-700 dark:text-amber-300 font-medium border border-amber-500/30"
+                      : isActive
+                      ? "bg-sky-50 dark:bg-sky-950/40 text-sky-600 dark:text-sky-300 font-semibold border-l-[3px] border-sky-500 pl-[7px]"
                       : "text-gray-600 dark:text-gray-400 hover:text-sky-600 dark:hover:text-sky-300 hover:bg-gray-100/70 dark:hover:bg-gray-800/70",
                   ].join(" ")
                 }
@@ -196,9 +213,19 @@ const Sidebar: React.FC<SidebarProps> = ({
                 >
                   Plans & Billing
                 </span>
+                {isExpired && !collapsedMode && (
+                  <span className="ml-auto text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-amber-500/30">
+                    Renew
+                  </span>
+                )}
                 {collapsedMode && (
-                  <div className="pointer-events-none fixed left-[68px] px-2.5 py-1 rounded-md bg-gray-900 dark:bg-gray-800 text-white text-xs font-medium whitespace-nowrap shadow-md opacity-0 group-hover:opacity-100 transition-opacity z-50">
-                    Plans & Billing
+                  <div className="pointer-events-none fixed left-[68px] px-2.5 py-1 rounded-md bg-gray-900 dark:bg-gray-800 text-white text-xs font-medium whitespace-nowrap shadow-md opacity-0 group-hover:opacity-100 transition-opacity z-50 flex items-center gap-1.5">
+                    <span>Plans & Billing</span>
+                    {isExpired && (
+                      <span className="text-[10px] text-amber-400 font-bold">
+                        Renew
+                      </span>
+                    )}
                   </div>
                 )}
               </NavLink>
@@ -209,8 +236,9 @@ const Sidebar: React.FC<SidebarProps> = ({
                 className={({ isActive }) =>
                   [
                     "group relative flex items-center h-10 px-2.5 rounded-lg transition-colors overflow-hidden",
+                    isExpired ? "opacity-60 hover:opacity-80" : "",
                     isActive
-                      ? "bg-sky-50 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300 font-semibold border-l-[3px] border-sky-500 pl-[7px]"
+                      ? "bg-sky-50 dark:bg-sky-950/40 text-sky-600 dark:text-sky-300 font-semibold border-l-[3px] border-sky-500 pl-[7px]"
                       : "text-gray-600 dark:text-gray-400 hover:text-sky-600 dark:hover:text-sky-300 hover:bg-gray-100/70 dark:hover:bg-gray-800/70",
                   ].join(" ")
                 }
@@ -228,9 +256,13 @@ const Sidebar: React.FC<SidebarProps> = ({
                 >
                   Workspace Settings
                 </span>
+                {isExpired && !collapsedMode && (
+                  <Lock className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500 ml-auto shrink-0" />
+                )}
                 {collapsedMode && (
-                  <div className="pointer-events-none fixed left-[68px] px-2.5 py-1 rounded-md bg-gray-900 dark:bg-gray-800 text-white text-xs font-medium whitespace-nowrap shadow-md opacity-0 group-hover:opacity-100 transition-opacity z-50">
-                    Workspace Settings
+                  <div className="pointer-events-none fixed left-[68px] px-2.5 py-1 rounded-md bg-gray-900 dark:bg-gray-800 text-white text-xs font-medium whitespace-nowrap shadow-md opacity-0 group-hover:opacity-100 transition-opacity z-50 flex items-center gap-1.5">
+                    <span>Workspace Settings</span>
+                    {isExpired && <Lock className="w-3 h-3 text-amber-400" />}
                   </div>
                 )}
               </NavLink>
@@ -289,7 +321,7 @@ const Sidebar: React.FC<SidebarProps> = ({
       {!isControlled && !mobileOpen && (
         <button
           onClick={() => setMobileOpen(true)}
-          className="fixed lg:hidden top-16 left-4 z-40 bg-sky-600 text-white p-2.5 rounded-full shadow-lg hover:bg-sky-700 transition-all cursor-pointer"
+          className="fixed lg:hidden top-16 left-4 z-40 bg-sky-500 text-white p-2.5 rounded-full shadow-lg hover:bg-sky-600 transition-all cursor-pointer"
           aria-label="Open navigation menu"
         >
           <Menu className="w-5 h-5" />
@@ -310,7 +342,7 @@ const Sidebar: React.FC<SidebarProps> = ({
             <div className="flex flex-col flex-1 min-h-0 space-y-3">
               {/* Drawer Brand Header */}
               <div className="flex justify-between items-center pb-3 border-b border-gray-100 dark:border-gray-800 shrink-0">
-                <PlanMateLogo size={26} showText textClassName="text-base font-bold text-sky-600" />
+                <PlanMateLogo size={26} showText textClassName="text-base font-bold text-sky-500" />
                 <button
                   className="text-gray-500 hover:text-gray-800 dark:hover:text-gray-200 p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors cursor-pointer"
                   onClick={() => setMobileOpen(false)}
@@ -333,7 +365,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                   {user.avatar ? (
                     <img src={user.avatar} alt="Avatar" className="w-8 h-8 rounded-full shadow-2xs" />
                   ) : (
-                    <div className="w-8 h-8 flex items-center justify-center rounded-full bg-gradient-to-br from-cyan-500 to-sky-600 text-white font-semibold text-xs shadow-2xs">
+                    <div className="w-8 h-8 flex items-center justify-center rounded-full bg-sky-500 text-white font-semibold text-xs shadow-2xs">
                       {user.name?.[0]?.toUpperCase() || "U"}
                     </div>
                   )}

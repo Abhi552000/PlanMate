@@ -1,4 +1,4 @@
-import { Eye, EyeOff, Lock, LogIn, Mail } from "lucide-react";
+import { Eye, EyeOff, Lock, LogIn, Mail, AlertCircle, X } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -6,7 +6,7 @@ import { authService } from "../services/authService";
 import { Input } from "./ui/Input";
 import { Button } from "./ui/Button";
 import { TOAST_MESSAGES } from "../constants/messages";
-import { AUTH_TEXTS } from "../constants/uiTexts";
+import { AUTH_TEXTS, SUBSCRIPTION_EXPIRED_TEXTS } from "../constants/uiTexts";
 import { PlanMateLogo } from "./common/PlanMateLogo";
 
 const INITIAL_FORM = { email: "", password: "" };
@@ -18,8 +18,22 @@ export const Login: React.FC<LoginProps> = ({ onSubmit, onSwitchMode }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState(INITIAL_FORM);
+  const [expiredNotice, setExpiredNotice] = useState<{
+    message: string;
+    admin?: { name: string; email: string };
+  } | null>(null);
 
   useEffect(() => {
+    const savedNotice = sessionStorage.getItem("expired_notice");
+    if (savedNotice) {
+      try {
+        setExpiredNotice(JSON.parse(savedNotice));
+      } catch {
+        setExpiredNotice({ message: savedNotice });
+      }
+      sessionStorage.removeItem("expired_notice");
+    }
+
     const token = localStorage.getItem("token");
     const userId = localStorage.getItem("userId");
     if (token) {
@@ -50,6 +64,7 @@ export const Login: React.FC<LoginProps> = ({ onSubmit, onSwitchMode }) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setExpiredNotice(null);
     try {
       const data = await authService.login(formData);
       if (!data.token)
@@ -65,11 +80,22 @@ export const Login: React.FC<LoginProps> = ({ onSubmit, onSwitchMode }) => {
       setTimeout(() => navigate(targetPath), 1000);
     } catch (err: any) {
       console.log("err", err);
-      const msg =
-        err?.response?.data?.message ||
-        err?.message ||
-        TOAST_MESSAGES.AUTH_LOGIN_FAILED;
-      toast.error(msg);
+      const resData = err?.response?.data;
+      if (
+        resData?.code === "SUBSCRIPTION_EXPIRED" ||
+        resData?.message?.toLowerCase().includes("subscription has expired")
+      ) {
+        setExpiredNotice({
+          message: resData.message || SUBSCRIPTION_EXPIRED_TEXTS.MEMBER_LOGIN_SUBTITLE,
+          admin: resData.admin,
+        });
+      } else {
+        const msg =
+          resData?.message ||
+          err?.message ||
+          TOAST_MESSAGES.AUTH_LOGIN_FAILED;
+        toast.error(msg);
+      }
     } finally {
       setLoading(false);
     }
@@ -89,6 +115,52 @@ export const Login: React.FC<LoginProps> = ({ onSubmit, onSwitchMode }) => {
           {AUTH_TEXTS.LOGIN_SUBTITLE}
         </p>
       </div>
+
+      {expiredNotice && (
+        <div className="mb-5 p-4 rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/50 text-left animate-in fade-in duration-200">
+          <div className="flex items-start gap-2.5">
+            <AlertCircle className="w-5 h-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+            <div className="flex-1 min-w-0">
+              <h3 className="text-sm font-semibold text-amber-900 dark:text-amber-200">
+                {SUBSCRIPTION_EXPIRED_TEXTS.MEMBER_LOGIN_TITLE}
+              </h3>
+              <p className="text-xs text-amber-800/90 dark:text-amber-300/90 mt-1 leading-relaxed">
+                {expiredNotice.message}
+              </p>
+              {expiredNotice.admin?.name && (
+                <div className="mt-2.5 pt-2 border-t border-amber-200 dark:border-amber-900/50 text-xs text-amber-900 dark:text-amber-200 flex flex-col gap-0.5">
+                  <span className="font-medium text-[11px] text-amber-700 dark:text-amber-400">
+                    {SUBSCRIPTION_EXPIRED_TEXTS.MEMBER_ADMIN_CONTACT_TITLE}
+                  </span>
+                  <div className="flex items-center gap-1.5 font-medium flex-wrap">
+                    <span>{expiredNotice.admin.name}</span>
+                    {expiredNotice.admin.email && (
+                      <>
+                        <span className="text-amber-500/60">•</span>
+                        <a
+                          href={`mailto:${expiredNotice.admin.email}`}
+                          className="text-sky-600 dark:text-sky-400 hover:underline font-mono"
+                        >
+                          {expiredNotice.admin.email}
+                        </a>
+                      </>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+            <button
+              type="button"
+              onClick={() => setExpiredNotice(null)}
+              className="text-amber-600/70 hover:text-amber-800 dark:text-amber-400/70 dark:hover:text-amber-200 p-0.5"
+              aria-label={SUBSCRIPTION_EXPIRED_TEXTS.MEMBER_DISMISS}
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      )}
+
       <form onSubmit={handleSubmit} className=" space-y-4">
         <Input
           type="email"
