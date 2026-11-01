@@ -13,12 +13,18 @@ export const getSprints = async (req, res) => {
         .json({ success: false, message: MESSAGES.ORG.NOT_FOUND });
     }
 
+    const { epic } = req.query;
+    const taskBaseQuery = {};
+    if (epic && epic !== "all") {
+      taskBaseQuery.epic = epic === "none" ? null : epic;
+    }
+
     // 1. Fetch Sprints
     const sprints = await Sprint.find({ organization: orgId }).sort({ createdAt: -1 }).lean();
 
     // 2. Fetch Tasks for each sprint
     const sprintsWithTasks = await Promise.all(sprints.map(async (sprint) => {
-      const tasks = await Task.find({ sprint: sprint._id })
+      const tasks = await Task.find({ sprint: sprint._id, ...taskBaseQuery })
         .populate("assignee", "name email")
         .populate("epic")
         .sort({ createdAt: -1 })
@@ -30,7 +36,7 @@ export const getSprints = async (req, res) => {
     }));
 
     // 3. Fetch Backlog Tasks (not assigned to any sprint)
-    const backlogTasks = await Task.find({ organization: orgId, sprint: null })
+    const backlogTasks = await Task.find({ organization: orgId, sprint: null, ...taskBaseQuery })
       .populate("assignee", "name email")
       .populate("epic")
       .sort({ createdAt: -1 })

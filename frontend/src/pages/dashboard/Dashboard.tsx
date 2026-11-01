@@ -11,7 +11,6 @@ import { taskService } from "../../services/taskService";
 import { orgService } from "../../services/orgService";
 import { ITask, IUser, DashboardContext } from "../../types";
 import { CONSOLE_ERRORS } from "../../constants/messages";
-import { filterDashboardTasks } from "./helpers/dashboardHelpers";
 import { getCachedStatuses, setCachedStatuses } from "../../utils/statusUtils";
 
 const AnalyticsDashboard = React.lazy(() =>
@@ -52,6 +51,8 @@ const Dashboard = () => {
 
   const [members, setMembers] = useState<IUser[]>([]);
   const [paginatedTasks, setPaginatedTasks] = useState<ITask[]>([]);
+  const [boardTasks, setBoardTasks] = useState<ITask[]>([]);
+  const [loadingBoard, setLoadingBoard] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalTasksCount, setTotalTasksCount] = useState(0);
@@ -134,16 +135,33 @@ const Dashboard = () => {
     };
   }, []);
 
-  // Filter tasks dynamically for the Board view
-  const filterTasks = useMemo(() => {
-    return filterDashboardTasks(tasks, {
-      searchQuery: debouncedSearch,
-      selectedAssignee,
-      selectedPriority,
-      selectedStatus,
-      selectedTimeframe,
-    });
-  }, [tasks, debouncedSearch, selectedAssignee, selectedPriority, selectedStatus, selectedTimeframe]);
+  // Fetch board tasks dynamically from backend with all active filters
+  const fetchBackendBoardTasks = useCallback(async () => {
+    setLoadingBoard(true);
+    try {
+      const params = new URLSearchParams();
+      if (debouncedSearch) params.append("search", debouncedSearch);
+      if (selectedAssignee && selectedAssignee !== "all") params.append("assignee", selectedAssignee);
+      if (selectedPriority && selectedPriority !== "all") params.append("priority", selectedPriority);
+      if (selectedStatus && selectedStatus !== "all") params.append("status", selectedStatus);
+      if (selectedTimeframe && selectedTimeframe !== "all") params.append("timeframe", selectedTimeframe);
+
+      const data = await taskService.getTasks(params);
+      if (data?.success && Array.isArray(data?.tasks)) {
+        setBoardTasks(data.tasks);
+      } else if (Array.isArray(data)) {
+        setBoardTasks(data);
+      }
+    } catch (err) {
+      console.error("Failed to fetch board tasks from backend:", err);
+    } finally {
+      setLoadingBoard(false);
+    }
+  }, [debouncedSearch, selectedAssignee, selectedPriority, selectedStatus, selectedTimeframe]);
+
+  useEffect(() => {
+    fetchBackendBoardTasks();
+  }, [fetchBackendBoardTasks]);
 
   const stats = useMemo(() => {
     let low = 0;
@@ -177,13 +195,15 @@ const Dashboard = () => {
     setShowModal(false);
     setSelectedTask(null);
     refreshTasks();
+    fetchBackendBoardTasks();
     if (viewMode === "list") fetchPaginatedListTasks(1, false);
-  }, [refreshTasks, viewMode, fetchPaginatedListTasks]);
+  }, [refreshTasks, viewMode, fetchPaginatedListTasks, fetchBackendBoardTasks]);
 
   const handleListRefresh = useCallback(() => {
     refreshTasks();
+    fetchBackendBoardTasks();
     fetchPaginatedListTasks(1, false);
-  }, [refreshTasks, fetchPaginatedListTasks]);
+  }, [refreshTasks, fetchPaginatedListTasks, fetchBackendBoardTasks]);
 
   if (loading && tasks.length === 0) {
     return (
@@ -217,7 +237,7 @@ const Dashboard = () => {
           setSelectedTimeframe={setSelectedTimeframe}
           members={members}
           statuses={statuses}
-          filterTasksCount={filterTasks.length}
+          filterTasksCount={boardTasks.length}
           totalTasksCount={tasks.length}
           viewMode={viewMode}
           setViewMode={setViewMode}
@@ -226,8 +246,12 @@ const Dashboard = () => {
         <div>
           {viewMode === "kanban" ? (
             <KanbanBoard
-              tasks={filterTasks}
-              onRefresh={refreshTasks}
+              tasks={boardTasks}
+              loading={loadingBoard}
+              onRefresh={() => {
+                refreshTasks();
+                fetchBackendBoardTasks();
+              }}
               onEdit={handleEditTask}
               onLogout={refreshTasks}
               columns={statuses}
@@ -242,7 +266,7 @@ const Dashboard = () => {
               }
             >
               <AnalyticsDashboard
-                tasks={filterTasks}
+                tasks={boardTasks}
                 onApplyFilters={(filters) => {
                   const nextAssignee = filters.assignee !== undefined ? filters.assignee : selectedAssignee;
                   const nextPriority = filters.priority !== undefined ? filters.priority : selectedPriority;

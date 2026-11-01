@@ -15,6 +15,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
   onEdit,
   onLogout,
   columns = DEFAULT_STATUSES,
+  loading = false,
 }) => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
@@ -23,7 +24,8 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
   // Group tasks by status with useMemo to avoid recomputing on every render
   const groupedTasks = useMemo(() => {
     return columns.reduce<Record<string, ITask[]>>((acc, col) => {
-      acc[col] = tasks.filter((t) => {
+      acc[col] = (tasks || []).filter((t) => {
+        if (!t) return false;
         const status = t.status || (t.completed ? "Done" : "To Do");
         return status === col;
       });
@@ -33,7 +35,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
 
   const handleStatusTransition = useCallback(
     async (taskId: string, newStatus: string) => {
-      const task = tasks.find((t) => t._id === taskId);
+      const task = (tasks || []).find((t) => t._id === taskId);
       if (!task) return;
 
       const blockedByLinks = task?.links?.filter((l) => l.linkType === "blocked by") || [];
@@ -180,29 +182,38 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
   );
 
   return (
-    <div
-      style={{ gridTemplateColumns: `repeat(${columns.length}, minmax(0, 1fr))` }}
-      className="flex flex-row overflow-x-auto gap-4 lg:gap-5 pt-2 pb-4 md:grid md:items-start select-none max-w-full snap-x snap-mandatory scroll-smooth -mx-3.5 px-3.5 sm:mx-0 sm:px-0"
-    >
-      {columns.map((col) => {
-        const colTasks = groupedTasks[col] || [];
-        return (
-          <KanbanColumn
-            key={col}
-            col={col}
-            columns={columns}
-            colTasks={colTasks}
-            activeOverColumn={activeOverColumn}
-            handleDragOver={handleDragOver}
-            handleDragEnter={handleDragEnter}
-            handleDragLeave={handleDragLeave}
-            handleDrop={handleDrop}
-            handleDragStart={handleDragStart}
-            handleStatusTransition={handleStatusTransition}
-            navigate={navigate}
-          />
-        );
-      })}
+    <div className="relative">
+      {loading && (
+        <div className="absolute top-0 left-0 right-0 h-0.5 bg-sky-100 dark:bg-sky-950/40 overflow-hidden rounded-full z-20">
+          <div className="h-full bg-sky-500 animate-pulse w-full" />
+        </div>
+      )}
+      <div
+        style={{ gridTemplateColumns: `repeat(${columns.length}, minmax(0, 1fr))` }}
+        className={`flex flex-row overflow-x-auto gap-4 lg:gap-5 pt-2 pb-4 md:grid md:items-start select-none max-w-full snap-x snap-mandatory scroll-smooth -mx-3.5 px-3.5 sm:mx-0 sm:px-0 transition-opacity duration-200 ${
+          loading ? "opacity-70 pointer-events-none" : "opacity-100"
+        }`}
+      >
+        {columns.map((col) => {
+          const colTasks = groupedTasks[col] || [];
+          return (
+            <KanbanColumn
+              key={col}
+              col={col}
+              columns={columns}
+              colTasks={colTasks}
+              activeOverColumn={activeOverColumn}
+              handleDragOver={handleDragOver}
+              handleDragEnter={handleDragEnter}
+              handleDragLeave={handleDragLeave}
+              handleDrop={handleDrop}
+              handleDragStart={handleDragStart}
+              handleStatusTransition={handleStatusTransition}
+              navigate={navigate}
+            />
+          );
+        })}
+      </div>
     </div>
   );
 };

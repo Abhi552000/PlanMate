@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { baseControlClasses, DEFAULT_TASK } from "../assets/dummy";
 import { taskService } from "../services/taskService";
 import { orgService } from "../services/orgService";
@@ -191,11 +192,6 @@ const TaskModal: React.FC<TaskModalProps> = ({
         finalTaskData = { ...parentTask, subtasks: updatedSubtasks };
       }
 
-      if (finalTaskData.dueDate && finalTaskData.dueDate < today) {
-        toast.error("Due date cannot be in the past");
-        return;
-      }
-
       setLoading(true);
 
       try {
@@ -222,29 +218,34 @@ const TaskModal: React.FC<TaskModalProps> = ({
         setLoading(false);
       }
     },
-    [taskData, parentTask, today, onLogout, onSave, onClose]
+    [taskData, parentTask, onLogout, onSave, onClose]
   );
 
   if (!isOpen) return null;
 
-  return (
+  return createPortal(
     <div 
-      className="fixed inset-0 backdrop-blur-sm bg-black/40 z-50 flex items-center justify-center p-3 sm:p-4 overflow-hidden"
+      className="fixed inset-0 backdrop-blur-xs bg-black/50 z-50 flex items-center justify-center p-3 sm:p-4 overflow-hidden"
       onClick={onClose}
     >
       <div 
-        className="bg-white dark:bg-gray-800/90 border border-sky-100 dark:border-gray-700 rounded-2xl max-w-2xl sm:max-w-3xl lg:max-w-4xl w-full shadow-2xl relative p-4 sm:p-6 md:p-8 animate-fadeIn max-h-[92vh] flex flex-col overflow-hidden"
+        className="bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-800 rounded-2xl max-w-2xl sm:max-w-3xl lg:max-w-4xl w-full shadow-2xl relative flex flex-col h-[90vh] sm:h-[84vh] max-h-[780px] overflow-hidden animate-fadeIn"
         onClick={(e) => e.stopPropagation()}
       >
-        <TaskModalHeader
-          parentTask={parentTask}
-          taskData={taskData}
-          handleBackToParent={handleBackToParent}
-          onClose={onClose}
-          setParentTask={setParentTask}
-        />
-        <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0 space-y-5 overflow-hidden">
-          <div className="flex-1 overflow-y-auto px-1.5 pr-2.5 min-h-0 py-3 scrollbar-thin">
+        {/* Pinned Modal Header */}
+        <div className="px-5 sm:px-6 py-4 border-b border-slate-100 dark:border-gray-800 shrink-0">
+          <TaskModalHeader
+            parentTask={parentTask}
+            taskData={taskData}
+            handleBackToParent={handleBackToParent}
+            onClose={onClose}
+            setParentTask={setParentTask}
+          />
+        </div>
+
+        {/* Scrollable Modal Form Body */}
+        <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0 h-full overflow-hidden">
+          <div className="flex-1 overflow-y-auto px-5 sm:px-6 py-5 min-h-0 scrollbar-thin">
             {loadingDependencies ? (
               <TaskModalSkeleton />
             ) : (
@@ -292,7 +293,8 @@ const TaskModal: React.FC<TaskModalProps> = ({
             )}
           </div>
 
-          <div className="shrink-0 pt-2 border-t border-sky-50 dark:border-gray-700">
+          {/* Pinned Modal Footer */}
+          <div className="px-5 sm:px-6 py-3.5 border-t border-slate-100 dark:border-gray-800 bg-slate-50/70 dark:bg-gray-850/60 shrink-0 mt-auto">
             <TaskModalFooter
               loading={loading}
               parentTask={parentTask}
@@ -303,7 +305,8 @@ const TaskModal: React.FC<TaskModalProps> = ({
           </div>
         </form>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 

@@ -186,6 +186,13 @@ export const getTasks = async (req, res) => {
       timeframe,
       completed,
       sortBy,
+      startDate,
+      endDate,
+      createdAfter,
+      createdBefore,
+      epic,
+      sprint,
+      issueType,
     } = req.query;
 
     let query = req.user.organization
@@ -220,6 +227,21 @@ export const getTasks = async (req, res) => {
       query.completed = completed === "true";
     }
 
+    // Apply issueType filter
+    if (issueType && issueType !== "all") {
+      query.issueType = issueType;
+    }
+
+    // Apply epic filter
+    if (epic && epic !== "all") {
+      query.epic = epic === "none" ? null : epic;
+    }
+
+    // Apply sprint filter
+    if (sprint && sprint !== "all") {
+      query.sprint = sprint === "backlog" || sprint === "null" ? null : sprint;
+    }
+
     // Apply global text search
     if (search && search.trim()) {
       query.$or = [
@@ -246,7 +268,30 @@ export const getTasks = async (req, res) => {
       } else if (timeframe === "overdue") {
         query.dueDate = { $lt: today };
         query.status = { $ne: "Done" };
+      } else if (timeframe === "7d") {
+        const past7Days = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+        query.createdAt = { $gte: past7Days };
+      } else if (timeframe === "30d") {
+        const past30Days = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+        query.createdAt = { $gte: past30Days };
+      } else if (timeframe === "90d") {
+        const past90Days = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000);
+        query.createdAt = { $gte: past90Days };
       }
+    }
+
+    // Apply custom due date range
+    if (startDate || endDate) {
+      query.dueDate = query.dueDate || {};
+      if (startDate) query.dueDate.$gte = new Date(startDate);
+      if (endDate) query.dueDate.$lte = new Date(endDate);
+    }
+
+    // Apply custom created date range
+    if (createdAfter || createdBefore) {
+      query.createdAt = query.createdAt || {};
+      if (createdAfter) query.createdAt.$gte = new Date(createdAfter);
+      if (createdBefore) query.createdAt.$lte = new Date(createdBefore);
     }
 
     // Apply sorting

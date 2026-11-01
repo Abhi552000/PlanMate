@@ -11,9 +11,9 @@ const initialState: SprintState = {
 };
 
 // Async Thunks
-export const fetchSprints = createAsyncThunk("sprints/fetchSprints", async (_, { rejectWithValue }) => {
+export const fetchSprints = createAsyncThunk("sprints/fetchSprints", async (params: URLSearchParams | void, { rejectWithValue }) => {
   try {
-    const data = await backlogService.getSprints();
+    const data = await backlogService.getSprints(params || undefined);
     return data;
   } catch (err: any) {
     return rejectWithValue(err.response?.data?.message || err.message || "Failed to fetch sprints.");

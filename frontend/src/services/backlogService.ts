@@ -4,8 +4,9 @@ import { ISprint, IEpic } from "../types";
 
 export const backlogService = {
   // SPRINTS
-  getSprints: async (): Promise<{ success: boolean; sprints: ISprint[]; backlogTasks: any[] }> => {
-    const { data } = await axiosInstance.get(API_ROUTES.SPRINTS.BASE);
+  getSprints: async (params?: URLSearchParams): Promise<{ success: boolean; sprints: ISprint[]; backlogTasks: any[] }> => {
+    const url = params && params.toString() ? `${API_ROUTES.SPRINTS.BASE}?${params.toString()}` : API_ROUTES.SPRINTS.BASE;
+    const { data } = await axiosInstance.get(url);
     return data;
   },
   createSprint: async (sprintData: { name: string; startDate?: string; endDate?: string; goal?: string }): Promise<ISprint> => {

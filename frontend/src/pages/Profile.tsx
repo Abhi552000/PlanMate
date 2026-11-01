@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import {
-  ChevronLeft,
   Lock,
   LogOut,
   Mail,
@@ -10,12 +9,10 @@ import {
   User,
   CheckCircle2,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 import { authService } from "../services/authService";
 import { ProfileProps } from "../types";
 
 const Profile: React.FC<ProfileProps> = ({ setCurrentUser, onLogout }) => {
-  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [savingProfile, setSavingProfile] = useState(false);
   const [changingPassword, setChangingPassword] = useState(false);
@@ -125,22 +122,30 @@ const Profile: React.FC<ProfileProps> = ({ setCurrentUser, onLogout }) => {
 
   if (loading) {
     return (
-      <div className="w-full max-w-5xl mx-auto space-y-6 font-sans px-4 sm:px-6 py-6 animate-pulse select-none">
-        <div className="h-6 w-32 rounded bg-slate-200 dark:bg-slate-800" />
-        <div className="space-y-2">
-          <div className="h-8 w-56 rounded-lg bg-slate-200 dark:bg-slate-800" />
-          <div className="h-4 w-80 rounded bg-slate-100 dark:bg-slate-800/60" />
+      <div className="w-full space-y-6 font-sans animate-pulse select-none">
+        {/* Header Skeleton */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-sky-100/50 dark:border-gray-800 pb-4">
+          <div className="space-y-2">
+            <div className="h-7 w-48 rounded-lg bg-slate-200 dark:bg-slate-800" />
+            <div className="h-4 w-72 rounded bg-slate-100 dark:bg-slate-800/60" />
+          </div>
+          <div className="h-9 w-28 rounded-xl bg-slate-200 dark:bg-slate-800" />
         </div>
-        <div className="grid md:grid-cols-2 gap-6 pt-4">
+
+        {/* Cards Grid Skeleton */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {[1, 2].map((i) => (
             <div
               key={i}
-              className="bg-white dark:bg-gray-900 rounded-2xl border border-slate-200 dark:border-gray-800 p-6 space-y-4"
+              className="bg-white dark:bg-gray-900 rounded-2xl border border-slate-200 dark:border-gray-800 p-5 sm:p-6 space-y-5"
             >
-              <div className="h-6 w-40 rounded bg-slate-200 dark:bg-slate-800" />
-              <div className="space-y-3 pt-2">
-                <div className="h-10 w-full rounded-xl bg-slate-100 dark:bg-slate-800" />
-                <div className="h-10 w-full rounded-xl bg-slate-100 dark:bg-slate-800" />
+              <div className="flex items-center justify-between border-b border-slate-100 dark:border-gray-800 pb-4">
+                <div className="h-6 w-40 rounded bg-slate-200 dark:bg-slate-800" />
+                <div className="h-8 w-16 rounded-xl bg-slate-200 dark:bg-slate-800" />
+              </div>
+              <div className="space-y-4 pt-1">
+                <div className="h-10 w-full rounded-xl bg-slate-100 dark:bg-slate-800/60" />
+                <div className="h-10 w-full rounded-xl bg-slate-100 dark:bg-slate-800/60" />
               </div>
             </div>
           ))}
@@ -152,37 +157,27 @@ const Profile: React.FC<ProfileProps> = ({ setCurrentUser, onLogout }) => {
   const initial = profile.name ? profile.name.charAt(0).toUpperCase() : "U";
 
   return (
-    <div className="w-full max-w-5xl mx-auto space-y-6 font-sans px-4 sm:px-6 py-4 sm:py-6">
-      {/* Top Navigation & Header */}
-      <div>
-        <button
-          onClick={() => navigate(-1)}
-          className="inline-flex items-center gap-1.5 text-xs font-semibold text-gray-500 hover:text-sky-600 dark:text-gray-400 dark:hover:text-sky-400 mb-3 transition-colors cursor-pointer"
-        >
-          <ChevronLeft className="w-4 h-4" />
-          Back to Dashboard
-        </button>
-
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white tracking-tight">
-              Account Settings
-            </h1>
-            <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1">
-              Manage your personal information, email address, and security credentials
-            </p>
-          </div>
-
-          {onLogout && (
-            <button
-              onClick={onLogout}
-              className="inline-flex items-center gap-2 px-3.5 py-2 text-xs font-bold text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/30 hover:bg-rose-100 dark:hover:bg-rose-900/40 rounded-xl border border-rose-200 dark:border-rose-900/50 transition-colors cursor-pointer self-start sm:self-auto"
-            >
-              <LogOut className="w-4 h-4" />
-              Sign Out
-            </button>
-          )}
+    <div className="w-full space-y-6 font-sans">
+      {/* Top Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-sky-100/50 dark:border-gray-800 pb-4">
+        <div>
+          <h1 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-gray-100">
+            Account Settings
+          </h1>
+          <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1">
+            Manage your personal information, email address, and security credentials
+          </p>
         </div>
+
+        {onLogout && (
+          <button
+            onClick={onLogout}
+            className="inline-flex items-center gap-2 px-3.5 py-2 text-xs font-bold text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/30 hover:bg-rose-100 dark:hover:bg-rose-900/40 rounded-xl border border-rose-200 dark:border-rose-900/50 transition-colors cursor-pointer self-start sm:self-auto"
+          >
+            <LogOut className="w-4 h-4" />
+            Sign Out
+          </button>
+        )}
       </div>
 
       {/* Profile Cards Grid */}

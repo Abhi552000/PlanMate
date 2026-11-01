@@ -65,13 +65,17 @@ export const useBacklog = () => {
 
   const loadData = useCallback(async () => {
     try {
-      await dispatch(fetchSprints()).unwrap();
+      const params = new URLSearchParams();
+      if (selectedEpicFilter) {
+        params.append("epic", selectedEpicFilter);
+      }
+      await dispatch(fetchSprints(params.toString() ? params : undefined)).unwrap();
       await dispatch(fetchEpics()).unwrap();
     } catch (err: any) {
       console.error(err);
       toast.error(TOAST_MESSAGES.BACKLOG_LOAD_ERROR);
     }
-  }, [dispatch]);
+  }, [dispatch, selectedEpicFilter]);
 
   useEffect(() => {
     loadData();
@@ -235,15 +239,10 @@ export const useBacklog = () => {
     }
   };
 
-  // Filters Epic helper
+  // Epic filter is managed directly by the backend query in loadData
   const filterByEpic = useCallback((tasks: ITask[]) => {
-    if (!selectedEpicFilter) return tasks;
-    return tasks.filter((t) => {
-      const epicId =
-        typeof t.epic === "object" && t.epic ? (t.epic as any)._id : t.epic;
-      return epicId === selectedEpicFilter;
-    });
-  }, [selectedEpicFilter]);
+    return tasks;
+  }, []);
 
   return {
     sprints,

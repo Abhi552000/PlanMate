@@ -43,7 +43,7 @@ export const TaskModalHeader: React.FC<TaskModalHeaderProps> = ({
           ← Parent Issue: {parentTask.title}
         </button>
       )}
-      <div className="flex justify-between items-center mb-5 border-b border-sky-100/60 dark:border-gray-700/60 pb-3.5">
+      <div className="flex justify-between items-center">
         <div className="space-y-1">
           {ticketKey && (
             <div
@@ -58,18 +58,12 @@ export const TaskModalHeader: React.FC<TaskModalHeaderProps> = ({
               <Copy className="w-3 h-3 text-sky-400 group-hover/key:text-sky-700 dark:group-hover/key:text-sky-200 transition-colors" />
             </div>
           )}
-          <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2">
-            {parentTask ? (
-              <>
-                <BookOpen className="text-sky-500 w-5 h-5" />
-                Sub-task Detail
-              </>
-            ) : taskData.id ? (
-              <Save className="text-sky-500 w-5 h-5" />
-            ) : (
-              <PlusCircle className="text-sky-500 w-5 h-5" />
-            )}
-            {!parentTask && (taskData.id ? "Edit Issue" : "Create New Issue")}
+          <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white tracking-tight">
+            {parentTask
+              ? "Sub-task Detail"
+              : taskData.id
+              ? "Edit Issue"
+              : "Create New Issue"}
           </h2>
         </div>
 

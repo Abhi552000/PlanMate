@@ -226,14 +226,20 @@ export const TaskFormMeta: React.FC<TaskFormMetaProps> = ({
       </div>
 
       <div>
-        <label className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">
-          <Calendar className="w-3.5 h-3.5 text-sky-500" /> Due Date
-        </label>
+        <div className="flex items-center justify-between mb-1.5">
+          <label className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+            <Calendar className="w-3.5 h-3.5 text-sky-500" /> Due Date
+          </label>
+          {taskData.dueDate && taskData.dueDate < today && (
+            <span className="text-[10px] text-amber-600 dark:text-amber-400 font-semibold bg-amber-50 dark:bg-amber-950/40 px-1.5 py-0.5 rounded border border-amber-200 dark:border-amber-900/50 flex items-center gap-1">
+              <Clock className="w-2.5 h-2.5" /> Past date (Overdue)
+            </span>
+          )}
+        </div>
         <input
           type="date"
           name="dueDate"
           required
-          min={today}
           value={taskData.dueDate}
           onChange={handleChange}
           className={`${baseControlClasses} cursor-pointer`}

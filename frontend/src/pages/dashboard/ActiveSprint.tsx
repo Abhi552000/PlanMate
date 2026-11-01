@@ -5,6 +5,7 @@ import { ActiveSprintHeader } from "./components/active-sprint/ActiveSprintHeade
 import { ActiveSprintFilters } from "./components/active-sprint/ActiveSprintFilters";
 import { ActiveSprintBoardColumn } from "./components/active-sprint/ActiveSprintBoardColumn";
 import { ConfirmCompleteSprintModal } from "./components/active-sprint/ConfirmCompleteSprintModal";
+import { ActiveSprintSkeleton } from "./components/active-sprint/ActiveSprintSkeleton";
 import { useActiveSprint } from "./hooks/useActiveSprint";
 import { ACTIVE_SPRINT_TEXTS } from "../../constants/uiTexts";
 
@@ -38,11 +39,7 @@ export const ActiveSprint: React.FC = () => {
   } = useActiveSprint();
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-sky-500" />
-      </div>
-    );
+    return <ActiveSprintSkeleton />;
   }
 
   // EMPTY STATE: No Active Sprint
