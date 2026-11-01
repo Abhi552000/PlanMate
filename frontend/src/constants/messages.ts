@@ -47,6 +47,9 @@ export const TOAST_MESSAGES = {
 
   // Member Onboarding
   MEMBER_FIELDS_REQUIRED: "Please fill all member onboarding fields",
+  MEMBER_NAME_REQUIRED: "Please enter the member's full name",
+  MEMBER_EMAIL_REQUIRED: "Please enter a valid email address",
+  MEMBER_PASSWORD_MIN_LENGTH: "Password must be at least 8 characters long",
   MEMBER_ONBOARD_SUCCESS: (name: string) =>
     `Member ${name} onboarded successfully!`,
   MEMBER_ONBOARD_ERROR: "Failed to add member",

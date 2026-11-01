@@ -174,7 +174,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
             completed: prevCompleted,
           })
         );
-        toast.error("Failed to update task status");
+        toast.error(TOAST_MESSAGES.TASK_STATUS_UPDATE_ERROR);
         if (error.response?.status === 401) onLogout?.();
       }
     },
@@ -202,6 +202,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
               col={col}
               columns={columns}
               colTasks={colTasks}
+              loading={loading}
               activeOverColumn={activeOverColumn}
               handleDragOver={handleDragOver}
               handleDragEnter={handleDragEnter}

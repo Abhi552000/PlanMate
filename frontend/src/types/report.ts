@@ -81,5 +81,6 @@ export interface ReportWorkItemDrawerProps {
 
 export interface ReportWorkItemTableProps {
   tasks: ITask[];
+  loading?: boolean;
   onSelectTask?: (task: ITask) => void;
 }

@@ -1,5 +1,6 @@
 import React, { useMemo } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { PAGINATION_TEXTS } from "../../constants/uiTexts";
 
 export interface PaginationProps {
   currentPage: number;
@@ -27,22 +28,8 @@ export const Pagination: React.FC<PaginationProps> = React.memo(
     showItemCount = true,
     hideOnSinglePage = false,
   }) => {
-    // If no items at all, hide pagination footer
-    if (totalItems === 0 || totalPages <= 0) {
-      return null;
-    }
-
-    // If hideOnSinglePage is requested and there's at most 1 page
-    if (hideOnSinglePage && totalPages <= 1) {
-      return null;
-    }
-
-    // Compute item ranges for the counter text
+    // Compute effective page numbers with smart ellipsis windowing
     const effectiveTotalPages = Math.max(1, totalPages);
-    const startItem = totalItems !== undefined ? (totalItems === 0 ? 0 : (currentPage - 1) * pageSize + 1) : 0;
-    const endItem = totalItems !== undefined ? Math.min(currentPage * pageSize, totalItems) : 0;
-
-    // Generate page numbers with smart ellipsis windowing
     const pageNumbers = useMemo<(number | string)[]>(() => {
       if (effectiveTotalPages <= 7) {
         return Array.from({ length: effectiveTotalPages }, (_, i) => i + 1);
@@ -75,6 +62,20 @@ export const Pagination: React.FC<PaginationProps> = React.memo(
       ];
     }, [currentPage, effectiveTotalPages]);
 
+    // If no items at all, hide pagination footer
+    if (totalItems === 0 || totalPages <= 0) {
+      return null;
+    }
+
+    // If hideOnSinglePage is requested and there's at most 1 page
+    if (hideOnSinglePage && totalPages <= 1) {
+      return null;
+    }
+
+    // Compute item ranges for the counter text
+    const startItem = totalItems !== undefined ? (totalItems === 0 ? 0 : (currentPage - 1) * pageSize + 1) : 0;
+    const endItem = totalItems !== undefined ? Math.min(currentPage * pageSize, totalItems) : 0;
+
     return (
       <div
         className={`flex flex-col sm:flex-row items-center justify-between gap-3 px-4 sm:px-6 py-3.5 border-t border-slate-100 dark:border-slate-800/80 bg-slate-50/40 dark:bg-slate-950/20 text-xs ${className}`}
@@ -85,8 +86,8 @@ export const Pagination: React.FC<PaginationProps> = React.memo(
             {totalItems !== undefined ? (
               totalItems > 0 ? (
                 <>
-                  Showing <span className="font-bold text-slate-700 dark:text-slate-200">{startItem}</span> to{" "}
-                  <span className="font-bold text-slate-700 dark:text-slate-200">{endItem}</span> of{" "}
+                  {PAGINATION_TEXTS.SHOWING} <span className="font-bold text-slate-700 dark:text-slate-200">{startItem}</span> {PAGINATION_TEXTS.TO}{" "}
+                  <span className="font-bold text-slate-700 dark:text-slate-200">{endItem}</span> {PAGINATION_TEXTS.OF}{" "}
                   <span className="font-bold text-slate-700 dark:text-slate-200">{totalItems}</span> {itemLabel}
                 </>
               ) : (
@@ -94,7 +95,7 @@ export const Pagination: React.FC<PaginationProps> = React.memo(
               )
             ) : (
               <>
-                Page <span className="font-bold text-slate-700 dark:text-slate-200">{currentPage}</span> of{" "}
+                {PAGINATION_TEXTS.PAGE} <span className="font-bold text-slate-700 dark:text-slate-200">{currentPage}</span> {PAGINATION_TEXTS.OF}{" "}
                 <span className="font-bold text-slate-700 dark:text-slate-200">{totalPages}</span>
               </>
             )}
@@ -112,7 +113,7 @@ export const Pagination: React.FC<PaginationProps> = React.memo(
             title="Previous page"
           >
             <ChevronLeft className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Previous</span>
+            <span className="hidden sm:inline">{PAGINATION_TEXTS.PREVIOUS}</span>
           </button>
 
           {/* Page Numbers */}
@@ -156,7 +157,7 @@ export const Pagination: React.FC<PaginationProps> = React.memo(
             className="h-8 px-2.5 rounded-lg border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 font-semibold hover:bg-slate-50 dark:hover:bg-slate-800 disabled:opacity-40 disabled:pointer-events-none transition-colors cursor-pointer flex items-center gap-1 shadow-2xs"
             title="Next page"
           >
-            <span className="hidden sm:inline">Next</span>
+            <span className="hidden sm:inline">{PAGINATION_TEXTS.NEXT}</span>
             <ChevronRight className="w-3.5 h-3.5" />
           </button>
         </div>

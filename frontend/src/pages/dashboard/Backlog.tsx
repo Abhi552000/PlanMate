@@ -72,9 +72,10 @@ export const Backlog: React.FC = () => {
     handleMoveTask,
     handleCreateInlineIssue,
     filterByEpic,
+    hasInitialLoaded,
   } = useBacklog();
 
-  if (loading && sprints.length === 0) {
+  if ((loading || !hasInitialLoaded) && sprints.length === 0 && backlogTasks.length === 0) {
     return <BacklogSkeleton />;
   }
 

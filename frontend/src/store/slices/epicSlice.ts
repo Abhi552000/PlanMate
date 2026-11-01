@@ -4,7 +4,7 @@ import { EpicState } from "../../types";
 
 const initialState: EpicState = {
   epics: [],
-  loading: false,
+  loading: true,
   error: null,
 };
 

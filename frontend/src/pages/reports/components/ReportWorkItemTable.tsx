@@ -24,9 +24,11 @@ import {
   TableHead,
   TableEmpty,
 } from "../../../components/ui";
+import { REPORT_TABLE_TEXTS } from "../../../constants/uiTexts";
 
 export const ReportWorkItemTable: React.FC<ReportWorkItemTableProps> = ({
   tasks,
+  loading = false,
   onSelectTask,
 }) => {
   const [search, setSearch] = useState("");
@@ -140,7 +142,7 @@ export const ReportWorkItemTable: React.FC<ReportWorkItemTableProps> = ({
       <div className="p-4 sm:p-5 border-b border-gray-100 dark:border-gray-800 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
-            Work item details
+            {REPORT_TABLE_TEXTS.TITLE}
           </h3>
         </div>
 
@@ -186,7 +188,7 @@ export const ReportWorkItemTable: React.FC<ReportWorkItemTableProps> = ({
             title="Export report to CSV"
           >
             <Download className="w-3.5 h-3.5" />
-            <span>Export CSV</span>
+            <span>{REPORT_TABLE_TEXTS.BTN_EXPORT_CSV}</span>
           </button>
         </div>
       </div>
@@ -195,19 +197,30 @@ export const ReportWorkItemTable: React.FC<ReportWorkItemTableProps> = ({
       <Table>
         <TableHeader>
           <tr>
-            <TableHead>Work item key</TableHead>
-            <TableHead>Work type</TableHead>
-            <TableHead>Work item priority</TableHead>
-            <TableHead>Issue summary</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Assignee</TableHead>
+            <TableHead>{REPORT_TABLE_TEXTS.COL_KEY}</TableHead>
+            <TableHead>{REPORT_TABLE_TEXTS.COL_TYPE}</TableHead>
+            <TableHead>{REPORT_TABLE_TEXTS.COL_PRIORITY}</TableHead>
+            <TableHead>{REPORT_TABLE_TEXTS.COL_SUMMARY}</TableHead>
+            <TableHead>{REPORT_TABLE_TEXTS.COL_STATUS}</TableHead>
+            <TableHead>{REPORT_TABLE_TEXTS.COL_ASSIGNEE}</TableHead>
           </tr>
         </TableHeader>
         <TableBody>
-          {paginatedTasks.length === 0 ? (
+          {loading && paginatedTasks.length === 0 ? (
+            Array.from({ length: 5 }).map((_, i) => (
+              <tr key={i} className="animate-pulse border-b border-gray-100 dark:border-gray-800">
+                <td className="px-3 sm:px-5 py-3.5"><div className="h-4 w-20 rounded bg-slate-200 dark:bg-slate-800" /></td>
+                <td className="px-3 sm:px-5 py-3.5"><div className="h-4 w-16 rounded bg-slate-200 dark:bg-slate-800" /></td>
+                <td className="px-3 sm:px-5 py-3.5"><div className="h-4 w-16 rounded-full bg-slate-200 dark:bg-slate-800" /></td>
+                <td className="px-3 sm:px-5 py-3.5"><div className="h-4 w-48 rounded bg-slate-200 dark:bg-slate-800" /></td>
+                <td className="px-3 sm:px-5 py-3.5"><div className="h-4 w-20 rounded-md bg-slate-200 dark:bg-slate-800" /></td>
+                <td className="px-3 sm:px-5 py-3.5"><div className="h-4 w-24 rounded bg-slate-200 dark:bg-slate-800" /></td>
+              </tr>
+            ))
+          ) : paginatedTasks.length === 0 ? (
             <TableEmpty
               colSpan={6}
-              message="No work items match your report filter criteria"
+              message={REPORT_TABLE_TEXTS.EMPTY_REPORTS}
             />
           ) : (
               paginatedTasks.map((t) => {

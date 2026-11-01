@@ -6,7 +6,7 @@ import { getCachedStatuses } from "../../utils/statusUtils";
 const initialState: TaskState = {
   tasks: [],
   statuses: getCachedStatuses(),
-  loading: false,
+  loading: true,
   error: null,
 };
 

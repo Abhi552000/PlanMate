@@ -74,17 +74,23 @@ export const useBacklog = () => {
     return cur.id || cur._id || "";
   }, []);
 
+  const [hasInitialLoaded, setHasInitialLoaded] = useState(false);
+
   const loadData = useCallback(async () => {
     try {
       const params = new URLSearchParams();
       if (selectedEpicFilter) {
         params.append("epic", selectedEpicFilter);
       }
-      await dispatch(fetchSprints(params.toString() ? params : undefined)).unwrap();
-      await dispatch(fetchEpics()).unwrap();
+      await Promise.all([
+        dispatch(fetchSprints(params.toString() ? params : undefined)).unwrap(),
+        dispatch(fetchEpics()).unwrap(),
+      ]);
     } catch (err: any) {
       console.error(err);
       toast.error(TOAST_MESSAGES.BACKLOG_LOAD_ERROR);
+    } finally {
+      setHasInitialLoaded(true);
     }
   }, [dispatch, selectedEpicFilter]);
 
@@ -318,5 +324,6 @@ export const useBacklog = () => {
     handleMoveTask,
     handleCreateInlineIssue,
     filterByEpic,
+    hasInitialLoaded,
   };
 };

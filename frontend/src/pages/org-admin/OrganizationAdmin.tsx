@@ -177,18 +177,18 @@ const OrganizationAdmin = () => {
     const trimmedEmail = email.trim();
 
     if (!trimmedName) {
-      toast.error("Please enter the member's full name");
+      toast.error(TOAST_MESSAGES.MEMBER_NAME_REQUIRED);
       return;
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(trimmedEmail)) {
-      toast.error("Please enter a valid email address");
+      toast.error(TOAST_MESSAGES.MEMBER_EMAIL_REQUIRED);
       return;
     }
 
     if (!password || password.length < 8) {
-      toast.error("Password must be at least 8 characters long");
+      toast.error(TOAST_MESSAGES.MEMBER_PASSWORD_MIN_LENGTH);
       return;
     }
 
@@ -288,6 +288,7 @@ const OrganizationAdmin = () => {
         totalPages={totalPages}
         totalCount={totalCount}
         togglingStatus={togglingStatus}
+        tableLoading={loading}
         onPageChange={(page) => {
           fetchTeamUsers(page, selectedStatus, selectedRole, debouncedSearch);
           window.scrollTo({ top: 0, behavior: "smooth" });

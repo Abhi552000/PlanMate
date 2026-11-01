@@ -179,3 +179,60 @@ export const CALENDAR_TEXTS = {
   ],
   WEEKDAY_NAMES: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
 };
+
+export const KANBAN_TEXTS = {
+  NO_ISSUES: "No issues in this status",
+  LOADING_BOARD: "Loading board tasks...",
+  LOADING_ANALYTICS: "Loading analytics...",
+  TOTAL_ISSUES: "Total Issues",
+};
+
+export const CALENDAR_UI_TEXTS = {
+  NO_TASKS_SCHEDULED: "No tasks scheduled for this day.",
+  ALL_TASKS_DEADLINES: "All tasks have deadlines!",
+  ADD_TASK_FOR_DAY: "Add task for this day",
+  INBOX_TITLE: "Unscheduled Tasks",
+  INBOX_SUBTITLE: "Inbox",
+};
+
+export const REPORT_TABLE_TEXTS = {
+  COL_KEY: "Work item key",
+  COL_TYPE: "Work type",
+  COL_PRIORITY: "Work item priority",
+  COL_SUMMARY: "Issue summary",
+  COL_STATUS: "Status",
+  COL_ASSIGNEE: "Assignee",
+  EMPTY_REPORTS: "No work items match your report filter criteria",
+  BTN_EXPORT_CSV: "Export CSV",
+  TITLE: "Work item details",
+  SUBTITLE: "Inspect all underlying tasks matching current filters",
+};
+
+export const ORG_MEMBERS_TEXTS = {
+  COL_NAME: "User Name",
+  COL_EMAIL: "Email",
+  COL_ROLE: "Role",
+  COL_SOLVED: "Solved Tickets",
+  COL_STATUS: "Access Status",
+  COL_ACTIONS: "Actions",
+  EMPTY_MEMBERS: "No members found",
+  FILTER_ALL_ROLES: "All Roles",
+  FILTER_ORG_ADMIN: "Org Admin",
+  FILTER_MEMBER: "Member",
+  FILTER_ALL_STATUSES: "All Statuses",
+  FILTER_ACTIVE: "Approved (Active)",
+  FILTER_PENDING: "Pending Approval",
+  FILTER_REJECTED: "Access Rejected",
+  LABEL_SOLVED: "Solved",
+};
+
+export const PAGINATION_TEXTS = {
+  PREVIOUS: "Previous",
+  NEXT: "Next",
+  SHOWING: "Showing",
+  TO: "to",
+  OF: "of",
+  PAGE: "Page",
+  RESULTS: "results",
+};
+
