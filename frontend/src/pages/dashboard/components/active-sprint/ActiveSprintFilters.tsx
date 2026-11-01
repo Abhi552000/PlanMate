@@ -13,16 +13,17 @@ export const ActiveSprintFilters: React.FC<ActiveSprintFiltersProps> = ({
   setGroupByEpic,
 }) => {
   return (
-    <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
+    <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 mb-6">
       {/* Quick Filters */}
-      <div className="flex items-center gap-2">
-        <span className="text-xs font-bold text-gray-405 flex items-center gap-1 mr-1">
+      <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-0.5">
+        <span className="text-xs font-bold text-slate-500 dark:text-slate-400 flex items-center gap-1 mr-1 shrink-0">
           <Filter className="w-3.5 h-3.5" /> {ACTIVE_SPRINT_TEXTS.FILTER_LABEL}
         </span>
         <Button
           variant={onlyMyIssues ? "primary" : "outline"}
           size="sm"
           onClick={() => setOnlyMyIssues(!onlyMyIssues)}
+          className="shrink-0"
         >
           {ACTIVE_SPRINT_TEXTS.BTN_ONLY_MY_ISSUES}
         </Button>
@@ -30,14 +31,15 @@ export const ActiveSprintFilters: React.FC<ActiveSprintFiltersProps> = ({
           variant={highPriorityOnly ? "primary" : "outline"}
           size="sm"
           onClick={() => setHighPriorityOnly(!highPriorityOnly)}
+          className="shrink-0"
         >
           {ACTIVE_SPRINT_TEXTS.BTN_HIGH_PRIORITY}
         </Button>
       </div>
 
       {/* Grouping Dropdown */}
-      <div className="flex items-center gap-2">
-        <span className="text-xs font-bold text-gray-405 flex items-center gap-1">
+      <div className="flex items-center gap-2 shrink-0 self-start sm:self-auto">
+        <span className="text-xs font-bold text-slate-500 dark:text-slate-400 flex items-center gap-1">
           <LayoutGrid className="w-3.5 h-3.5" />{" "}
           {ACTIVE_SPRINT_TEXTS.GROUP_BY_LABEL}
         </span>

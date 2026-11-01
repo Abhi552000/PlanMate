@@ -23,7 +23,7 @@ export const ConfirmCompleteSprintModal: React.FC<
         className="bg-white dark:bg-gray-900 border border-sky-100 dark:border-gray-800 rounded-2xl max-w-sm w-full p-6 shadow-2xl animate-fadeIn space-y-4"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex justify-between items-center border-b border-sky-50 dark:border-gray-850 pb-2">
+        <div className="flex justify-between items-center border-b border-slate-100 dark:border-slate-800/80 pb-3">
           <h3 className="font-extrabold text-gray-900 dark:text-white text-base">
             {ACTIVE_SPRINT_TEXTS.MODAL_COMPLETE_SPRINT_TITLE}
           </h3>
