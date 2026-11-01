@@ -2,6 +2,7 @@ import React from "react";
 import { Plus, Layers, FolderPlus } from "lucide-react";
 import TaskModal from "../../components/TaskModal";
 import { Button } from "../../components/ui/Button";
+import { FilterSelect } from "../../components/ui/FilterSelect";
 import { BacklogModals } from "./components/backlog/BacklogModals";
 import { BacklogSprintAccordion } from "./components/backlog/BacklogSprintAccordion";
 import { BacklogTasksSection } from "./components/backlog/BacklogTasksSection";
@@ -101,56 +102,67 @@ export const Backlog: React.FC = () => {
         </div>
       </div>
 
-      {/* Epic Filter Tabs Row (Responsive Horizontal Scroll) */}
-      <div className="flex items-center gap-2 mb-6 pb-3 border-b border-slate-200/80 dark:border-slate-800/80 overflow-x-auto no-scrollbar">
-        <span className="text-xs font-bold text-slate-500 dark:text-slate-400 flex items-center gap-1 mr-1 shrink-0">
-          <Layers className="w-3.5 h-3.5" /> {BACKLOG_TEXTS.FILTER_EPICS}
-        </span>
-        <Button
-          variant={!selectedEpicFilter ? "primary" : "outline"}
-          size="sm"
-          onClick={() => setSelectedEpicFilter(null)}
-          className="shrink-0"
-        >
-          {BACKLOG_TEXTS.EPICS_FILTER_ALL}
-        </Button>
-        {epics.map((epic) => (
+      {/* Unified Filter Toolbar Matching Dashboard */}
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-white dark:bg-slate-900/90 p-3.5 sm:p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 shadow-2xs mb-6">
+        <div className="flex flex-wrap items-center gap-2.5">
+          {/* Epic Filter Select */}
+          <FilterSelect
+            label="Epic"
+            value={selectedEpicFilter || "all"}
+            options={[
+              { label: BACKLOG_TEXTS.EPICS_FILTER_ALL, value: "all" },
+              ...epics.map((epic) => ({
+                label: epic.name,
+                value: epic._id,
+                icon: (
+                  <span
+                    className={`w-2 h-2 rounded-full shrink-0 ${
+                      epic.color === "emerald"
+                        ? "bg-emerald-500"
+                        : epic.color === "violet"
+                        ? "bg-violet-500"
+                        : epic.color === "amber"
+                        ? "bg-amber-500"
+                        : epic.color === "rose"
+                        ? "bg-rose-500"
+                        : epic.color === "indigo"
+                        ? "bg-indigo-500"
+                        : "bg-sky-500"
+                    }`}
+                  />
+                ),
+              })),
+            ]}
+            onChange={(val) => setSelectedEpicFilter(val === "all" ? null : val)}
+          />
+
           <Button
-            key={epic._id}
-            variant={selectedEpicFilter === epic._id ? "primary" : "outline"}
+            variant="outline"
             size="sm"
-            onClick={() => setSelectedEpicFilter(epic._id)}
-            className="shrink-0"
-            icon={
-              <span
-                className={`w-2 h-2 rounded-full shrink-0 ${
-                  epic.color === "emerald"
-                    ? "bg-emerald-500"
-                    : epic.color === "violet"
-                    ? "bg-violet-500"
-                    : epic.color === "amber"
-                    ? "bg-amber-500"
-                    : epic.color === "rose"
-                    ? "bg-rose-500"
-                    : epic.color === "indigo"
-                    ? "bg-indigo-500"
-                    : "bg-sky-500"
-                }`}
-              />
-            }
+            onClick={() => setShowCreateEpic(true)}
+            icon={<FolderPlus className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400" />}
+            className="h-[38px] rounded-xl text-xs font-semibold shrink-0"
           >
-            {epic.name}
+            {BACKLOG_TEXTS.BTN_NEW_EPIC}
           </Button>
-        ))}
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => setShowCreateEpic(true)}
-          icon={<FolderPlus className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400" />}
-          className="sm:ml-auto shrink-0"
-        >
-          {BACKLOG_TEXTS.BTN_NEW_EPIC}
-        </Button>
+
+          {selectedEpicFilter && (
+            <button
+              type="button"
+              onClick={() => setSelectedEpicFilter(null)}
+              className="text-xs font-bold text-sky-600 dark:text-sky-400 hover:text-sky-700 dark:hover:text-sky-300 px-2.5 py-1.5 rounded-xl transition-colors cursor-pointer hover:bg-sky-50 dark:hover:bg-slate-800 border border-transparent hover:border-sky-100 dark:hover:border-slate-700"
+            >
+              Clear Filters
+            </button>
+          )}
+        </div>
+
+        {/* Quick summary */}
+        <div className="text-xs font-semibold text-slate-500 dark:text-slate-400 shrink-0 self-start sm:self-auto">
+          <span>
+            {sprints.length} {sprints.length === 1 ? "sprint" : "sprints"} • {backlogTasks.length} backlog issues
+          </span>
+        </div>
       </div>
 
       <div className="w-full space-y-5 sm:space-y-6">

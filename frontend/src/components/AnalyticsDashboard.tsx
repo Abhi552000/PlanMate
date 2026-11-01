@@ -1,6 +1,6 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import { ITask, AnalyticsDashboardProps } from "../types";
-import { HelpCircle, Info, AlertCircle, Flag, UserX, Briefcase, TrendingUp, ArrowUpRight } from "lucide-react";
+import { Info, AlertCircle, Flag, UserX, Briefcase, TrendingUp, ArrowUpRight, BarChart2 } from "lucide-react";
 import { MetricCards } from "./analytics/MetricCards";
 import { ChartsSection } from "./analytics/ChartsSection";
 import {
@@ -13,11 +13,10 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
   tasks,
   onApplyFilters,
 }) => {
-
   // 1. Calculate General Metrics from Filtered Tasks
   const metrics = useMemo(() => {
     const totalCount = tasks.length;
-    const completedTasks = tasks.filter((t) => t.status === "Done");
+    const completedTasks = tasks.filter((t) => t.status === "Done" || t.completed === true || t.completed === "Yes");
     const completedCount = completedTasks.length;
     const pendingCount = totalCount - completedCount;
 
@@ -43,7 +42,7 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
         typeof t.dueDate === "string"
           ? t.dueDate.split("T")[0]
           : getLocalYYYYMMDD(new Date(t.dueDate));
-      const isCompleted = t.status === "Done";
+      const isCompleted = t.status === "Done" || t.completed === true || t.completed === "Yes";
       return dueStr < todayStr && !isCompleted;
     }).length;
 
@@ -81,7 +80,7 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
     });
 
     return [
-      { name: "Urgent / High", value: breakdown.High, color: "#ef4444" },
+      { name: "Urgent / High", value: breakdown.High, color: "#f43f5e" },
       { name: "Medium Priority", value: breakdown.Medium, color: "#f59e0b" },
       { name: "Low Priority", value: breakdown.Low, color: "#10b981" },
     ].filter((p) => p.value > 0);
@@ -94,7 +93,7 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
   const formatInsightText = (text: string) => {
     return text.replace(
       /\*\*(.*?)\*\*/g,
-      '<strong class="font-extrabold text-gray-800 dark:text-gray-100">$1</strong>'
+      '<strong class="font-bold text-slate-800 dark:text-slate-100">$1</strong>'
     );
   };
 
@@ -102,11 +101,11 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
   const renderInsightIcon = (type: string) => {
     switch (type) {
       case "overdue":
-        return <AlertCircle className="w-4 h-4 text-red-500 mt-0.5 shrink-0" />;
+        return <AlertCircle className="w-4 h-4 text-rose-500 mt-0.5 shrink-0" />;
       case "highPriority":
         return <Flag className="w-4 h-4 text-amber-500 mt-0.5 shrink-0" />;
       case "unassigned":
-        return <UserX className="w-4 h-4 text-gray-500 mt-0.5 shrink-0" />;
+        return <UserX className="w-4 h-4 text-slate-400 mt-0.5 shrink-0" />;
       case "workload":
         return <Briefcase className="w-4 h-4 text-sky-500 mt-0.5 shrink-0" />;
       default:
@@ -116,13 +115,15 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
 
   if (tasks.length === 0) {
     return (
-      <div className="text-center p-12 bg-white dark:bg-gray-900 border border-sky-100 dark:border-gray-800 rounded-2xl space-y-3">
-        <p className="text-gray-400 font-semibold text-sm">
+      <div className="text-center p-12 bg-white dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl space-y-3 shadow-2xs">
+        <div className="w-12 h-12 rounded-2xl bg-sky-50 dark:bg-sky-950/40 text-sky-500 flex items-center justify-center mx-auto">
+          <BarChart2 className="w-6 h-6" />
+        </div>
+        <p className="text-slate-800 dark:text-slate-200 font-bold text-sm">
           No tasks match your selected filters.
         </p>
-        <p className="text-gray-400 text-xs">
-          Try clearing your filters or search terms to generate workspace
-          metrics.
+        <p className="text-slate-400 dark:text-slate-500 text-xs max-w-sm mx-auto">
+          Try clearing your filters, changing timeframes, or resetting search terms to generate workspace analytics.
         </p>
       </div>
     );
@@ -131,40 +132,40 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
   return (
     <div className="space-y-6 w-full font-sans pb-10">
       {/* Title Header */}
-      <div className="border-b border-sky-50 dark:border-gray-800 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+      <div className="border-b border-slate-200/80 dark:border-slate-800/80 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
         <div>
-          <h2 className="text-lg font-bold text-gray-850 dark:text-gray-200">
-            Interactive Analytics
+          <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100">
+            Sprint & Workload Analytics
           </h2>
-          <p className="text-xs text-gray-550 dark:text-gray-400 mt-1">
-            Analyzing {metrics.totalCount} active tasks matching your current
-            dashboard filters.
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+            Analyzing {metrics.totalCount} active tasks across your current filters.
           </p>
         </div>
-        <span className="text-[10px] font-bold text-sky-700 bg-sky-50 dark:bg-sky-955/20 px-2.5 py-1 rounded-full border border-sky-100 dark:border-gray-800 self-start sm:self-auto">
-          ⚡ Updates automatically with filters
+        <span className="text-[11px] font-semibold text-sky-700 dark:text-sky-300 bg-sky-50 dark:bg-sky-950/50 px-3 py-1 rounded-full border border-sky-200/70 dark:border-sky-800/60 self-start sm:self-auto flex items-center gap-1.5 shadow-2xs">
+          <span className="w-1.5 h-1.5 rounded-full bg-sky-500 animate-pulse" />
+          Live Filter Synced
         </span>
       </div>
 
       {/* Visual Analytics Header Cards */}
-      <MetricCards
-        metrics={metrics}
-      />
+      <MetricCards metrics={metrics} />
 
       {/* Dynamic Smart Observations */}
-      <div className="bg-sky-50/10 dark:bg-gray-900 border border-sky-100 dark:border-gray-800 p-5 rounded-2xl space-y-3">
-        <div className="flex items-center gap-2 border-b border-sky-100/50 dark:border-gray-800/80 pb-2.5">
-          <Info className="w-4 h-4 text-gray-500" />
-          <h3 className="text-xs font-black uppercase tracking-wider text-gray-700 dark:text-gray-300">
-            Workspace Insights
+      <div className="bg-white dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800/80 p-4 sm:p-5 rounded-2xl space-y-3 shadow-2xs">
+        <div className="flex items-center gap-2 border-b border-slate-100 dark:border-slate-800/70 pb-3">
+          <div className="p-1.5 rounded-lg bg-sky-50 dark:bg-sky-950/40 text-sky-600 dark:text-sky-400">
+            <Info className="w-4 h-4" />
+          </div>
+          <h3 className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+            Workspace Insights & Actionable Bottlenecks
           </h3>
         </div>
-        <ul className="space-y-3.5 pt-1">
+        <ul className="space-y-2.5 pt-1">
           {insights.map((insight, idx) => (
             <li
               key={idx}
               onClick={() => onApplyFilters?.(insight.filters)}
-              className="flex items-center justify-between text-xs text-gray-600 dark:text-gray-350 hover:text-sky-600 dark:hover:text-sky-400 cursor-pointer transition-colors group py-0.5"
+              className="flex items-center justify-between text-xs text-slate-600 dark:text-slate-350 hover:text-sky-600 dark:hover:text-sky-400 cursor-pointer transition-colors group p-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/50"
             >
               <div className="flex items-start gap-3 leading-relaxed">
                 {renderInsightIcon(insight.type)}
@@ -173,7 +174,10 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
                 />
               </div>
               {insight.type !== "progress" && (
-                <ArrowUpRight className="w-3.5 h-3.5 text-sky-500 opacity-0 group-hover:opacity-100 transition-opacity shrink-0 ml-2" />
+                <div className="flex items-center gap-1 text-[11px] font-semibold text-sky-600 dark:text-sky-400 opacity-0 group-hover:opacity-100 transition-opacity shrink-0 ml-2">
+                  <span>Filter view</span>
+                  <ArrowUpRight className="w-3.5 h-3.5" />
+                </div>
               )}
             </li>
           ))}

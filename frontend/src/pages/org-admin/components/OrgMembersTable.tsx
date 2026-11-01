@@ -1,8 +1,32 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Users, Eye, Power, RotateCcw, MoreVertical, Search, Filter, X } from "lucide-react";
 import { OrgMembersTableProps } from "../../../types";
+import {
+  FilterSelect,
+  SearchInput,
+  Pagination,
+  TableCard,
+  Table,
+  TableHeader,
+  TableBody,
+  TableHead,
+  TableEmpty,
+} from "../../../components/ui";
 
 const ITEMS_PER_PAGE = 5;
+
+const ROLE_OPTIONS = [
+  { label: "All Roles", value: "all" },
+  { label: "Org Admin", value: "org_admin" },
+  { label: "Member", value: "member" },
+];
+
+const STATUS_OPTIONS = [
+  { label: "All Statuses", value: "all" },
+  { label: "Approved (Active)", value: "active" },
+  { label: "Pending Approval", value: "pending" },
+  { label: "Access Rejected", value: "rejected" },
+];
 
 export const OrgMembersTable: React.FC<OrgMembersTableProps> = ({
   teamUsers,
@@ -38,7 +62,7 @@ export const OrgMembersTable: React.FC<OrgMembersTableProps> = ({
   const hasActiveFilters = selectedStatus !== "all" || selectedRole !== "all" || Boolean(searchQuery);
 
   return (
-    <div className="bg-white dark:bg-gray-900 rounded-2xl border border-sky-100/50 dark:border-gray-800 shadow-sm overflow-visible">
+    <TableCard className="border-sky-100/50 dark:border-gray-800 shadow-sm overflow-visible">
       {/* Table Header with Integrated Backend Filter Toolbar */}
       <div className="p-4 sm:p-5 border-b border-sky-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/50 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
         <div>
@@ -53,43 +77,28 @@ export const OrgMembersTable: React.FC<OrgMembersTableProps> = ({
         {/* Backend Filters */}
         <div className="flex flex-wrap items-center gap-2.5">
           {/* Search Input */}
-          <div className="relative min-w-[200px] flex-1 sm:flex-initial">
-            <Search className="w-3.5 h-3.5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-            <input
-              type="text"
-              placeholder="Search by name or email..."
-              value={searchQuery}
-              onChange={(e) => onSearchChange(e.target.value)}
-              className="w-full h-[38px] pl-9 pr-3 text-xs bg-white dark:bg-gray-950 border border-slate-200 dark:border-gray-700 rounded-lg text-gray-800 dark:text-gray-200 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-sky-500 shadow-2xs"
-            />
-          </div>
+          <SearchInput
+            value={searchQuery}
+            onChange={onSearchChange}
+            placeholder="Search by name or email..."
+            className="min-w-[200px] flex-1 sm:flex-initial"
+          />
 
           {/* Role Filter Dropdown */}
-          <div className="relative">
-            <select
-              value={selectedRole}
-              onChange={(e) => onRoleChange(e.target.value)}
-              className="h-[38px] px-3 text-xs font-semibold bg-white dark:bg-gray-950 border border-slate-200 dark:border-gray-700 rounded-lg text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-1 focus:ring-sky-500 cursor-pointer shadow-2xs"
-            >
-              <option value="all">All Roles</option>
-              <option value="org_admin">Org Admin</option>
-              <option value="member">Member</option>
-            </select>
-          </div>
+          <FilterSelect
+            label="Role"
+            value={selectedRole}
+            options={ROLE_OPTIONS}
+            onChange={onRoleChange}
+          />
 
           {/* Status Filter Dropdown */}
-          <div className="relative">
-            <select
-              value={selectedStatus}
-              onChange={(e) => onStatusChange(e.target.value)}
-              className="h-[38px] px-3 text-xs font-semibold bg-white dark:bg-gray-950 border border-slate-200 dark:border-gray-700 rounded-lg text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-1 focus:ring-sky-500 cursor-pointer shadow-2xs"
-            >
-              <option value="all">All Statuses</option>
-              <option value="active">Approved (Active)</option>
-              <option value="pending">Pending Approval</option>
-              <option value="rejected">Access Rejected</option>
-            </select>
-          </div>
+          <FilterSelect
+            label="Status"
+            value={selectedStatus}
+            options={STATUS_OPTIONS}
+            onChange={onStatusChange}
+          />
 
           {/* Reset Filters Button */}
           {hasActiveFilters && (
@@ -105,31 +114,25 @@ export const OrgMembersTable: React.FC<OrgMembersTableProps> = ({
         </div>
       </div>
 
-      <div className="overflow-x-auto overflow-y-visible min-h-[250px]">
-        <table className="w-full text-left border-collapse">
-          <thead>
-            <tr className="border-b border-sky-50/70 dark:border-gray-800 text-[10px] sm:text-[11px] font-bold text-gray-500 dark:text-gray-300 uppercase bg-gray-50/30 dark:bg-gray-950/20 whitespace-nowrap">
-              <th className="px-3 sm:px-6 py-3 sm:py-4">User Name</th>
-              <th className="px-3 sm:px-6 py-3 sm:py-4 hidden sm:table-cell">Email</th>
-              <th className="px-3 sm:px-6 py-3 sm:py-4">Role</th>
-              <th className="px-3 sm:px-6 py-3 sm:py-4 hidden md:table-cell">Solved Tickets</th>
-              <th className="px-3 sm:px-6 py-3 sm:py-4">Access Status</th>
-              <th className="px-3 sm:px-6 py-3 sm:py-4 text-right">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-sky-50/45 dark:divide-gray-800 text-[11px] sm:text-xs overflow-y-visible">
-            {teamUsers.length === 0 ? (
-              <tr>
-                <td colSpan={6} className="text-center py-14 text-gray-400 dark:text-gray-500">
-                  <div className="flex flex-col items-center justify-center gap-2">
-                    <Users className="w-8 h-8 text-gray-300 dark:text-gray-650" />
-                    <p className="text-sm font-semibold text-gray-600 dark:text-gray-400">
-                      No members found
-                    </p>
-                  </div>
-                </td>
-              </tr>
-            ) : (
+      <Table wrapperClassName="overflow-y-visible min-h-[250px]">
+        <TableHeader>
+          <tr>
+            <TableHead>User Name</TableHead>
+            <TableHead className="hidden sm:table-cell">Email</TableHead>
+            <TableHead>Role</TableHead>
+            <TableHead className="hidden md:table-cell">Solved Tickets</TableHead>
+            <TableHead>Access Status</TableHead>
+            <TableHead className="text-right">Actions</TableHead>
+          </tr>
+        </TableHeader>
+        <TableBody className="overflow-y-visible">
+          {teamUsers.length === 0 ? (
+            <TableEmpty
+              colSpan={6}
+              message="No members found"
+              icon={<Users className="w-8 h-8 text-gray-300 dark:text-gray-600" />}
+            />
+          ) : (
               teamUsers.map((member) => (
               <tr
                 key={member._id}
@@ -238,49 +241,18 @@ export const OrgMembersTable: React.FC<OrgMembersTableProps> = ({
                 </td>
               </tr>
             )))}
-          </tbody>
-        </table>
-      </div>
+          </TableBody>
+        </Table>
 
       {/* Pagination Controls */}
-      {totalCount > ITEMS_PER_PAGE && (
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-6 py-4 border-t border-sky-100 dark:border-gray-800 bg-gray-50/20 dark:bg-gray-950/20 text-xs">
-          <span className="font-semibold text-gray-500 dark:text-gray-400">
-            Showing {(currentPage - 1) * ITEMS_PER_PAGE + 1} to{" "}
-            {Math.min(currentPage * ITEMS_PER_PAGE, totalCount)} of{" "}
-            {totalCount} users
-          </span>
-          <div className="flex items-center gap-1.5">
-            <button
-              disabled={currentPage === 1}
-              onClick={() => onPageChange(currentPage - 1)}
-              className="px-3 py-1.5 rounded-lg border border-sky-100 dark:border-gray-800 bg-white dark:bg-gray-900 text-gray-650 dark:text-gray-300 font-bold hover:bg-sky-50 dark:hover:bg-gray-850 disabled:opacity-50 disabled:pointer-events-none transition-colors cursor-pointer"
-            >
-              Previous
-            </button>
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
-              <button
-                key={pageNum}
-                onClick={() => onPageChange(pageNum)}
-                className={`w-8 h-8 rounded-lg border font-bold flex items-center justify-center transition-colors cursor-pointer ${
-                  currentPage === pageNum
-                    ? "bg-sky-500 border-sky-500 text-white shadow-sm"
-                    : "border-sky-100 dark:border-gray-800 bg-white dark:bg-gray-900 text-gray-650 dark:text-gray-300 hover:bg-sky-50 dark:hover:bg-gray-800"
-                }`}
-              >
-                {pageNum}
-              </button>
-            ))}
-            <button
-              disabled={currentPage === totalPages}
-              onClick={() => onPageChange(currentPage + 1)}
-              className="px-3 py-1.5 rounded-lg border border-sky-100 dark:border-gray-800 bg-white dark:bg-gray-900 text-gray-650 dark:text-gray-300 font-bold hover:bg-sky-50 dark:hover:bg-gray-800 disabled:opacity-50 disabled:pointer-events-none transition-colors cursor-pointer"
-            >
-              Next
-            </button>
-          </div>
-        </div>
-      )}
-    </div>
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        totalItems={totalCount}
+        pageSize={ITEMS_PER_PAGE}
+        itemLabel="users"
+        onPageChange={onPageChange}
+      />
+    </TableCard>
   );
 };
