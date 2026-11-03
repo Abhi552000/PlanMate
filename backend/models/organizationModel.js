@@ -9,6 +9,26 @@ const organizationSchema = new mongoose.Schema({
     type: String,
     default: "",
   },
+  industry: {
+    type: String,
+    default: "",
+  },
+  companySize: {
+    type: String,
+    default: "",
+  },
+  website: {
+    type: String,
+    default: "",
+  },
+  location: {
+    type: String,
+    default: "",
+  },
+  phone: {
+    type: String,
+    default: "",
+  },
   admin: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "user",

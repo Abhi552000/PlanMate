@@ -39,7 +39,7 @@ export const ReportWorkItemTable: React.FC<ReportWorkItemTableProps> = ({
   const pageSize = 10;
 
   const typeOptions = useMemo(() => [
-    { label: "All Types", value: "all" },
+    { label: "All", value: "all" },
     { label: "Task", value: "Task" },
     { label: "Bug", value: "Bug" },
     { label: "Story", value: "Story" },
@@ -47,7 +47,7 @@ export const ReportWorkItemTable: React.FC<ReportWorkItemTableProps> = ({
   ], []);
 
   const priorityOptions = useMemo(() => [
-    { label: "All Priorities", value: "all" },
+    { label: "All", value: "all" },
     { label: "High", value: "High" },
     { label: "Medium", value: "Medium" },
     { label: "Low", value: "Low" },

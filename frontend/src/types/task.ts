@@ -213,6 +213,8 @@ export interface TaskMetaSidebarProps {
   onAddLink: (e: React.FormEvent) => void;
   onRemoveLink: (linkId: string) => void;
   createdAt?: string | Date;
+  timeLogged?: number;
+  onLogTimeClick?: () => void;
 }
 
 export interface CommentsSectionProps {

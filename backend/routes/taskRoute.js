@@ -11,6 +11,7 @@ import {
   deleteTaskComment,
   getTaskAnalytics,
   logWork,
+  deleteWorkLog,
   linkTask,
   unlinkTask,
 } from "../controllers/taskContoller.js";
@@ -35,6 +36,7 @@ taskRouter
 taskRouter.route("/:id/comments").post(addTaskComment);
 taskRouter.route("/:id/comments/:commentId").delete(deleteTaskComment);
 taskRouter.route("/:id/worklogs").post(logWork);
+taskRouter.route("/:id/worklogs/:workLogId").delete(deleteWorkLog);
 taskRouter.route("/:id/links").post(linkTask);
 taskRouter.route("/:id/links/:linkId").delete(unlinkTask);
 

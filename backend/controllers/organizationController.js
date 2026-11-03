@@ -20,7 +20,18 @@ export const onboardOrganization = async (req, res) => {
       .status(HttpStatus.FORBIDDEN)
       .json({ success: false, message: MESSAGES.ORG.SYS_ADMIN_REQUIRED });
   }
-  const { orgName, adminName, adminEmail, adminPassword } = req.body;
+  const {
+    orgName,
+    adminName,
+    adminEmail,
+    adminPassword,
+    description,
+    industry,
+    companySize,
+    website,
+    location,
+    phone,
+  } = req.body;
 
   if (!orgName || !adminName || !adminEmail) {
     return res
@@ -67,6 +78,12 @@ export const onboardOrganization = async (req, res) => {
     // Create Organization
     const organization = new Organization({
       name: orgName,
+      description: description?.trim() || "",
+      industry: industry?.trim() || "",
+      companySize: companySize?.trim() || "",
+      website: website?.trim() || "",
+      location: location?.trim() || "",
+      phone: phone?.trim() || "",
       admin: savedUser._id,
     });
 
@@ -477,7 +494,18 @@ export const updateOrganizationAdmin = async (req, res) => {
   }
 
   const { id } = req.params;
-  const { orgName, adminName, adminEmail, adminPassword } = req.body;
+  const {
+    orgName,
+    adminName,
+    adminEmail,
+    adminPassword,
+    description,
+    industry,
+    companySize,
+    website,
+    location,
+    phone,
+  } = req.body;
 
   try {
     const org = await Organization.findById(id);
@@ -487,10 +515,14 @@ export const updateOrganizationAdmin = async (req, res) => {
         .json({ success: false, message: MESSAGES.ORG.NOT_FOUND });
     }
 
-    if (orgName) {
-      org.name = orgName;
-      await org.save();
-    }
+    if (orgName) org.name = orgName;
+    if (description !== undefined) org.description = description;
+    if (industry !== undefined) org.industry = industry;
+    if (companySize !== undefined) org.companySize = companySize;
+    if (website !== undefined) org.website = website;
+    if (location !== undefined) org.location = location;
+    if (phone !== undefined) org.phone = phone;
+    await org.save();
 
     const adminUser = await User.findById(org.admin);
     if (adminUser) {

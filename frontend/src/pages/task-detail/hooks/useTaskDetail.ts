@@ -43,6 +43,9 @@ export const useTaskDetail = (id: string | undefined, subtaskIndex: number | nul
   const [targetTaskId, setTargetTaskId] = useState("");
   const [linking, setLinking] = useState(false);
 
+  const [loggingWork, setLoggingWork] = useState(false);
+  const [deletingWorkLogId, setDeletingWorkLogId] = useState<string | null>(null);
+
   useEffect(() => {
     if (subtaskIndex !== null) return;
     const fetchOrgTasks = async () => {
@@ -120,6 +123,38 @@ export const useTaskDetail = (id: string | undefined, subtaskIndex: number | nul
       }
     } catch (err: any) {
       toast.error(err?.response?.data?.message || TOAST_MESSAGES.LINK_REMOVE_ERROR || "Failed to remove issue link");
+    }
+  };
+
+  const handleLogWork = async (hoursSpent: number, description?: string, date?: string) => {
+    if (!id || hoursSpent <= 0) return;
+    setLoggingWork(true);
+    try {
+      const data = await taskService.logWork(id, hoursSpent, description, date);
+      if (data?.success && data?.task) {
+        setParentTaskData(data.task);
+        toast.success(`Logged ${hoursSpent}h of work`);
+      }
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message || "Failed to log work");
+    } finally {
+      setLoggingWork(false);
+    }
+  };
+
+  const handleDeleteWorkLog = async (workLogId: string) => {
+    if (!id || !workLogId) return;
+    setDeletingWorkLogId(workLogId);
+    try {
+      const data = await taskService.deleteWorkLog(id, workLogId);
+      if (data?.success && data?.task) {
+        setParentTaskData(data.task);
+        toast.success("Work log removed");
+      }
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message || "Failed to delete work log");
+    } finally {
+      setDeletingWorkLogId(null);
     }
   };
 
@@ -332,8 +367,10 @@ export const useTaskDetail = (id: string | undefined, subtaskIndex: number | nul
     targetTaskId,
     setTargetTaskId,
     linking,
-    searchParams,
-    setSearchParams,
+    loggingWork,
+    deletingWorkLogId,
+    handleLogWork,
+    handleDeleteWorkLog,
     handleAddComment,
     handleDeleteComment,
     handleAddLink,

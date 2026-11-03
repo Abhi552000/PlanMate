@@ -59,7 +59,7 @@ export const DashboardFilters: React.FC<DashboardFiltersProps> = React.memo(({
   ], [statuses]);
 
   const timeframeOptions = React.useMemo(() => [
-    { label: "All Time", value: "all" },
+    { label: "All", value: "all" },
     { label: "Due Today", value: "today" },
     { label: "Due This Week", value: "week" },
     { label: "Overdue", value: "overdue" },

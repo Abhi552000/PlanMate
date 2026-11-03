@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import {
   X,
-  CreditCard,
   Plus,
   Edit2,
   Trash2,
@@ -10,7 +9,6 @@ import {
   AlertCircle,
   Save,
   Users,
-  Sparkles,
 } from "lucide-react";
 import { toast } from "react-toastify";
 import { planService } from "../../../services/planService";
@@ -152,18 +150,13 @@ export const PlanManagementModal: React.FC<PlanManagementModalProps> = ({
       <div className="bg-white dark:bg-gray-900 rounded-2xl max-w-3xl w-full shadow-2xl border border-sky-100 dark:border-gray-800 overflow-hidden flex flex-col max-h-[90vh]">
         {/* Header */}
         <div className="flex items-center justify-between p-5 border-b border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-950/40">
-          <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-sky-50 dark:bg-sky-950/60 border border-sky-100 dark:border-sky-900 flex items-center justify-center text-sky-600 dark:text-sky-400">
-              <CreditCard className="w-5 h-5" />
-            </div>
-            <div>
-              <h3 className="font-bold text-base text-gray-900 dark:text-white leading-tight">
-                Superadmin Plans & Pricing Configuration
-              </h3>
-              <p className="text-xs text-gray-500 dark:text-gray-400">
-                Define and edit subscription tiers, pricing, and member capacity
-              </p>
-            </div>
+          <div>
+            <h3 className="font-bold text-base text-gray-900 dark:text-white leading-tight">
+              Superadmin Plans & Pricing Configuration
+            </h3>
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              Define and edit subscription tiers, pricing, and member capacity
+            </p>
           </div>
           <button
             onClick={onClose}
@@ -182,8 +175,7 @@ export const PlanManagementModal: React.FC<PlanManagementModalProps> = ({
               className="p-5 rounded-2xl border border-sky-200 dark:border-sky-900/60 bg-sky-50/20 dark:bg-sky-950/20 space-y-4 animate-in fade-in"
             >
               <div className="flex items-center justify-between border-b border-sky-100 dark:border-gray-800 pb-3">
-                <h4 className="font-extrabold text-sm text-gray-900 dark:text-white flex items-center gap-2">
-                  <Sparkles className="w-4 h-4 text-sky-500" />
+                <h4 className="font-extrabold text-sm text-gray-900 dark:text-white">
                   {isCreatingNew ? "Create New Subscription Tier" : `Edit Plan: ${editingPlan?.name}`}
                 </h4>
                 <button
@@ -205,7 +197,7 @@ export const PlanManagementModal: React.FC<PlanManagementModalProps> = ({
                     type="text"
                     value={formName}
                     onChange={(e) => setFormName(e.target.value)}
-                    placeholder="e.g. Pro Growth"
+                    placeholder="Enter plan display name"
                     className="w-full h-[38px] px-3 bg-white dark:bg-gray-950 border border-slate-200 dark:border-gray-700 rounded-lg text-xs font-semibold text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-1 focus:ring-sky-500"
                     required
                   />
@@ -221,7 +213,7 @@ export const PlanManagementModal: React.FC<PlanManagementModalProps> = ({
                     value={formPlanId}
                     onChange={(e) => setFormPlanId(e.target.value)}
                     disabled={!isCreatingNew}
-                    placeholder="e.g. pro"
+                    placeholder="Enter unique plan slug"
                     className="w-full h-[38px] px-3 bg-white dark:bg-gray-950 border border-slate-200 dark:border-gray-700 rounded-lg text-xs font-mono font-semibold text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-1 focus:ring-sky-500 disabled:opacity-50"
                     required
                   />

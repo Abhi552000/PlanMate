@@ -25,6 +25,7 @@ import { OrgListTable } from "./components/OrgListTable";
 import { OnboardOrgModal } from "./components/OnboardOrgModal";
 import { EditOrgModal } from "./components/EditOrgModal";
 import { DeactivateOrgModal } from "./components/DeactivateOrgModal";
+import { DeleteOrgModal } from "./components/DeleteOrgModal";
 import { ResetPasswordModal } from "./components/ResetPasswordModal";
 import { TenantDetailModal } from "./components/TenantDetailModal";
 import { PlanManagementModal } from "./components/PlanManagementModal";
@@ -70,16 +71,16 @@ const SystemAdminDashboard: React.FC<SystemAdminDashboardProps> = ({ onLogout, u
     onboarding,
     updating,
     togglingStatus,
-    error,
-    setError,
-    success,
-    setSuccess,
     handleOnboardSubmit,
     handleEditClick,
     handleUpdate,
     handleToggleActive,
     submitDeactivation,
     handleDelete,
+    deletingOrg,
+    setDeletingOrg,
+    deleting,
+    handleDeleteConfirm,
     handleCopyPassword,
     handleResetPassword,
     handleResetPasswordConfirm,
@@ -114,9 +115,9 @@ const SystemAdminDashboard: React.FC<SystemAdminDashboardProps> = ({ onLogout, u
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex flex-col">
+      <div className="h-screen h-[100dvh] bg-gray-50 dark:bg-gray-950 flex flex-col overflow-hidden">
         <SysAdminHeader user={user} onLogout={onLogout} />
-        <main className="px-3.5 sm:px-6 lg:px-8 py-4 sm:py-8 flex-1 w-full space-y-6 animate-pulse">
+        <main className="px-3.5 sm:px-6 lg:px-8 py-4 sm:py-8 flex-1 w-full space-y-6 animate-pulse overflow-y-auto min-h-0">
           <div className="flex justify-between items-center">
             <div className="space-y-2">
               <div className="h-7 w-56 rounded bg-slate-200 dark:bg-slate-800" />
@@ -143,7 +144,7 @@ const SystemAdminDashboard: React.FC<SystemAdminDashboardProps> = ({ onLogout, u
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex flex-col font-sans transition-colors duration-300">
+    <div className="h-screen h-[100dvh] bg-gray-50 dark:bg-gray-950 flex flex-col font-sans transition-colors duration-300 overflow-hidden">
       <SysAdminHeader
         user={user}
         onLogout={onLogout}
@@ -151,7 +152,7 @@ const SystemAdminDashboard: React.FC<SystemAdminDashboardProps> = ({ onLogout, u
       />
 
       {/* SUPER ADMIN WORKSPACE LAYOUT WITH SIDEBAR */}
-      <div className="flex-1 flex overflow-hidden">
+      <div className="flex-1 flex overflow-hidden min-h-0">
         {/* Superadmin Sidebar Menu */}
         <SysAdminSidebar
           activeTab={activeTab}
@@ -163,13 +164,11 @@ const SystemAdminDashboard: React.FC<SystemAdminDashboardProps> = ({ onLogout, u
           onOnboardClick={() => {
             setShowOnboardModal(true);
             setOnboardedResult(null);
-            setError(null);
-            setSuccess(null);
           }}
         />
 
         {/* Main Content Area */}
-        <main className="flex-1 overflow-y-auto px-3.5 sm:px-6 lg:px-8 py-4 sm:py-8 space-y-6">
+        <main className="flex-1 overflow-y-auto px-3.5 sm:px-6 lg:px-8 py-4 sm:py-8 space-y-6 min-h-0">
           {activeTab === "organizations" && (
             <>
               {/* HEADER SECTION */}
@@ -188,8 +187,6 @@ const SystemAdminDashboard: React.FC<SystemAdminDashboardProps> = ({ onLogout, u
                     onClick={() => {
                       setShowOnboardModal(true);
                       setOnboardedResult(null);
-                      setError(null);
-                      setSuccess(null);
                     }}
                     className={ADD_BUTTON}
                   >
@@ -238,17 +235,6 @@ const SystemAdminDashboard: React.FC<SystemAdminDashboardProps> = ({ onLogout, u
                 </div>
               </div>
 
-              {/* NOTIFICATIONS */}
-              {error && (
-                <div className="text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/20 p-4 rounded-xl border border-red-100 dark:border-red-900/50 animate-fadeIn font-semibold">
-                  {error}
-                </div>
-              )}
-              {success && (
-                <div className="text-sm text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/20 p-4 rounded-xl border border-emerald-100 dark:border-emerald-900/50 font-bold animate-fadeIn">
-                  {success}
-                </div>
-              )}
 
               {/* ORGANIZATIONS DIRECTORY TABLE */}
               <OrgListTable
@@ -304,10 +290,6 @@ const SystemAdminDashboard: React.FC<SystemAdminDashboardProps> = ({ onLogout, u
       <TenantDetailModal
         org={inspectingOrg}
         onClose={() => setInspectingOrg(null)}
-        onResetPassword={handleResetPassword}
-        onEdit={handleEditClick}
-        onToggleActive={handleToggleActive}
-        onDelete={handleDelete}
       />
 
       {/* Onboard Organization Modal */}
@@ -344,6 +326,14 @@ const SystemAdminDashboard: React.FC<SystemAdminDashboardProps> = ({ onLogout, u
         setDeactivateRemark={setDeactivateRemark}
         togglingStatus={togglingStatus}
         onSubmit={submitDeactivation}
+      />
+
+      {/* Delete Organization Confirmation Modal */}
+      <DeleteOrgModal
+        deletingOrg={deletingOrg}
+        onClose={() => setDeletingOrg(null)}
+        onConfirm={handleDeleteConfirm}
+        deleting={deleting}
       />
 
       {/* Plan Management Configuration Modal (shortcut fallback) */}
