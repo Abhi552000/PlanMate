@@ -13,6 +13,12 @@
   --color-text-primary-dark: hsl(210, 10%, 90%);
 }
 
+html,
+body,
+#root {
+  height: 100%;
+}
+
 html {
   font-family: 'Inter', sans-serif;
   background-color: var(--color-bg-primary);

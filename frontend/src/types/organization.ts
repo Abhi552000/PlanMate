@@ -5,6 +5,11 @@ export interface IOrganization {
   _id: string;
   name: string;
   description?: string;
+  industry?: string;
+  companySize?: string;
+  website?: string;
+  location?: string;
+  phone?: string;
   owner?: string;
   taskCounter?: number;
   taskCount?: number;
@@ -131,6 +136,13 @@ export interface DeactivateOrgModalProps {
   setDeactivateRemark: (val: string) => void;
   togglingStatus: boolean;
   onSubmit: (e: React.FormEvent) => void;
+}
+
+export interface DeleteOrgModalProps {
+  deletingOrg: any | null;
+  onClose: () => void;
+  onConfirm: () => void;
+  deleting?: boolean;
 }
 
 export interface AccessRemarkModalProps {

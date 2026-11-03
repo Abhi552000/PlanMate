@@ -1,6 +1,5 @@
 import React, { useState, useMemo, useEffect } from "react";
 import {
-  Building,
   Search,
   Power,
   Edit,
@@ -53,8 +52,7 @@ export const OrgListTable: React.FC<OrgListTableProps> = ({
       {/* TOOLBAR MATCHING OTHER TABLES AND FILTERS */}
       <div className="p-4 sm:p-5 border-b border-sky-100 dark:border-gray-800 flex flex-col md:flex-row md:items-center justify-between gap-3.5 bg-gray-50/50 dark:bg-gray-900/50">
         <div>
-          <h3 className="text-sm font-bold text-gray-800 dark:text-gray-200 flex items-center gap-2">
-            <Building className="w-4.5 h-4.5 text-sky-500" />
+          <h3 className="text-sm font-bold text-gray-800 dark:text-gray-200">
             {ORG_TABLE_TEXTS.DIRECTORY_TITLE}
           </h3>
           <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
@@ -239,11 +237,11 @@ export const OrgListTable: React.FC<OrgListTableProps> = ({
                 {/* Action Controls */}
                 <td className="px-3 sm:px-5 py-3 sm:py-3.5 text-right">
                   <div className="flex items-center justify-end gap-1">
-                    {/* 1-Click Reset Password Key with project sky color */}
+                    {/* 1-Click Reset Password Key */}
                     {onResetPasswordClick && (
                       <button
                         onClick={() => onResetPasswordClick(org)}
-                        className="p-1.5 text-sky-500 hover:text-sky-600 hover:bg-sky-50 dark:hover:bg-sky-950/30 rounded-lg transition-colors border border-transparent hover:border-sky-200 cursor-pointer"
+                        className="p-1.5 text-gray-400 dark:text-gray-500 hover:text-sky-600 dark:hover:text-sky-400 hover:bg-sky-50 dark:hover:bg-gray-800 rounded-lg transition-colors cursor-pointer"
                         title={ORG_TABLE_TEXTS.TOOLTIP_RESET_PASSWORD}
                         aria-label={ORG_TABLE_TEXTS.TOOLTIP_RESET_PASSWORD}
                       >
@@ -255,9 +253,9 @@ export const OrgListTable: React.FC<OrgListTableProps> = ({
                     {onInspectClick && (
                       <button
                         onClick={() => onInspectClick(org)}
-                        className="p-1.5 text-gray-500 hover:text-sky-600 dark:hover:text-sky-400 hover:bg-sky-50 dark:hover:bg-sky-950/30 rounded-lg transition-colors border border-transparent hover:border-sky-200 cursor-pointer"
-                        title="Inspect Workspace Overview"
-                        aria-label="Inspect Workspace Overview"
+                        className="p-1.5 text-gray-400 dark:text-gray-500 hover:text-sky-600 dark:hover:text-sky-400 hover:bg-sky-50 dark:hover:bg-gray-800 rounded-lg transition-colors cursor-pointer"
+                        title={ORG_TABLE_TEXTS.TOOLTIP_INSPECT}
+                        aria-label={ORG_TABLE_TEXTS.TOOLTIP_INSPECT}
                       >
                         <Eye className="w-4 h-4" />
                       </button>
@@ -267,11 +265,7 @@ export const OrgListTable: React.FC<OrgListTableProps> = ({
                     <button
                       onClick={() => onToggleActive(org)}
                       disabled={togglingStatus}
-                      className={`p-1.5 rounded-lg border transition-colors cursor-pointer ${
-                        org.isActive
-                          ? "text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 border-transparent hover:border-rose-200"
-                          : "text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 border-transparent hover:border-emerald-200"
-                      }`}
+                      className="p-1.5 text-gray-400 dark:text-gray-500 hover:text-sky-600 dark:hover:text-sky-400 hover:bg-sky-50 dark:hover:bg-gray-800 rounded-lg transition-colors cursor-pointer disabled:opacity-50"
                       title={org.isActive ? "Deactivate Organization" : "Activate Organization"}
                       aria-label={org.isActive ? "Deactivate Organization" : "Activate Organization"}
                     >
@@ -281,7 +275,7 @@ export const OrgListTable: React.FC<OrgListTableProps> = ({
                     {/* Edit Details */}
                     <button
                       onClick={() => onEditClick(org)}
-                      className="p-1.5 text-gray-500 hover:text-sky-600 dark:hover:text-sky-400 hover:bg-sky-50 dark:hover:bg-sky-950/30 rounded-lg transition-colors border border-transparent hover:border-sky-200 cursor-pointer"
+                      className="p-1.5 text-gray-400 dark:text-gray-500 hover:text-sky-600 dark:hover:text-sky-400 hover:bg-sky-50 dark:hover:bg-gray-800 rounded-lg transition-colors cursor-pointer"
                       title="Edit Details"
                       aria-label="Edit Details"
                     >
@@ -291,7 +285,7 @@ export const OrgListTable: React.FC<OrgListTableProps> = ({
                     {/* Delete Org */}
                     <button
                       onClick={() => onDeleteClick(org)}
-                      className="p-1.5 text-gray-500 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 rounded-lg transition-colors border border-transparent hover:border-rose-200 cursor-pointer"
+                      className="p-1.5 text-gray-400 dark:text-gray-500 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 rounded-lg transition-colors cursor-pointer"
                       title="Delete Instance"
                       aria-label="Delete Instance"
                     >

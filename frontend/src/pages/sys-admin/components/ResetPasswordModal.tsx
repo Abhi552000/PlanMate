@@ -26,18 +26,13 @@ export const ResetPasswordModal: React.FC<ResetPasswordModalProps> = ({
       >
         {/* Header */}
         <div className="flex items-center justify-between pb-3 border-b border-gray-100 dark:border-gray-800 mb-4">
-          <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-lg bg-sky-50 dark:bg-sky-950/50 flex items-center justify-center text-sky-500 shrink-0">
-              <KeyRound className="w-4.5 h-4.5" />
-            </div>
-            <div>
-              <h3 className="font-bold text-gray-900 dark:text-white text-base">
-                {RESET_PASSWORD_TEXTS.TITLE}
-              </h3>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                {RESET_PASSWORD_TEXTS.SUBTITLE}
-              </p>
-            </div>
+          <div>
+            <h3 className="font-bold text-gray-900 dark:text-white text-base">
+              {RESET_PASSWORD_TEXTS.TITLE}
+            </h3>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+              {RESET_PASSWORD_TEXTS.SUBTITLE}
+            </p>
           </div>
           <button
             onClick={onClose}

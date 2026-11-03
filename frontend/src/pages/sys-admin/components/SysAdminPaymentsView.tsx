@@ -112,11 +112,8 @@ export const SysAdminPaymentsView: React.FC = () => {
       <div className="space-y-6 animate-pulse select-none">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              <div className="w-6 h-6 rounded-lg bg-slate-200 dark:bg-slate-800 shrink-0" />
-              <div className="h-6 w-44 rounded-lg bg-slate-200 dark:bg-slate-800" />
-            </div>
-            <div className="h-4 w-72 ml-8 rounded bg-slate-100 dark:bg-slate-800/60" />
+            <div className="h-6 w-44 rounded-lg bg-slate-200 dark:bg-slate-800" />
+            <div className="h-4 w-72 rounded bg-slate-100 dark:bg-slate-800/60" />
           </div>
           <div className="h-[38px] w-24 rounded-lg bg-slate-200 dark:bg-slate-800 self-start sm:self-auto" />
         </div>

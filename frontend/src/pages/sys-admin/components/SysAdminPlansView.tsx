@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from "react";
 import {
-  CreditCard,
   Plus,
   Edit2,
   Trash2,
   CheckCircle2,
   Users,
-  Sparkles,
   Save,
   RotateCw,
 } from "lucide-react";
@@ -177,7 +175,7 @@ export const SysAdminPlansView: React.FC<SysAdminPlansViewProps> = () => {
   if (loading) {
     return (
       <div className="space-y-6 animate-pulse select-none">
-        <div className="p-5 rounded-2xl bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-800 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="space-y-1.5">
             <div className="h-5 w-40 rounded-lg bg-slate-200 dark:bg-slate-800" />
             <div className="h-3.5 w-64 rounded bg-slate-100 dark:bg-slate-800/60" />
@@ -220,19 +218,18 @@ export const SysAdminPlansView: React.FC<SysAdminPlansViewProps> = () => {
 
   return (
     <div className="space-y-6">
-      {/* SIMPLE HEADER */}
-      <div className="p-5 rounded-2xl bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-800 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      {/* HEADER SECTION */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
-            <CreditCard className="w-5 h-5 text-sky-500" />
+          <h1 className="text-lg md:text-2xl font-black text-gray-900 dark:text-white tracking-tight">
             {SYSADMIN_PLANS_TEXTS.HEADER_TITLE}
-          </h2>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+          </h1>
+          <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1">
             {SYSADMIN_PLANS_TEXTS.HEADER_SUBTITLE}
           </p>
         </div>
 
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-2.5 self-start sm:self-auto">
           <button
             onClick={() => loadPlans(true)}
             disabled={refreshing}
@@ -262,8 +259,7 @@ export const SysAdminPlansView: React.FC<SysAdminPlansViewProps> = () => {
           className="p-6 rounded-2xl border border-sky-300 dark:border-sky-900 bg-sky-50/20 dark:bg-sky-950/20 shadow-sm space-y-4 animate-in fade-in"
         >
           <div className="flex items-center justify-between border-b border-sky-100 dark:border-gray-800 pb-3">
-            <h4 className="font-black text-sm text-gray-900 dark:text-white flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-sky-500" />
+            <h4 className="font-black text-sm text-gray-900 dark:text-white">
               {isCreatingNew
                 ? SYSADMIN_PLANS_TEXTS.FORM_TITLE_CREATE
                 : `${SYSADMIN_PLANS_TEXTS.FORM_TITLE_EDIT}: ${editingPlan?.name}`}

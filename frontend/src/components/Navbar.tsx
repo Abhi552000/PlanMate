@@ -131,7 +131,7 @@ const Navbar: React.FC<NavbarProps> = ({
   return (
     <header
       className="sticky top-0 z-40 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md shadow-xs 
-    border-b border-gray-200 dark:border-gray-800 font-sans"
+    border-b border-gray-200 dark:border-gray-800 font-sans shrink-0"
     >
       <div className="flex flex-row items-center justify-between gap-2 md:gap-4 px-3 sm:px-5 md:px-6 h-[52px] w-full">
         {/* LOGO & ORG BADGE */}

@@ -318,6 +318,7 @@ export const getTasks = async (req, res) => {
         .populate("reporter", "name email")
         .populate("assignee", "name email")
         .populate("links.targetTask", "title key status priority completed issueType")
+        .populate("workLogs.user", "name email")
         .sort(sortQuery)
         .skip(skip)
         .limit(l)
@@ -347,6 +348,7 @@ export const getTasks = async (req, res) => {
       .populate("reporter", "name email")
       .populate("assignee", "name email")
       .populate("links.targetTask", "title key status priority completed issueType")
+      .populate("workLogs.user", "name email")
       .sort(sortQuery)
       .lean();
 
@@ -805,7 +807,7 @@ export const getTaskAnalytics = async (req, res) => {
 // LOG WORK ON A TASK
 export const logWork = async (req, res) => {
   try {
-    const { hoursSpent, description } = req.body;
+    const { hoursSpent, description, date } = req.body;
     if (!hoursSpent || Number(hoursSpent) <= 0) {
       return res
         .status(HttpStatus.BAD_REQUEST)
@@ -823,12 +825,13 @@ export const logWork = async (req, res) => {
         .json({ success: false, message: MESSAGES.TASK.NOT_FOUND });
     }
 
-    // Add log entry
+    // Add log entry with optional custom date
+    const logDate = date ? new Date(date) : new Date();
     task.workLogs.push({
       hoursSpent: Number(hoursSpent),
       description: description || "",
       user: req.user.id,
-      createdAt: new Date(),
+      createdAt: isNaN(logDate.getTime()) ? new Date() : logDate,
     });
 
     // Update total logged hours
@@ -845,6 +848,79 @@ export const logWork = async (req, res) => {
       newValue: `Logged ${hoursSpent}h of work: ${
         description || "No description"
       }`,
+      updatedBy: req.user.id,
+      updatedAt: new Date(),
+    });
+
+    await task.save();
+
+    const updated = await Task.findById(task._id)
+      .populate("owner", "name email")
+      .populate("assignee", "name email")
+      .populate("history.updatedBy", "name email")
+      .populate("comments.user", "name email avatar")
+      .populate("links.targetTask", "title key status priority completed issueType")
+      .populate("workLogs.user", "name email")
+      .lean();
+
+    res.json({ success: true, task: updated });
+  } catch (error) {
+    res
+      .status(HttpStatus.BAD_REQUEST)
+      .json({ success: false, message: error.message });
+  }
+};
+
+// DELETE A WORK LOG ENTRY
+export const deleteWorkLog = async (req, res) => {
+  try {
+    const { id, workLogId } = req.params;
+    const query = req.user.organization
+      ? { organization: req.user.organization }
+      : { owner: req.user.id };
+
+    const task = await Task.findOne(buildTaskFilter(id, query));
+    if (!task) {
+      return res
+        .status(HttpStatus.NOT_FOUND)
+        .json({ success: false, message: MESSAGES.TASK.NOT_FOUND });
+    }
+
+    const logIndex = (task.workLogs || []).findIndex(
+      (w) => w._id.toString() === workLogId
+    );
+    if (logIndex === -1) {
+      return res
+        .status(HttpStatus.NOT_FOUND)
+        .json({ success: false, message: "Work log entry not found." });
+    }
+
+    const logEntry = task.workLogs[logIndex];
+    const isOrgAdmin = req.user.role === "org_admin" || req.user.role === "sys_admin";
+    const isOwner =
+      logEntry.user &&
+      (logEntry.user._id || logEntry.user).toString() === req.user.id.toString();
+
+    if (!isOrgAdmin && !isOwner) {
+      return res.status(HttpStatus.FORBIDDEN).json({
+        success: false,
+        message: "You are not authorized to delete this work log entry.",
+      });
+    }
+
+    const removedHours = logEntry.hoursSpent || 0;
+    task.workLogs.splice(logIndex, 1);
+
+    task.timeLogged = task.workLogs.reduce(
+      (sum, log) => sum + (log.hoursSpent || 0),
+      0
+    );
+
+    if (!task.history) task.history = [];
+    task.history.push({
+      field: "workLog",
+      oldValue: `${removedHours}h`,
+      newValue: `Removed work log entry of ${removedHours}h`,
       updatedBy: req.user.id,
       updatedAt: new Date(),
     });

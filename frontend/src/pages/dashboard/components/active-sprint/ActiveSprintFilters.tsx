@@ -27,7 +27,7 @@ export const ActiveSprintFilters: React.FC<ActiveSprintFiltersProps> = ({
           label="Filter"
           value={onlyMyIssues ? "my_issues" : "all"}
           options={[
-            { label: "All Board Issues", value: "all" },
+            { label: "All", value: "all" },
             { label: ACTIVE_SPRINT_TEXTS.BTN_ONLY_MY_ISSUES, value: "my_issues" },
           ]}
           onChange={(val) => setOnlyMyIssues(val === "my_issues")}
@@ -37,7 +37,7 @@ export const ActiveSprintFilters: React.FC<ActiveSprintFiltersProps> = ({
           label="Priority"
           value={highPriorityOnly ? "high" : "all"}
           options={[
-            { label: "All Priorities", value: "all" },
+            { label: "All", value: "all" },
             { label: ACTIVE_SPRINT_TEXTS.BTN_HIGH_PRIORITY, value: "high" },
           ]}
           onChange={(val) => setHighPriorityOnly(val === "high")}

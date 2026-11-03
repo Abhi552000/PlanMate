@@ -14,7 +14,19 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
             htmlFor={inputId}
             className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1"
           >
-            {label}
+            {typeof label === "string" && label.includes("*") ? (
+              <>
+                {label.replace(/\*/g, "").trim()}{" "}
+                <span className="text-red-500 font-bold">*</span>
+              </>
+            ) : (
+              <>
+                {label}
+                {props.required && (
+                  <span className="text-red-500 font-bold ml-1">*</span>
+                )}
+              </>
+            )}
           </label>
         )}
         <div

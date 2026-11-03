@@ -1,258 +1,400 @@
 import React, { useState } from "react";
-import {
-  X,
-  Users,
-  KeyRound,
-  Edit,
-  Power,
-  Trash2,
-  Calendar,
-  Layers,
-  Copy,
-  Check,
-  CreditCard,
-} from "lucide-react";
+import { Copy, Check, X, ExternalLink } from "lucide-react";
 import { TenantDetailModalProps } from "../../../types";
-import { TENANT_MODAL_TEXTS } from "../../../constants/billingTexts";
 
 export const TenantDetailModal: React.FC<TenantDetailModalProps> = ({
   org,
   onClose,
-  onResetPassword,
-  onEdit,
-  onToggleActive,
-  onDelete,
 }) => {
-  const [copiedEmail, setCopiedEmail] = useState(false);
+  const [copiedKey, setCopiedKey] = useState<string | null>(null);
 
   if (!org) return null;
 
-  const handleCopyEmail = () => {
-    if (!org.admin?.email) return;
-    navigator.clipboard.writeText(org.admin.email);
-    setCopiedEmail(true);
-    setTimeout(() => setCopiedEmail(false), 2000);
+  const handleCopy = (text: string, key: string) => {
+    if (!text) return;
+    navigator.clipboard.writeText(text);
+    setCopiedKey(key);
+    setTimeout(() => {
+      setCopiedKey(null);
+    }, 2000);
   };
 
-  const statuses = Array.isArray(org.statuses) && org.statuses.length > 0
-    ? org.statuses
-    : ["To Do", "In Progress", "Done", "Reopen"];
+  const statuses: string[] =
+    Array.isArray(org.statuses) && org.statuses.length > 0
+      ? org.statuses
+      : ["To Do", "In Progress", "Done", "Reopen"];
+
+  const memberCount = org.memberCount !== undefined ? org.memberCount : 0;
+  const maxSeats = org.subscription?.maxMembers || 5;
+  const seatPercent = Math.min(100, Math.round((memberCount / maxSeats) * 100));
+  const workItemsCount =
+    org.taskCount !== undefined ? org.taskCount : org.taskCounter || 0;
+
+  const formattedCreatedDate = org.createdAt
+    ? new Date(org.createdAt).toLocaleDateString(undefined, {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      })
+    : "—";
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto flex items-center justify-center p-4">
-      {/* Backdrop */}
+    <div
+      className="fixed inset-0 bg-black/45 backdrop-blur-xs z-50 flex items-center justify-center p-4 sm:p-6"
+      onClick={onClose}
+    >
       <div
-        className="fixed inset-0 bg-black/50 backdrop-blur-xs transition-opacity animate-fadeIn"
-        onClick={onClose}
-      />
-
-      {/* Centered Modal Container */}
-      <div className="relative w-full max-w-2xl bg-white dark:bg-gray-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-gray-800 flex flex-col overflow-hidden animate-fadeIn my-6 max-h-[90vh]">
-        {/* Top Header */}
-        <div className="p-5 sm:p-6 border-b border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-950/40">
-          <div className="flex items-start justify-between gap-4">
-            <div className="flex items-center gap-3.5 min-w-0">
-              <div className="w-11 h-11 rounded-xl bg-sky-50 dark:bg-sky-950/60 border border-sky-100 dark:border-sky-900 flex items-center justify-center font-black text-lg text-sky-600 dark:text-sky-400 shrink-0 shadow-2xs">
-                {org.name?.[0]?.toUpperCase() || "O"}
-              </div>
-              <div className="min-w-0">
-                <div className="flex items-center gap-2.5 flex-wrap">
-                  <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100 truncate">
-                    {org.name}
-                  </h2>
-                  {org.isActive ? (
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 text-[11px] font-semibold rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                      {TENANT_MODAL_TEXTS.TITLE_ACTIVE}
-                    </span>
-                  ) : (
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 text-[11px] font-semibold rounded-full bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800">
-                      <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
-                      {TENANT_MODAL_TEXTS.TITLE_DEACTIVATED}
-                    </span>
-                  )}
-                </div>
-                <div className="flex items-center gap-3 mt-1 text-xs text-gray-400 dark:text-gray-500">
-                  {org.slug && <span>/{org.slug}</span>}
-                  {org.createdAt && (
-                    <span className="flex items-center gap-1">
-                      <Calendar className="w-3.5 h-3.5" />
-                      {new Date(org.createdAt).toLocaleDateString(undefined, {
-                        month: "short",
-                        day: "numeric",
-                        year: "numeric",
-                      })}
-                    </span>
-                  )}
-                </div>
-              </div>
+        className="bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-800 rounded-2xl shadow-2xl max-w-4xl w-full p-6 sm:p-7 space-y-5 animate-scaleUp max-h-[92vh] overflow-y-auto"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Top Header: Organization Name, Status & Plan */}
+        <div className="flex items-center justify-between border-b border-gray-100 dark:border-gray-800 pb-4">
+          <div className="flex items-center gap-3.5 min-w-0">
+            <div className="w-12 h-12 rounded-2xl bg-sky-500 text-white flex items-center justify-center font-bold text-lg shadow-xs shrink-0">
+              {org.name?.[0]?.toUpperCase() || "O"}
             </div>
-
-            <button
-              onClick={onClose}
-              className="p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors cursor-pointer shrink-0"
-              aria-label="Close"
-            >
-              <X className="w-5 h-5" />
-            </button>
-          </div>
-        </div>
-
-        {/* Modal Body */}
-        <div className="p-5 sm:p-6 space-y-5 overflow-y-auto scrollbar-thin">
-          {/* KPI Resource Utilization Grid */}
-          <div>
-            <h3 className="text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500 mb-3">
-              {TENANT_MODAL_TEXTS.LABEL_RESOURCE_PLAN}
-            </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <div className="p-3.5 rounded-xl border border-sky-100 dark:border-gray-800 bg-sky-50/30 dark:bg-gray-950/40">
-                <div className="flex items-center gap-2 text-sky-600 dark:text-sky-400 mb-1">
-                  <Users className="w-4 h-4" />
-                  <span className="text-xs font-semibold">{TENANT_MODAL_TEXTS.LABEL_TEAM_SIZE}</span>
-                </div>
-                <p className="text-xl font-black text-gray-900 dark:text-gray-100">
-                  {org.memberCount !== undefined ? org.memberCount : "—"}
-                </p>
-                <span className="text-[10px] text-gray-400 font-medium">{TENANT_MODAL_TEXTS.LABEL_ACTIVE_MEMBERS}</span>
-              </div>
-
-              <div className="p-3.5 rounded-xl border border-sky-100 dark:border-gray-800 bg-sky-50/30 dark:bg-gray-950/40">
-                <div className="flex items-center gap-2 text-indigo-600 dark:text-indigo-400 mb-1">
-                  <Layers className="w-4 h-4" />
-                  <span className="text-xs font-semibold">{TENANT_MODAL_TEXTS.LABEL_TOTAL_WORK_ITEMS}</span>
-                </div>
-                <p className="text-xl font-black text-gray-900 dark:text-gray-100">
-                  {org.taskCount !== undefined ? org.taskCount : org.taskCounter || 0}
-                </p>
-                <span className="text-[10px] text-gray-400 font-medium">{TENANT_MODAL_TEXTS.LABEL_LIFETIME_TICKETS}</span>
-              </div>
-
-              <div className="p-3.5 rounded-xl border border-sky-100 dark:border-gray-800 bg-sky-50/30 dark:bg-gray-950/40">
-                <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 mb-1">
-                  <CreditCard className="w-4 h-4" />
-                  <span className="text-xs font-semibold">{TENANT_MODAL_TEXTS.LABEL_SUBSCRIPTION}</span>
-                </div>
-                <p className="text-sm font-black text-gray-900 dark:text-gray-100 truncate">
+            <div className="min-w-0">
+              <div className="flex items-center gap-2.5 flex-wrap">
+                <h3 className="font-bold text-gray-900 dark:text-gray-100 text-xl leading-tight truncate">
+                  {org.name}
+                </h3>
+                {org.isActive ? (
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 text-xs font-semibold rounded-full bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                    Active
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 text-xs font-semibold rounded-full bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-300 border border-rose-200 dark:border-rose-800">
+                    <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
+                    Deactivated
+                  </span>
+                )}
+                <span className="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-semibold bg-sky-50 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300 border border-sky-100 dark:border-sky-900">
                   {org.subscription?.planName || "Starter"}
-                </p>
-                <div className="flex items-center gap-1.5 mt-0.5">
-                  <span className="text-[10px] text-gray-400 font-medium">
-                    {TENANT_MODAL_TEXTS.MAX_SEATS(org.subscription?.maxMembers || 5)}
-                  </span>
-                  <span className="text-[10px] text-gray-300 dark:text-gray-700">•</span>
-                  <span className="inline-flex items-center px-1.5 py-0.2 rounded text-[10px] font-semibold bg-sky-50 text-sky-700 dark:bg-sky-950/60 dark:text-sky-300 border border-sky-200 dark:border-sky-800 capitalize">
-                    {org.subscription?.billingCycle || "Monthly"}
-                  </span>
-                </div>
+                </span>
               </div>
-            </div>
-          </div>
-
-          {/* Admin Representative Details */}
-          <div className="p-4 rounded-xl border border-sky-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-950/50 space-y-2.5">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500">
-              {TENANT_MODAL_TEXTS.LABEL_ADMIN_REP}
-            </h3>
-            <div className="flex items-center justify-between gap-3">
-              <div className="min-w-0">
-                <p className="font-bold text-gray-900 dark:text-gray-100 text-sm truncate">
-                  {org.admin?.name || TENANT_MODAL_TEXTS.LABEL_UNASSIGNED}
+              {org.slug && (
+                <p className="text-xs text-gray-500 dark:text-gray-400 font-mono mt-0.5">
+                  /{org.slug}
                 </p>
-                <p className="text-xs text-gray-500 dark:text-gray-400 font-mono mt-0.5 truncate">
-                  {org.admin?.email || TENANT_MODAL_TEXTS.LABEL_NO_EMAIL}
-                </p>
-              </div>
-              {org.admin?.email && (
-                <button
-                  onClick={handleCopyEmail}
-                  className="p-1.5 rounded-lg border border-slate-200 dark:border-gray-700 text-gray-500 hover:text-sky-600 dark:hover:text-sky-400 hover:bg-sky-50 dark:hover:bg-gray-800 transition-colors cursor-pointer shrink-0"
-                  title={TENANT_MODAL_TEXTS.TOOLTIP_COPY_EMAIL}
-                >
-                  {copiedEmail ? (
-                    <Check className="w-4 h-4 text-emerald-600" />
-                  ) : (
-                    <Copy className="w-4 h-4" />
-                  )}
-                </button>
               )}
             </div>
           </div>
 
-          {/* Configured Workflow Statuses */}
-          <div>
-            <h3 className="text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500 mb-2.5">
-              {TENANT_MODAL_TEXTS.LABEL_WORKFLOW_COLUMNS(statuses.length)}
-            </h3>
-            <div className="flex flex-wrap gap-2">
-              {statuses.map((statusName) => (
-                <span
-                  key={statusName}
-                  className="inline-flex items-center gap-1.5 px-3 py-1 bg-white dark:bg-gray-800 border border-slate-200 dark:border-gray-700 rounded-lg text-xs font-semibold text-gray-700 dark:text-gray-300 shadow-2xs"
-                >
-                  <span className="w-1.5 h-1.5 rounded-full bg-sky-500" />
-                  {statusName}
-                </span>
-              ))}
-            </div>
-          </div>
-
-          {/* Deactivation Reason if inactive */}
-          {!org.isActive && org.remark && (
-            <div className="p-3.5 rounded-xl border border-rose-200 dark:border-rose-900/60 bg-rose-50/50 dark:bg-rose-950/20 text-xs text-rose-800 dark:text-rose-300">
-              <span className="font-bold block mb-1">{TENANT_MODAL_TEXTS.LABEL_DEACTIVATION_NOTE}</span>
-              <p className="italic">{org.remark}</p>
-            </div>
-          )}
+          <button
+            onClick={onClose}
+            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 p-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors cursor-pointer shrink-0"
+            aria-label="Close"
+          >
+            <X className="w-5 h-5" />
+          </button>
         </div>
 
-        {/* Modal Actions Footer */}
-        <div className="p-4 sm:p-5 border-t border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/80 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5">
-          <button
-            onClick={() => {
-              onResetPassword(org);
-            }}
-            className="h-[38px] px-4 bg-sky-500 hover:bg-sky-600 text-white font-bold rounded-lg text-xs transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-2xs"
-          >
-            <KeyRound className="w-4 h-4" />
-            {TENANT_MODAL_TEXTS.BTN_RESET_PASSWORD}
-          </button>
+        {/* Card 1: Organization & Administrator Details (Top Card) */}
+        <div className="space-y-2">
+          <span className="block text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500">
+            Organization & Administrator Details
+          </span>
 
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => {
-                onEdit(org);
-              }}
-              className="h-[38px] px-3.5 bg-white dark:bg-gray-800 border border-slate-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg text-xs font-semibold transition-colors flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs flex-1 sm:flex-initial"
-            >
-              <Edit className="w-3.5 h-3.5" />
-              {TENANT_MODAL_TEXTS.BTN_EDIT}
-            </button>
+          <div className="p-5 rounded-2xl border border-slate-200 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-950/40 space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 text-xs">
+              {/* Organization Name */}
+              <div>
+                <span className="block text-gray-400 dark:text-gray-500 font-medium mb-1">
+                  Organization Name
+                </span>
+                <span className="font-bold text-gray-900 dark:text-gray-100 text-sm">
+                  {org.name}
+                </span>
+              </div>
 
-            <button
-              onClick={() => {
-                onToggleActive(org);
-              }}
-              className={`h-[38px] px-3.5 border rounded-lg text-xs font-semibold transition-colors flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs flex-1 sm:flex-initial ${
-                org.isActive
-                  ? "bg-rose-50 text-rose-700 border-rose-200 hover:bg-rose-100 dark:bg-rose-950/30 dark:border-rose-900"
-                  : "bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100 dark:bg-emerald-950/30 dark:border-emerald-900"
-              }`}
-            >
-              <Power className="w-3.5 h-3.5" />
-              {org.isActive ? TENANT_MODAL_TEXTS.BTN_DEACTIVATE : TENANT_MODAL_TEXTS.BTN_ACTIVATE}
-            </button>
+              {/* Organization ID */}
+              <div>
+                <span className="block text-gray-400 dark:text-gray-500 font-medium mb-1">
+                  Organization ID
+                </span>
+                <div className="flex items-center gap-1.5">
+                  <span className="font-mono text-xs font-semibold text-gray-900 dark:text-gray-100 truncate select-all">
+                    {org._id}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => handleCopy(org._id, "id")}
+                    className="p-0.5 rounded text-gray-400 hover:text-sky-600 transition-colors cursor-pointer shrink-0"
+                    title="Copy ID"
+                  >
+                    {copiedKey === "id" ? (
+                      <Check className="w-3.5 h-3.5 text-emerald-600" />
+                    ) : (
+                      <Copy className="w-3.5 h-3.5" />
+                    )}
+                  </button>
+                  {copiedKey === "id" && (
+                    <span className="text-[10px] text-emerald-600 font-bold">
+                      Copied!
+                    </span>
+                  )}
+                </div>
+              </div>
 
-            <button
-              onClick={() => {
-                onDelete(org);
-              }}
-              className="h-[38px] px-3.5 bg-white dark:bg-gray-800 border border-rose-200 dark:border-rose-900 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 rounded-lg text-xs font-semibold transition-colors flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs flex-1 sm:flex-initial"
-            >
-              <Trash2 className="w-3.5 h-3.5" />
-              {TENANT_MODAL_TEXTS.BTN_DELETE}
-            </button>
+              {/* Created Date */}
+              <div>
+                <span className="block text-gray-400 dark:text-gray-500 font-medium mb-1">
+                  Created Date
+                </span>
+                <span className="font-bold text-gray-900 dark:text-gray-100 text-sm">
+                  {formattedCreatedDate}
+                </span>
+              </div>
+
+              {/* Industry / Sector */}
+              <div>
+                <span className="block text-gray-400 dark:text-gray-500 font-medium mb-1">
+                  Industry / Sector
+                </span>
+                <span className="font-bold text-gray-900 dark:text-gray-100 text-sm">
+                  {org.industry || "—"}
+                </span>
+              </div>
+
+              {/* Company Size */}
+              <div>
+                <span className="block text-gray-400 dark:text-gray-500 font-medium mb-1">
+                  Company Size
+                </span>
+                <span className="font-bold text-gray-900 dark:text-gray-100 text-sm">
+                  {org.companySize ? `${org.companySize} employees` : "—"}
+                </span>
+              </div>
+
+              {/* Website URL */}
+              <div>
+                <span className="block text-gray-400 dark:text-gray-500 font-medium mb-1">
+                  Website URL
+                </span>
+                {org.website ? (
+                  <a
+                    href={
+                      org.website.startsWith("http")
+                        ? org.website
+                        : `https://${org.website}`
+                    }
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-bold text-gray-900 dark:text-gray-100 text-sm hover:underline inline-flex items-center gap-1 truncate max-w-full"
+                  >
+                    <span className="truncate">{org.website.replace(/^https?:\/\//, "")}</span>
+                    <ExternalLink className="w-3.5 h-3.5 text-gray-400 shrink-0" />
+                  </a>
+                ) : (
+                  <span className="font-bold text-gray-900 dark:text-gray-100 text-sm">—</span>
+                )}
+              </div>
+
+              {/* Location / Region */}
+              <div>
+                <span className="block text-gray-400 dark:text-gray-500 font-medium mb-1">
+                  Location / Region
+                </span>
+                <span className="font-bold text-gray-900 dark:text-gray-100 text-sm">
+                  {org.location || "—"}
+                </span>
+              </div>
+
+              {/* Administrator Name */}
+              <div>
+                <span className="block text-gray-400 dark:text-gray-500 font-medium mb-1">
+                  Administrator
+                </span>
+                <span className="font-bold text-gray-900 dark:text-gray-100 text-sm">
+                  {org.admin?.name || "Unassigned"}
+                </span>
+              </div>
+
+              {/* Administrator Email */}
+              <div>
+                <span className="block text-gray-400 dark:text-gray-500 font-medium mb-1">
+                  Admin Email
+                </span>
+                <div className="flex items-center gap-1.5">
+                  <span className="font-mono text-gray-900 dark:text-gray-100 font-bold truncate select-all">
+                    {org.admin?.email || "No email registered"}
+                  </span>
+                  {org.admin?.email && (
+                    <button
+                      type="button"
+                      onClick={() => handleCopy(org.admin.email, "email")}
+                      className="p-0.5 rounded text-gray-400 hover:text-sky-600 transition-colors cursor-pointer shrink-0"
+                      title="Copy email"
+                    >
+                      {copiedKey === "email" ? (
+                        <Check className="w-3.5 h-3.5 text-emerald-600" />
+                      ) : (
+                        <Copy className="w-3.5 h-3.5" />
+                      )}
+                    </button>
+                  )}
+                  {copiedKey === "email" && (
+                    <span className="text-[10px] text-emerald-600 font-bold">
+                      Copied!
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {/* Contact Phone */}
+              <div>
+                <span className="block text-gray-400 dark:text-gray-500 font-medium mb-1">
+                  Contact Phone
+                </span>
+                {org.phone ? (
+                  <div className="flex items-center gap-1.5">
+                    <a
+                      href={`tel:${org.phone}`}
+                      className="font-bold text-gray-900 dark:text-gray-100 text-sm hover:underline"
+                    >
+                      {org.phone}
+                    </a>
+                    <button
+                      type="button"
+                      onClick={() => handleCopy(org.phone, "phone")}
+                      className="p-0.5 rounded text-gray-400 hover:text-sky-600 transition-colors cursor-pointer shrink-0"
+                      title="Copy phone"
+                    >
+                      {copiedKey === "phone" ? (
+                        <Check className="w-3.5 h-3.5 text-emerald-600" />
+                      ) : (
+                        <Copy className="w-3.5 h-3.5" />
+                      )}
+                    </button>
+                  </div>
+                ) : (
+                  <span className="font-bold text-gray-900 dark:text-gray-100 text-sm">—</span>
+                )}
+              </div>
+
+              {/* Subscription Plan */}
+              <div>
+                <span className="block text-gray-400 dark:text-gray-500 font-medium mb-1">
+                  Subscription Plan
+                </span>
+                <span className="font-bold text-gray-900 dark:text-gray-100 text-sm">
+                  {org.subscription?.planName || "Starter"}
+                </span>
+              </div>
+
+              {/* Billing Cycle */}
+              <div>
+                <span className="block text-gray-400 dark:text-gray-500 font-medium mb-1">
+                  Billing Cycle
+                </span>
+                <span className="font-bold text-gray-900 dark:text-gray-100 text-sm capitalize">
+                  {org.subscription?.billingCycle || "Monthly"}
+                </span>
+              </div>
+            </div>
+
+            {/* Description if present */}
+            {org.description && (
+              <div className="pt-3 border-t border-gray-200/60 dark:border-gray-800 text-xs">
+                <span className="block text-gray-400 dark:text-gray-500 font-medium mb-1">
+                  Description
+                </span>
+                <p className="text-gray-700 dark:text-gray-300 leading-relaxed text-xs">
+                  {org.description}
+                </p>
+              </div>
+            )}
+
+            {/* Deactivation Remark if inactive */}
+            {!org.isActive && org.remark && (
+              <div className="p-3 rounded-xl border border-rose-200 dark:border-rose-900/60 bg-rose-50/70 dark:bg-rose-950/30 text-rose-700 dark:text-rose-300 text-xs">
+                <span className="font-bold block mb-0.5">Deactivation Remark:</span>
+                <p className="italic">{org.remark}</p>
+              </div>
+            )}
           </div>
+        </div>
+
+        {/* Card 2: Workspace Utilization & Activity (Below Card 1) */}
+        <div className="space-y-2">
+          <span className="block text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500">
+            Workspace Utilization & Activity
+          </span>
+
+          <div className="p-5 rounded-2xl border border-slate-200 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-950/40 space-y-4">
+            {/* Utilization Metrics: Seats & Tickets */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {/* Seat Utilization */}
+              <div className="space-y-2 p-4 rounded-xl bg-white dark:bg-gray-900 border border-slate-200/80 dark:border-gray-800">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-gray-500 dark:text-gray-400 font-medium">
+                    Seat Allocation
+                  </span>
+                  <span className="font-bold text-gray-900 dark:text-gray-100">
+                    {seatPercent}%
+                  </span>
+                </div>
+                <div className="w-full h-2.5 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-sky-500 rounded-full transition-all"
+                    style={{ width: `${seatPercent}%` }}
+                  />
+                </div>
+                <div className="flex items-center justify-between text-xs">
+                  <span className="font-bold text-gray-900 dark:text-gray-100">
+                    {memberCount} / {maxSeats} seats
+                  </span>
+                  <span className="text-gray-400 text-[11px]">
+                    {maxSeats - memberCount > 0
+                      ? `${maxSeats - memberCount} available`
+                      : "Capacity reached"}
+                  </span>
+                </div>
+              </div>
+
+              {/* Lifetime Tickets */}
+              <div className="p-4 rounded-xl bg-white dark:bg-gray-900 border border-slate-200/80 dark:border-gray-800 flex flex-col justify-between">
+                <span className="block text-gray-500 dark:text-gray-400 text-xs font-medium">
+                  Lifetime Tickets
+                </span>
+                <span className="text-2xl font-bold text-gray-900 dark:text-gray-100 my-1">
+                  {workItemsCount}
+                </span>
+                <span className="block text-[11px] text-gray-400">
+                  Total tasks logged
+                </span>
+              </div>
+            </div>
+
+            {/* Workflow Columns (No count) */}
+            <div className="pt-3 border-t border-gray-200/60 dark:border-gray-800 space-y-2">
+              <span className="block text-xs text-gray-500 dark:text-gray-400 font-medium">
+                Workflow Columns
+              </span>
+              <div className="flex flex-wrap gap-2">
+                {statuses.map((statusName) => (
+                  <span
+                    key={statusName}
+                    className="inline-flex items-center px-3 py-1 bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-800 rounded-lg text-xs font-semibold text-gray-700 dark:text-gray-300 shadow-2xs"
+                  >
+                    {statusName}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="flex justify-end pt-3 border-t border-gray-100 dark:border-gray-800">
+          <button
+            type="button"
+            onClick={onClose}
+            className="px-6 py-2.5 bg-sky-500 hover:bg-sky-600 text-white font-bold rounded-xl text-xs transition-colors cursor-pointer shadow-xs"
+          >
+            Done
+          </button>
         </div>
       </div>
     </div>

@@ -1,5 +1,5 @@
 import React from "react";
-import { Power, X } from "lucide-react";
+import { X } from "lucide-react";
 import { DeactivateOrgModalProps } from "../../../types";
 
 export const DeactivateOrgModal: React.FC<DeactivateOrgModalProps> = ({
@@ -39,8 +39,8 @@ export const DeactivateOrgModal: React.FC<DeactivateOrgModalProps> = ({
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between border-b border-sky-50 dark:border-gray-800 pb-3">
-          <h3 className="font-bold text-gray-800 dark:text-gray-200 text-base flex items-center gap-1.5">
-            <Power className="w-5 h-5 text-red-500" /> Deactivate {deactivatingOrg.name}
+          <h3 className="font-bold text-gray-800 dark:text-gray-200 text-base">
+            Deactivate {deactivatingOrg.name}
           </h3>
           <button 
             onClick={onClose}
@@ -71,7 +71,7 @@ export const DeactivateOrgModal: React.FC<DeactivateOrgModalProps> = ({
                   ? "border-red-500 focus:ring-2 focus:ring-red-400/50"
                   : "border-sky-100 dark:border-gray-800 focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
               }`}
-              placeholder="e.g. Payment pending, License expired, Contract ended"
+              placeholder="Enter reason for deactivation..."
             />
             {error && (
               <p className="text-[11px] text-red-500 mt-1 font-medium">

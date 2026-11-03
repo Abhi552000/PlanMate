@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
-import { MessageSquare, Activity } from "lucide-react";
+import { MessageSquare, Activity, Clock } from "lucide-react";
 import { WRAPPER } from "../../assets/dummy";
 import { ROUTES } from "../../constants/routeConstant";
 
@@ -11,6 +11,7 @@ import { SubtaskListSection } from "./components/SubtaskListSection";
 import { IssueLinkingSection } from "./components/IssueLinkingSection";
 import { ActivityTimelineSection } from "./components/ActivityTimelineSection";
 import { CommentsSection } from "./components/CommentsSection";
+import { WorkLogsSection } from "./components/WorkLogsSection";
 import { TaskMetaSidebar } from "./components/TaskMetaSidebar";
 import { useTaskDetail } from "./hooks/useTaskDetail";
 
@@ -24,7 +25,7 @@ const TaskDetailPage = () => {
 
   const subtaskIndexParam = searchParams.get("subtask");
   const subtaskIndex = subtaskIndexParam !== null ? parseInt(subtaskIndexParam, 10) : null;
-  const [activeBottomTab, setActiveBottomTab] = useState<"comments" | "timeline">("comments");
+  const [activeBottomTab, setActiveBottomTab] = useState<"comments" | "timeline" | "worklogs">("comments");
 
   const {
     parentTaskData,
@@ -52,6 +53,10 @@ const TaskDetailPage = () => {
     targetTaskId,
     setTargetTaskId,
     linking,
+    loggingWork,
+    deletingWorkLogId,
+    handleLogWork,
+    handleDeleteWorkLog,
     handleAddComment,
     handleDeleteComment,
     handleAddLink,
@@ -194,13 +199,13 @@ const TaskDetailPage = () => {
           )}
 
           {!isEditingSubtask && (
-            <div className="border-t border-sky-100/50 dark:border-gray-800 pt-5 mt-6">
+            <div id="task-bottom-tabs" className="border-t border-sky-100/50 dark:border-gray-800 pt-5 mt-6">
               {/* Tab Navigation */}
-              <div className="flex items-center gap-2 border-b border-gray-100 dark:border-gray-800 mb-5">
+              <div className="flex items-center gap-2 border-b border-gray-100 dark:border-gray-800 mb-5 overflow-x-auto">
                 <button
                   type="button"
                   onClick={() => setActiveBottomTab("comments")}
-                  className={`flex items-center gap-2 px-3 py-2 text-xs font-bold transition-all relative cursor-pointer ${
+                  className={`flex items-center gap-2 px-3 py-2 text-xs font-bold transition-all relative cursor-pointer shrink-0 ${
                     activeBottomTab === "comments"
                       ? "text-sky-600 dark:text-sky-400 after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-sky-500"
                       : "text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
@@ -221,8 +226,30 @@ const TaskDetailPage = () => {
 
                 <button
                   type="button"
+                  onClick={() => setActiveBottomTab("worklogs")}
+                  className={`flex items-center gap-2 px-3 py-2 text-xs font-bold transition-all relative cursor-pointer shrink-0 ${
+                    activeBottomTab === "worklogs"
+                      ? "text-sky-600 dark:text-sky-400 after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-sky-500"
+                      : "text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                  }`}
+                >
+                  <Clock className="w-3.5 h-3.5" />
+                  Work Logs
+                  <span
+                    className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${
+                      activeBottomTab === "worklogs"
+                        ? "bg-sky-50 dark:bg-sky-950/50 text-sky-600 dark:text-sky-400"
+                        : "bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400"
+                    }`}
+                  >
+                    {parentTaskData.workLogs?.length || 0}
+                  </span>
+                </button>
+
+                <button
+                  type="button"
                   onClick={() => setActiveBottomTab("timeline")}
-                  className={`flex items-center gap-2 px-3 py-2 text-xs font-bold transition-all relative cursor-pointer ${
+                  className={`flex items-center gap-2 px-3 py-2 text-xs font-bold transition-all relative cursor-pointer shrink-0 ${
                     activeBottomTab === "timeline"
                       ? "text-sky-600 dark:text-sky-400 after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-sky-500"
                       : "text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
@@ -255,6 +282,18 @@ const TaskDetailPage = () => {
                   onDeleteComment={handleDeleteComment}
                   members={members}
                 />
+              ) : activeBottomTab === "worklogs" ? (
+                <WorkLogsSection
+                  workLogs={parentTaskData.workLogs || []}
+                  originalEstimate={parentTaskData.originalEstimate || taskData.originalEstimate || 0}
+                  timeLogged={parentTaskData.timeLogged || 0}
+                  onLogWork={handleLogWork}
+                  onDeleteWorkLog={handleDeleteWorkLog}
+                  loggingWork={loggingWork}
+                  deletingWorkLogId={deletingWorkLogId}
+                  currentUser={currentUser}
+                  baseControlClasses={baseControlClasses}
+                />
               ) : (
                 <ActivityTimelineSection history={parentTaskData.history || []} />
               )}
@@ -281,6 +320,11 @@ const TaskDetailPage = () => {
           onAddLink={handleAddLink}
           onRemoveLink={handleRemoveLink}
           createdAt={parentTaskData.createdAt}
+          timeLogged={parentTaskData.timeLogged || 0}
+          onLogTimeClick={() => {
+            setActiveBottomTab("worklogs");
+            document.getElementById("task-bottom-tabs")?.scrollIntoView({ behavior: "smooth" });
+          }}
         />
       </div>
     </div>

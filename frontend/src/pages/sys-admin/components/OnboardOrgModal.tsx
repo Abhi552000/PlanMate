@@ -1,6 +1,16 @@
 import React from "react";
-import { Building, X, Check, Copy, User, Mail, Lock } from "lucide-react";
+import { X, Check, Copy } from "lucide-react";
 import { OnboardOrgModalProps } from "../../../types";
+import { Input, Select } from "../../../components/ui";
+
+const COMPANY_SIZE_OPTIONS = [
+  { value: "", label: "Select company size" },
+  { value: "1-10", label: "1-10 employees" },
+  { value: "11-50", label: "11-50 employees" },
+  { value: "51-200", label: "51-200 employees" },
+  { value: "201-500", label: "201-500 employees" },
+  { value: "500+", label: "500+ employees" },
+];
 
 export const OnboardOrgModal: React.FC<OnboardOrgModalProps> = ({
   isOpen,
@@ -16,21 +26,23 @@ export const OnboardOrgModal: React.FC<OnboardOrgModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div 
+    <div
       className="fixed inset-0 bg-black/45 backdrop-blur-sm z-50 flex items-center justify-center p-4"
       onClick={onClose}
     >
-      <div 
-        className="bg-white dark:bg-gray-900 border border-sky-100 dark:border-gray-800 rounded-2xl shadow-xl max-w-md w-full p-6 space-y-4 animate-scaleUp max-h-[90vh] overflow-y-auto"
+      <div
+        className="bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-800 rounded-2xl shadow-xl max-w-lg w-full p-6 sm:p-7 space-y-4 animate-scaleUp max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between border-b border-sky-50 dark:border-gray-800 pb-3">
-          <h3 className="font-bold text-gray-800 dark:text-gray-200 text-base flex items-center gap-1.5">
-            <Building className="w-5 h-5 text-sky-500" /> Onboard Organization
+        {/* Header */}
+        <div className="flex items-center justify-between border-b border-gray-100 dark:border-gray-800 pb-3.5">
+          <h3 className="font-bold text-gray-800 dark:text-gray-100 text-base">
+            Onboard Organization
           </h3>
-          <button 
+          <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 p-1 hover:bg-sky-50 rounded-lg transition-colors cursor-pointer"
+            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors cursor-pointer"
+            aria-label="Close"
           >
             <X className="w-5 h-5" />
           </button>
@@ -38,37 +50,57 @@ export const OnboardOrgModal: React.FC<OnboardOrgModalProps> = ({
 
         {onboardedResult ? (
           <div className="space-y-4 py-2 text-center">
-            <div className="w-12 h-12 bg-green-50 rounded-full flex items-center justify-center mx-auto border border-green-200">
-              <Check className="w-6 h-6 text-green-600" />
+            <div className="w-12 h-12 bg-emerald-50 rounded-full flex items-center justify-center mx-auto border border-emerald-200">
+              <Check className="w-6 h-6 text-emerald-600" />
             </div>
             <div className="space-y-1">
-              <h4 className="font-bold text-gray-800 dark:text-gray-250 text-sm">Onboarding Complete!</h4>
-              <p className="text-xs text-gray-405 font-medium">Successfully created tenant site for {onboardedResult.orgName}</p>
+              <h4 className="font-bold text-gray-800 dark:text-gray-100 text-sm">
+                Onboarding Complete!
+              </h4>
+              <p className="text-xs text-gray-500 font-medium">
+                Successfully created tenant workspace for {onboardedResult.orgName}
+              </p>
             </div>
 
             <div className="bg-sky-50/40 dark:bg-sky-950/20 p-4 rounded-xl border border-sky-100/50 dark:border-gray-800 text-left text-xs space-y-2.5">
               <div>
-                <span className="block font-bold text-gray-405 uppercase tracking-wider text-[9px]">Admin Email</span>
-                <span className="font-bold text-gray-700 dark:text-gray-300">{onboardedResult.email}</span>
+                <span className="block font-bold text-gray-400 uppercase tracking-wider text-[10px]">
+                  Admin Email
+                </span>
+                <span className="font-bold text-gray-700 dark:text-gray-300">
+                  {onboardedResult.email}
+                </span>
               </div>
               <div>
-                <span className="block font-bold text-gray-405 uppercase tracking-wider text-[9px]">Generated Temporary Password</span>
-                <div className="flex items-center justify-between bg-white dark:bg-gray-900 p-2 rounded border border-sky-100 dark:border-gray-800 mt-1 select-all font-mono font-bold text-gray-800 dark:text-gray-200">
+                <span className="block font-bold text-gray-400 uppercase tracking-wider text-[10px]">
+                  Generated Temporary Password
+                </span>
+                <div className="flex items-center justify-between bg-white dark:bg-gray-900 p-2 rounded-lg border border-slate-200 dark:border-gray-800 mt-1 select-all font-mono font-bold text-gray-800 dark:text-gray-200">
                   <span>{onboardedResult.password}</span>
                   <button
+                    type="button"
                     onClick={onCopyPassword}
                     className="text-sky-600 hover:text-sky-700 p-1 hover:bg-sky-50 rounded transition-colors cursor-pointer"
                     title="Copy Password"
                   >
-                    {copied ? <span className="text-[10px] text-green-600 font-bold">Copied!</span> : <Copy className="w-3.5 h-3.5" />}
+                    {copied ? (
+                      <span className="text-[10px] text-emerald-600 font-bold">
+                        Copied!
+                      </span>
+                    ) : (
+                      <Copy className="w-3.5 h-3.5" />
+                    )}
                   </button>
                 </div>
               </div>
             </div>
 
-            <p className="text-[10px] text-red-500 font-semibold italic">Copy these credentials now. The temporary password will not be shown again.</p>
+            <p className="text-[10px] text-rose-500 font-semibold italic">
+              Copy these credentials now. The temporary password will not be shown again.
+            </p>
 
             <button
+              type="button"
               onClick={onClose}
               className="w-full bg-sky-500 hover:bg-sky-600 text-white font-bold py-2 rounded-lg text-xs transition-colors cursor-pointer"
             >
@@ -76,90 +108,173 @@ export const OnboardOrgModal: React.FC<OnboardOrgModalProps> = ({
             </button>
           </div>
         ) : (
-          <form onSubmit={onboardSubmit} className="space-y-4">
-            <div>
-              <label className="flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1">
-                <span>Organization Name</span>
-                <span className="text-red-500 font-bold">*</span>
+          <form onSubmit={onboardSubmit} className="space-y-3.5 text-xs">
+            {/* Organization Name */}
+            <Input
+              label="Organization Name *"
+              type="text"
+              value={newOrg.orgName}
+              onChange={(e) =>
+                setNewOrg((prev: any) => ({
+                  ...prev,
+                  orgName: e.target.value,
+                }))
+              }
+              placeholder="Enter organization name"
+              required
+            />
+
+            {/* Admin Name & Admin Email */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <Input
+                label="Admin Full Name *"
+                type="text"
+                value={newOrg.adminName}
+                onChange={(e) =>
+                  setNewOrg((prev: any) => ({
+                    ...prev,
+                    adminName: e.target.value,
+                  }))
+                }
+                placeholder="Enter administrator name"
+                required
+              />
+
+              <Input
+                label="Admin Email Address *"
+                type="email"
+                value={newOrg.adminEmail}
+                onChange={(e) =>
+                  setNewOrg((prev: any) => ({
+                    ...prev,
+                    adminEmail: e.target.value,
+                  }))
+                }
+                placeholder="Enter administrator email"
+                required
+              />
+            </div>
+
+            {/* Industry & Company Size */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <Input
+                label="Industry / Sector"
+                type="text"
+                value={newOrg.industry || ""}
+                onChange={(e) =>
+                  setNewOrg((prev: any) => ({
+                    ...prev,
+                    industry: e.target.value,
+                  }))
+                }
+                placeholder="Enter industry or sector"
+              />
+
+              <Select
+                label="Company Size"
+                options={COMPANY_SIZE_OPTIONS}
+                value={newOrg.companySize || ""}
+                onChange={(e) =>
+                  setNewOrg((prev: any) => ({
+                    ...prev,
+                    companySize: e.target.value,
+                  }))
+                }
+              />
+            </div>
+
+            {/* Website & Location */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <Input
+                label="Website URL"
+                type="text"
+                value={newOrg.website || ""}
+                onChange={(e) =>
+                  setNewOrg((prev: any) => ({
+                    ...prev,
+                    website: e.target.value,
+                  }))
+                }
+                placeholder="Enter website URL"
+              />
+
+              <Input
+                label="Location / Country"
+                type="text"
+                value={newOrg.location || ""}
+                onChange={(e) =>
+                  setNewOrg((prev: any) => ({
+                    ...prev,
+                    location: e.target.value,
+                  }))
+                }
+                placeholder="Enter location or country"
+              />
+            </div>
+
+            {/* Admin Phone & Password */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <Input
+                label="Admin Contact Phone"
+                type="tel"
+                value={newOrg.phone || ""}
+                onChange={(e) =>
+                  setNewOrg((prev: any) => ({
+                    ...prev,
+                    phone: e.target.value,
+                  }))
+                }
+                placeholder="Enter contact phone number"
+              />
+
+              <Input
+                label="Custom Password"
+                type="password"
+                value={newOrg.adminPassword}
+                onChange={(e) =>
+                  setNewOrg((prev: any) => ({
+                    ...prev,
+                    adminPassword: e.target.value,
+                  }))
+                }
+                placeholder="Enter password (leave blank to auto-generate)"
+              />
+            </div>
+
+            {/* Description */}
+            <div className="space-y-1.5 w-full">
+              <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">
+                Organization Description
               </label>
-              <div className="flex items-center border border-sky-100 dark:border-gray-800 rounded-lg px-3 py-2 bg-white dark:bg-gray-950 focus-within:ring-2 focus-within:ring-sky-500 focus-within:border-sky-500 transition-all duration-200">
-                <Building className="w-4 h-4 text-sky-500 mr-2 shrink-0" />
-                <input
-                  type="text"
-                  value={newOrg.orgName}
-                  onChange={(e) => setNewOrg((prev: any) => ({ ...prev, orgName: e.target.value }))}
-                  className="w-full focus:outline-none text-sm text-gray-800 dark:text-gray-250 font-semibold bg-transparent"
-                  placeholder="e.g. Pepsi, TCS, Apple"
-                  required
+              <div className="border border-slate-200/90 dark:border-slate-800 rounded-xl px-3 py-2.5 bg-white dark:bg-slate-900 transition-all duration-200 shadow-2xs hover:border-slate-300 dark:hover:border-slate-700 focus-within:ring-2 focus-within:ring-sky-500/20 focus-within:border-sky-500">
+                <textarea
+                  rows={2}
+                  value={newOrg.description || ""}
+                  onChange={(e) =>
+                    setNewOrg((prev: any) => ({
+                      ...prev,
+                      description: e.target.value,
+                    }))
+                  }
+                  className="w-full focus:outline-none text-sm text-slate-800 dark:text-slate-200 bg-transparent placeholder-slate-400 dark:placeholder-slate-500 font-medium resize-none"
+                  placeholder="Enter organization description"
                 />
               </div>
             </div>
 
-            <div>
-              <label className="flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1">
-                <span>Admin Full Name</span>
-                <span className="text-red-500 font-bold">*</span>
-              </label>
-              <div className="flex items-center border border-sky-100 dark:border-gray-800 rounded-lg px-3 py-2 bg-white dark:bg-gray-950 focus-within:ring-2 focus-within:ring-sky-500 focus-within:border-sky-500 transition-all duration-200">
-                <User className="w-4.5 h-4.5 text-sky-500 mr-2 shrink-0" />
-                <input
-                  type="text"
-                  value={newOrg.adminName}
-                  onChange={(e) => setNewOrg((prev: any) => ({ ...prev, adminName: e.target.value }))}
-                  className="w-full focus:outline-none text-sm text-gray-800 dark:text-gray-250 font-semibold bg-transparent"
-                  placeholder="e.g. John Doe"
-                  required
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1">
-                <span>Admin Email Address</span>
-                <span className="text-red-500 font-bold">*</span>
-              </label>
-              <div className="flex items-center border border-sky-100 dark:border-gray-800 rounded-lg px-3 py-2 bg-white dark:bg-gray-950 focus-within:ring-2 focus-within:ring-sky-500 focus-within:border-sky-500 transition-all duration-200">
-                <Mail className="w-4 h-4 text-sky-500 mr-2 shrink-0" />
-                <input
-                  type="email"
-                  value={newOrg.adminEmail}
-                  onChange={(e) => setNewOrg((prev: any) => ({ ...prev, adminEmail: e.target.value }))}
-                  className="w-full focus:outline-none text-sm text-gray-800 dark:text-gray-250 font-semibold bg-transparent"
-                  placeholder="e.g. admin@tcs.com"
-                  required
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1">
-                Custom Password (Optional)
-              </label>
-              <div className="flex items-center border border-sky-100 dark:border-gray-800 rounded-lg px-3 py-2 bg-white dark:bg-gray-950 focus-within:ring-2 focus-within:ring-sky-500 focus-within:border-sky-500 transition-all duration-200">
-                <Lock className="w-4 h-4 text-sky-500 mr-2 shrink-0" />
-                <input
-                  type="password"
-                  value={newOrg.adminPassword}
-                  onChange={(e) => setNewOrg((prev: any) => ({ ...prev, adminPassword: e.target.value }))}
-                  className="w-full focus:outline-none text-sm text-gray-800 dark:text-gray-250 font-semibold bg-transparent"
-                  placeholder="Leave blank to generate randomly"
-                />
-              </div>
-              <p className="text-[10px] text-gray-400 mt-1 font-semibold">If left empty, a secure password will be generated automatically.</p>
-            </div>
-
-            <div className="flex justify-end gap-2.5 pt-3 border-t border-sky-50 dark:border-gray-800 mt-4">
+            {/* Action Buttons */}
+            <div className="flex justify-end gap-2.5 pt-3 border-t border-gray-100 dark:border-gray-800 mt-4">
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2 border border-sky-200 dark:border-gray-800 text-gray-600 dark:text-gray-300 hover:bg-sky-50 dark:hover:bg-gray-800 font-bold rounded-lg text-xs transition-colors cursor-pointer bg-white dark:bg-gray-900"
+                className="px-4 py-2 border border-slate-200 dark:border-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 font-bold rounded-xl text-xs transition-colors cursor-pointer bg-white dark:bg-gray-900"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={onboarding}
-                className="bg-sky-500 hover:bg-sky-600 disabled:opacity-50 text-white font-bold py-2 px-5 rounded-lg flex items-center justify-center gap-1.5 transition-colors cursor-pointer text-xs"
+                className="bg-sky-500 hover:bg-sky-600 disabled:opacity-50 text-white font-bold py-2 px-5 rounded-xl transition-colors cursor-pointer text-xs shadow-xs"
               >
                 {onboarding ? "Onboarding..." : "Onboard Organization"}
               </button>
@@ -170,3 +285,5 @@ export const OnboardOrgModal: React.FC<OnboardOrgModalProps> = ({
     </div>
   );
 };
+
+export default OnboardOrgModal;

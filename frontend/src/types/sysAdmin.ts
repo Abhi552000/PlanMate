@@ -28,10 +28,10 @@ export interface SysAdminPlansViewProps {
 export interface TenantDetailModalProps {
   org: any;
   onClose: () => void;
-  onResetPassword: (org: any) => void;
-  onEdit: (org: any) => void;
-  onToggleActive: (org: any) => void;
-  onDelete: (org: any) => void;
+  onResetPassword?: (org: any) => void;
+  onEdit?: (org: any) => void;
+  onToggleActive?: (org: any) => void;
+  onDelete?: (org: any) => void;
 }
 
 export type TenantDetailDrawerProps = TenantDetailModalProps;

@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect, useCallback } from "react";
 import { useOutletContext, useNavigate } from "react-router-dom";
-import { BarChart2, RefreshCw, Layers } from "lucide-react";
+import { BarChart2, RefreshCw, Layers, Clock } from "lucide-react";
 import { DashboardContext, ITask } from "../../types";
 import { taskService } from "../../services/taskService";
 import {
@@ -18,15 +18,27 @@ import { ReportDonutBreakdowns } from "./components/ReportDonutBreakdowns";
 import { ReportTrendsSection } from "./components/ReportTrendsSection";
 import { ReportWorkItemTable } from "./components/ReportWorkItemTable";
 import { ReportWorkItemDrawer } from "./components/ReportWorkItemDrawer";
+import { ReportTimeTrackingView } from "./components/ReportTimeTrackingView";
 
 export const ReportsPage: React.FC = () => {
   const { tasks, refreshTasks, loading } = useOutletContext<DashboardContext>();
   const navigate = useNavigate();
 
   const [timeframe, setTimeframe] = useState<"all" | "30d" | "7d">("all");
+  const [activeReportTab, setActiveReportTab] = useState<"metrics" | "timetracking">("metrics");
   const [reportTasks, setReportTasks] = useState<ITask[]>([]);
   const [loadingReport, setLoadingReport] = useState<boolean>(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const currentUser = useMemo(() => {
+    const s = localStorage.getItem("currentUser");
+    return s ? JSON.parse(s) : null;
+  }, []);
+
+  const totalOrgWorkLogs = useMemo(
+    () => reportTasks.reduce((sum, t) => sum + (t.workLogs?.length || 0), 0),
+    [reportTasks]
+  );
 
   // Drawer state for drilldowns
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -242,32 +254,80 @@ export const ReportsPage: React.FC = () => {
         </div>
       </div>
 
-      {/* 1. Top 4 7-Day KPI Cards */}
-      <ReportSummaryKPIs kpis={kpis} onFilterClick={handleKPIClick} />
+      {/* Tab Navigation for Reports vs Time Tracking */}
+      <div className="flex items-center gap-2 border-b border-gray-100 dark:border-gray-800 pb-1">
+        <button
+          type="button"
+          onClick={() => setActiveReportTab("metrics")}
+          className={`flex items-center gap-2 px-3.5 py-2 text-xs font-bold transition-all relative cursor-pointer ${
+            activeReportTab === "metrics"
+              ? "text-sky-600 dark:text-sky-400 after:absolute after:bottom-[-5px] after:left-0 after:right-0 after:h-0.5 after:bg-sky-500"
+              : "text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+          }`}
+        >
+          <BarChart2 className="w-3.5 h-3.5" />
+          Agile Metrics & KPIs
+        </button>
 
-      {/* 2. Donut Breakdown Charts (Status, Type, Assignee) */}
-      <ReportDonutBreakdowns
-        statusData={statusDonut}
-        typeData={typeDonut}
-        assigneeData={assigneeDonut}
-        totalTasks={reportTasks.length}
-        onSliceClick={handleSliceClick}
-      />
+        <button
+          type="button"
+          onClick={() => setActiveReportTab("timetracking")}
+          className={`flex items-center gap-2 px-3.5 py-2 text-xs font-bold transition-all relative cursor-pointer ${
+            activeReportTab === "timetracking"
+              ? "text-sky-600 dark:text-sky-400 after:absolute after:bottom-[-5px] after:left-0 after:right-0 after:h-0.5 after:bg-sky-500"
+              : "text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+          }`}
+        >
+          <Clock className="w-3.5 h-3.5" />
+          Time Tracking & Work Logs
+          <span
+            className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${
+              activeReportTab === "timetracking"
+                ? "bg-sky-50 dark:bg-sky-950/50 text-sky-600 dark:text-sky-400"
+                : "bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400"
+            }`}
+          >
+            {totalOrgWorkLogs}
+          </span>
+        </button>
+      </div>
 
-      {/* 3. Trends & Agile Performance Section */}
-      <ReportTrendsSection
-        leadTimeData={leadTimeData}
-        completionTrendData={completionTrendData}
-        cycleTimeData={cycleTimeData}
-        creationTrendData={creationTrendData}
-      />
+      {activeReportTab === "metrics" ? (
+        <>
+          {/* 1. Top 4 7-Day KPI Cards */}
+          <ReportSummaryKPIs kpis={kpis} onFilterClick={handleKPIClick} />
 
-      {/* 4. Tabular Work Item Details with CSV Export & Search */}
-      <ReportWorkItemTable
-        tasks={reportTasks}
-        loading={loadingReport}
-        onSelectTask={(task) => navigate(`/task/${task._id}`)}
-      />
+          {/* 2. Donut Breakdown Charts (Status, Type, Assignee) */}
+          <ReportDonutBreakdowns
+            statusData={statusDonut}
+            typeData={typeDonut}
+            assigneeData={assigneeDonut}
+            totalTasks={reportTasks.length}
+            onSliceClick={handleSliceClick}
+          />
+
+          {/* 3. Trends & Agile Performance Section */}
+          <ReportTrendsSection
+            leadTimeData={leadTimeData}
+            completionTrendData={completionTrendData}
+            cycleTimeData={cycleTimeData}
+            creationTrendData={creationTrendData}
+          />
+
+          {/* 4. Tabular Work Item Details with CSV Export & Search */}
+          <ReportWorkItemTable
+            tasks={reportTasks}
+            loading={loadingReport}
+            onSelectTask={(task) => navigate(`/task/${task._id}`)}
+          />
+        </>
+      ) : (
+        <ReportTimeTrackingView
+          tasks={reportTasks}
+          onRefresh={handleRefresh}
+          currentUser={currentUser}
+        />
+      )}
 
       {/* 5. View Work Items Side Drawer */}
       <ReportWorkItemDrawer

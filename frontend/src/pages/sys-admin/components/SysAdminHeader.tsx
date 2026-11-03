@@ -25,7 +25,7 @@ export const SysAdminHeader: React.FC<SysAdminHeaderProps> = ({
   };
 
   return (
-    <header className="sticky top-0 z-40 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md shadow-xs border-b border-gray-200 dark:border-gray-800 font-sans">
+    <header className="sticky top-0 z-40 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md shadow-xs border-b border-gray-200 dark:border-gray-800 font-sans shrink-0">
       <div className="flex flex-row items-center justify-between gap-2 md:gap-4 px-3 sm:px-6 lg:px-8 h-[52px] w-full">
         {/* BRAND LOGO & BADGE */}
         <div className="flex items-center gap-2 sm:gap-2.5">

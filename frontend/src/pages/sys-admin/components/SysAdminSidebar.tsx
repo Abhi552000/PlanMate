@@ -71,10 +71,9 @@ export const SysAdminSidebar: React.FC<SysAdminSidebarProps> = ({
       <aside
         className={`hidden lg:flex shrink-0 bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm border-r border-gray-200 dark:border-gray-800 shadow-xs transition-[width] duration-300 ease-in-out flex-col justify-between ${
           isCollapsed ? "w-16" : "w-60"
-        }`}
-        style={{ minHeight: "calc(100vh - 52px)" }}
+        } h-full overflow-hidden`}
       >
-        <div className="flex flex-col flex-1">
+        <div className="flex flex-col flex-1 min-h-0">
           {/* Header Row with Collapse Button matching user sidebar */}
           {onToggleCollapse && (
             <div className="h-12 px-3 flex items-center justify-between border-b border-gray-100 dark:border-gray-800 shrink-0">
@@ -114,7 +113,7 @@ export const SysAdminSidebar: React.FC<SysAdminSidebarProps> = ({
           )}
 
           {/* Navigation list */}
-          <nav className="py-3 px-2.5 space-y-1 overflow-y-auto flex-1">
+          <nav className="py-3 px-2.5 space-y-1 overflow-y-auto flex-1 min-h-0 scrollbar-thin">
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = activeTab === item.id;
@@ -154,7 +153,7 @@ export const SysAdminSidebar: React.FC<SysAdminSidebarProps> = ({
         </div>
 
         {/* Quick Action Button at Bottom */}
-        <div className="p-2.5 border-t border-gray-100 dark:border-gray-800">
+        <div className="p-2.5 border-t border-gray-100 dark:border-gray-800 shrink-0">
           <button
             onClick={onOnboardClick}
             className={`w-full h-10 rounded-lg bg-sky-500 hover:bg-sky-600 text-white text-xs font-bold transition-all shadow-2xs flex items-center justify-center gap-2 cursor-pointer ${

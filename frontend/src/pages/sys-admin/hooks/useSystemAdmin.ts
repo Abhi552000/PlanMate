@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback, useRef } from "react";
+import { toast } from "react-toastify";
 import { orgService } from "../../../services/orgService";
 import { SystemMetrics } from "../../../types";
 
@@ -14,6 +15,12 @@ export const useSystemAdmin = () => {
     adminName: "",
     adminEmail: "",
     adminPassword: "",
+    description: "",
+    industry: "",
+    companySize: "",
+    website: "",
+    location: "",
+    phone: "",
   });
   const [onboardedResult, setOnboardedResult] = useState<any | null>(null);
   const [copied, setCopied] = useState(false);
@@ -25,11 +32,21 @@ export const useSystemAdmin = () => {
     adminName: "",
     adminEmail: "",
     adminPassword: "",
+    description: "",
+    industry: "",
+    companySize: "",
+    website: "",
+    location: "",
+    phone: "",
   });
 
   // Deactivate Modal State
   const [deactivatingOrg, setDeactivatingOrg] = useState<any | null>(null);
   const [deactivateRemark, setDeactivateRemark] = useState("");
+
+  // Delete Confirmation Modal State
+  const [deletingOrg, setDeletingOrg] = useState<any | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   // Inspect Drawer State
   const [inspectingOrg, setInspectingOrg] = useState<any | null>(null);
@@ -52,8 +69,6 @@ export const useSystemAdmin = () => {
   const [onboarding, setOnboarding] = useState(false);
   const [updating, setUpdating] = useState(false);
   const [togglingStatus, setTogglingStatus] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
 
   // Debounce search query to prevent unnecessary backend calls
   useEffect(() => {
@@ -99,9 +114,9 @@ export const useSystemAdmin = () => {
             setTotalPages(data.pagination.totalPages);
           }
         }
-      } catch (err) {
+      } catch (err: any) {
         console.error(err);
-        setError("Failed to fetch organizations.");
+        toast.error(err?.response?.data?.message || "Failed to fetch organizations.");
       } finally {
         isInitialLoadRef.current = false;
         setLoading(false);
@@ -119,17 +134,15 @@ export const useSystemAdmin = () => {
     e.preventDefault();
     const { orgName, adminName, adminEmail } = newOrg;
     if (!orgName?.trim() || !adminName?.trim() || !adminEmail?.trim()) {
-      setError("Please fill in organization name, admin name, and admin email.");
+      toast.error("Please fill in organization name, admin name, and admin email.");
       return;
     }
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(adminEmail.trim())) {
-      setError("Please enter a valid admin email address.");
+      toast.error("Please enter a valid admin email address.");
       return;
     }
     setOnboarding(true);
-    setError(null);
-    setSuccess(null);
     setOnboardedResult(null);
 
     try {
@@ -140,16 +153,28 @@ export const useSystemAdmin = () => {
         adminEmail: adminEmail.trim(),
       });
       if (data?.success) {
+        toast.success(data?.message || "Organization onboarded successfully!");
         setOnboardedResult({
           orgName: orgName.trim(),
           email: data.admin?.email,
           password: data.admin?.password,
         });
-        setNewOrg({ orgName: "", adminName: "", adminEmail: "", adminPassword: "" });
+        setNewOrg({
+          orgName: "",
+          adminName: "",
+          adminEmail: "",
+          adminPassword: "",
+          description: "",
+          industry: "",
+          companySize: "",
+          website: "",
+          location: "",
+          phone: "",
+        });
         await fetchOrganizations();
       }
     } catch (err: any) {
-      setError(err?.response?.data?.message || "Failed to onboard organization.");
+      toast.error(err?.response?.data?.message || "Failed to onboard organization.");
     } finally {
       setOnboarding(false);
     }
@@ -162,26 +187,28 @@ export const useSystemAdmin = () => {
       adminName: org.admin?.name || "",
       adminEmail: org.admin?.email || "",
       adminPassword: "",
+      description: org.description || "",
+      industry: org.industry || "",
+      companySize: org.companySize || "",
+      website: org.website || "",
+      location: org.location || "",
+      phone: org.phone || "",
     });
-    setError(null);
-    setSuccess(null);
   };
 
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingOrg) return;
     if (!editForm.orgName?.trim()) {
-      setError("Organization name cannot be empty.");
+      toast.error("Organization name cannot be empty.");
       return;
     }
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (editForm.adminEmail && !emailRegex.test(editForm.adminEmail.trim())) {
-      setError("Please enter a valid admin email address.");
+      toast.error("Please enter a valid admin email address.");
       return;
     }
     setUpdating(true);
-    setError(null);
-    setSuccess(null);
 
     try {
       const data = await orgService.updateOrgAdmin(editingOrg._id, {
@@ -191,21 +218,18 @@ export const useSystemAdmin = () => {
         adminEmail: editForm.adminEmail?.trim(),
       });
       if (data?.success) {
-        setSuccess(`Successfully updated organization details!`);
+        toast.success(data?.message || "Successfully updated organization details!");
         setEditingOrg(null);
         await fetchOrganizations();
       }
     } catch (err: any) {
-      setError(err?.response?.data?.message || "Failed to update organization.");
+      toast.error(err?.response?.data?.message || "Failed to update organization.");
     } finally {
       setUpdating(false);
     }
   };
 
   const handleToggleActive = async (org: any) => {
-    setError(null);
-    setSuccess(null);
-
     if (org.isActive) {
       setDeactivatingOrg(org);
       setDeactivateRemark("");
@@ -219,11 +243,11 @@ export const useSystemAdmin = () => {
         remark: "",
       });
       if (data?.success) {
-        setSuccess(`Successfully activated organization "${org.name}".`);
+        toast.success(data?.message || `Successfully activated organization "${org.name}".`);
         await fetchOrganizations();
       }
     } catch (err: any) {
-      setError(err?.response?.data?.message || "Failed to activate organization.");
+      toast.error(err?.response?.data?.message || "Failed to activate organization.");
     } finally {
       setTogglingStatus(false);
     }
@@ -233,8 +257,6 @@ export const useSystemAdmin = () => {
     e.preventDefault();
     if (!deactivatingOrg) return;
     setTogglingStatus(true);
-    setError(null);
-    setSuccess(null);
 
     try {
       const data = await orgService.updateOrgStatus(deactivatingOrg._id, {
@@ -242,37 +264,36 @@ export const useSystemAdmin = () => {
         remark: deactivateRemark.trim() || "Deactivated by System Admin",
       });
       if (data?.success) {
-        setSuccess(`Successfully deactivated organization "${deactivatingOrg.name}".`);
+        toast.success(data?.message || `Successfully deactivated organization "${deactivatingOrg.name}".`);
         setDeactivatingOrg(null);
         await fetchOrganizations();
       }
     } catch (err: any) {
-      setError(err?.response?.data?.message || "Failed to deactivate organization.");
+      toast.error(err?.response?.data?.message || "Failed to deactivate organization.");
     } finally {
       setTogglingStatus(false);
     }
   };
 
-  const handleDelete = async (org: any) => {
-    if (
-      !window.confirm(
-        `WARNING: Are you sure you want to delete organization "${org.name}"?\n\nThis will PERMANENTLY delete all users and tasks associated with it. This action cannot be undone.`
-      )
-    ) {
-      return;
-    }
+  const handleDelete = (org: any) => {
+    setDeletingOrg(org);
+  };
 
-    setError(null);
-    setSuccess(null);
+  const handleDeleteConfirm = async () => {
+    if (!deletingOrg) return;
+    setDeleting(true);
     try {
-      const data = await orgService.deleteOrg(org._id);
+      const data = await orgService.deleteOrg(deletingOrg._id);
       if (data?.success) {
-        setSuccess(`Successfully deleted organization "${org.name}".`);
-        if (inspectingOrg?._id === org._id) setInspectingOrg(null);
+        toast.success(data?.message || `Successfully deleted organization "${deletingOrg.name}".`);
+        if (inspectingOrg?._id === deletingOrg._id) setInspectingOrg(null);
+        setDeletingOrg(null);
         await fetchOrganizations();
       }
     } catch (err: any) {
-      setError(err?.response?.data?.message || "Failed to delete organization.");
+      toast.error(err?.response?.data?.message || "Failed to delete organization.");
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -280,23 +301,20 @@ export const useSystemAdmin = () => {
   const handleResetPassword = async (org: any) => {
     setResetPasswordOrg(org);
     setResetResult(null);
-    setError(null);
-    setSuccess(null);
   };
 
   const handleResetPasswordConfirm = async () => {
     if (!resetPasswordOrg) return;
     setResettingPassword(true);
-    setError(null);
     try {
       const data = await orgService.resetAdminPassword(resetPasswordOrg._id);
       if (data?.success && data?.admin) {
         setResetResult(data.admin);
-        setSuccess(`Successfully generated temporary credentials for "${resetPasswordOrg.name}".`);
+        toast.success(`Successfully generated temporary credentials for "${resetPasswordOrg.name}".`);
         await fetchOrganizations();
       }
     } catch (err: any) {
-      setError(err?.response?.data?.message || "Failed to reset admin credentials.");
+      toast.error(err?.response?.data?.message || "Failed to reset admin credentials.");
     } finally {
       setResettingPassword(false);
     }
@@ -371,8 +389,9 @@ export const useSystemAdmin = () => {
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-    } catch (err) {
+    } catch (err: any) {
       console.error("Export CSV error:", err);
+      toast.error("Failed to export organizations.");
     }
   };
 
@@ -415,16 +434,16 @@ export const useSystemAdmin = () => {
     onboarding,
     updating,
     togglingStatus,
-    error,
-    setError,
-    success,
-    setSuccess,
     handleOnboardSubmit,
     handleEditClick,
     handleUpdate,
     handleToggleActive,
     submitDeactivation,
     handleDelete,
+    deletingOrg,
+    setDeletingOrg,
+    deleting,
+    handleDeleteConfirm,
     handleCopyPassword,
     handleResetPassword,
     handleResetPasswordConfirm,
