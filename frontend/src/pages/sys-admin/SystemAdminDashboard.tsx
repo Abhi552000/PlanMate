@@ -29,6 +29,7 @@ import { DeleteOrgModal } from "./components/DeleteOrgModal";
 import { ResetPasswordModal } from "./components/ResetPasswordModal";
 import { TenantDetailModal } from "./components/TenantDetailModal";
 import { PlanManagementModal } from "./components/PlanManagementModal";
+import { ConfirmationModal } from "../../components/ui/ConfirmationModal";
 import { useSystemAdmin } from "./hooks/useSystemAdmin";
 
 const SystemAdminDashboard: React.FC<SystemAdminDashboardProps> = ({ onLogout, user }) => {
@@ -75,6 +76,9 @@ const SystemAdminDashboard: React.FC<SystemAdminDashboardProps> = ({ onLogout, u
     handleEditClick,
     handleUpdate,
     handleToggleActive,
+    restoringOrg,
+    setRestoringOrg,
+    handleRestoreOrgConfirm,
     submitDeactivation,
     handleDelete,
     deletingOrg,
@@ -334,6 +338,26 @@ const SystemAdminDashboard: React.FC<SystemAdminDashboardProps> = ({ onLogout, u
         onClose={() => setDeletingOrg(null)}
         onConfirm={handleDeleteConfirm}
         deleting={deleting}
+      />
+
+      {/* Restore / Activate Organization Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={Boolean(restoringOrg)}
+        onClose={() => setRestoringOrg(null)}
+        onConfirm={handleRestoreOrgConfirm}
+        title="Restore Organization"
+        message={
+          <>
+            Are you sure you want to restore and activate access for{" "}
+            <span className="font-bold text-sky-600 dark:text-sky-400">
+              {restoringOrg?.name}
+            </span>
+            ? Workspace members will be granted full access.
+          </>
+        }
+        confirmText="Restore Organization"
+        cancelText="Cancel"
+        loading={togglingStatus}
       />
 
       {/* Plan Management Configuration Modal (shortcut fallback) */}

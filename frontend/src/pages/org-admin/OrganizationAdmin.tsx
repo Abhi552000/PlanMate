@@ -332,13 +332,27 @@ const OrganizationAdmin = () => {
         }}
         title={
           pendingNewStatus === "active"
-            ? "Approve & Grant Workspace Access"
-            : "Reject / Deactivate User Access"
+            ? "Grant / Restore Workspace Access"
+            : "Deactivate User Access"
         }
         description={
-          pendingNewStatus === "active"
-            ? `Are you sure you want to approve and grant workspace privileges to ${selectedUserForStatusChange?.name}?`
-            : `Please provide a reason or administrative note for rejecting/deactivating ${selectedUserForStatusChange?.name}.`
+          pendingNewStatus === "active" ? (
+            <>
+              Are you sure you want to grant and restore workspace privileges for{" "}
+              <span className="font-bold text-sky-600 dark:text-sky-400">
+                {selectedUserForStatusChange?.name}
+              </span>
+              ?
+            </>
+          ) : (
+            <>
+              Please provide a reason or administrative note for deactivating{" "}
+              <span className="font-bold text-sky-600 dark:text-sky-400">
+                {selectedUserForStatusChange?.name}
+              </span>
+              .
+            </>
+          )
         }
         loading={togglingStatus}
       />

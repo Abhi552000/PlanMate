@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import { Clock, Plus, Trash2, Calendar, User, CheckCircle2, AlertCircle } from "lucide-react";
+import { Clock, Plus, Trash2, Calendar, User } from "lucide-react";
 import { IWorkLog, IUser } from "../../../types";
+import { ConfirmationModal } from "../../../components/ui/ConfirmationModal";
 
 interface WorkLogsSectionProps {
   workLogs: IWorkLog[];
@@ -37,8 +38,6 @@ export const WorkLogsSection: React.FC<WorkLogsSectionProps> = ({
   const totalLogged = timeLogged || workLogs.reduce((sum, log) => sum + (log.hoursSpent || 0), 0);
   const estimate = Number(originalEstimate) || 0;
   const remaining = Math.max(0, estimate - totalLogged);
-  const progressPercent = estimate > 0 ? Math.min(100, Math.round((totalLogged / estimate) * 100)) : 0;
-  const isOverEstimate = estimate > 0 && totalLogged > estimate;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -52,333 +51,266 @@ export const WorkLogsSection: React.FC<WorkLogsSectionProps> = ({
     setShowLogForm(false);
   };
 
-  const handleQuickAddHours = (additional: number) => {
+  const handleResetAndCloseForm = () => {
+    setHoursInput("");
+    setDescriptionInput("");
+    setDateInput(new Date().toISOString().split("T")[0]);
+    setShowLogForm(false);
+  };
+
+  const handleToggleForm = () => {
+    if (showLogForm) {
+      handleResetAndCloseForm();
+    } else {
+      setHoursInput("");
+      setDescriptionInput("");
+      setDateInput(new Date().toISOString().split("T")[0]);
+      setShowLogForm(true);
+    }
+  };
+
+  const handleQuickAddHours = (val: number) => {
     const current = parseFloat(hoursInput) || 0;
-    const nextVal = (current + additional).toFixed(1).replace(/\.0$/, "");
+    const nextVal = (current + val).toFixed(1).replace(/\.0$/, "");
     setHoursInput(nextVal);
   };
 
   return (
-    <div className="space-y-6">
-      {/* Time Tracking Overview Card */}
-      <div className="bg-slate-50/70 dark:bg-gray-800/40 p-4 sm:p-5 rounded-xl border border-sky-100/70 dark:border-gray-800">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
-          <div>
-            <div className="flex items-center gap-2">
-              <Clock className="w-4 h-4 text-sky-500" />
-              <h4 className="text-sm font-semibold text-gray-800 dark:text-gray-100">
-                Time Tracking & Progress
-              </h4>
-            </div>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-              Logged work history and remaining effort
-            </p>
-          </div>
-
-          <button
-            type="button"
-            onClick={() => setShowLogForm((prev) => !prev)}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-sky-500 hover:bg-sky-600 active:bg-sky-700 text-white shadow-xs transition-colors cursor-pointer self-start sm:self-auto"
-          >
-            <Plus className="w-3.5 h-3.5" />
-            {showLogForm ? "Cancel" : "Log Work"}
-          </button>
+    <div className="space-y-4">
+      {/* Header Bar */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-gray-100 dark:border-gray-800">
+        <div className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-300">
+          <span>
+            Total: <strong className="text-gray-900 dark:text-gray-100">{totalLogged}h</strong> logged
+          </span>
+          {estimate > 0 && (
+            <>
+              <span className="text-gray-300 dark:text-gray-700">•</span>
+              <span>
+                <strong className="text-gray-900 dark:text-gray-100">{remaining.toFixed(1)}h</strong> remaining of {estimate}h
+              </span>
+            </>
+          )}
         </div>
 
-        {/* Progress Bar */}
-        <div className="space-y-2">
-          <div className="w-full h-2.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden flex">
-            <div
-              className={`h-full transition-all duration-300 rounded-full ${
-                isOverEstimate
-                  ? "bg-amber-500 dark:bg-amber-400"
-                  : "bg-sky-500 dark:bg-sky-400"
-              }`}
-              style={{ width: `${estimate > 0 ? Math.min(100, progressPercent) : totalLogged > 0 ? 100 : 0}%` }}
-            />
-          </div>
-
-          {/* Quick Metrics */}
-          <div className="grid grid-cols-3 gap-2 pt-1 text-center sm:text-left">
-            <div className="bg-white dark:bg-gray-900/60 p-2.5 rounded-lg border border-gray-100 dark:border-gray-800/80">
-              <span className="block text-[11px] font-medium text-gray-400 uppercase tracking-wider">
-                Logged
-              </span>
-              <span className="text-sm font-bold text-gray-800 dark:text-gray-100">
-                {totalLogged}h
-              </span>
-            </div>
-
-            <div className="bg-white dark:bg-gray-900/60 p-2.5 rounded-lg border border-gray-100 dark:border-gray-800/80">
-              <span className="block text-[11px] font-medium text-gray-400 uppercase tracking-wider">
-                Estimated
-              </span>
-              <span className="text-sm font-bold text-gray-800 dark:text-gray-100">
-                {estimate > 0 ? `${estimate}h` : "None"}
-              </span>
-            </div>
-
-            <div className="bg-white dark:bg-gray-900/60 p-2.5 rounded-lg border border-gray-100 dark:border-gray-800/80">
-              <span className="block text-[11px] font-medium text-gray-400 uppercase tracking-wider">
-                Remaining
-              </span>
-              <span
-                className={`text-sm font-bold ${
-                  isOverEstimate
-                    ? "text-amber-600 dark:text-amber-400"
-                    : "text-gray-800 dark:text-gray-100"
-                }`}
-              >
-                {estimate > 0 ? (isOverEstimate ? `+${(totalLogged - estimate).toFixed(1)}h over` : `${remaining.toFixed(1)}h`) : "--"}
-              </span>
-            </div>
-          </div>
-        </div>
+        <button
+          type="button"
+          onClick={handleToggleForm}
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-sky-500 hover:bg-sky-600 active:bg-sky-700 text-white shadow-xs transition-colors cursor-pointer self-start sm:self-auto"
+        >
+          <Plus className="w-3.5 h-3.5" />
+          {showLogForm ? "Cancel" : "Log Time"}
+        </button>
       </div>
 
-      {/* Log Work Form (Collapsible) */}
+      {/* Log Time Form */}
       {showLogForm && (
         <form
           onSubmit={handleSubmit}
-          className="bg-white dark:bg-gray-900 p-4 sm:p-5 rounded-xl border border-sky-200 dark:border-sky-900/40 shadow-xs space-y-4 animate-fadeIn"
+          className="p-4 rounded-xl bg-slate-50/80 dark:bg-gray-800/50 border border-sky-100 dark:border-gray-800 space-y-3"
         >
-          <div className="flex items-center justify-between border-b border-gray-100 dark:border-gray-800 pb-2">
-            <h5 className="text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-gray-200">
-              New Work Log Entry
-            </h5>
-            <span className="text-[11px] text-gray-400">
-              Recorded in task history
-            </span>
-          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            {/* Hours spent input */}
+            <div className="sm:col-span-2">
+              <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
+                Time Spent (Hours) <span className="text-amber-500">*</span>
+              </label>
+              <div className="flex items-center gap-2">
+                <input
+                  type="number"
+                  step="any"
+                  min="0.01"
+                  max="100"
+                  placeholder="e.g. 1.5"
+                  value={hoursInput}
+                  onChange={(e) => setHoursInput(e.target.value)}
+                  required
+                  className={`${baseControlClasses} py-1.5 text-xs flex-1`}
+                  autoFocus
+                />
+                {/* Preset Chips */}
+                <div className="flex items-center gap-1 shrink-0">
+                  {[
+                    { label: "+30m", val: 0.5 },
+                    { label: "+1h", val: 1 },
+                    { label: "+2h", val: 2 },
+                    { label: "+4h", val: 4 },
+                  ].map((chip) => (
+                    <button
+                      key={chip.label}
+                      type="button"
+                      onClick={() => handleQuickAddHours(chip.val)}
+                      className="px-2 py-1 rounded text-[11px] font-medium bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-sky-400 dark:hover:border-sky-500 text-gray-600 dark:text-gray-300 transition-colors cursor-pointer"
+                    >
+                      {chip.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {/* Date */}
             <div>
-              <label className="block text-xs font-semibold text-gray-600 dark:text-gray-300 mb-1">
-                Time Spent (Hours) <span className="text-red-500">*</span>
+              <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
+                Date
               </label>
               <input
-                type="number"
-                step="0.25"
-                min="0.1"
-                max="100"
-                placeholder="e.g. 1.5"
-                value={hoursInput}
-                onChange={(e) => setHoursInput(e.target.value)}
-                required
-                className={baseControlClasses}
+                type="date"
+                value={dateInput}
+                onChange={(e) => setDateInput(e.target.value)}
+                className={`${baseControlClasses} py-1.5 text-xs`}
               />
-              {/* Quick preset chips */}
-              <div className="flex items-center gap-1.5 mt-2">
-                <span className="text-[11px] text-gray-400 mr-1">Quick add:</span>
-                {[
-                  { label: "+30m", val: 0.5 },
-                  { label: "+1h", val: 1 },
-                  { label: "+2h", val: 2 },
-                  { label: "+4h", val: 4 },
-                ].map((chip) => (
-                  <button
-                    key={chip.label}
-                    type="button"
-                    onClick={() => handleQuickAddHours(chip.val)}
-                    className="px-2 py-0.5 rounded text-[11px] font-medium bg-gray-100 dark:bg-gray-800 hover:bg-sky-50 dark:hover:bg-sky-950 text-gray-600 dark:text-gray-300 hover:text-sky-600 transition-colors cursor-pointer"
-                  >
-                    {chip.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-gray-600 dark:text-gray-300 mb-1">
-                Date Worked
-              </label>
-              <div className="relative">
-                <input
-                  type="date"
-                  value={dateInput}
-                  onChange={(e) => setDateInput(e.target.value)}
-                  className={baseControlClasses}
-                />
-              </div>
             </div>
           </div>
 
+          {/* Description */}
           <div>
-            <label className="block text-xs font-semibold text-gray-600 dark:text-gray-300 mb-1">
-              Work Description / Notes (Optional)
+            <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
+              Work Description (Optional)
             </label>
-            <textarea
-              rows={2}
-              placeholder="What did you work on or accomplish? (e.g., Debugged API integration and tested edge cases)"
+            <input
+              type="text"
+              placeholder="What did you work on? (e.g. Fixed navigation bug and added tests)"
               value={descriptionInput}
               onChange={(e) => setDescriptionInput(e.target.value)}
-              className={baseControlClasses}
+              className={`${baseControlClasses} py-1.5 text-xs`}
             />
           </div>
 
+          {/* Actions */}
           <div className="flex items-center justify-end gap-2 pt-1">
             <button
               type="button"
-              onClick={() => setShowLogForm(false)}
-              className="px-3 py-1.5 rounded-lg text-xs font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors cursor-pointer"
+              onClick={handleResetAndCloseForm}
+              className="px-3 py-1.5 rounded-lg text-xs font-medium text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 transition-colors cursor-pointer"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={loggingWork || !hoursInput || parseFloat(hoursInput) <= 0}
-              className="px-4 py-1.5 rounded-lg text-xs font-semibold bg-sky-500 hover:bg-sky-600 text-white shadow-xs disabled:opacity-50 disabled:cursor-not-allowed transition-all cursor-pointer"
+              className="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-sky-500 hover:bg-sky-600 active:bg-sky-700 text-white shadow-xs disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
             >
-              {loggingWork ? "Saving..." : "Save Log"}
+              {loggingWork ? "Saving..." : "Log Time"}
             </button>
           </div>
         </form>
       )}
 
       {/* Work Logs List */}
-      <div className="space-y-3">
-        <div className="flex items-center justify-between border-b border-gray-100 dark:border-gray-800 pb-2">
-          <h5 className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">
-            Work Log Entries ({workLogs.length})
-          </h5>
-          {isOrgAdmin && (
-            <span className="text-[11px] text-sky-600 dark:text-sky-400 font-medium">
-              Org Admin Management Mode
-            </span>
-          )}
+      {workLogs.length === 0 ? (
+        <div className="text-center py-8 px-4 bg-gray-50/50 dark:bg-gray-800/30 rounded-xl border border-dashed border-gray-200 dark:border-gray-800">
+          <Clock className="w-7 h-7 text-gray-300 dark:text-gray-600 mx-auto mb-2" />
+          <p className="text-xs font-semibold text-gray-700 dark:text-gray-300">
+            No work logged yet
+          </p>
+          <p className="text-[11px] text-gray-400 mt-0.5">
+            Record time spent on this issue by clicking "Log Time" above.
+          </p>
         </div>
+      ) : (
+        <div className="divide-y divide-gray-100 dark:divide-gray-800">
+          {workLogs
+            .slice()
+            .reverse()
+            .map((log: any, idx: number) => {
+              const logUser = log.user as IUser | any;
+              const userName = logUser?.name || "Team Member";
+              const userEmail = logUser?.email || "";
+              const userInitials = userName
+                .split(" ")
+                .map((n: string) => n[0])
+                .join("")
+                .toUpperCase()
+                .slice(0, 2);
 
-        {workLogs.length === 0 ? (
-          <div className="text-center py-8 px-4 bg-gray-50/50 dark:bg-gray-900/40 rounded-xl border border-dashed border-gray-200 dark:border-gray-800">
-            <Clock className="w-8 h-8 text-gray-300 dark:text-gray-600 mx-auto mb-2" />
-            <p className="text-xs font-semibold text-gray-700 dark:text-gray-300">
-              No work logged yet
-            </p>
-            <p className="text-[11px] text-gray-400 mt-1 max-w-sm mx-auto">
-              Track your team's hours spent on this issue by clicking "Log Work" above.
-            </p>
-          </div>
-        ) : (
-          <div className="divide-y divide-gray-100 dark:divide-gray-800/80">
-            {workLogs
-              .slice()
-              .reverse()
-              .map((log: any, idx: number) => {
-                const logUser = log.user as IUser | any;
-                const userName = logUser?.name || "Team Member";
-                const userEmail = logUser?.email || "";
-                const userInitials = userName
-                  .split(" ")
-                  .map((n: string) => n[0])
-                  .join("")
-                  .toUpperCase()
-                  .slice(0, 2);
+              const isAuthor =
+                currentUser?._id &&
+                (logUser?._id || logUser) === currentUser._id;
+              const canDelete = isOrgAdmin || isAuthor;
+              const isDeleting = deletingWorkLogId === log._id;
 
-                const isAuthor =
-                  currentUser?._id &&
-                  (logUser?._id || logUser) === currentUser._id;
-                const canDelete = isOrgAdmin || isAuthor;
-                const isDeleting = deletingWorkLogId === log._id;
+              const formattedDate = log.createdAt
+                ? new Date(log.createdAt).toLocaleDateString(undefined, {
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric",
+                  })
+                : "";
 
-                const formattedDate = log.createdAt
-                  ? new Date(log.createdAt).toLocaleDateString(undefined, {
-                      year: "numeric",
-                      month: "short",
-                      day: "numeric",
-                    })
-                  : "";
-
-                return (
-                  <div
-                    key={log._id || idx}
-                    className="py-3 sm:py-3.5 flex items-start justify-between gap-3 group transition-colors"
-                  >
-                    <div className="flex items-start gap-3 min-w-0">
-                      {/* Avatar */}
-                      <div className="w-7 h-7 rounded-full bg-sky-100 dark:bg-sky-900/50 text-sky-700 dark:text-sky-300 flex items-center justify-center font-bold text-xs shrink-0 mt-0.5 border border-sky-200/60 dark:border-sky-800">
-                        {userInitials || <User className="w-3.5 h-3.5" />}
-                      </div>
-
-                      <div className="space-y-1 min-w-0">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <span className="text-xs font-semibold text-gray-800 dark:text-gray-200">
-                            {userName}
-                          </span>
-                          {userEmail && (
-                            <span className="text-[11px] text-gray-400 hidden sm:inline">
-                              ({userEmail})
-                            </span>
-                          )}
-                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-bold bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 border border-sky-200/50 dark:border-sky-800/60">
-                            +{log.hoursSpent}h
-                          </span>
-                        </div>
-
-                        {log.description ? (
-                          <p className="text-xs text-gray-600 dark:text-gray-300 break-words leading-relaxed">
-                            {log.description}
-                          </p>
-                        ) : (
-                          <p className="text-[11px] text-gray-400 italic">
-                            No description provided
-                          </p>
-                        )}
-
-                        <div className="flex items-center gap-2 text-[11px] text-gray-400 pt-0.5">
-                          <span className="flex items-center gap-1">
-                            <Calendar className="w-3 h-3 text-gray-400" />
-                            {formattedDate}
-                          </span>
-                        </div>
-                      </div>
+              return (
+                <div
+                  key={log._id || idx}
+                  className="py-3 flex items-start justify-between gap-3 group transition-colors"
+                >
+                  <div className="flex items-start gap-2.5 min-w-0">
+                    {/* User Initials Avatar */}
+                    <div className="w-6 h-6 rounded-full bg-sky-100 dark:bg-sky-900/50 text-sky-700 dark:text-sky-300 flex items-center justify-center font-bold text-[10px] shrink-0 mt-0.5 border border-sky-200/50 dark:border-sky-800">
+                      {userInitials || <User className="w-3 h-3" />}
                     </div>
 
-                    {/* Delete Action (Org Admin or Author) */}
-                    {canDelete && (
-                      <div className="shrink-0 flex items-center">
-                        {confirmDeleteId === log._id ? (
-                          <div className="flex items-center gap-1.5 bg-red-50 dark:bg-red-950/40 p-1 rounded-lg border border-red-200 dark:border-red-900">
-                            <span className="text-[10px] text-red-600 dark:text-red-400 font-medium px-1">
-                              Delete?
-                            </span>
-                            <button
-                              type="button"
-                              onClick={() => {
-                                onDeleteWorkLog(log._id);
-                                setConfirmDeleteId(null);
-                              }}
-                              disabled={isDeleting}
-                              className="px-1.5 py-0.5 bg-red-600 text-white text-[10px] rounded hover:bg-red-700 cursor-pointer disabled:opacity-50"
-                            >
-                              Yes
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => setConfirmDeleteId(null)}
-                              className="px-1.5 py-0.5 bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-[10px] rounded hover:bg-gray-300 cursor-pointer"
-                            >
-                              No
-                            </button>
-                          </div>
-                        ) : (
-                          <button
-                            type="button"
-                            onClick={() => setConfirmDeleteId(log._id)}
-                            disabled={isDeleting}
-                            className="p-1.5 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/40 transition-colors cursor-pointer opacity-70 group-hover:opacity-100"
-                            title={isOrgAdmin ? "Delete work log (Org Admin)" : "Delete your work log"}
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
-                        )}
+                    <div className="space-y-0.5 min-w-0">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="text-xs font-semibold text-gray-800 dark:text-gray-200">
+                          {userName}
+                        </span>
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-bold bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 border border-sky-200/50 dark:border-sky-800/60">
+                          {log.hoursSpent}h
+                        </span>
+                        <span className="text-[11px] text-gray-400 flex items-center gap-1">
+                          <Calendar className="w-3 h-3 text-gray-400" />
+                          {formattedDate}
+                        </span>
                       </div>
-                    )}
+
+                      {log.description ? (
+                        <p className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed pt-0.5">
+                          {log.description}
+                        </p>
+                      ) : (
+                        <p className="text-[11px] text-gray-400 italic pt-0.5">
+                          No notes provided
+                        </p>
+                      )}
+                    </div>
                   </div>
-                );
-              })}
-          </div>
-        )}
-      </div>
+
+                  {/* Delete Action (Org Admin or Author) */}
+                  {canDelete && (
+                    <div className="shrink-0 flex items-center">
+                      <button
+                        type="button"
+                        onClick={() => setConfirmDeleteId(log._id)}
+                        disabled={isDeleting}
+                        className="p-1 rounded text-gray-400 hover:text-sky-600 hover:bg-sky-50 dark:hover:bg-gray-800 transition-colors cursor-pointer opacity-50 group-hover:opacity-100"
+                        title="Delete work log"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+        </div>
+      )}
+
+      {/* Delete Work Log Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={Boolean(confirmDeleteId)}
+        onClose={() => setConfirmDeleteId(null)}
+        onConfirm={() => {
+          if (confirmDeleteId) {
+            onDeleteWorkLog(confirmDeleteId);
+            setConfirmDeleteId(null);
+          }
+        }}
+        title="Delete Work Log"
+        message="Are you sure you want to delete this work log entry? This action cannot be undone."
+        confirmText="Delete Work Log"
+        cancelText="Cancel"
+        loading={Boolean(deletingWorkLogId)}
+      />
     </div>
   );
 };

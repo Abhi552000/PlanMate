@@ -246,7 +246,7 @@ export const OrgMembersTable: React.FC<OrgMembersTableProps> = ({
                                   setActiveMenuUserId(null);
                                   onUpdateUserStatusClick(member, "deactivate");
                                 }}
-                                className="w-full px-4 py-2 text-xs font-bold text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20 flex items-center gap-2 cursor-pointer border-t border-sky-50 dark:border-gray-700"
+                                className="w-full px-4 py-2 text-xs font-semibold text-gray-700 dark:text-gray-300 hover:text-sky-600 dark:hover:text-sky-400 hover:bg-sky-50 dark:hover:bg-gray-700/60 flex items-center gap-2 cursor-pointer border-t border-sky-50 dark:border-gray-700"
                               >
                                 <Power className="w-3.5 h-3.5" /> Deactivate Access
                               </button>
@@ -256,7 +256,7 @@ export const OrgMembersTable: React.FC<OrgMembersTableProps> = ({
                                   setActiveMenuUserId(null);
                                   onUpdateUserStatusClick(member, "activate");
                                 }}
-                                className="w-full px-4 py-2 text-xs font-bold text-green-600 hover:bg-green-50 dark:hover:bg-green-950/20 flex items-center gap-2 cursor-pointer border-t border-sky-50 dark:border-gray-700"
+                                className="w-full px-4 py-2 text-xs font-semibold text-gray-700 dark:text-gray-300 hover:text-sky-600 dark:hover:text-sky-400 hover:bg-sky-50 dark:hover:bg-gray-700/60 flex items-center gap-2 cursor-pointer border-t border-sky-50 dark:border-gray-700"
                               >
                                 <RotateCcw className="w-3.5 h-3.5" /> Grant/Restore Access
                               </button>

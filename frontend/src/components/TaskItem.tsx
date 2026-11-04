@@ -12,6 +12,7 @@ import axiosInstance from "../config";
 import { TaskItemProps } from "../types";
 import { getPriorityStyle } from "../utils";
 import { CONSOLE_ERRORS } from "../constants/messages";
+import { ConfirmationModal } from "./ui/ConfirmationModal";
 
 const TaskItem: React.FC<TaskItemProps> = ({
   task,
@@ -22,6 +23,8 @@ const TaskItem: React.FC<TaskItemProps> = ({
 }) => {
   const navigate = useNavigate();
   const [showMenu, setShowMenu] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [isCompleted, setIsCompleted] = useState(
     [true, 1, "yes"].includes(
       typeof task.completed === "string"
@@ -63,15 +66,19 @@ const TaskItem: React.FC<TaskItemProps> = ({
   const handleAction = (action: string) => {
     setShowMenu(false);
     if (action === "edit") navigate(`/task/${task._id}`);
-    if (action === "delete") handleDelete();
+    if (action === "delete") setShowDeleteModal(true);
   };
 
-  const handleDelete = async () => {
+  const handleDeleteConfirm = async () => {
+    setDeleting(true);
     try {
       await axiosInstance.delete(`/api/tasks/${task._id}/gp`);
+      setShowDeleteModal(false);
       onRefresh?.();
     } catch (error: any) {
       if (error.response?.status === 401) onLogout?.();
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -223,6 +230,26 @@ const TaskItem: React.FC<TaskItemProps> = ({
           </div>
         </div>
       </div>
+
+      {/* Delete Task Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onConfirm={handleDeleteConfirm}
+        title="Delete Task"
+        message={
+          <>
+            Are you sure you want to delete task{" "}
+            <span className="font-bold text-sky-600 dark:text-sky-400">
+              {task.key ? `${task.key} - ${task.title}` : task.title}
+            </span>
+            ? This action cannot be undone.
+          </>
+        }
+        confirmText="Delete Task"
+        cancelText="Cancel"
+        loading={deleting}
+      />
     </>
   );
 };

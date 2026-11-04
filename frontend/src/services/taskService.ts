@@ -49,6 +49,27 @@ export const taskService = {
     );
     return data;
   },
+  getUserWorklogSummaries: async (params?: URLSearchParams) => {
+    const url = params
+      ? `${API_ROUTES.TASKS.WORKLOG_USERS}?${params.toString()}`
+      : API_ROUTES.TASKS.WORKLOG_USERS;
+    const { data } = await axiosInstance.get(url);
+    return data;
+  },
+  getUserDetailedWorklogs: async (userId: string, params?: URLSearchParams) => {
+    const url = params
+      ? `${API_ROUTES.TASKS.WORKLOG_USER_DETAILS(userId)}?${params.toString()}`
+      : API_ROUTES.TASKS.WORKLOG_USER_DETAILS(userId);
+    const { data } = await axiosInstance.get(url);
+    return data;
+  },
+  exportWorklogs: async (params?: URLSearchParams) => {
+    const url = params
+      ? `${API_ROUTES.TASKS.WORKLOG_EXPORT}?${params.toString()}`
+      : API_ROUTES.TASKS.WORKLOG_EXPORT;
+    const { data } = await axiosInstance.get(url);
+    return data;
+  },
   linkTask: async (id: string, linkType: string, targetTaskId: string) => {
     const { data } = await axiosInstance.post(API_ROUTES.TASKS.LINK(id), { linkType, targetTaskId });
     return data;

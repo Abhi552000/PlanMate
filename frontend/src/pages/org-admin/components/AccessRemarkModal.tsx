@@ -60,7 +60,7 @@ export const AccessRemarkModal: React.FC<AccessRemarkModalProps> = ({
           <div>
             <label className="block text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5 flex items-center gap-1">
               <span>Reason / Remark</span>
-              <span className="text-red-500 text-xs font-bold">*</span>
+              <span className="text-amber-500 text-xs font-bold">*</span>
             </label>
             <textarea
               rows={3}
@@ -75,12 +75,12 @@ export const AccessRemarkModal: React.FC<AccessRemarkModalProps> = ({
               placeholder="e.g. Contract ended, temporary leave, role reassignment..."
               className={`w-full px-3 py-2 text-xs border rounded-lg bg-white dark:bg-gray-800 focus:outline-none transition-all text-gray-750 dark:text-gray-300 font-medium ${
                 error
-                  ? "border-red-500 focus:ring-2 focus:ring-red-400/50"
+                  ? "border-amber-400 focus:ring-2 focus:ring-amber-400/50"
                   : "border-sky-100 dark:border-gray-700 focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
               }`}
             />
             {error && (
-              <p className="text-[11px] text-red-500 mt-1 font-medium">
+              <p className="text-[11px] text-amber-600 dark:text-amber-400 mt-1 font-medium">
                 {error}
               </p>
             )}

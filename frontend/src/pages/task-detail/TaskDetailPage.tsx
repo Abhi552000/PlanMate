@@ -256,7 +256,7 @@ const TaskDetailPage = () => {
                   }`}
                 >
                   <Activity className="w-3.5 h-3.5" />
-                  Activity Timeline
+                  Activity
                   <span
                     className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${
                       activeBottomTab === "timeline"

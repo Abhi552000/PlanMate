@@ -43,6 +43,10 @@ export const API_ROUTES = {
     LOG_WORK: (id: string) => `/api/tasks/${id}/worklogs`,
     DELETE_WORKLOG: (id: string, workLogId: string) =>
       `/api/tasks/${id}/worklogs/${workLogId}`,
+    WORKLOG_USERS: "/api/tasks/gp/worklogs/users",
+    WORKLOG_USER_DETAILS: (userId: string) =>
+      `/api/tasks/gp/worklogs/users/${userId}`,
+    WORKLOG_EXPORT: "/api/tasks/gp/worklogs/export",
     LINK: (id: string) => `/api/tasks/${id}/links`,
     UNLINK: (id: string, linkId: string) => `/api/tasks/${id}/links/${linkId}`,
   },

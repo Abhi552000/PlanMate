@@ -22,7 +22,7 @@ export const DeleteOrgModal: React.FC<DeleteOrgModalProps> = ({
         {/* Header */}
         <div className="flex items-center justify-between border-b border-gray-100 dark:border-gray-800 pb-3">
           <h3 className="font-bold text-gray-800 dark:text-gray-200 text-base">
-            Delete {deletingOrg.name}
+            Delete Organization
           </h3>
           <button
             onClick={onClose}
@@ -34,18 +34,15 @@ export const DeleteOrgModal: React.FC<DeleteOrgModalProps> = ({
           </button>
         </div>
 
-        {/* Warning Body */}
+        {/* Body */}
         <div className="space-y-3">
           <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
             Are you sure you want to permanently delete{" "}
-            <span className="font-bold text-gray-900 dark:text-white">
+            <span className="font-bold text-sky-600 dark:text-sky-400">
               {deletingOrg.name}
             </span>
-            ?
+            ? All users, tasks, and data associated with this tenant will be permanently removed.
           </p>
-          <div className="p-3 bg-rose-50/70 dark:bg-rose-950/30 border border-rose-100 dark:border-rose-900/40 rounded-xl text-xs text-rose-700 dark:text-rose-300 leading-relaxed font-medium">
-            This action cannot be undone. All users, tasks, sprints, and data associated with this tenant will be permanently removed.
-          </div>
         </div>
 
         {/* Footer Actions */}
@@ -62,7 +59,7 @@ export const DeleteOrgModal: React.FC<DeleteOrgModalProps> = ({
             type="button"
             disabled={deleting}
             onClick={onConfirm}
-            className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-lg text-xs shadow-2xs transition-all cursor-pointer disabled:opacity-50 flex items-center gap-1.5"
+            className="px-4 py-2 bg-sky-500 hover:bg-sky-600 text-white font-bold rounded-lg text-xs transition-all cursor-pointer disabled:opacity-50 flex items-center gap-1.5"
           >
             {deleting ? (
               <>
