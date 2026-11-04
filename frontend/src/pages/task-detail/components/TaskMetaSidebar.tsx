@@ -26,6 +26,9 @@ export const TaskMetaSidebar: React.FC<TaskMetaSidebarProps> = ({
   createdAt,
   timeLogged = 0,
   onLogTimeClick,
+  priorities = ["Low", "Medium", "High"],
+  boardFeatures = {},
+  customFields = [],
 }) => {
   const [labelInput, setLabelInput] = useState("");
   return (
@@ -88,19 +91,21 @@ export const TaskMetaSidebar: React.FC<TaskMetaSidebarProps> = ({
             getPriorityStyle(taskData.priority)
           }`}
         >
-          <option value="Low" className="bg-white dark:bg-gray-800 text-slate-800 dark:text-slate-100 py-1.5">Low</option>
-          <option value="Medium" className="bg-white dark:bg-gray-800 text-slate-800 dark:text-slate-100 py-1.5">Medium</option>
-          <option value="High" className="bg-white dark:bg-gray-800 text-slate-800 dark:text-slate-100 py-1.5">High</option>
+          {priorities.map((p) => (
+            <option key={p} value={p} className="bg-white dark:bg-gray-800 text-slate-800 dark:text-slate-100 py-1.5">
+              {p}
+            </option>
+          ))}
         </select>
       </div>
 
       {/* Assignee Selection (Only editable on parent issue detail) */}
       {!isEditingSubtask && (
         <div className="flex flex-col gap-1.5">
-          <label className="flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-gray-500 mb-1">
-            <User className="w-3.5 h-3.5 text-sky-500" /> Assignee
-          </label>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center justify-between">
+            <label className="flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-gray-500">
+              <User className="w-3.5 h-3.5 text-sky-500" /> Assignee
+            </label>
             <button
               type="button"
               onClick={() => {
@@ -110,24 +115,24 @@ export const TaskMetaSidebar: React.FC<TaskMetaSidebarProps> = ({
                   setTaskData((prev: any) => ({ ...prev, assignee: userMember._id }));
                 }
               }}
-              className="text-[10px] text-sky-600 hover:text-sky-700 hover:underline font-bold transition-all cursor-pointer shrink-0"
+              className="text-[11px] text-sky-600 dark:text-sky-400 hover:text-sky-700 dark:hover:text-sky-300 hover:underline font-semibold transition-all cursor-pointer"
             >
               Assign to me
             </button>
-            <select
-              name="assignee"
-              value={taskData.assignee || ""}
-              onChange={handleChange}
-              className={selectControlClasses}
-            >
-              <option value="" className="bg-white dark:bg-gray-800 text-slate-800 dark:text-slate-100 py-1.5">Unassigned</option>
-              {members.map(member => (
-                <option key={member._id} value={member._id} className="bg-white dark:bg-gray-800 text-slate-800 dark:text-slate-100 py-1.5">
-                  {member.name}
-                </option>
-              ))}
-            </select>
           </div>
+          <select
+            name="assignee"
+            value={taskData.assignee || ""}
+            onChange={handleChange}
+            className={`${selectControlClasses} w-full`}
+          >
+            <option value="" className="bg-white dark:bg-gray-800 text-slate-800 dark:text-slate-100 py-1.5">Unassigned</option>
+            {members.map(member => (
+              <option key={member._id} value={member._id} className="bg-white dark:bg-gray-800 text-slate-800 dark:text-slate-100 py-1.5">
+                {member.name}
+              </option>
+            ))}
+          </select>
         </div>
       )}
 
@@ -153,40 +158,45 @@ export const TaskMetaSidebar: React.FC<TaskMetaSidebarProps> = ({
         </div>
       )}
 
-      <div>
-        <label className="flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-gray-500 mb-1">
-          <Calendar className="w-3.5 h-3.5 text-sky-500" /> Due Date
-        </label>
-        <input
-          type="date"
-          name="dueDate"
-          required
-          min={today}
-          value={taskData.dueDate}
-          onChange={handleChange}
-          className={baseControlClasses}
-        />
-      </div>
+      {/* Due Date */}
+      {boardFeatures.dueDates !== false && (
+        <div>
+          <label className="flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-gray-500 mb-1">
+            <Calendar className="w-3.5 h-3.5 text-sky-500" /> Due Date
+          </label>
+          <input
+            type="date"
+            name="dueDate"
+            required
+            min={today}
+            value={taskData.dueDate}
+            onChange={handleChange}
+            className={baseControlClasses}
+          />
+        </div>
+      )}
 
       {/* Story Points */}
-      <div>
-        <label className="flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-gray-500 mb-1">
-          <Flag className="w-3.5 h-3.5 text-sky-500" /> Story Points
-        </label>
-        <input
-          type="number"
-          name="storyPoints"
-          min="0"
-          max="100"
-          value={taskData.storyPoints !== undefined ? taskData.storyPoints : 1}
-          onChange={handleChange}
-          className={baseControlClasses}
-          required
-        />
-      </div>
+      {boardFeatures.storyPoints !== false && (
+        <div>
+          <label className="flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-gray-500 mb-1">
+            <Flag className="w-3.5 h-3.5 text-sky-500" /> Story Points
+          </label>
+          <input
+            type="number"
+            name="storyPoints"
+            min="0"
+            max="100"
+            value={taskData.storyPoints !== undefined ? taskData.storyPoints : 1}
+            onChange={handleChange}
+            className={baseControlClasses}
+            required
+          />
+        </div>
+      )}
 
       {/* Time Tracking (Unified Section) */}
-      {!isEditingSubtask && (
+      {!isEditingSubtask && boardFeatures.timeTracking !== false && (
         <div className="p-3.5 rounded-xl bg-slate-50/80 dark:bg-gray-800/50 border border-sky-100/60 dark:border-gray-800 space-y-3">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 flex items-center gap-1.5">
@@ -252,49 +262,65 @@ export const TaskMetaSidebar: React.FC<TaskMetaSidebarProps> = ({
       )}
 
       {/* Labels Section */}
-      <div>
-        <label className="flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-gray-500 mb-1.5">
-          <Tag className="w-3.5 h-3.5 text-sky-500" /> Labels
-        </label>
+      {boardFeatures.labels !== false && (
+        <div>
+          <label className="flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-gray-500 mb-1.5">
+            <Tag className="w-3.5 h-3.5 text-sky-500" /> Labels
+          </label>
 
-        {/* Existing Labels */}
-        <div className="flex flex-wrap items-center gap-1.5 mb-2 min-h-[22px]">
-          {(taskData.labels || []).map((label: string, idx: number) => (
-            <span
-              key={idx}
-              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-semibold bg-sky-50 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300 border border-sky-100 dark:border-sky-850"
-            >
-              {label}
-              <button
-                type="button"
-                onClick={() => {
-                  setTaskData((prev: any) => ({
-                    ...prev,
-                    labels: (prev.labels || []).filter((_: any, i: number) => i !== idx),
-                  }));
-                }}
-                className="hover:text-red-500 transition-colors cursor-pointer"
-                title={`Remove ${label}`}
+          {/* Existing Labels */}
+          <div className="flex flex-wrap items-center gap-1.5 mb-2 min-h-[22px]">
+            {(taskData.labels || []).map((label: string, idx: number) => (
+              <span
+                key={idx}
+                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-semibold bg-sky-50 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300 border border-sky-100 dark:border-sky-850"
               >
-                <X className="w-3 h-3" />
-              </button>
-            </span>
-          ))}
-          {(!taskData.labels || taskData.labels.length === 0) && (
-            <span className="text-[11px] text-gray-400 italic">None</span>
-          )}
-        </div>
+                {label}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setTaskData((prev: any) => ({
+                      ...prev,
+                      labels: (prev.labels || []).filter((_: any, i: number) => i !== idx),
+                    }));
+                  }}
+                  className="hover:text-slate-800 dark:hover:text-slate-200 transition-colors cursor-pointer"
+                  title={`Remove ${label}`}
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              </span>
+            ))}
+            {(!taskData.labels || taskData.labels.length === 0) && (
+              <span className="text-[11px] text-gray-400 italic">None</span>
+            )}
+          </div>
 
-        {/* Add Label Input */}
-        <div className="flex items-center gap-1.5">
-          <input
-            type="text"
-            placeholder="Add label and press Enter..."
-            value={labelInput}
-            onChange={(e) => setLabelInput(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" || e.key === ",") {
-                e.preventDefault();
+          {/* Add Label Input */}
+          <div className="flex items-center gap-1.5">
+            <input
+              type="text"
+              placeholder="Add label and press Enter..."
+              value={labelInput}
+              onChange={(e) => setLabelInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === ",") {
+                  e.preventDefault();
+                  const trimmed = labelInput.trim().toLowerCase();
+                  if (trimmed && !(taskData.labels || []).includes(trimmed)) {
+                    setTaskData((prev: any) => ({
+                      ...prev,
+                      labels: [...(prev.labels || []), trimmed],
+                    }));
+                    setLabelInput("");
+                  }
+                }
+              }}
+              className={`${baseControlClasses} py-1.5 text-xs`}
+            />
+            <button
+              type="button"
+              onClick={() => {
                 const trimmed = labelInput.trim().toLowerCase();
                 if (trimmed && !(taskData.labels || []).includes(trimmed)) {
                   setTaskData((prev: any) => ({
@@ -303,29 +329,87 @@ export const TaskMetaSidebar: React.FC<TaskMetaSidebarProps> = ({
                   }));
                   setLabelInput("");
                 }
-              }
-            }}
-            className={`${baseControlClasses} py-1.5 text-xs`}
-          />
-          <button
-            type="button"
-            onClick={() => {
-              const trimmed = labelInput.trim().toLowerCase();
-              if (trimmed && !(taskData.labels || []).includes(trimmed)) {
+              }}
+              className="p-1.5 rounded-lg border border-sky-100 dark:border-gray-800 text-sky-600 dark:text-sky-400 hover:bg-sky-50 dark:hover:bg-gray-800 cursor-pointer shrink-0"
+              title="Add Label"
+            >
+              <Plus className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Custom Fields Section */}
+      {!isEditingSubtask && customFields && customFields.length > 0 && (
+        <div className="pt-3 border-t border-sky-100/50 dark:border-gray-800 space-y-3">
+          <label className="flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-gray-500">
+            Custom Fields
+          </label>
+          <div className="space-y-3">
+            {customFields.map((field) => {
+              const val = taskData.customFieldValues?.[field.id] ?? "";
+              const handleCustomFieldChange = (newVal: any) => {
                 setTaskData((prev: any) => ({
                   ...prev,
-                  labels: [...(prev.labels || []), trimmed],
+                  customFieldValues: {
+                    ...(prev.customFieldValues || {}),
+                    [field.id]: newVal,
+                  },
                 }));
-                setLabelInput("");
-              }
-            }}
-            className="p-1.5 rounded-lg border border-sky-100 dark:border-gray-800 text-sky-600 dark:text-sky-400 hover:bg-sky-50 dark:hover:bg-gray-800 cursor-pointer shrink-0"
-            title="Add Label"
-          >
-            <Plus className="w-4 h-4" />
-          </button>
+              };
+
+              return (
+                <div key={field.id} className="space-y-1">
+                  <label className="text-[11px] font-semibold text-gray-600 dark:text-gray-300 flex items-center justify-between">
+                    <span>{field.name}</span>
+                    {field.required && (
+                      <span className="text-[10px] text-amber-500 font-bold">*</span>
+                    )}
+                  </label>
+
+                  {field.type === "dropdown" ? (
+                    <select
+                      value={val}
+                      onChange={(e) => handleCustomFieldChange(e.target.value)}
+                      className={selectControlClasses}
+                    >
+                      <option value="">Select {field.name}</option>
+                      {(field.options || []).map((opt) => (
+                        <option key={opt} value={opt}>
+                          {opt}
+                        </option>
+                      ))}
+                    </select>
+                  ) : field.type === "number" ? (
+                    <input
+                      type="number"
+                      value={val}
+                      onChange={(e) => handleCustomFieldChange(e.target.value)}
+                      className={baseControlClasses}
+                      placeholder={`Enter ${field.name}`}
+                    />
+                  ) : field.type === "date" ? (
+                    <input
+                      type="date"
+                      value={val}
+                      onChange={(e) => handleCustomFieldChange(e.target.value)}
+                      className={baseControlClasses}
+                    />
+                  ) : (
+                    <input
+                      type="text"
+                      value={val}
+                      onChange={(e) => handleCustomFieldChange(e.target.value)}
+                      className={baseControlClasses}
+                      placeholder={`Enter ${field.name}`}
+                    />
+                  )}
+                </div>
+              );
+            })}
+          </div>
         </div>
-      </div>
+      )}
 
 
 

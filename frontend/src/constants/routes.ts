@@ -11,6 +11,15 @@ export const API_ROUTES = {
     MEMBERS: "/api/organization/members",
     USERS: "/api/organization/users",
     STATUSES: "/api/organization/statuses",
+    STATUS_DELETE: (statusName: string) =>
+      `/api/organization/statuses/${encodeURIComponent(statusName)}`,
+    BOARD_FEATURES: "/api/organization/board-features",
+    PRIORITIES: "/api/organization/priorities",
+    PRIORITY_DELETE: (priorityName: string) =>
+      `/api/organization/priorities/${encodeURIComponent(priorityName)}`,
+    CUSTOM_FIELDS: "/api/organization/custom-fields",
+    CUSTOM_FIELD_DELETE: (fieldId: string) =>
+      `/api/organization/custom-fields/${encodeURIComponent(fieldId)}`,
     ALL: "/api/organization/all",
     ONBOARD: "/api/organization/onboard",
     PUBLIC_LIST: "/api/organization/public-list",
@@ -19,8 +28,6 @@ export const API_ROUTES = {
     SUBSCRIPTION_BY_ID: (id: string) => `/api/organization/${id}/subscription`,
     RESET_ADMIN_PASSWORD: (id: string) => `/api/organization/${id}/reset-admin-password`,
     DELETE_BY_ID: (id: string) => `/api/organization/${id}`,
-    STATUS_DELETE: (statusName: string) =>
-      `/api/organization/statuses/${encodeURIComponent(statusName)}`,
     USER_STATUS_UPDATE: (userId: string) =>
       `/api/organization/users/${userId}/status`,
     SUBSCRIPTION: "/api/organization/subscription",

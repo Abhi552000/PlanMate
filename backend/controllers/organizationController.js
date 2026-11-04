@@ -126,7 +126,24 @@ export const getOrganizationInfo = async (req, res) => {
         .status(HttpStatus.NOT_FOUND)
         .json({ success: false, message: MESSAGES.ORG.NOT_FOUND });
     }
-    res.json({ success: true, organization: org });
+    const orgObj = org.toObject();
+    if (!orgObj.priorities || orgObj.priorities.length === 0) {
+      orgObj.priorities = ["Low", "Medium", "High"];
+    }
+    if (!orgObj.boardFeatures) {
+      orgObj.boardFeatures = {
+        storyPoints: true,
+        timeTracking: true,
+        dueDates: true,
+        labels: true,
+        subtasks: true,
+        issueLinking: true,
+      };
+    }
+    if (!orgObj.customFields) {
+      orgObj.customFields = [];
+    }
+    res.json({ success: true, organization: orgObj });
   } catch (error) {
     console.error(error);
     res
@@ -882,6 +899,288 @@ export const deleteCustomStatus = async (req, res) => {
     res.json({ success: true, message: MESSAGES.ORG.STATUS_DELETED, statuses: org.statuses });
   } catch (error) {
     console.error("Delete custom status error:", error);
+    res
+      .status(HttpStatus.INTERNAL_SERVER_ERROR)
+      .json({ success: false, message: MESSAGES.COMMON.SERVER_ERROR });
+  }
+};
+
+// Update board feature toggles (Org Admin only)
+export const updateBoardFeatures = async (req, res) => {
+  if (req.user.role !== "org_admin") {
+    return res
+      .status(HttpStatus.FORBIDDEN)
+      .json({ success: false, message: MESSAGES.ORG.NOT_AUTHORIZED });
+  }
+
+  const { boardFeatures } = req.body;
+  if (!boardFeatures || typeof boardFeatures !== "object") {
+    return res
+      .status(HttpStatus.BAD_REQUEST)
+      .json({ success: false, message: "Invalid board features payload" });
+  }
+
+  try {
+    const org = await Organization.findById(req.user.organization);
+    if (!org) {
+      return res
+        .status(HttpStatus.NOT_FOUND)
+        .json({ success: false, message: MESSAGES.ORG.NOT_FOUND });
+    }
+
+    org.boardFeatures = {
+      storyPoints: boardFeatures.storyPoints !== undefined ? Boolean(boardFeatures.storyPoints) : true,
+      timeTracking: boardFeatures.timeTracking !== undefined ? Boolean(boardFeatures.timeTracking) : true,
+      dueDates: boardFeatures.dueDates !== undefined ? Boolean(boardFeatures.dueDates) : true,
+      labels: boardFeatures.labels !== undefined ? Boolean(boardFeatures.labels) : true,
+      subtasks: boardFeatures.subtasks !== undefined ? Boolean(boardFeatures.subtasks) : true,
+      issueLinking: boardFeatures.issueLinking !== undefined ? Boolean(boardFeatures.issueLinking) : true,
+    };
+
+    await org.save();
+
+    res.json({
+      success: true,
+      message: MESSAGES.ORG.FEATURES_UPDATED,
+      boardFeatures: org.boardFeatures,
+    });
+  } catch (error) {
+    console.error("Update board features error:", error);
+    res
+      .status(HttpStatus.INTERNAL_SERVER_ERROR)
+      .json({ success: false, message: MESSAGES.COMMON.SERVER_ERROR });
+  }
+};
+
+// Add a custom priority to organization (Org Admin only)
+export const addCustomPriority = async (req, res) => {
+  const { priority } = req.body;
+
+  if (req.user.role !== "org_admin") {
+    return res
+      .status(HttpStatus.FORBIDDEN)
+      .json({ success: false, message: MESSAGES.ORG.NOT_AUTHORIZED });
+  }
+
+  if (!priority || !priority.trim()) {
+    return res
+      .status(HttpStatus.BAD_REQUEST)
+      .json({ success: false, message: MESSAGES.ORG.PRIORITY_REQUIRED });
+  }
+
+  const trimmed = priority.trim();
+
+  try {
+    const org = await Organization.findById(req.user.organization);
+    if (!org) {
+      return res
+        .status(HttpStatus.NOT_FOUND)
+        .json({ success: false, message: MESSAGES.ORG.NOT_FOUND });
+    }
+
+    if (!org.priorities || org.priorities.length === 0) {
+      org.priorities = ["Low", "Medium", "High"];
+    }
+
+    const exists = org.priorities.some(
+      (p) => p.toLowerCase() === trimmed.toLowerCase()
+    );
+    if (exists) {
+      return res
+        .status(HttpStatus.BAD_REQUEST)
+        .json({ success: false, message: MESSAGES.ORG.PRIORITY_EXISTS });
+    }
+
+    org.priorities.push(trimmed);
+    await org.save();
+
+    res.json({
+      success: true,
+      message: MESSAGES.ORG.PRIORITY_ADDED,
+      priorities: org.priorities,
+    });
+  } catch (error) {
+    console.error("Add custom priority error:", error);
+    res
+      .status(HttpStatus.INTERNAL_SERVER_ERROR)
+      .json({ success: false, message: MESSAGES.COMMON.SERVER_ERROR });
+  }
+};
+
+// Delete a custom priority from organization (Org Admin only)
+export const deleteCustomPriority = async (req, res) => {
+  const { priorityName } = req.params;
+
+  if (req.user.role !== "org_admin") {
+    return res
+      .status(HttpStatus.FORBIDDEN)
+      .json({ success: false, message: MESSAGES.ORG.NOT_AUTHORIZED });
+  }
+
+  try {
+    const org = await Organization.findById(req.user.organization);
+    if (!org) {
+      return res
+        .status(HttpStatus.NOT_FOUND)
+        .json({ success: false, message: MESSAGES.ORG.NOT_FOUND });
+    }
+
+    if (!org.priorities || org.priorities.length === 0) {
+      org.priorities = ["Low", "Medium", "High"];
+    }
+
+    if (org.priorities.length <= 1) {
+      return res
+        .status(HttpStatus.BAD_REQUEST)
+        .json({ success: false, message: "Workspace must have at least one priority level" });
+    }
+
+    const index = org.priorities.findIndex(
+      (p) => p.toLowerCase() === priorityName.toLowerCase()
+    );
+    if (index === -1) {
+      return res
+        .status(HttpStatus.NOT_FOUND)
+        .json({ success: false, message: MESSAGES.ORG.PRIORITY_NOT_FOUND });
+    }
+
+    const matchingPriority = org.priorities[index];
+    const taskCount = await Task.countDocuments({
+      organization: req.user.organization,
+      priority: matchingPriority,
+    });
+
+    if (taskCount > 0) {
+      return res.status(HttpStatus.BAD_REQUEST).json({
+        success: false,
+        message: `Cannot delete priority "${matchingPriority}" because it is currently assigned to ${taskCount} task(s)`,
+      });
+    }
+
+    org.priorities.splice(index, 1);
+    await org.save();
+
+    res.json({
+      success: true,
+      message: MESSAGES.ORG.PRIORITY_DELETED,
+      priorities: org.priorities,
+    });
+  } catch (error) {
+    console.error("Delete custom priority error:", error);
+    res
+      .status(HttpStatus.INTERNAL_SERVER_ERROR)
+      .json({ success: false, message: MESSAGES.COMMON.SERVER_ERROR });
+  }
+};
+
+// Add a custom field definition (Org Admin only)
+export const addCustomField = async (req, res) => {
+  if (req.user.role !== "org_admin") {
+    return res
+      .status(HttpStatus.FORBIDDEN)
+      .json({ success: false, message: MESSAGES.ORG.NOT_AUTHORIZED });
+  }
+
+  const { name, type, options, required } = req.body;
+  if (!name || !name.trim()) {
+    return res
+      .status(HttpStatus.BAD_REQUEST)
+      .json({ success: false, message: "Field name is required" });
+  }
+
+  const validTypes = ["text", "number", "dropdown", "date"];
+  const fieldType = validTypes.includes(type) ? type : "text";
+  const trimmedName = name.trim();
+
+  try {
+    const org = await Organization.findById(req.user.organization);
+    if (!org) {
+      return res
+        .status(HttpStatus.NOT_FOUND)
+        .json({ success: false, message: MESSAGES.ORG.NOT_FOUND });
+    }
+
+    if (!org.customFields) {
+      org.customFields = [];
+    }
+
+    const exists = org.customFields.some(
+      (f) => f.name.toLowerCase() === trimmedName.toLowerCase()
+    );
+    if (exists) {
+      return res
+        .status(HttpStatus.BAD_REQUEST)
+        .json({ success: false, message: "A custom field with this name already exists" });
+    }
+
+    const fieldId = `cf_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
+    const parsedOptions =
+      fieldType === "dropdown" && Array.isArray(options)
+        ? options.map((opt) => String(opt).trim()).filter(Boolean)
+        : [];
+
+    org.customFields.push({
+      id: fieldId,
+      name: trimmedName,
+      type: fieldType,
+      options: parsedOptions,
+      required: Boolean(required),
+    });
+
+    await org.save();
+
+    res.json({
+      success: true,
+      message: MESSAGES.ORG.CUSTOM_FIELD_ADDED,
+      customFields: org.customFields,
+    });
+  } catch (error) {
+    console.error("Add custom field error:", error);
+    res
+      .status(HttpStatus.INTERNAL_SERVER_ERROR)
+      .json({ success: false, message: MESSAGES.COMMON.SERVER_ERROR });
+  }
+};
+
+// Delete a custom field definition (Org Admin only)
+export const deleteCustomField = async (req, res) => {
+  const { fieldId } = req.params;
+
+  if (req.user.role !== "org_admin") {
+    return res
+      .status(HttpStatus.FORBIDDEN)
+      .json({ success: false, message: MESSAGES.ORG.NOT_AUTHORIZED });
+  }
+
+  try {
+    const org = await Organization.findById(req.user.organization);
+    if (!org) {
+      return res
+        .status(HttpStatus.NOT_FOUND)
+        .json({ success: false, message: MESSAGES.ORG.NOT_FOUND });
+    }
+
+    if (!org.customFields) {
+      org.customFields = [];
+    }
+
+    const index = org.customFields.findIndex((f) => f.id === fieldId);
+    if (index === -1) {
+      return res
+        .status(HttpStatus.NOT_FOUND)
+        .json({ success: false, message: "Custom field not found" });
+    }
+
+    org.customFields.splice(index, 1);
+    await org.save();
+
+    res.json({
+      success: true,
+      message: MESSAGES.ORG.CUSTOM_FIELD_DELETED,
+      customFields: org.customFields,
+    });
+  } catch (error) {
+    console.error("Delete custom field error:", error);
     res
       .status(HttpStatus.INTERNAL_SERVER_ERROR)
       .json({ success: false, message: MESSAGES.COMMON.SERVER_ERROR });

@@ -4,6 +4,7 @@ import { toast } from "react-toastify";
 import { taskService } from "../../../services/taskService";
 import { orgService } from "../../../services/orgService";
 import { ITask, IUser } from "../../../types";
+import { IBoardFeatures, ICustomField } from "../../../types/organization";
 import { TOAST_MESSAGES, CONSOLE_ERRORS } from "../../../constants/messages";
 import { cleanMentionsForEditing, formatMentionsForSaving } from "../../../utils/mentions";
 import { getCachedStatuses, setCachedStatuses } from "../../../utils/statusUtils";
@@ -22,7 +23,8 @@ export const useTaskDetail = (id: string | undefined, subtaskIndex: number | nul
     issueType: "Task",
     storyPoints: 1,
     assignee: "",
-    subtasks: []
+    subtasks: [],
+    customFieldValues: {}
   });
 
   const [newSubtaskTitle, setNewSubtaskTitle] = useState("");
@@ -33,6 +35,16 @@ export const useTaskDetail = (id: string | undefined, subtaskIndex: number | nul
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [statuses, setStatuses] = useState<string[]>(getCachedStatuses);
+  const [priorities, setPriorities] = useState<string[]>(["Low", "Medium", "High"]);
+  const [boardFeatures, setBoardFeatures] = useState<IBoardFeatures>({
+    storyPoints: true,
+    timeTracking: true,
+    dueDates: true,
+    labels: true,
+    subtasks: true,
+    issueLinking: true,
+  });
+  const [customFields, setCustomFields] = useState<ICustomField[]>([]);
 
   const [commentText, setCommentText] = useState("");
   const [addingComment, setAddingComment] = useState(false);
@@ -240,7 +252,8 @@ export const useTaskDetail = (id: string | undefined, subtaskIndex: number | nul
         storyPoints: parentTaskData.storyPoints !== undefined ? parentTaskData.storyPoints : 1,
         originalEstimate: parentTaskData.originalEstimate !== undefined ? parentTaskData.originalEstimate : 0,
         labels: Array.isArray(parentTaskData.labels) ? parentTaskData.labels : [],
-        issueType: parentTaskData.issueType || "Task"
+        issueType: parentTaskData.issueType || "Task",
+        customFieldValues: parentTaskData.customFieldValues || {}
       });
     }
   }, [parentTaskData, subtaskIndex]);
@@ -253,9 +266,20 @@ export const useTaskDetail = (id: string | undefined, subtaskIndex: number | nul
           setMembers(membersData.members);
         }
         const orgData = await orgService.getOrgDetails();
-        if (orgData?.success && Array.isArray(orgData?.organization?.statuses) && orgData.organization.statuses.length > 0) {
-          setCachedStatuses(orgData.organization.statuses);
-          setStatuses(orgData.organization.statuses);
+        if (orgData?.success && orgData.organization) {
+          if (Array.isArray(orgData.organization.statuses) && orgData.organization.statuses.length > 0) {
+            setCachedStatuses(orgData.organization.statuses);
+            setStatuses(orgData.organization.statuses);
+          }
+          if (Array.isArray(orgData.organization.priorities) && orgData.organization.priorities.length > 0) {
+            setPriorities(orgData.organization.priorities);
+          }
+          if (orgData.organization.boardFeatures) {
+            setBoardFeatures(orgData.organization.boardFeatures);
+          }
+          if (Array.isArray(orgData.organization.customFields)) {
+            setCustomFields(orgData.organization.customFields);
+          }
         }
       } catch (err) {
         console.error(CONSOLE_ERRORS.FETCH_WORKSPACE_DETAILS, err);
@@ -305,7 +329,8 @@ export const useTaskDetail = (id: string | undefined, subtaskIndex: number | nul
           storyPoints: Number(taskData.storyPoints),
           originalEstimate: Number(taskData.originalEstimate || 0),
           labels: Array.isArray(taskData.labels) ? taskData.labels : [],
-          issueType: taskData.issueType
+          issueType: taskData.issueType,
+          customFieldValues: taskData.customFieldValues || {}
         };
       }
 
@@ -357,6 +382,9 @@ export const useTaskDetail = (id: string | undefined, subtaskIndex: number | nul
     saving,
     error,
     statuses,
+    priorities,
+    boardFeatures,
+    customFields,
     commentText,
     setCommentText,
     addingComment,

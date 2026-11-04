@@ -43,6 +43,9 @@ const TaskDetailPage = () => {
     saving,
     error,
     statuses,
+    priorities,
+    boardFeatures,
+    customFields,
     commentText,
     setCommentText,
     addingComment,
@@ -165,7 +168,7 @@ const TaskDetailPage = () => {
             members={members}
           />
 
-          {!isEditingSubtask && (
+          {!isEditingSubtask && boardFeatures.subtasks !== false && (
             <SubtaskListSection
               subtasks={parentTaskData.subtasks || []}
               projectKey={issueKey}
@@ -182,7 +185,7 @@ const TaskDetailPage = () => {
             />
           )}
 
-          {!isEditingSubtask && (
+          {!isEditingSubtask && boardFeatures.issueLinking !== false && (
             <IssueLinkingSection
               linkType={linkType}
               setLinkType={setLinkType}
@@ -224,27 +227,29 @@ const TaskDetailPage = () => {
                   </span>
                 </button>
 
-                <button
-                  type="button"
-                  onClick={() => setActiveBottomTab("worklogs")}
-                  className={`flex items-center gap-2 px-3 py-2 text-xs font-bold transition-all relative cursor-pointer shrink-0 ${
-                    activeBottomTab === "worklogs"
-                      ? "text-sky-600 dark:text-sky-400 after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-sky-500"
-                      : "text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-                  }`}
-                >
-                  <Clock className="w-3.5 h-3.5" />
-                  Work Logs
-                  <span
-                    className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${
+                {boardFeatures.timeTracking !== false && (
+                  <button
+                    type="button"
+                    onClick={() => setActiveBottomTab("worklogs")}
+                    className={`flex items-center gap-2 px-3 py-2 text-xs font-bold transition-all relative cursor-pointer shrink-0 ${
                       activeBottomTab === "worklogs"
-                        ? "bg-sky-50 dark:bg-sky-950/50 text-sky-600 dark:text-sky-400"
-                        : "bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400"
+                        ? "text-sky-600 dark:text-sky-400 after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-sky-500"
+                        : "text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
                     }`}
                   >
-                    {parentTaskData.workLogs?.length || 0}
-                  </span>
-                </button>
+                    <Clock className="w-3.5 h-3.5" />
+                    Work Logs
+                    <span
+                      className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${
+                        activeBottomTab === "worklogs"
+                          ? "bg-sky-50 dark:bg-sky-950/50 text-sky-600 dark:text-sky-400"
+                          : "bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400"
+                      }`}
+                    >
+                      {parentTaskData.workLogs?.length || 0}
+                    </span>
+                  </button>
+                )}
 
                 <button
                   type="button"
@@ -325,6 +330,9 @@ const TaskDetailPage = () => {
             setActiveBottomTab("worklogs");
             document.getElementById("task-bottom-tabs")?.scrollIntoView({ behavior: "smooth" });
           }}
+          priorities={priorities}
+          boardFeatures={boardFeatures}
+          customFields={customFields}
         />
       </div>
     </div>

@@ -54,6 +54,31 @@ const organizationSchema = new mongoose.Schema({
     type: [String],
     default: ["To Do", "In Progress", "Done"],
   },
+  priorities: {
+    type: [String],
+    default: ["Low", "Medium", "High"],
+  },
+  boardFeatures: {
+    storyPoints: { type: Boolean, default: true },
+    timeTracking: { type: Boolean, default: true },
+    dueDates: { type: Boolean, default: true },
+    labels: { type: Boolean, default: true },
+    subtasks: { type: Boolean, default: true },
+    issueLinking: { type: Boolean, default: true },
+  },
+  customFields: [
+    {
+      id: { type: String, required: true },
+      name: { type: String, required: true },
+      type: {
+        type: String,
+        enum: ["text", "number", "dropdown", "date"],
+        default: "text",
+      },
+      options: [String],
+      required: { type: Boolean, default: false },
+    },
+  ],
   subscription: {
     planId: {
       type: String,

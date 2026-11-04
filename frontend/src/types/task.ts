@@ -63,7 +63,7 @@ export interface ITask {
   key?: string;
   title: string;
   description?: string;
-  priority: "High" | "Medium" | "Low";
+  priority: "High" | "Medium" | "Low" | string;
   status: "To Do" | "In Progress" | "Done" | string;
   dueDate?: string | Date;
   completed: boolean | number | string;
@@ -85,6 +85,7 @@ export interface ITask {
   links?: ITaskLink[];
   sprint?: any;
   epic?: any;
+  customFieldValues?: Record<string, any>;
 }
 
 export interface INotification {
@@ -132,6 +133,9 @@ export interface TaskFormMetaProps {
   today: string;
   baseControlClasses: string;
   handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => void;
+  priorities?: string[];
+  boardFeatures?: any;
+  customFields?: any[];
 }
 
 export interface TaskFormSubtasksProps {
@@ -215,6 +219,9 @@ export interface TaskMetaSidebarProps {
   createdAt?: string | Date;
   timeLogged?: number;
   onLogTimeClick?: () => void;
+  priorities?: string[];
+  boardFeatures?: any;
+  customFields?: any[];
 }
 
 export interface CommentsSectionProps {
