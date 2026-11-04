@@ -1,6 +1,7 @@
 import React from "react";
 import { X } from "lucide-react";
 import { DeactivateOrgModalProps } from "../../../types";
+import { ORG_MODALS_TEXTS } from "../../../constants/billingTexts";
 
 export const DeactivateOrgModal: React.FC<DeactivateOrgModalProps> = ({
   deactivatingOrg,
@@ -23,7 +24,7 @@ export const DeactivateOrgModal: React.FC<DeactivateOrgModalProps> = ({
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!deactivateRemark.trim()) {
-      setError("Reason / Remark is mandatory.");
+      setError(ORG_MODALS_TEXTS.ERR_DEACTIVATE_REASON_REQUIRED);
       return;
     }
     onSubmit(e);
@@ -40,12 +41,12 @@ export const DeactivateOrgModal: React.FC<DeactivateOrgModalProps> = ({
       >
         <div className="flex items-center justify-between border-b border-gray-100 dark:border-gray-800 pb-3">
           <h3 className="font-bold text-gray-800 dark:text-gray-200 text-base">
-            Deactivate Organization
+            {ORG_MODALS_TEXTS.DEACTIVATE_TITLE}
           </h3>
           <button 
             onClick={onClose}
             className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors cursor-pointer"
-            aria-label="Close"
+            aria-label={ORG_MODALS_TEXTS.ARIA_CLOSE}
           >
             <X className="w-5 h-5" />
           </button>
@@ -53,16 +54,12 @@ export const DeactivateOrgModal: React.FC<DeactivateOrgModalProps> = ({
 
         <form onSubmit={handleFormSubmit} className="space-y-4">
           <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
-            Are you sure you want to deactivate{" "}
-            <span className="font-bold text-sky-600 dark:text-sky-400">
-              {deactivatingOrg.name}
-            </span>
-            ? Users belonging to this organization will temporarily lose access.
+            {ORG_MODALS_TEXTS.DEACTIVATE_CONFIRM_QUESTION(deactivatingOrg.name)}
           </p>
 
           <div>
             <label className="block text-xs font-bold uppercase tracking-wider text-gray-600 dark:text-gray-300 mb-1 flex items-center gap-1">
-              <span>Reason for Deactivation (Remark)</span>
+              <span>{ORG_MODALS_TEXTS.LABEL_DEACTIVATE_REASON}</span>
               <span className="text-amber-500 text-xs font-bold">*</span>
             </label>
             <textarea
@@ -73,14 +70,14 @@ export const DeactivateOrgModal: React.FC<DeactivateOrgModalProps> = ({
                 if (error && e.target.value.trim()) setError("");
               }}
               onBlur={() => {
-                if (!deactivateRemark.trim()) setError("Reason / Remark is mandatory.");
+                if (!deactivateRemark.trim()) setError(ORG_MODALS_TEXTS.ERR_DEACTIVATE_REASON_REQUIRED);
               }}
               className={`w-full px-3.5 py-2.5 border rounded-lg text-sm bg-white dark:bg-gray-950 focus:outline-none transition-all duration-200 font-medium ${
                 error
                   ? "border-amber-400 focus:ring-2 focus:ring-amber-400/50"
                   : "border-slate-200 dark:border-gray-800 focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
               }`}
-              placeholder="Enter reason for deactivation..."
+              placeholder={ORG_MODALS_TEXTS.PLACEHOLDER_DEACTIVATE_REASON}
             />
             {error && (
               <p className="text-[11px] text-amber-600 dark:text-amber-400 mt-1 font-medium">
@@ -95,7 +92,7 @@ export const DeactivateOrgModal: React.FC<DeactivateOrgModalProps> = ({
               onClick={onClose}
               className="px-4 py-2 border border-slate-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 font-semibold rounded-lg text-xs transition-colors cursor-pointer"
             >
-              Cancel
+              {ORG_MODALS_TEXTS.BTN_CANCEL}
             </button>
             <button
               type="submit"
@@ -105,7 +102,7 @@ export const DeactivateOrgModal: React.FC<DeactivateOrgModalProps> = ({
               {togglingStatus && (
                 <span className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
               )}
-              <span>Deactivate Organization</span>
+              <span>{ORG_MODALS_TEXTS.BTN_DEACTIVATE}</span>
             </button>
           </div>
         </form>

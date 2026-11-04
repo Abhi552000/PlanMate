@@ -1,5 +1,6 @@
 import React from "react";
 import { Search, X } from "lucide-react";
+import { COMMON_UI_TEXTS } from "../../constants/uiTexts";
 
 export interface SearchInputProps {
   value: string;
@@ -16,7 +17,7 @@ export const SearchInput: React.FC<SearchInputProps> = React.memo(
   ({
     value,
     onChange,
-    placeholder = "Search...",
+    placeholder = COMMON_UI_TEXTS.SEARCH_PLACEHOLDER,
     onClear,
     className = "",
     disabled = false,
@@ -48,7 +49,8 @@ export const SearchInput: React.FC<SearchInputProps> = React.memo(
             type="button"
             onClick={handleClear}
             className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-0.5 rounded-md hover:bg-slate-200/50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
-            title="Clear search"
+            title={COMMON_UI_TEXTS.CLEAR_SEARCH}
+            aria-label={COMMON_UI_TEXTS.CLEAR_SEARCH}
           >
             <X className="w-3.5 h-3.5" />
           </button>

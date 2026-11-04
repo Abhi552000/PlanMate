@@ -1,6 +1,7 @@
 import React from "react";
 import { Save, PlusCircle } from "lucide-react";
 import { TaskModalFooterProps } from "../../types";
+import { TASK_MODAL_TEXTS } from "../../constants/uiTexts";
 
 export const TaskModalFooter: React.FC<TaskModalFooterProps> = ({
   loading,
@@ -19,7 +20,7 @@ export const TaskModalFooter: React.FC<TaskModalFooterProps> = ({
         }}
         className="w-full sm:w-auto px-4 py-2 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-gray-800 font-medium rounded-lg text-xs sm:text-sm transition-colors cursor-pointer bg-white dark:bg-gray-800"
       >
-        Cancel
+        {TASK_MODAL_TEXTS.BTN_CANCEL}
       </button>
       <button
         type="submit"
@@ -27,18 +28,18 @@ export const TaskModalFooter: React.FC<TaskModalFooterProps> = ({
         className="w-full sm:w-auto bg-sky-500 hover:bg-sky-600 active:bg-sky-700 text-white font-medium py-2 px-5 rounded-lg flex items-center justify-center gap-2 disabled:opacity-50 transition-colors cursor-pointer text-xs sm:text-sm shadow-2xs"
       >
         {loading ? (
-          "Saving..."
+          TASK_MODAL_TEXTS.BTN_SAVING
         ) : parentTask ? (
           <>
-            <Save className="w-4 h-4" /> Save Sub-task
+            <Save className="w-4 h-4" /> {TASK_MODAL_TEXTS.BTN_SAVE_SUBTASK}
           </>
         ) : taskData.id ? (
           <>
-            <Save className="w-4 h-4" /> Save Changes
+            <Save className="w-4 h-4" /> {TASK_MODAL_TEXTS.BTN_SAVE_CHANGES}
           </>
         ) : (
           <>
-            <PlusCircle className="w-4 h-4" /> Create Issue
+            <PlusCircle className="w-4 h-4" /> {TASK_MODAL_TEXTS.BTN_CREATE_ISSUE}
           </>
         )}
       </button>

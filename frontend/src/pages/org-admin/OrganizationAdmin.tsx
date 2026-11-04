@@ -5,6 +5,7 @@ import { orgService } from "../../services/orgService";
 import { IUser } from "../../types";
 import { ROUTES } from "../../constants/routeConstant";
 import { TOAST_MESSAGES, CONSOLE_ERRORS } from "../../constants/messages";
+import { ORG_ACCESS_MODAL_TEXTS } from "../../constants/uiTexts";
 
 // Sub-components
 import { OrgAdminHeader } from "./components/OrgAdminHeader";
@@ -332,13 +333,13 @@ const OrganizationAdmin = () => {
         }}
         title={
           pendingNewStatus === "active"
-            ? "Grant / Restore Workspace Access"
-            : "Deactivate User Access"
+            ? ORG_ACCESS_MODAL_TEXTS.TITLE_GRANT
+            : ORG_ACCESS_MODAL_TEXTS.TITLE_DEACTIVATE
         }
         description={
           pendingNewStatus === "active" ? (
             <>
-              Are you sure you want to grant and restore workspace privileges for{" "}
+              {ORG_ACCESS_MODAL_TEXTS.DESC_GRANT_PREFIX}{" "}
               <span className="font-bold text-sky-600 dark:text-sky-400">
                 {selectedUserForStatusChange?.name}
               </span>
@@ -346,7 +347,7 @@ const OrganizationAdmin = () => {
             </>
           ) : (
             <>
-              Please provide a reason or administrative note for deactivating{" "}
+              {ORG_ACCESS_MODAL_TEXTS.DESC_DEACTIVATE_PREFIX}{" "}
               <span className="font-bold text-sky-600 dark:text-sky-400">
                 {selectedUserForStatusChange?.name}
               </span>

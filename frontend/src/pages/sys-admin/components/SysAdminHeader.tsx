@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { LogOut, Menu, Sun, Moon } from "lucide-react";
 import { SysAdminHeaderProps } from "../../../types";
 import { PlanMateLogo } from "../../../components/common/PlanMateLogo";
+import { SYSADMIN_HEADER_TEXTS } from "../../../constants/billingTexts";
 
 export const SysAdminHeader: React.FC<SysAdminHeaderProps> = ({
   user,
@@ -33,7 +34,7 @@ export const SysAdminHeader: React.FC<SysAdminHeaderProps> = ({
             <button
               onClick={onToggleMobileMenu}
               className="lg:hidden p-1.5 -ml-1 text-gray-500 hover:text-sky-600 dark:text-gray-400 dark:hover:text-sky-400 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors cursor-pointer"
-              aria-label="Open Navigation Menu"
+              aria-label={SYSADMIN_HEADER_TEXTS.ARIA_OPEN_MENU}
             >
               <Menu className="w-5 h-5" />
             </button>
@@ -42,7 +43,7 @@ export const SysAdminHeader: React.FC<SysAdminHeaderProps> = ({
             <PlanMateLogo size={28} showText textClassName="text-base sm:text-xl font-bold tracking-tight" />
           </div>
           <span className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-0.5 text-[11px] font-bold uppercase bg-sky-50 dark:bg-gray-800 text-sky-600 dark:text-sky-400 rounded-full border border-sky-100 dark:border-gray-700 tracking-wider shadow-2xs">
-            System Admin
+            {SYSADMIN_HEADER_TEXTS.BADGE_SYS_ADMIN}
           </span>
         </div>
 
@@ -52,7 +53,7 @@ export const SysAdminHeader: React.FC<SysAdminHeaderProps> = ({
           <button
             onClick={toggleDarkMode}
             className="p-1.5 text-gray-600 dark:text-gray-400 hover:text-sky-500 dark:hover:text-sky-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200 rounded-full cursor-pointer text-sm"
-            aria-label="Toggle dark mode"
+            aria-label={SYSADMIN_HEADER_TEXTS.ARIA_TOGGLE_DARK_MODE}
           >
             {isDark ? <Sun className="w-4 h-4 text-amber-500" /> : <Moon className="w-4 h-4 text-slate-600 dark:text-slate-300" />}
           </button>
@@ -64,19 +65,19 @@ export const SysAdminHeader: React.FC<SysAdminHeaderProps> = ({
             </div>
             <div className="text-left hidden md:block text-xs max-w-[140px]">
               <p className="font-medium text-gray-800 dark:text-gray-200 truncate leading-tight">
-                {user?.name || "System Admin"}
+                {user?.name || SYSADMIN_HEADER_TEXTS.DEFAULT_ADMIN_NAME}
               </p>
               <p className="text-gray-500 dark:text-gray-400 font-normal truncate text-[10px] leading-tight">
-                {user?.email || "admin@planmate.com"}
+                {user?.email || SYSADMIN_HEADER_TEXTS.DEFAULT_ADMIN_EMAIL}
               </p>
             </div>
             <button
               onClick={onLogout}
               className="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-lg text-xs font-semibold transition-colors flex items-center gap-1.5 border border-gray-200 dark:border-gray-700 cursor-pointer ml-1"
-              title="Log Out"
+              title={SYSADMIN_HEADER_TEXTS.BTN_LOGOUT}
             >
               <LogOut className="w-3.5 h-3.5 text-gray-500 dark:text-gray-400" />
-              <span className="hidden sm:inline">Log Out</span>
+              <span className="hidden sm:inline">{SYSADMIN_HEADER_TEXTS.BTN_LOGOUT}</span>
             </button>
           </div>
         </div>

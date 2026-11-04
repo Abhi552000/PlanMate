@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import {
   History,
-  Search,
   RotateCw,
   Building,
   Check,

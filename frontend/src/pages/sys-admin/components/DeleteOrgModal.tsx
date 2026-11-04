@@ -1,6 +1,7 @@
 import React from "react";
 import { X } from "lucide-react";
 import { DeleteOrgModalProps } from "../../../types";
+import { ORG_MODALS_TEXTS } from "../../../constants/billingTexts";
 
 export const DeleteOrgModal: React.FC<DeleteOrgModalProps> = ({
   deletingOrg,
@@ -22,13 +23,13 @@ export const DeleteOrgModal: React.FC<DeleteOrgModalProps> = ({
         {/* Header */}
         <div className="flex items-center justify-between border-b border-gray-100 dark:border-gray-800 pb-3">
           <h3 className="font-bold text-gray-800 dark:text-gray-200 text-base">
-            Delete Organization
+            {ORG_MODALS_TEXTS.DELETE_TITLE}
           </h3>
           <button
             onClick={onClose}
             disabled={deleting}
             className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors cursor-pointer disabled:opacity-50"
-            aria-label="Close"
+            aria-label={ORG_MODALS_TEXTS.ARIA_CLOSE}
           >
             <X className="w-5 h-5" />
           </button>
@@ -37,11 +38,7 @@ export const DeleteOrgModal: React.FC<DeleteOrgModalProps> = ({
         {/* Body */}
         <div className="space-y-3">
           <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
-            Are you sure you want to permanently delete{" "}
-            <span className="font-bold text-sky-600 dark:text-sky-400">
-              {deletingOrg.name}
-            </span>
-            ? All users, tasks, and data associated with this tenant will be permanently removed.
+            {ORG_MODALS_TEXTS.DELETE_CONFIRM_QUESTION(deletingOrg.name)}
           </p>
         </div>
 
@@ -53,7 +50,7 @@ export const DeleteOrgModal: React.FC<DeleteOrgModalProps> = ({
             onClick={onClose}
             className="px-4 py-2 border border-slate-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 font-semibold rounded-lg text-xs transition-colors cursor-pointer disabled:opacity-50"
           >
-            Cancel
+            {ORG_MODALS_TEXTS.BTN_CANCEL}
           </button>
           <button
             type="button"
@@ -64,10 +61,10 @@ export const DeleteOrgModal: React.FC<DeleteOrgModalProps> = ({
             {deleting ? (
               <>
                 <span className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                <span>Deleting...</span>
+                <span>{ORG_MODALS_TEXTS.BTN_DELETING}</span>
               </>
             ) : (
-              <span>Delete Organization</span>
+              <span>{ORG_MODALS_TEXTS.BTN_DELETE}</span>
             )}
           </button>
         </div>

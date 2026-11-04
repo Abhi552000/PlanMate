@@ -43,7 +43,7 @@ export const SysAdminPlansView: React.FC<SysAdminPlansViewProps> = () => {
         setPlans(res.plans);
       }
     } catch (err: any) {
-      toast.error(err?.response?.data?.message || "Failed to load plans");
+      toast.error(err?.response?.data?.message || SYSADMIN_PLANS_TEXTS.ERR_LOAD_PLANS);
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -487,7 +487,7 @@ export const SysAdminPlansView: React.FC<SysAdminPlansViewProps> = () => {
                   {SYSADMIN_PLANS_TEXTS.DELETE_MODAL_TITLE}
                 </h3>
                 <p className="text-xs text-gray-400">
-                  This action cannot be undone.
+                  {SYSADMIN_PLANS_TEXTS.DELETE_PERMANENT_WARNING}
                 </p>
               </div>
             </div>

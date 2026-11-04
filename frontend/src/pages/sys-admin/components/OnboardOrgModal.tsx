@@ -2,6 +2,7 @@ import React from "react";
 import { X, Check, Copy } from "lucide-react";
 import { OnboardOrgModalProps } from "../../../types";
 import { Input, Select } from "../../../components/ui";
+import { ORG_MODALS_TEXTS, TENANT_MODAL_TEXTS } from "../../../constants/billingTexts";
 
 const COMPANY_SIZE_OPTIONS = [
   { value: "", label: "Select company size" },
@@ -37,12 +38,12 @@ export const OnboardOrgModal: React.FC<OnboardOrgModalProps> = ({
         {/* Header */}
         <div className="flex items-center justify-between border-b border-gray-100 dark:border-gray-800 pb-3.5">
           <h3 className="font-bold text-gray-800 dark:text-gray-100 text-base">
-            Onboard Organization
+            {ORG_MODALS_TEXTS.ONBOARD_TITLE}
           </h3>
           <button
             onClick={onClose}
             className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors cursor-pointer"
-            aria-label="Close"
+            aria-label={ORG_MODALS_TEXTS.ARIA_CLOSE}
           >
             <X className="w-5 h-5" />
           </button>
@@ -55,17 +56,17 @@ export const OnboardOrgModal: React.FC<OnboardOrgModalProps> = ({
             </div>
             <div className="space-y-1">
               <h4 className="font-bold text-gray-800 dark:text-gray-100 text-sm">
-                Onboarding Complete!
+                {ORG_MODALS_TEXTS.ONBOARD_COMPLETE_TITLE}
               </h4>
               <p className="text-xs text-gray-500 font-medium">
-                Successfully created tenant workspace for {onboardedResult.orgName}
+                {ORG_MODALS_TEXTS.ONBOARD_COMPLETE_SUBTITLE(onboardedResult.orgName)}
               </p>
             </div>
 
             <div className="bg-sky-50/40 dark:bg-sky-950/20 p-4 rounded-xl border border-sky-100/50 dark:border-gray-800 text-left text-xs space-y-2.5">
               <div>
                 <span className="block font-bold text-gray-400 uppercase tracking-wider text-[10px]">
-                  Admin Email
+                  {TENANT_MODAL_TEXTS.LABEL_ADMIN_EMAIL}
                 </span>
                 <span className="font-bold text-gray-700 dark:text-gray-300">
                   {onboardedResult.email}
@@ -73,7 +74,7 @@ export const OnboardOrgModal: React.FC<OnboardOrgModalProps> = ({
               </div>
               <div>
                 <span className="block font-bold text-gray-400 uppercase tracking-wider text-[10px]">
-                  Generated Temporary Password
+                  {ORG_MODALS_TEXTS.LABEL_GENERATED_PASSWORD}
                 </span>
                 <div className="flex items-center justify-between bg-white dark:bg-gray-900 p-2 rounded-lg border border-slate-200 dark:border-gray-800 mt-1 select-all font-mono font-bold text-gray-800 dark:text-gray-200">
                   <span>{onboardedResult.password}</span>
@@ -81,11 +82,11 @@ export const OnboardOrgModal: React.FC<OnboardOrgModalProps> = ({
                     type="button"
                     onClick={onCopyPassword}
                     className="text-sky-600 hover:text-sky-700 p-1 hover:bg-sky-50 rounded transition-colors cursor-pointer"
-                    title="Copy Password"
+                    title={ORG_MODALS_TEXTS.TOOLTIP_COPY_PASSWORD}
                   >
                     {copied ? (
                       <span className="text-[10px] text-emerald-600 font-bold">
-                        Copied!
+                        {ORG_MODALS_TEXTS.TOOLTIP_PASSWORD_COPIED}
                       </span>
                     ) : (
                       <Copy className="w-3.5 h-3.5" />
@@ -104,7 +105,7 @@ export const OnboardOrgModal: React.FC<OnboardOrgModalProps> = ({
               onClick={onClose}
               className="w-full bg-sky-500 hover:bg-sky-600 text-white font-bold py-2 rounded-lg text-xs transition-colors cursor-pointer"
             >
-              Done
+              {TENANT_MODAL_TEXTS.BTN_DONE}
             </button>
           </div>
         ) : (
@@ -269,14 +270,14 @@ export const OnboardOrgModal: React.FC<OnboardOrgModalProps> = ({
                 onClick={onClose}
                 className="px-4 py-2 border border-slate-200 dark:border-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 font-bold rounded-xl text-xs transition-colors cursor-pointer bg-white dark:bg-gray-900"
               >
-                Cancel
+                {ORG_MODALS_TEXTS.BTN_CANCEL}
               </button>
               <button
                 type="submit"
                 disabled={onboarding}
                 className="bg-sky-500 hover:bg-sky-600 disabled:opacity-50 text-white font-bold py-2 px-5 rounded-xl transition-colors cursor-pointer text-xs shadow-xs"
               >
-                {onboarding ? "Onboarding..." : "Onboard Organization"}
+                {onboarding ? ORG_MODALS_TEXTS.BTN_ONBOARDING : ORG_MODALS_TEXTS.BTN_ONBOARD_SUBMIT}
               </button>
             </div>
           </form>

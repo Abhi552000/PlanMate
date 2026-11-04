@@ -38,12 +38,28 @@ export const TOAST_MESSAGES = {
 
   // Workspace Settings
   WORKSPACE_LOAD_ERROR: "Failed to load workspace details.",
+  WORKSPACE_NAME_REQUIRED: "Workspace name cannot be empty",
   WORKSPACE_STATUS_ADD_SUCCESS: "Custom status added successfully!",
   WORKSPACE_STATUS_ADD_ERROR: "Failed to add status.",
   WORKSPACE_STATUS_DEL_SUCCESS: "Custom status deleted successfully!",
   WORKSPACE_STATUS_DEL_ERROR: "Failed to delete status.",
   WORKSPACE_UPDATE_SUCCESS: "Workspace settings updated successfully!",
   WORKSPACE_UPDATE_ERROR: "Failed to update workspace settings.",
+  WORKSPACE_FEATURE_UPDATE_SUCCESS: "Board feature setting updated",
+  WORKSPACE_FEATURE_UPDATE_ERROR: "Failed to update board feature",
+  WORKSPACE_PRIORITY_EMPTY_ERROR: "Priority name cannot be empty",
+  WORKSPACE_PRIORITY_EXISTS_ERROR: "This priority level already exists",
+  WORKSPACE_PRIORITY_ADD_SUCCESS: "Priority added successfully",
+  WORKSPACE_PRIORITY_ADD_ERROR: "Failed to add priority",
+  WORKSPACE_PRIORITY_DEL_SUCCESS: "Priority deleted successfully",
+  WORKSPACE_PRIORITY_DEL_ERROR: "Failed to delete priority",
+  WORKSPACE_FIELD_NAME_REQUIRED: "Field name is required",
+  WORKSPACE_FIELD_DROPDOWN_OPTION_REQUIRED: "Please add at least one option for dropdown field",
+  WORKSPACE_FIELD_OPTION_EXISTS: "Option already exists",
+  WORKSPACE_FIELD_ADD_SUCCESS: "Custom field created",
+  WORKSPACE_FIELD_ADD_ERROR: "Failed to create custom field",
+  WORKSPACE_FIELD_DEL_SUCCESS: "Custom field removed",
+  WORKSPACE_FIELD_DEL_ERROR: "Failed to delete custom field",
 
   // Member Onboarding
   MEMBER_FIELDS_REQUIRED: "Please fill all member onboarding fields",
@@ -83,6 +99,29 @@ export const TOAST_MESSAGES = {
   WORKLOG_HOURS_INVALID: "Please enter a valid number of hours (> 0)",
   WORKLOG_ADD_SUCCESS: "Work logged successfully!",
   WORKLOG_ADD_ERROR: "Failed to log work",
+
+  // SysAdmin Orgs
+  SYSADMIN_FETCH_ORGS_ERROR: "Failed to fetch organizations.",
+  SYSADMIN_ONBOARD_REQUIRED_FIELDS:
+    "Please fill in organization name, admin name, and admin email.",
+  SYSADMIN_INVALID_ADMIN_EMAIL: "Please enter a valid admin email address.",
+  SYSADMIN_ONBOARD_SUCCESS: "Organization onboarded successfully!",
+  SYSADMIN_ONBOARD_ERROR: "Failed to onboard organization.",
+  SYSADMIN_ORG_NAME_REQUIRED: "Organization name cannot be empty.",
+  SYSADMIN_ORG_UPDATE_SUCCESS: "Successfully updated organization details!",
+  SYSADMIN_ORG_UPDATE_ERROR: "Failed to update organization.",
+  SYSADMIN_ORG_RESTORE_SUCCESS: (name: string) =>
+    `Successfully restored organization "${name}".`,
+  SYSADMIN_ORG_RESTORE_ERROR: "Failed to restore organization.",
+  SYSADMIN_ORG_DEACTIVATE_SUCCESS: (name: string) =>
+    `Successfully deactivated organization "${name}".`,
+  SYSADMIN_ORG_DEACTIVATE_ERROR: "Failed to deactivate organization.",
+  SYSADMIN_ORG_DELETE_SUCCESS: (name: string) =>
+    `Successfully deleted organization "${name}".`,
+  SYSADMIN_ORG_DELETE_ERROR: "Failed to delete organization.",
+  SYSADMIN_RESET_PASSWORD_SUCCESS: (name: string) =>
+    `Successfully generated temporary credentials for "${name}".`,
+  SYSADMIN_RESET_PASSWORD_ERROR: "Failed to reset admin credentials.",
 };
 
 export const CONSOLE_ERRORS = {

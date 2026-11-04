@@ -226,6 +226,13 @@ export const ORG_MEMBERS_TEXTS = {
   LABEL_SOLVED: "Solved",
 };
 
+export const ORG_ACCESS_MODAL_TEXTS = {
+  TITLE_GRANT: "Grant / Restore Workspace Access",
+  TITLE_DEACTIVATE: "Deactivate User Access",
+  DESC_GRANT_PREFIX: "Are you sure you want to grant and restore workspace privileges for",
+  DESC_DEACTIVATE_PREFIX: "Please provide a reason or administrative note for deactivating",
+};
+
 export const PAGINATION_TEXTS = {
   PREVIOUS: "Previous",
   NEXT: "Next",
@@ -255,5 +262,132 @@ export const SUBSCRIPTION_EXPIRED_TEXTS = {
     "Your organization's subscription has expired. Please contact your workspace administrator to renew the plan and restore access.",
   MEMBER_ADMIN_CONTACT_TITLE: "Workspace Administrator:",
   MEMBER_DISMISS: "Dismiss",
+};
+
+export const WORKSPACE_SETTINGS_TEXTS = {
+  // Page Header
+  PAGE_TITLE: "Workspace Settings",
+  PAGE_SUBTITLE: "Manage your workspace details, workflow, and board settings.",
+
+  // Workspace Branding
+  BRANDING_TITLE: "Workspace Branding",
+  BRANDING_DESC: "Set your workspace name and details",
+  BTN_SAVE_CHANGES: "Save Changes",
+  LABEL_WORKSPACE_NAME: "Workspace Name",
+  PLACEHOLDER_WORKSPACE_NAME: "e.g. Acme Corp",
+  LABEL_DESCRIPTION: "Description",
+  PLACEHOLDER_DESCRIPTION: "Briefly describe what your team works on...",
+
+  // Required Fields
+  REQUIRED_FIELDS_TITLE: "Required Fields",
+  REQUIRED_FIELDS_DESC: "Always active on every task",
+  BADGE_REQUIRED: "Required",
+  FIELD_TITLE_NAME: "Title",
+  FIELD_TITLE_DESC: "Name of the task",
+  FIELD_STATUS_NAME: "Status",
+  FIELD_STATUS_DESC: "Progress state",
+  FIELD_PRIORITY_NAME: "Priority",
+  FIELD_PRIORITY_DESC: "Urgency level",
+  FIELD_ASSIGNEE_NAME: "Assignee",
+  FIELD_ASSIGNEE_DESC: "Assigned member",
+
+  // Statuses & Priorities
+  STATUSES_PRIORITIES_TITLE: "Statuses & Priorities",
+  STATUSES_PRIORITIES_DESC: "Manage workflow stages and priority levels",
+  STATUSES_SECTION_TITLE: "Statuses",
+  STATUS_INPUT_PLACEHOLDER: "Add a status (e.g. In Review)",
+  BTN_ADD_STATUS: "Add Status",
+  LABEL_ACTIVE_STATUSES: "Active Statuses",
+  PRIORITIES_SECTION_TITLE: "Priorities",
+  PRIORITY_INPUT_PLACEHOLDER: "Add a priority (e.g. Urgent)",
+  BTN_ADD_PRIORITY: "Add Priority",
+  LABEL_ACTIVE_PRIORITIES: "Active Priorities",
+
+  // Board Features
+  BOARD_FEATURES_TITLE: "Board Features",
+  BOARD_FEATURES_DESC: "Turn extra task tools on or off",
+  FEATURE_STORY_POINTS_LABEL: "Story Points",
+  FEATURE_STORY_POINTS_DESC: "Estimate task effort with points.",
+  FEATURE_TIME_TRACKING_LABEL: "Time Tracking",
+  FEATURE_TIME_TRACKING_DESC: "Log hours and track time spent on tasks.",
+  FEATURE_DUE_DATES_LABEL: "Due Dates",
+  FEATURE_DUE_DATES_DESC: "Set target dates and track deadlines.",
+  FEATURE_LABELS_LABEL: "Labels",
+  FEATURE_LABELS_DESC: "Tag tasks to organize and filter.",
+  FEATURE_SUBTASKS_LABEL: "Subtasks",
+  FEATURE_SUBTASKS_DESC: "Break tasks into smaller checklist items.",
+  FEATURE_TASK_LINKING_LABEL: "Task Linking",
+  FEATURE_TASK_LINKING_DESC: "Link related, blocking, or duplicate tasks.",
+
+  // Custom Fields
+  CUSTOM_FIELDS_TITLE: "Custom Fields",
+  CUSTOM_FIELDS_DESC: "Add extra details to your tasks",
+  BTN_ADD_FIELD: "Add Field",
+  EMPTY_CUSTOM_FIELDS: 'No custom fields yet. Click "Add Field" to create one.',
+
+  // Add Custom Field Modal
+  MODAL_ADD_FIELD_TITLE: "Add Custom Field",
+  LABEL_FIELD_NAME: "Field Name",
+  PLACEHOLDER_FIELD_NAME: "e.g. Client Name",
+  LABEL_FIELD_TYPE: "Field Type",
+  TYPE_TEXT: "Text",
+  TYPE_NUMBER: "Number",
+  TYPE_DROPDOWN: "Dropdown",
+  TYPE_DATE: "Date",
+  LABEL_DROPDOWN_OPTIONS: "Dropdown Options",
+  PLACEHOLDER_DROPDOWN_OPTION: "Add an option and press Add...",
+  BTN_ADD_OPTION: "Add",
+  NO_OPTIONS_YET: "No options added yet",
+  LABEL_REQUIRE_FIELD: "Require this field on tasks",
+  BTN_CANCEL: "Cancel",
+  BTN_CLOSE: "Close",
+  BTN_CREATE_FIELD: "Create Field",
+  BTN_SAVING_FIELD: "Saving...",
+
+  // Delete Custom Field Modal
+  MODAL_DELETE_FIELD_TITLE: "Remove Custom Field",
+  BTN_REMOVE_FIELD: "Remove Field",
+  BTN_REMOVING_FIELD: "Removing...",
+
+  // Delete Priority Modal
+  MODAL_DELETE_PRIORITY_TITLE: "Delete Priority",
+  CHECKING_TASKS: "Checking workspace tasks...",
+  BTN_DELETE_PRIORITY: "Delete Priority",
+  BTN_DELETING_PRIORITY: "Deleting...",
+
+  // Delete Status Modal
+  MODAL_DELETE_STATUS_TITLE: "Delete Status",
+  BTN_DELETE_STATUS: "Delete Status",
+  BTN_DELETING_STATUS: "Deleting...",
+};
+
+export const COMMON_UI_TEXTS = {
+  SEARCH_PLACEHOLDER: "Search...",
+  CLEAR_SEARCH: "Clear search",
+};
+
+export const TASK_MODAL_TEXTS = {
+  TITLE_SUBTASK: "Sub-task Detail",
+  TITLE_EDIT: "Edit Issue",
+  TITLE_CREATE: "Create New Issue",
+  PARENT_ISSUE_PREFIX: "← Parent Issue:",
+  COPY_TICKET_LINK: (link: string) => `Click to copy ticket link (${link})`,
+  TICKET_LINK_COPIED: (link: string) => `Copied ticket link (${link})`,
+  OPEN_FULL_PAGE: "Open full page",
+  CLOSE: "Close",
+
+  // General Form
+  LABEL_SUMMARY: "Summary",
+  PLACEHOLDER_SUMMARY: "Provide a brief summary of the issue",
+  LABEL_DESCRIPTION: "Description",
+  PLACEHOLDER_DESCRIPTION:
+    "Add details about this issue... Type @ to mention team members",
+
+  // Footer Buttons
+  BTN_CANCEL: "Cancel",
+  BTN_SAVING: "Saving...",
+  BTN_SAVE_SUBTASK: "Save Sub-task",
+  BTN_SAVE_CHANGES: "Save Changes",
+  BTN_CREATE_ISSUE: "Create Issue",
 };
 

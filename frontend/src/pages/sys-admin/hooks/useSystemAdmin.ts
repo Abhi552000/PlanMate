@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback, useRef } from "react";
 import { toast } from "react-toastify";
 import { orgService } from "../../../services/orgService";
 import { SystemMetrics } from "../../../types";
+import { TOAST_MESSAGES } from "../../../constants/messages";
 
 export const useSystemAdmin = () => {
   const [organizations, setOrganizations] = useState<any[]>([]);
@@ -119,7 +120,7 @@ export const useSystemAdmin = () => {
         }
       } catch (err: any) {
         console.error(err);
-        toast.error(err?.response?.data?.message || "Failed to fetch organizations.");
+        toast.error(err?.response?.data?.message || TOAST_MESSAGES.SYSADMIN_FETCH_ORGS_ERROR);
       } finally {
         isInitialLoadRef.current = false;
         setLoading(false);
@@ -137,12 +138,12 @@ export const useSystemAdmin = () => {
     e.preventDefault();
     const { orgName, adminName, adminEmail } = newOrg;
     if (!orgName?.trim() || !adminName?.trim() || !adminEmail?.trim()) {
-      toast.error("Please fill in organization name, admin name, and admin email.");
+      toast.error(TOAST_MESSAGES.SYSADMIN_ONBOARD_REQUIRED_FIELDS);
       return;
     }
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(adminEmail.trim())) {
-      toast.error("Please enter a valid admin email address.");
+      toast.error(TOAST_MESSAGES.SYSADMIN_INVALID_ADMIN_EMAIL);
       return;
     }
     setOnboarding(true);
@@ -156,7 +157,7 @@ export const useSystemAdmin = () => {
         adminEmail: adminEmail.trim(),
       });
       if (data?.success) {
-        toast.success(data?.message || "Organization onboarded successfully!");
+        toast.success(data?.message || TOAST_MESSAGES.SYSADMIN_ONBOARD_SUCCESS);
         setOnboardedResult({
           orgName: orgName.trim(),
           email: data.admin?.email,
@@ -177,7 +178,7 @@ export const useSystemAdmin = () => {
         await fetchOrganizations();
       }
     } catch (err: any) {
-      toast.error(err?.response?.data?.message || "Failed to onboard organization.");
+      toast.error(err?.response?.data?.message || TOAST_MESSAGES.SYSADMIN_ONBOARD_ERROR);
     } finally {
       setOnboarding(false);
     }
@@ -203,12 +204,12 @@ export const useSystemAdmin = () => {
     e.preventDefault();
     if (!editingOrg) return;
     if (!editForm.orgName?.trim()) {
-      toast.error("Organization name cannot be empty.");
+      toast.error(TOAST_MESSAGES.SYSADMIN_ORG_NAME_REQUIRED);
       return;
     }
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (editForm.adminEmail && !emailRegex.test(editForm.adminEmail.trim())) {
-      toast.error("Please enter a valid admin email address.");
+      toast.error(TOAST_MESSAGES.SYSADMIN_INVALID_ADMIN_EMAIL);
       return;
     }
     setUpdating(true);
@@ -221,12 +222,12 @@ export const useSystemAdmin = () => {
         adminEmail: editForm.adminEmail?.trim(),
       });
       if (data?.success) {
-        toast.success(data?.message || "Successfully updated organization details!");
+        toast.success(data?.message || TOAST_MESSAGES.SYSADMIN_ORG_UPDATE_SUCCESS);
         setEditingOrg(null);
         await fetchOrganizations();
       }
     } catch (err: any) {
-      toast.error(err?.response?.data?.message || "Failed to update organization.");
+      toast.error(err?.response?.data?.message || TOAST_MESSAGES.SYSADMIN_ORG_UPDATE_ERROR);
     } finally {
       setUpdating(false);
     }
@@ -250,12 +251,12 @@ export const useSystemAdmin = () => {
         remark: "",
       });
       if (data?.success) {
-        toast.success(data?.message || `Successfully restored organization "${restoringOrg.name}".`);
+        toast.success(data?.message || TOAST_MESSAGES.SYSADMIN_ORG_RESTORE_SUCCESS(restoringOrg.name));
         setRestoringOrg(null);
         await fetchOrganizations();
       }
     } catch (err: any) {
-      toast.error(err?.response?.data?.message || "Failed to restore organization.");
+      toast.error(err?.response?.data?.message || TOAST_MESSAGES.SYSADMIN_ORG_RESTORE_ERROR);
     } finally {
       setTogglingStatus(false);
     }
@@ -272,12 +273,12 @@ export const useSystemAdmin = () => {
         remark: deactivateRemark.trim() || "Deactivated by System Admin",
       });
       if (data?.success) {
-        toast.success(data?.message || `Successfully deactivated organization "${deactivatingOrg.name}".`);
+        toast.success(data?.message || TOAST_MESSAGES.SYSADMIN_ORG_DEACTIVATE_SUCCESS(deactivatingOrg.name));
         setDeactivatingOrg(null);
         await fetchOrganizations();
       }
     } catch (err: any) {
-      toast.error(err?.response?.data?.message || "Failed to deactivate organization.");
+      toast.error(err?.response?.data?.message || TOAST_MESSAGES.SYSADMIN_ORG_DEACTIVATE_ERROR);
     } finally {
       setTogglingStatus(false);
     }
@@ -293,13 +294,13 @@ export const useSystemAdmin = () => {
     try {
       const data = await orgService.deleteOrg(deletingOrg._id);
       if (data?.success) {
-        toast.success(data?.message || `Successfully deleted organization "${deletingOrg.name}".`);
+        toast.success(data?.message || TOAST_MESSAGES.SYSADMIN_ORG_DELETE_SUCCESS(deletingOrg.name));
         if (inspectingOrg?._id === deletingOrg._id) setInspectingOrg(null);
         setDeletingOrg(null);
         await fetchOrganizations();
       }
     } catch (err: any) {
-      toast.error(err?.response?.data?.message || "Failed to delete organization.");
+      toast.error(err?.response?.data?.message || TOAST_MESSAGES.SYSADMIN_ORG_DELETE_ERROR);
     } finally {
       setDeleting(false);
     }
@@ -318,11 +319,11 @@ export const useSystemAdmin = () => {
       const data = await orgService.resetAdminPassword(resetPasswordOrg._id);
       if (data?.success && data?.admin) {
         setResetResult(data.admin);
-        toast.success(`Successfully generated temporary credentials for "${resetPasswordOrg.name}".`);
+        toast.success(TOAST_MESSAGES.SYSADMIN_RESET_PASSWORD_SUCCESS(resetPasswordOrg.name));
         await fetchOrganizations();
       }
     } catch (err: any) {
-      toast.error(err?.response?.data?.message || "Failed to reset admin credentials.");
+      toast.error(err?.response?.data?.message || TOAST_MESSAGES.SYSADMIN_RESET_PASSWORD_ERROR);
     } finally {
       setResettingPassword(false);
     }

@@ -1,9 +1,10 @@
 import React from "react";
-import { BookOpen, Save, PlusCircle, X, ExternalLink, Copy } from "lucide-react";
+import { X, ExternalLink, Copy } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { TaskModalHeaderProps } from "../../types";
 import { getIssueTypeIcon } from "../../utils";
+import { TASK_MODAL_TEXTS } from "../../constants/uiTexts";
 
 export const TaskModalHeader: React.FC<TaskModalHeaderProps> = ({
   parentTask,
@@ -28,7 +29,7 @@ export const TaskModalHeader: React.FC<TaskModalHeaderProps> = ({
   const handleCopyLink = () => {
     if (ticketLink) {
       navigator.clipboard.writeText(ticketLink);
-      toast.success(`Copied ticket link (${ticketLink})`);
+      toast.success(TASK_MODAL_TEXTS.TICKET_LINK_COPIED(ticketLink));
     }
   };
 
@@ -40,7 +41,7 @@ export const TaskModalHeader: React.FC<TaskModalHeaderProps> = ({
           onClick={handleBackToParent}
           className="text-xs font-bold text-sky-600 hover:text-sky-850 mb-3 flex items-center gap-1.5 bg-sky-50 hover:bg-sky-100/70 px-2.5 py-1.5 rounded-lg transition-colors cursor-pointer w-fit"
         >
-          ← Parent Issue: {parentTask.title}
+          {TASK_MODAL_TEXTS.PARENT_ISSUE_PREFIX} {parentTask.title}
         </button>
       )}
       <div className="flex justify-between items-center">
@@ -49,7 +50,7 @@ export const TaskModalHeader: React.FC<TaskModalHeaderProps> = ({
             <div
               onClick={handleCopyLink}
               className="group/key flex items-center gap-1.5 bg-sky-50 dark:bg-sky-950/50 hover:bg-sky-100 dark:hover:bg-sky-900/60 px-2 py-0.5 rounded border border-sky-200/60 dark:border-sky-800 transition-colors cursor-pointer w-fit"
-              title={`Click to copy ticket link (${ticketLink})`}
+              title={TASK_MODAL_TEXTS.COPY_TICKET_LINK(ticketLink)}
             >
               {getIssueTypeIcon(taskData.issueType, "w-3.5 h-3.5")}
               <span className="text-[11px] font-bold tracking-wider text-sky-700 dark:text-sky-300 select-all inline-block">
@@ -60,10 +61,10 @@ export const TaskModalHeader: React.FC<TaskModalHeaderProps> = ({
           )}
           <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white tracking-tight">
             {parentTask
-              ? "Sub-task Detail"
+              ? TASK_MODAL_TEXTS.TITLE_SUBTASK
               : taskData.id
-              ? "Edit Issue"
-              : "Create New Issue"}
+              ? TASK_MODAL_TEXTS.TITLE_EDIT
+              : TASK_MODAL_TEXTS.TITLE_CREATE}
           </h2>
         </div>
 
@@ -73,7 +74,8 @@ export const TaskModalHeader: React.FC<TaskModalHeaderProps> = ({
               type="button"
               onClick={handleOpenFullPage}
               className="p-2 hover:bg-sky-50 dark:hover:bg-gray-700 rounded-lg transition-colors text-gray-500 dark:text-gray-400 hover:text-sky-700 dark:hover:text-sky-300 cursor-pointer"
-              title="Open full page"
+              title={TASK_MODAL_TEXTS.OPEN_FULL_PAGE}
+              aria-label={TASK_MODAL_TEXTS.OPEN_FULL_PAGE}
             >
               <ExternalLink className="w-4 h-4" />
             </button>
@@ -85,7 +87,8 @@ export const TaskModalHeader: React.FC<TaskModalHeaderProps> = ({
             }}
             type="button"
             className="p-2 hover:bg-sky-50 dark:hover:bg-gray-700 rounded-lg transition-colors text-gray-400 hover:text-sky-700 dark:hover:text-gray-200 cursor-pointer"
-            title="Close"
+            title={TASK_MODAL_TEXTS.CLOSE}
+            aria-label={TASK_MODAL_TEXTS.CLOSE}
           >
             <X className="w-4 h-4" />
           </button>
