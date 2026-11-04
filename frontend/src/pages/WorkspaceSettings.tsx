@@ -7,8 +7,9 @@ import { IUser } from "../types";
 import { TOAST_MESSAGES, CONSOLE_ERRORS } from "../constants/messages";
 import { toast } from "react-toastify";
 import { WorkspaceBrandingForm } from "./workspace-settings/WorkspaceBrandingForm";
-import { CustomStatusesSettings } from "./workspace-settings/CustomStatusesSettings";
 import { ConfirmDeleteStatusModal } from "./workspace-settings/ConfirmDeleteStatusModal";
+import { BoardCustomizationSettings } from "./workspace-settings/BoardCustomizationSettings";
+import { IBoardFeatures, ICustomField } from "../types/organization";
 
 const WorkspaceSettings = () => {
   const navigate = useNavigate();
@@ -25,6 +26,17 @@ const WorkspaceSettings = () => {
   });
 
   const [statuses, setStatuses] = useState<string[]>([]);
+  const [priorities, setPriorities] = useState<string[]>(["Low", "Medium", "High"]);
+  const [boardFeatures, setBoardFeatures] = useState<IBoardFeatures>({
+    storyPoints: true,
+    timeTracking: true,
+    dueDates: true,
+    labels: true,
+    subtasks: true,
+    issueLinking: true,
+  });
+  const [customFields, setCustomFields] = useState<ICustomField[]>([]);
+
   const [newStatus, setNewStatus] = useState("");
   const [addingStatus, setAddingStatus] = useState(false);
   const [deletingStatus, setDeletingStatus] = useState<string | null>(null);
@@ -44,6 +56,15 @@ const WorkspaceSettings = () => {
           description: data.organization.description || "",
         });
         setStatuses(data.organization.statuses || ["To Do", "In Progress", "Done"]);
+        if (data.organization.priorities && data.organization.priorities.length > 0) {
+          setPriorities(data.organization.priorities);
+        }
+        if (data.organization.boardFeatures) {
+          setBoardFeatures(data.organization.boardFeatures);
+        }
+        if (data.organization.customFields) {
+          setCustomFields(data.organization.customFields);
+        }
       }
     } catch (err) {
       console.error(CONSOLE_ERRORS.FETCH_ORG_DETAILS, err);
@@ -211,7 +232,7 @@ const WorkspaceSettings = () => {
             Workspace Settings
           </h1>
           <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1">
-            Configure name, description, branding and details of your team space.
+            Manage your workspace details, workflow, and board settings.
           </p>
         </div>
       </div>
@@ -224,14 +245,20 @@ const WorkspaceSettings = () => {
         handleUpdateOrg={handleUpdateOrg}
       />
 
-      {/* Custom Statuses Settings */}
-      <CustomStatusesSettings
+      {/* Board Customization (Core Mandatory Fields, Statuses & Priorities, Feature Visibility, Custom Fields) */}
+      <BoardCustomizationSettings
         statuses={statuses}
         newStatus={newStatus}
         setNewStatus={setNewStatus}
         addingStatus={addingStatus}
         handleAddStatus={handleAddStatus}
-        handleOpenDeleteModal={handleOpenDeleteModal}
+        handleOpenDeleteStatusModal={handleOpenDeleteModal}
+        boardFeatures={boardFeatures}
+        priorities={priorities}
+        customFields={customFields}
+        onFeaturesUpdated={setBoardFeatures}
+        onPrioritiesUpdated={setPriorities}
+        onCustomFieldsUpdated={setCustomFields}
       />
 
       {/* Delete Status Confirmation Modal */}

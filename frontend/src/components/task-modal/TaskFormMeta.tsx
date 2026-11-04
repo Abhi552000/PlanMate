@@ -29,6 +29,9 @@ export const TaskFormMeta: React.FC<TaskFormMetaProps> = ({
   today,
   baseControlClasses,
   handleChange,
+  priorities = ["Low", "Medium", "High"],
+  boardFeatures = {},
+  customFields = [],
 }) => {
   // Log work local states
   const [showLogForm, setShowLogForm] = useState(false);
@@ -185,9 +188,11 @@ export const TaskFormMeta: React.FC<TaskFormMetaProps> = ({
             priorityStyles[taskData.priority] || ""
           }`}
         >
-          <option value="Low" className="bg-white dark:bg-gray-800 text-slate-800 dark:text-slate-100 py-1.5">Low</option>
-          <option value="Medium" className="bg-white dark:bg-gray-800 text-slate-800 dark:text-slate-100 py-1.5">Medium</option>
-          <option value="High" className="bg-white dark:bg-gray-800 text-slate-800 dark:text-slate-100 py-1.5">High</option>
+          {priorities.map((p) => (
+            <option key={p} value={p} className="bg-white dark:bg-gray-800 text-slate-800 dark:text-slate-100 py-1.5">
+              {p}
+            </option>
+          ))}
         </select>
       </div>
 
@@ -220,7 +225,7 @@ export const TaskFormMeta: React.FC<TaskFormMetaProps> = ({
           name="assignee"
           value={taskData.assignee || ""}
           onChange={handleChange}
-          className={selectControlClasses}
+          className={`${selectControlClasses} w-full`}
         >
           <option value="" className="bg-white dark:bg-gray-800 text-slate-800 dark:text-slate-100 py-1.5">Unassigned</option>
           {members.map((member) => (
@@ -231,26 +236,28 @@ export const TaskFormMeta: React.FC<TaskFormMetaProps> = ({
         </select>
       </div>
 
-      <div>
-        <div className="flex items-center justify-between mb-1.5">
-          <label className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-            <Calendar className="w-3.5 h-3.5 text-sky-500" /> Due Date
-          </label>
-          {taskData.dueDate && taskData.dueDate < today && (
-            <span className="text-[10px] text-amber-600 dark:text-amber-400 font-semibold bg-amber-50 dark:bg-amber-950/40 px-1.5 py-0.5 rounded border border-amber-200 dark:border-amber-900/50 flex items-center gap-1">
-              <Clock className="w-2.5 h-2.5" /> Past date (Overdue)
-            </span>
-          )}
+      {boardFeatures.dueDates !== false && (
+        <div>
+          <div className="flex items-center justify-between mb-1.5">
+            <label className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+              <Calendar className="w-3.5 h-3.5 text-sky-500" /> Due Date
+            </label>
+            {taskData.dueDate && taskData.dueDate < today && (
+              <span className="text-[10px] text-amber-600 dark:text-amber-400 font-semibold bg-amber-50 dark:bg-amber-950/40 px-1.5 py-0.5 rounded border border-amber-200 dark:border-amber-900/50 flex items-center gap-1">
+                <Clock className="w-2.5 h-2.5" /> Past date (Overdue)
+              </span>
+            )}
+          </div>
+          <input
+            type="date"
+            name="dueDate"
+            required
+            value={taskData.dueDate}
+            onChange={handleChange}
+            className={`${baseControlClasses} cursor-pointer`}
+          />
         </div>
-        <input
-          type="date"
-          name="dueDate"
-          required
-          value={taskData.dueDate}
-          onChange={handleChange}
-          className={`${baseControlClasses} cursor-pointer`}
-        />
-      </div>
+      )}
 
       {parentTask === null && (
         <>
@@ -294,47 +301,53 @@ export const TaskFormMeta: React.FC<TaskFormMetaProps> = ({
         </>
       )}
 
-      <div className="grid grid-cols-2 gap-3">
-        <div>
-          <label className="flex items-center gap-1 text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">
-            Story Points
-          </label>
-          <input
-            type="number"
-            name="storyPoints"
-            min="0"
-            max="100"
-            value={
-              taskData.storyPoints !== undefined ? taskData.storyPoints : 1
-            }
-            onChange={handleChange}
-            className={baseControlClasses}
-            required
-          />
-        </div>
+      {(boardFeatures.storyPoints !== false || boardFeatures.timeTracking !== false) && (
+        <div className={`grid ${boardFeatures.storyPoints !== false && boardFeatures.timeTracking !== false ? "grid-cols-2" : "grid-cols-1"} gap-3`}>
+          {boardFeatures.storyPoints !== false && (
+            <div>
+              <label className="flex items-center gap-1 text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">
+                Story Points
+              </label>
+              <input
+                type="number"
+                name="storyPoints"
+                min="0"
+                max="100"
+                value={
+                  taskData.storyPoints !== undefined ? taskData.storyPoints : 1
+                }
+                onChange={handleChange}
+                className={baseControlClasses}
+                required
+              />
+            </div>
+          )}
 
-        <div>
-          <label className="flex items-center gap-1 text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">
-            Estimate (h)
-          </label>
-          <input
-            type="number"
-            name="originalEstimate"
-            min="0"
-            value={
-              taskData.originalEstimate !== undefined
-                ? taskData.originalEstimate
-                : 0
-            }
-            onChange={handleChange}
-            className={baseControlClasses}
-            required
-          />
+          {boardFeatures.timeTracking !== false && (
+            <div>
+              <label className="flex items-center gap-1 text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">
+                Estimate (h)
+              </label>
+              <input
+                type="number"
+                name="originalEstimate"
+                min="0"
+                value={
+                  taskData.originalEstimate !== undefined
+                    ? taskData.originalEstimate
+                    : 0
+                }
+                onChange={handleChange}
+                className={baseControlClasses}
+                required
+              />
+            </div>
+          )}
         </div>
-      </div>
+      )}
 
       {/* Jira Style Time Tracking Component */}
-      {(taskData.id || taskData._id) && (
+      {(taskData.id || taskData._id) && boardFeatures.timeTracking !== false && (
         <div className="border-t border-sky-100 dark:border-gray-800 pt-4 mt-2 space-y-3">
           <div className="flex justify-between items-center">
             <span className="flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-gray-500">
@@ -455,11 +468,12 @@ export const TaskFormMeta: React.FC<TaskFormMetaProps> = ({
           )}
 
           {/* Issue Links Sub-section */}
-          <div className="border-t border-sky-100 dark:border-gray-800 pt-4 mt-4 space-y-3">
-            <div className="flex justify-between items-center">
-              <span className="flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-gray-500">
-                <Link2 className="w-3.5 h-3.5 text-sky-500" /> Linked Issues
-              </span>
+          {boardFeatures.issueLinking !== false && (
+            <div className="border-t border-sky-100 dark:border-gray-800 pt-4 mt-4 space-y-3">
+              <div className="flex justify-between items-center">
+                <span className="flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-gray-500">
+                  <Link2 className="w-3.5 h-3.5 text-sky-500" /> Linked Issues
+                </span>
               <button
                 type="button"
                 onClick={() => {
@@ -561,7 +575,7 @@ export const TaskFormMeta: React.FC<TaskFormMetaProps> = ({
                       <button
                         type="button"
                         onClick={() => handleUnlinkIssue(link._id)}
-                        className="text-gray-400 hover:text-red-500 transition-colors p-1"
+                        className="text-gray-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors p-1 cursor-pointer"
                         title="Remove link"
                       >
                         <Trash2 className="w-3 h-3" />
@@ -576,8 +590,85 @@ export const TaskFormMeta: React.FC<TaskFormMetaProps> = ({
               </p>
             )}
           </div>
+        )}
+      </div>
+    )}
+
+    {/* Custom Fields in Task Form */}
+    {customFields && customFields.length > 0 && (
+      <div className="border-t border-sky-100/60 dark:border-gray-800 pt-3 mt-3 space-y-3">
+        <label className="flex items-center gap-1 text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+          Custom Fields
+        </label>
+        <div className="space-y-2.5">
+          {customFields.map((field) => {
+            const val = taskData.customFieldValues?.[field.id] ?? "";
+            const handleCustomFieldChange = (newVal: any) => {
+              setTaskData((prev: any) => ({
+                ...prev,
+                customFieldValues: {
+                  ...(prev.customFieldValues || {}),
+                  [field.id]: newVal,
+                },
+              }));
+            };
+
+            return (
+              <div key={field.id} className="space-y-1">
+                <label className="text-[11px] font-semibold text-gray-600 dark:text-gray-300 flex items-center justify-between">
+                  <span>{field.name}</span>
+                  {field.required && (
+                    <span className="text-[10px] text-amber-500 font-bold">*</span>
+                  )}
+                </label>
+
+                {field.type === "dropdown" ? (
+                  <select
+                    value={val}
+                    onChange={(e) => handleCustomFieldChange(e.target.value)}
+                    className={selectControlClasses}
+                    required={field.required}
+                  >
+                    <option value="">Select {field.name}</option>
+                    {(field.options || []).map((opt) => (
+                      <option key={opt} value={opt}>
+                        {opt}
+                      </option>
+                    ))}
+                  </select>
+                ) : field.type === "number" ? (
+                  <input
+                    type="number"
+                    value={val}
+                    onChange={(e) => handleCustomFieldChange(e.target.value)}
+                    className={baseControlClasses}
+                    placeholder={`Enter ${field.name}`}
+                    required={field.required}
+                  />
+                ) : field.type === "date" ? (
+                  <input
+                    type="date"
+                    value={val}
+                    onChange={(e) => handleCustomFieldChange(e.target.value)}
+                    className={baseControlClasses}
+                    required={field.required}
+                  />
+                ) : (
+                  <input
+                    type="text"
+                    value={val}
+                    onChange={(e) => handleCustomFieldChange(e.target.value)}
+                    className={baseControlClasses}
+                    placeholder={`Enter ${field.name}`}
+                    required={field.required}
+                  />
+                )}
+              </div>
+            );
+          })}
         </div>
-      )}
-    </div>
-  );
+      </div>
+    )}
+  </div>
+);
 };

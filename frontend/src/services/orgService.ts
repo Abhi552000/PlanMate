@@ -35,6 +35,26 @@ export const orgService = {
     const { data } = await axiosInstance.delete(API_ROUTES.ORGANIZATION.STATUS_DELETE(statusName));
     return data;
   },
+  updateBoardFeatures: async (boardFeatures: any) => {
+    const { data } = await axiosInstance.put(API_ROUTES.ORGANIZATION.BOARD_FEATURES, { boardFeatures });
+    return data;
+  },
+  addCustomPriority: async (priority: string) => {
+    const { data } = await axiosInstance.post(API_ROUTES.ORGANIZATION.PRIORITIES, { priority });
+    return data;
+  },
+  deleteCustomPriority: async (priorityName: string) => {
+    const { data } = await axiosInstance.delete(API_ROUTES.ORGANIZATION.PRIORITY_DELETE(priorityName));
+    return data;
+  },
+  addCustomField: async (fieldData: { name: string; type: string; options?: string[]; required?: boolean }) => {
+    const { data } = await axiosInstance.post(API_ROUTES.ORGANIZATION.CUSTOM_FIELDS, fieldData);
+    return data;
+  },
+  deleteCustomField: async (fieldId: string) => {
+    const { data } = await axiosInstance.delete(API_ROUTES.ORGANIZATION.CUSTOM_FIELD_DELETE(fieldId));
+    return data;
+  },
   getSystemAdminOrgs: async (params?: Record<string, any>) => {
     const { data } = await axiosInstance.get(API_ROUTES.ORGANIZATION.ALL, { params });
     return data;

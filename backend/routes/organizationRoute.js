@@ -15,6 +15,11 @@ import {
   updateUserStatus,
   addCustomStatus,
   deleteCustomStatus,
+  updateBoardFeatures,
+  addCustomPriority,
+  deleteCustomPriority,
+  addCustomField,
+  deleteCustomField,
   getOrganizationSubscription,
   subscribeToPlan,
   previewPlanUpgrade,
@@ -58,5 +63,12 @@ orgRouter.get("/members", authMiddleware, getOrganizationMembers);
 // Scoped custom statuses
 orgRouter.post("/statuses", authMiddleware, addCustomStatus);
 orgRouter.delete("/statuses/:statusName", authMiddleware, deleteCustomStatus);
+
+// Board customization: features, priorities, custom fields
+orgRouter.put("/board-features", authMiddleware, updateBoardFeatures);
+orgRouter.post("/priorities", authMiddleware, addCustomPriority);
+orgRouter.delete("/priorities/:priorityName", authMiddleware, deleteCustomPriority);
+orgRouter.post("/custom-fields", authMiddleware, addCustomField);
+orgRouter.delete("/custom-fields/:fieldId", authMiddleware, deleteCustomField);
 
 export default orgRouter;

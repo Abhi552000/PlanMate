@@ -39,6 +39,9 @@ const TaskModal: React.FC<TaskModalProps> = ({
   const [members, setMembers] = useState<IUser[]>([]);
   const [sprints, setSprints] = useState<any[]>([]);
   const [epics, setEpics] = useState<any[]>([]);
+  const [priorities, setPriorities] = useState<string[]>(["Low", "Medium", "High"]);
+  const [boardFeatures, setBoardFeatures] = useState<any>({});
+  const [customFields, setCustomFields] = useState<any[]>([]);
   const [newSubtaskTitle, setNewSubtaskTitle] = useState("");
   const [editingSubtaskIdx, setEditingSubtaskIdx] = useState<number | null>(
     null
@@ -52,10 +55,11 @@ const TaskModal: React.FC<TaskModalProps> = ({
   const fetchMembersAndAgile = useCallback(async () => {
     setLoadingDependencies(true);
     try {
-      const [memberData, sprintData, epicData] = await Promise.allSettled([
+      const [memberData, sprintData, epicData, orgData] = await Promise.allSettled([
         orgService.getOrgMembers(),
         backlogService.getSprints(),
         backlogService.getEpics(),
+        orgService.getOrgDetails(),
       ]);
 
       if (memberData.status === "fulfilled" && memberData.value?.success && Array.isArray(memberData.value?.members)) {
@@ -66,6 +70,18 @@ const TaskModal: React.FC<TaskModalProps> = ({
       }
       if (epicData.status === "fulfilled" && epicData.value?.success && Array.isArray(epicData.value?.epics)) {
         setEpics(epicData.value.epics);
+      }
+      if (orgData.status === "fulfilled" && orgData.value?.success && orgData.value?.organization) {
+        const org = orgData.value.organization;
+        if (Array.isArray(org.priorities) && org.priorities.length > 0) {
+          setPriorities(org.priorities);
+        }
+        if (org.boardFeatures) {
+          setBoardFeatures(org.boardFeatures);
+        }
+        if (Array.isArray(org.customFields)) {
+          setCustomFields(org.customFields);
+        }
       }
     } catch (err) {
       console.error(CONSOLE_ERRORS.FETCH_DEPENDENCIES_MODAL, err);
@@ -87,6 +103,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
     setParentTask(null);
     const normalized = getNormalizedTaskData(taskToEdit, DEFAULT_TASK);
     normalized.description = cleanMentionsForEditing(normalized.description || "");
+    normalized.customFieldValues = taskToEdit?.customFieldValues ? { ...taskToEdit.customFieldValues } : {};
     setTaskData(normalized);
     setNewSubtaskTitle("");
   }, [isOpen, taskToEdit]);
@@ -260,7 +277,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
                     members={Array.isArray(members) ? members : []}
                   />
 
-                  {parentTask === null && (
+                  {parentTask === null && boardFeatures.subtasks !== false && (
                     <TaskFormSubtasks
                       subtasks={Array.isArray(taskData?.subtasks) ? taskData.subtasks : []}
                       setTaskData={setTaskData}
@@ -288,6 +305,9 @@ const TaskModal: React.FC<TaskModalProps> = ({
                   today={today}
                   baseControlClasses={baseControlClasses}
                   handleChange={handleChange}
+                  priorities={priorities}
+                  boardFeatures={boardFeatures}
+                  customFields={customFields}
                 />
               </div>
             )}

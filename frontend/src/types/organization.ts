@@ -1,6 +1,23 @@
 import React from "react";
 import { IUser } from "./user";
 
+export interface IBoardFeatures {
+  storyPoints?: boolean;
+  timeTracking?: boolean;
+  dueDates?: boolean;
+  labels?: boolean;
+  subtasks?: boolean;
+  issueLinking?: boolean;
+}
+
+export interface ICustomField {
+  id: string;
+  name: string;
+  type: "text" | "number" | "dropdown" | "date";
+  options?: string[];
+  required?: boolean;
+}
+
 export interface IOrganization {
   _id: string;
   name: string;
@@ -16,6 +33,9 @@ export interface IOrganization {
   memberCount?: number;
   createdAt?: string;
   statuses?: string[];
+  priorities?: string[];
+  boardFeatures?: IBoardFeatures;
+  customFields?: ICustomField[];
   isActive?: boolean;
   remark?: string;
   slug?: string;

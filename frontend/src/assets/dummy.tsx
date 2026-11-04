@@ -20,19 +20,23 @@ export const priorityStyles: Record<string, string> = {
   Low: "!bg-emerald-50/80 !text-emerald-700 !border-emerald-200 dark:!bg-emerald-950/30 dark:!text-emerald-400 dark:!border-emerald-800/80",
   Medium: "!bg-amber-50/80 !text-amber-700 !border-amber-200 dark:!bg-amber-950/30 dark:!text-amber-400 dark:!border-amber-800/80",
   High: "!bg-rose-50/80 !text-rose-700 !border-rose-200 dark:!bg-rose-950/30 dark:!text-rose-400 dark:!border-rose-800/80",
+  Critical: "!bg-purple-50/80 !text-purple-700 !border-purple-200 dark:!bg-purple-950/30 dark:!text-purple-400 dark:!border-purple-800/80",
+  Urgent: "!bg-purple-50/80 !text-purple-700 !border-purple-200 dark:!bg-purple-950/30 dark:!text-purple-400 dark:!border-purple-800/80",
+  Blocker: "!bg-purple-50/80 !text-purple-700 !border-purple-200 dark:!bg-purple-950/30 dark:!text-purple-400 dark:!border-purple-800/80",
 };
 
 // Default Task
 export const DEFAULT_TASK = {
   title: "",
   description: "",
-  priority: "Low" as "Low" | "Medium" | "High",
+  priority: "Low" as string,
   dueDate: "",
   completed: "No",
   id: null as string | null,
   originalEstimate: 0,
   labels: [] as string[],
   reporter: null as string | null,
+  customFieldValues: {} as Record<string, any>,
 };
 
 // Sidebar Menu Items

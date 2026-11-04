@@ -45,7 +45,9 @@ export const BacklogTaskRow: React.FC<BacklogTaskRowProps> = React.memo(({
           ? "border-l-rose-500"
           : task.priority === "Medium"
           ? "border-l-amber-500"
-          : "border-l-emerald-500"
+          : task.priority === "Low"
+          ? "border-l-emerald-500"
+          : "border-l-purple-500"
       }`}
     >
       <div className="flex items-center gap-2.5 min-w-0 flex-1">

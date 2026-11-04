@@ -11,7 +11,6 @@ const taskSchema = new mongoose.Schema({
   },
   priority: {
     type: String,
-    enum: ["Low", "Medium", "High"],
     default: "Low",
   },
   dueDate: {
@@ -202,6 +201,11 @@ const taskSchema = new mongoose.Schema({
   createdAt: {
     type: Date,
     default: Date.now,
+  },
+  customFieldValues: {
+    type: Map,
+    of: mongoose.Schema.Types.Mixed,
+    default: {},
   },
 });
 

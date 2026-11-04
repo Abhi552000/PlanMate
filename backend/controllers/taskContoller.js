@@ -80,6 +80,7 @@ export const createTask = async (req, res) => {
       originalEstimate,
       sprint,
       epic,
+      customFieldValues,
     } = req.body;
 
     let finalCompleted = completed === "Yes" || completed === true;
@@ -137,6 +138,7 @@ export const createTask = async (req, res) => {
       links: links || [],
       sprint: sprint || null,
       epic: epic || null,
+      customFieldValues: customFieldValues || {},
     });
 
     const saved = await task.save();
@@ -545,6 +547,10 @@ export const updateTask = async (req, res) => {
 
     // Apply updates
     Object.assign(task, data);
+    if (data.customFieldValues !== undefined) {
+      task.set("customFieldValues", data.customFieldValues);
+      task.markModified("customFieldValues");
+    }
 
     if (historyEntries.length > 0) {
       if (!task.history) task.history = [];
