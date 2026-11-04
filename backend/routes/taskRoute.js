@@ -12,6 +12,9 @@ import {
   getTaskAnalytics,
   logWork,
   deleteWorkLog,
+  getUserWorklogSummaries,
+  getUserDetailedWorklogs,
+  exportWorklogs,
   linkTask,
   unlinkTask,
 } from "../controllers/taskContoller.js";
@@ -21,6 +24,9 @@ const taskRouter = express.Router();
 taskRouter.use(authMiddleware, requireActiveSubscription);
 
 taskRouter.route("/gp/analytics").get(getTaskAnalytics);
+taskRouter.route("/gp/worklogs/users").get(getUserWorklogSummaries);
+taskRouter.route("/gp/worklogs/users/:userId").get(getUserDetailedWorklogs);
+taskRouter.route("/gp/worklogs/export").get(exportWorklogs);
 
 taskRouter
   .route("/gp")

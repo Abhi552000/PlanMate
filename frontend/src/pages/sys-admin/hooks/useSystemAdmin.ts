@@ -44,6 +44,9 @@ export const useSystemAdmin = () => {
   const [deactivatingOrg, setDeactivatingOrg] = useState<any | null>(null);
   const [deactivateRemark, setDeactivateRemark] = useState("");
 
+  // Restore Confirmation Modal State
+  const [restoringOrg, setRestoringOrg] = useState<any | null>(null);
+
   // Delete Confirmation Modal State
   const [deletingOrg, setDeletingOrg] = useState<any | null>(null);
   const [deleting, setDeleting] = useState(false);
@@ -229,25 +232,30 @@ export const useSystemAdmin = () => {
     }
   };
 
-  const handleToggleActive = async (org: any) => {
+  const handleToggleActive = (org: any) => {
     if (org.isActive) {
       setDeactivatingOrg(org);
       setDeactivateRemark("");
       return;
     }
+    setRestoringOrg(org);
+  };
 
+  const handleRestoreOrgConfirm = async () => {
+    if (!restoringOrg) return;
     setTogglingStatus(true);
     try {
-      const data = await orgService.updateOrgStatus(org._id, {
+      const data = await orgService.updateOrgStatus(restoringOrg._id, {
         isActive: true,
         remark: "",
       });
       if (data?.success) {
-        toast.success(data?.message || `Successfully activated organization "${org.name}".`);
+        toast.success(data?.message || `Successfully restored organization "${restoringOrg.name}".`);
+        setRestoringOrg(null);
         await fetchOrganizations();
       }
     } catch (err: any) {
-      toast.error(err?.response?.data?.message || "Failed to activate organization.");
+      toast.error(err?.response?.data?.message || "Failed to restore organization.");
     } finally {
       setTogglingStatus(false);
     }
@@ -438,6 +446,9 @@ export const useSystemAdmin = () => {
     handleEditClick,
     handleUpdate,
     handleToggleActive,
+    restoringOrg,
+    setRestoringOrg,
+    handleRestoreOrgConfirm,
     submitDeactivation,
     handleDelete,
     deletingOrg,

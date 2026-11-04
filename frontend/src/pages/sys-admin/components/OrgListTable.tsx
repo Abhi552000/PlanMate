@@ -285,7 +285,7 @@ export const OrgListTable: React.FC<OrgListTableProps> = ({
                     {/* Delete Org */}
                     <button
                       onClick={() => onDeleteClick(org)}
-                      className="p-1.5 text-gray-400 dark:text-gray-500 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 rounded-lg transition-colors cursor-pointer"
+                      className="p-1.5 text-gray-400 dark:text-gray-500 hover:text-sky-600 dark:hover:text-sky-400 hover:bg-sky-50 dark:hover:bg-gray-800 rounded-lg transition-colors cursor-pointer"
                       title="Delete Instance"
                       aria-label="Delete Instance"
                     >

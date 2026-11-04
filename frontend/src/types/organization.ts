@@ -150,7 +150,7 @@ export interface AccessRemarkModalProps {
   onClose: () => void;
   onConfirm: (remark: string) => void;
   title: string;
-  description: string;
+  description: React.ReactNode;
   loading?: boolean;
 }
 

@@ -266,7 +266,7 @@ export const ReportsPage: React.FC = () => {
           }`}
         >
           <BarChart2 className="w-3.5 h-3.5" />
-          Agile Metrics & KPIs
+          Overview
         </button>
 
         <button
@@ -279,16 +279,7 @@ export const ReportsPage: React.FC = () => {
           }`}
         >
           <Clock className="w-3.5 h-3.5" />
-          Time Tracking & Work Logs
-          <span
-            className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${
-              activeReportTab === "timetracking"
-                ? "bg-sky-50 dark:bg-sky-950/50 text-sky-600 dark:text-sky-400"
-                : "bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400"
-            }`}
-          >
-            {totalOrgWorkLogs}
-          </span>
+          Time Tracking
         </button>
       </div>
 
@@ -323,8 +314,7 @@ export const ReportsPage: React.FC = () => {
         </>
       ) : (
         <ReportTimeTrackingView
-          tasks={reportTasks}
-          onRefresh={handleRefresh}
+          timeframe={timeframe}
           currentUser={currentUser}
         />
       )}

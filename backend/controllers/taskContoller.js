@@ -1103,3 +1103,359 @@ export const unlinkTask = async (req, res) => {
     res.status(HttpStatus.BAD_REQUEST).json({ success: false, message: error.message });
   }
 };
+
+// GET PAGINATED USER WORKLOG SUMMARIES FOR ORG
+export const getUserWorklogSummaries = async (req, res) => {
+  try {
+    const {
+      page = 1,
+      limit = 10,
+      search = "",
+      timeframe = "all",
+      startDate,
+      endDate,
+    } = req.query;
+
+    const p = Math.max(1, parseInt(page) || 1);
+    const l = Math.max(1, parseInt(limit) || 10);
+    const skip = (p - 1) * l;
+
+    const orgMatch = req.user.organization
+      ? { organization: new mongoose.Types.ObjectId(req.user.organization) }
+      : { owner: new mongoose.Types.ObjectId(req.user.id) };
+
+    const dateFilter = {};
+    if (timeframe === "7d") {
+      dateFilter.$gte = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+    } else if (timeframe === "30d") {
+      dateFilter.$gte = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+    } else if (timeframe === "today") {
+      const todayStart = new Date();
+      todayStart.setHours(0, 0, 0, 0);
+      dateFilter.$gte = todayStart;
+    } else if (startDate || endDate) {
+      if (startDate) dateFilter.$gte = new Date(startDate);
+      if (endDate) {
+        const end = new Date(endDate);
+        end.setHours(23, 59, 59, 999);
+        dateFilter.$lte = end;
+      }
+    }
+
+    const matchStage = { ...orgMatch, "workLogs.0": { $exists: true } };
+
+    const pipeline = [
+      { $match: matchStage },
+      { $unwind: "$workLogs" },
+    ];
+
+    if (Object.keys(dateFilter).length > 0) {
+      pipeline.push({
+        $match: { "workLogs.createdAt": dateFilter },
+      });
+    }
+
+    pipeline.push(
+      {
+        $group: {
+          _id: "$workLogs.user",
+          totalHours: { $sum: "$workLogs.hoursSpent" },
+          taskIds: { $addToSet: "$_id" },
+          logCount: { $sum: 1 },
+          lastLoggedAt: { $max: "$workLogs.createdAt" },
+        },
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "_id",
+          foreignField: "_id",
+          as: "userInfo",
+        },
+      },
+      { $unwind: { path: "$userInfo", preserveNullAndEmptyArrays: true } }
+    );
+
+    if (search && search.trim()) {
+      pipeline.push({
+        $match: {
+          $or: [
+            { "userInfo.name": { $regex: search.trim(), $options: "i" } },
+            { "userInfo.email": { $regex: search.trim(), $options: "i" } },
+          ],
+        },
+      });
+    }
+
+    pipeline.push({
+      $facet: {
+        totalStats: [
+          {
+            $group: {
+              _id: null,
+              overallHours: { $sum: "$totalHours" },
+              userCount: { $sum: 1 },
+              allTasks: { $push: "$taskIds" },
+            },
+          },
+        ],
+        paginatedData: [
+          { $sort: { totalHours: -1 } },
+          { $skip: skip },
+          { $limit: l },
+          {
+            $project: {
+              userId: "$_id",
+              name: { $ifNull: ["$userInfo.name", "Unknown Member"] },
+              email: { $ifNull: ["$userInfo.email", ""] },
+              avatar: "$userInfo.avatar",
+              role: "$userInfo.role",
+              totalHours: { $round: ["$totalHours", 1] },
+              taskCount: { $size: "$taskIds" },
+              logCount: "$logCount",
+              lastLoggedAt: "$lastLoggedAt",
+            },
+          },
+        ],
+      },
+    });
+
+    const result = await Task.aggregate(pipeline);
+    const facetData = result[0] || {};
+    const totalStats = facetData.totalStats?.[0] || {};
+    const users = facetData.paginatedData || [];
+    const totalCount = totalStats.userCount || 0;
+
+    const allTaskIds = new Set();
+    (totalStats.allTasks || []).forEach((arr) => {
+      arr.forEach((id) => allTaskIds.add(id.toString()));
+    });
+
+    res.json({
+      success: true,
+      users,
+      pagination: {
+        currentPage: p,
+        totalPages: Math.ceil(totalCount / l) || 1,
+        totalCount,
+        pageSize: l,
+      },
+      summary: {
+        totalHours: Math.round((totalStats.overallHours || 0) * 10) / 10,
+        activeContributors: totalCount,
+        trackedTasksCount: allTaskIds.size,
+      },
+    });
+  } catch (error) {
+    res.status(HttpStatus.BAD_REQUEST).json({ success: false, message: error.message });
+  }
+};
+
+// GET DETAILED WORKLOG ENTRIES FOR A SINGLE USER (LAZY-LOADED ON ACCORDION EXPAND)
+export const getUserDetailedWorklogs = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const {
+      page = 1,
+      limit = 5,
+      timeframe = "all",
+      startDate,
+      endDate,
+      search = "",
+    } = req.query;
+
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(HttpStatus.BAD_REQUEST).json({ success: false, message: "Invalid user ID" });
+    }
+
+    const p = Math.max(1, parseInt(page) || 1);
+    const l = Math.max(1, parseInt(limit) || 5);
+    const skip = (p - 1) * l;
+
+    const userObjectId = new mongoose.Types.ObjectId(userId);
+    const orgMatch = req.user.organization
+      ? { organization: new mongoose.Types.ObjectId(req.user.organization) }
+      : { owner: new mongoose.Types.ObjectId(req.user.id) };
+
+    const dateFilter = {};
+    if (timeframe === "7d") {
+      dateFilter.$gte = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+    } else if (timeframe === "30d") {
+      dateFilter.$gte = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+    } else if (timeframe === "today") {
+      const todayStart = new Date();
+      todayStart.setHours(0, 0, 0, 0);
+      dateFilter.$gte = todayStart;
+    } else if (startDate || endDate) {
+      if (startDate) dateFilter.$gte = new Date(startDate);
+      if (endDate) {
+        const end = new Date(endDate);
+        end.setHours(23, 59, 59, 999);
+        dateFilter.$lte = end;
+      }
+    }
+
+    const pipeline = [
+      { $match: { ...orgMatch, "workLogs.user": userObjectId } },
+      { $unwind: "$workLogs" },
+      { $match: { "workLogs.user": userObjectId } },
+    ];
+
+    if (Object.keys(dateFilter).length > 0) {
+      pipeline.push({
+        $match: { "workLogs.createdAt": dateFilter },
+      });
+    }
+
+    pipeline.push({
+      $project: {
+        taskId: "$_id",
+        taskKey: {
+          $ifNull: [
+            "$key",
+            { $concat: ["PM-", { $substrCP: [{ $toString: "$_id" }, 20, 4] }] },
+          ],
+        },
+        taskTitle: "$title",
+        issueType: { $ifNull: ["$issueType", "Task"] },
+        status: { $ifNull: ["$status", "To Do"] },
+        priority: { $ifNull: ["$priority", "Low"] },
+        originalEstimate: { $ifNull: ["$originalEstimate", 0] },
+        timeLogged: { $ifNull: ["$timeLogged", 0] },
+        workLogId: "$workLogs._id",
+        hoursSpent: "$workLogs.hoursSpent",
+        description: { $ifNull: ["$workLogs.description", ""] },
+        createdAt: "$workLogs.createdAt",
+      },
+    });
+
+    if (search && search.trim()) {
+      pipeline.push({
+        $match: {
+          $or: [
+            { taskKey: { $regex: search.trim(), $options: "i" } },
+            { taskTitle: { $regex: search.trim(), $options: "i" } },
+            { description: { $regex: search.trim(), $options: "i" } },
+          ],
+        },
+      });
+    }
+
+    pipeline.push({
+      $facet: {
+        meta: [{ $count: "total" }],
+        items: [
+          { $sort: { createdAt: -1 } },
+          { $skip: skip },
+          { $limit: l },
+        ],
+      },
+    });
+
+    const result = await Task.aggregate(pipeline);
+    const totalCount = result[0]?.meta?.[0]?.total || 0;
+    const logs = result[0]?.items || [];
+
+    res.json({
+      success: true,
+      logs,
+      pagination: {
+        currentPage: p,
+        totalPages: Math.ceil(totalCount / l) || 1,
+        totalCount,
+        pageSize: l,
+      },
+    });
+  } catch (error) {
+    res.status(HttpStatus.BAD_REQUEST).json({ success: false, message: error.message });
+  }
+};
+
+// EXPORT WORKLOGS (CSV DATA) FOR A SPECIFIC USER OR ALL EMPLOYEES
+export const exportWorklogs = async (req, res) => {
+  try {
+    const { userId, timeframe = "all", startDate, endDate } = req.query;
+
+    const orgMatch = req.user.organization
+      ? { organization: new mongoose.Types.ObjectId(req.user.organization) }
+      : { owner: new mongoose.Types.ObjectId(req.user.id) };
+
+    const dateFilter = {};
+    if (timeframe === "7d") {
+      dateFilter.$gte = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+    } else if (timeframe === "30d") {
+      dateFilter.$gte = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+    } else if (timeframe === "today") {
+      const todayStart = new Date();
+      todayStart.setHours(0, 0, 0, 0);
+      dateFilter.$gte = todayStart;
+    } else if (startDate || endDate) {
+      if (startDate) dateFilter.$gte = new Date(startDate);
+      if (endDate) {
+        const end = new Date(endDate);
+        end.setHours(23, 59, 59, 999);
+        dateFilter.$lte = end;
+      }
+    }
+
+    const matchStage = { ...orgMatch, "workLogs.0": { $exists: true } };
+    if (userId && mongoose.Types.ObjectId.isValid(userId)) {
+      matchStage["workLogs.user"] = new mongoose.Types.ObjectId(userId);
+    }
+
+    const pipeline = [
+      { $match: matchStage },
+      { $unwind: "$workLogs" },
+    ];
+
+    if (userId && mongoose.Types.ObjectId.isValid(userId)) {
+      pipeline.push({
+        $match: { "workLogs.user": new mongoose.Types.ObjectId(userId) },
+      });
+    }
+
+    if (Object.keys(dateFilter).length > 0) {
+      pipeline.push({
+        $match: { "workLogs.createdAt": dateFilter },
+      });
+    }
+
+    pipeline.push(
+      {
+        $lookup: {
+          from: "users",
+          localField: "workLogs.user",
+          foreignField: "_id",
+          as: "userInfo",
+        },
+      },
+      { $unwind: { path: "$userInfo", preserveNullAndEmptyArrays: true } },
+      {
+        $project: {
+          taskId: "$_id",
+          taskKey: {
+            $ifNull: [
+              "$key",
+              { $concat: ["PM-", { $substrCP: [{ $toString: "$_id" }, 20, 4] }] },
+            ],
+          },
+          taskTitle: "$title",
+          issueType: { $ifNull: ["$issueType", "Task"] },
+          status: { $ifNull: ["$status", "To Do"] },
+          userName: { $ifNull: ["$userInfo.name", "Unknown Member"] },
+          userEmail: { $ifNull: ["$userInfo.email", ""] },
+          hoursSpent: "$workLogs.hoursSpent",
+          description: { $ifNull: ["$workLogs.description", ""] },
+          createdAt: "$workLogs.createdAt",
+        },
+      },
+      { $sort: { createdAt: -1 } }
+    );
+
+    const logs = await Task.aggregate(pipeline);
+
+    res.json({ success: true, logs });
+  } catch (error) {
+    res.status(HttpStatus.BAD_REQUEST).json({ success: false, message: error.message });
+  }
+};

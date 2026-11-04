@@ -168,95 +168,85 @@ export const TaskMetaSidebar: React.FC<TaskMetaSidebarProps> = ({
         />
       </div>
 
-      {/* Estimation: Story Points & Time Estimate */}
-      <div className="grid grid-cols-2 gap-2.5">
-        <div>
-          <label className="flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-gray-500 mb-1">
-            <Flag className="w-3.5 h-3.5 text-sky-500" /> Story Points
-          </label>
-          <input
-            type="number"
-            name="storyPoints"
-            min="0"
-            max="100"
-            value={taskData.storyPoints !== undefined ? taskData.storyPoints : 1}
-            onChange={handleChange}
-            className={baseControlClasses}
-            required
-          />
-        </div>
-
-        <div>
-          <label className="flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-gray-500 mb-1" title="Original Time Estimate in hours">
-            <Clock className="w-3.5 h-3.5 text-sky-500" /> Estimate (h)
-          </label>
-          <input
-            type="number"
-            name="originalEstimate"
-            min="0"
-            max="1000"
-            step="0.5"
-            placeholder="0"
-            value={taskData.originalEstimate !== undefined ? taskData.originalEstimate : 0}
-            onChange={handleChange}
-            className={baseControlClasses}
-          />
-        </div>
+      {/* Story Points */}
+      <div>
+        <label className="flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-gray-500 mb-1">
+          <Flag className="w-3.5 h-3.5 text-sky-500" /> Story Points
+        </label>
+        <input
+          type="number"
+          name="storyPoints"
+          min="0"
+          max="100"
+          value={taskData.storyPoints !== undefined ? taskData.storyPoints : 1}
+          onChange={handleChange}
+          className={baseControlClasses}
+          required
+        />
       </div>
 
-      {/* Time Tracking Widget */}
+      {/* Time Tracking (Unified Section) */}
       {!isEditingSubtask && (
-        <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-gray-800/50 border border-sky-100/60 dark:border-gray-800 space-y-2.5">
+        <div className="p-3.5 rounded-xl bg-slate-50/80 dark:bg-gray-800/50 border border-sky-100/60 dark:border-gray-800 space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 flex items-center gap-1.5">
+            <span className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 flex items-center gap-1.5">
               <Clock className="w-3.5 h-3.5 text-sky-500" /> Time Tracking
             </span>
-            {onLogTimeClick && (
-              <button
-                type="button"
-                onClick={onLogTimeClick}
-                className="text-[11px] font-semibold text-sky-600 dark:text-sky-400 hover:text-sky-700 dark:hover:text-sky-300 transition-colors cursor-pointer"
-              >
-                + Log Time
-              </button>
-            )}
           </div>
 
-          {/* Progress Bar */}
-          <div className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden flex">
-            <div
-              className={`h-full rounded-full transition-all duration-300 ${
-                (taskData.originalEstimate || 0) > 0 && (timeLogged || 0) > (taskData.originalEstimate || 0)
-                  ? "bg-amber-500 dark:bg-amber-400"
-                  : "bg-sky-500 dark:bg-sky-400"
-              }`}
-              style={{
-                width: `${
-                  (taskData.originalEstimate || 0) > 0
-                    ? Math.min(100, Math.round(((timeLogged || 0) / (taskData.originalEstimate || 1)) * 100))
-                    : (timeLogged || 0) > 0 ? 100 : 0
-                }%`,
-              }}
+          <div>
+            <label className="block text-[11px] font-medium text-gray-400 mb-1">
+              Estimated Hours
+            </label>
+            <input
+              type="number"
+              name="originalEstimate"
+              min="0"
+              max="1000"
+              step="any"
+              placeholder="0h"
+              value={taskData.originalEstimate !== undefined ? taskData.originalEstimate : 0}
+              onChange={handleChange}
+              className={`${baseControlClasses} py-1.5 text-xs`}
             />
           </div>
 
-          {/* Stats breakdown */}
-          <div className="flex items-center justify-between text-[11px] text-gray-500 dark:text-gray-400">
-            <span>
-              <strong className="text-gray-800 dark:text-gray-200">{timeLogged || 0}h</strong> logged
-            </span>
-            <span>
-              {taskData.originalEstimate > 0 ? (
-                <>
-                  <strong className="text-gray-800 dark:text-gray-200">
-                    {Math.max(0, (taskData.originalEstimate || 0) - (timeLogged || 0)).toFixed(1)}h
-                  </strong>{" "}
-                  remaining
-                </>
-              ) : (
-                <span className="text-gray-400">No estimate</span>
-              )}
-            </span>
+          {/* Progress Bar & Summary */}
+          <div className="space-y-1.5 pt-0.5">
+            <div className="w-full h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+              <div
+                className={`h-full rounded-full transition-all duration-300 ${
+                  (taskData.originalEstimate || 0) > 0 && (timeLogged || 0) > (taskData.originalEstimate || 0)
+                    ? "bg-amber-500 dark:bg-amber-400"
+                    : "bg-sky-500 dark:bg-sky-400"
+                }`}
+                style={{
+                  width: `${
+                    (taskData.originalEstimate || 0) > 0
+                      ? Math.min(100, Math.round(((timeLogged || 0) / (taskData.originalEstimate || 1)) * 100))
+                      : (timeLogged || 0) > 0 ? 100 : 0
+                  }%`,
+                }}
+              />
+            </div>
+
+            <div className="flex items-center justify-between text-[11px] text-gray-500 dark:text-gray-400">
+              <span>
+                <strong className="text-gray-800 dark:text-gray-200">{timeLogged || 0}h</strong> logged
+              </span>
+              <span>
+                {taskData.originalEstimate > 0 ? (
+                  <>
+                    <strong className="text-gray-800 dark:text-gray-200">
+                      {Math.max(0, (taskData.originalEstimate || 0) - (timeLogged || 0)).toFixed(1)}h
+                    </strong>{" "}
+                    left
+                  </>
+                ) : (
+                  <span className="text-gray-400">No estimate</span>
+                )}
+              </span>
+            </div>
           </div>
         </div>
       )}

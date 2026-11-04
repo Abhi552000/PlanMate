@@ -121,6 +121,12 @@ export const TaskFormMeta: React.FC<TaskFormMetaProps> = ({
     }
   };
 
+  const handleCancelLogWork = () => {
+    setLogHours("");
+    setLogDesc("");
+    setShowLogForm(false);
+  };
+
   return (
     <div className="md:col-span-5 mt-4 md:mt-0 space-y-3.5 bg-slate-50/60 dark:bg-gray-900/40 p-4 rounded-xl border border-slate-200/80 dark:border-gray-800/80 self-start">
       <div>
@@ -336,8 +342,16 @@ export const TaskFormMeta: React.FC<TaskFormMetaProps> = ({
             </span>
             <button
               type="button"
-              onClick={() => setShowLogForm(!showLogForm)}
-              className="text-[10px] bg-sky-50 hover:bg-sky-100 dark:bg-gray-800 dark:hover:bg-gray-700 text-sky-600 dark:text-sky-400 px-2 py-1 rounded font-bold flex items-center gap-0.5 transition"
+              onClick={() => {
+                if (showLogForm) {
+                  handleCancelLogWork();
+                } else {
+                  setLogHours("");
+                  setLogDesc("");
+                  setShowLogForm(true);
+                }
+              }}
+              className="text-[10px] bg-sky-50 hover:bg-sky-100 dark:bg-gray-800 dark:hover:bg-gray-700 text-sky-600 dark:text-sky-400 px-2 py-1 rounded font-bold flex items-center gap-0.5 transition cursor-pointer"
             >
               <Plus className="w-3 h-3" /> Log Work
             </button>
@@ -370,8 +384,8 @@ export const TaskFormMeta: React.FC<TaskFormMetaProps> = ({
               <div className="grid grid-cols-3 gap-2">
                 <input
                   type="number"
-                  step="0.5"
-                  min="0.1"
+                  step="any"
+                  min="0.01"
                   placeholder="Hours (e.g. 1.5)"
                   value={logHours}
                   onChange={(e) => setLogHours(e.target.value)}
@@ -389,8 +403,8 @@ export const TaskFormMeta: React.FC<TaskFormMetaProps> = ({
               <div className="flex justify-end gap-1.5 pt-1">
                 <button
                   type="button"
-                  onClick={() => setShowLogForm(false)}
-                  className="px-2 py-1 text-[10px] text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition font-medium"
+                  onClick={handleCancelLogWork}
+                  className="px-2 py-1 text-[10px] text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition font-medium cursor-pointer"
                 >
                   Cancel
                 </button>
