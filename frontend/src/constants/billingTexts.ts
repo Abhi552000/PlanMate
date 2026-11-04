@@ -131,10 +131,12 @@ export const SYSADMIN_PLANS_TEXTS = {
   CARD_MONTH_SUFFIX: "/ month",
   CARD_MEMBERS_CAPACITY: (count: number) => `Up to ${count} members capacity`,
   DELETE_MODAL_TITLE: "Delete Subscription Plan",
+  DELETE_PERMANENT_WARNING: "This action cannot be undone.",
   DELETE_CONFIRM_QUESTION: (name: string) =>
     `Are you sure you want to permanently delete the "${name}" plan? Organizations currently on this plan will not be impacted, but new organizations will no longer be able to subscribe to it.`,
   BTN_DELETE: "Delete Plan",
   BTN_DELETING: "Deleting...",
+  ERR_LOAD_PLANS: "Failed to load plans",
   ERR_REQUIRED_FIELDS: "Plan Name and Plan ID are required",
   ERR_INVALID_PRICE: "Price must be 0 or a positive number",
   ERR_INVALID_MEMBERS: "Maximum member limit must be at least 1",
@@ -151,6 +153,16 @@ export const SYSADMIN_SIDEBAR_TEXTS = {
   TAB_PLANS: "Plans & Pricing",
   TAB_PAYMENTS: "Payment History",
   BTN_ONBOARD_ORG: "Onboard Organization",
+  CLOSE_MENU: "Close navigation menu",
+};
+
+export const SYSADMIN_HEADER_TEXTS = {
+  BADGE_SYS_ADMIN: "System Admin",
+  DEFAULT_ADMIN_NAME: "System Admin",
+  DEFAULT_ADMIN_EMAIL: "admin@planmate.com",
+  BTN_LOGOUT: "Log Out",
+  ARIA_OPEN_MENU: "Open Navigation Menu",
+  ARIA_TOGGLE_DARK_MODE: "Toggle dark mode",
 };
 
 export const RESET_PASSWORD_TEXTS = {
@@ -178,6 +190,7 @@ export const ORG_TABLE_TEXTS = {
   FILTER_ALL_STATUS: "All",
   FILTER_ACTIVE: "Active Only",
   FILTER_INACTIVE: "Inactive Only",
+  FILTER_STATUS_LABEL: "Status",
   SEARCH_PLACEHOLDER: "Search by name, email...",
   BTN_EXPORT_CSV: "Export CSV",
   COL_ORGANIZATION: "Organization",
@@ -191,43 +204,114 @@ export const ORG_TABLE_TEXTS = {
   BADGE_INACTIVE: "Inactive",
   TOOLTIP_RESET_PASSWORD: "Reset Admin Password",
   TOOLTIP_INSPECT: "View Details",
+  TOOLTIP_ACTIVATE: "Activate Organization",
+  TOOLTIP_DEACTIVATE: "Deactivate Organization",
+  TOOLTIP_EDIT: "Edit Details",
+  TOOLTIP_DELETE: "Delete Instance",
   UNASSIGNED: "Unassigned",
   EMPTY_MATCH_SUBTITLE: "No organizations found matching the selected filters.",
+  DEFAULT_PLAN: "Starter",
+  DEFAULT_BILLING_CYCLE: "Monthly",
+  PAGINATION_ITEM_LABEL: "organizations",
 };
 
 export const TENANT_MODAL_TEXTS = {
   MODAL_TITLE: "Organization Details",
   TITLE_ACTIVE: "Active",
   TITLE_DEACTIVATED: "Deactivated",
-  LABEL_GENERAL_INFO: "General Information",
+  LABEL_GENERAL_INFO: "Organization & Administrator Details",
   LABEL_ORG_ID: "Organization ID",
-  TOOLTIP_COPY_ID: "Copy Organization ID",
-  LABEL_CREATED_DATE: "Created On",
+  TOOLTIP_COPY_ID: "Copy ID",
+  LABEL_CREATED_DATE: "Created Date",
   LABEL_DESCRIPTION: "Description",
   LABEL_NO_DESCRIPTION: "No description provided.",
   LABEL_ADMIN_REP: "Administrator",
+  LABEL_ADMIN_EMAIL: "Admin Email",
+  LABEL_CONTACT_PHONE: "Contact Phone",
+  LABEL_WEBSITE: "Website URL",
+  LABEL_LOCATION: "Location / Region",
+  LABEL_INDUSTRY: "Industry / Sector",
+  LABEL_COMPANY_SIZE: "Company Size",
+  EMPLOYEES_SUFFIX: "employees",
   LABEL_UNASSIGNED: "Unassigned",
   LABEL_NO_EMAIL: "No email registered",
   TOOLTIP_COPY_EMAIL: "Copy email",
-  LABEL_SUBSCRIPTION: "Subscription & Quota",
-  LABEL_PLAN_TIER: "Plan Tier",
+  TOOLTIP_COPY_PHONE: "Copy phone",
+  LABEL_SUBSCRIPTION: "Subscription Plan",
   LABEL_BILLING_CYCLE: "Billing Cycle",
+  LABEL_UTILIZATION_TITLE: "Workspace Utilization & Activity",
   LABEL_SEAT_USAGE: "Seat Allocation",
-  SEATS_FRACTION: (used: number, max: number) => `${used} of ${max} seats used`,
-  LABEL_VALID_UNTIL: "Valid Until",
-  LABEL_ONGOING: "Ongoing",
-  LABEL_TXN_ID: "Transaction ID",
-  LABEL_ACTIVITY_WORKFLOW: "Activity & Workflow",
+  SEATS_FRACTION: (used: number, max: number) => `${used} / ${max} seats`,
+  SEATS_AVAILABLE: (count: number) => `${count} available`,
+  SEATS_CAPACITY_REACHED: "Capacity reached",
   LABEL_TOTAL_WORK_ITEMS: "Lifetime Tickets",
-  LABEL_WORKFLOW_COLUMNS: (count: number) => `Board Workflow Columns (${count})`,
+  TOTAL_TASKS_LOGGED: "Total tasks logged",
+  LABEL_WORKFLOW_COLUMNS: "Workflow Columns",
   LABEL_DEACTIVATION_NOTE: "Deactivation Remark:",
   MSG_COPIED: "Copied!",
-  LIFETIME_ACTIVITY: "lifetime activity",
-  BTN_CLOSE: "Close",
-  // Kept for backward compatibility
-  BTN_RESET_PASSWORD: "Reset Admin Password",
-  BTN_EDIT: "Edit",
-  BTN_ACTIVATE: "Activate",
-  BTN_DEACTIVATE: "Deactivate",
-  BTN_DELETE: "Delete",
+  BTN_DONE: "Done",
+  DEFAULT_PLAN: "Starter",
+  DEFAULT_BILLING_CYCLE: "Monthly",
+  ARIA_CLOSE: "Close",
+};
+
+export const ORG_MODALS_TEXTS = {
+  // Deactivate Modal
+  DEACTIVATE_TITLE: "Deactivate Organization",
+  DEACTIVATE_CONFIRM_QUESTION: (name: string) =>
+    `Are you sure you want to deactivate ${name}? Users belonging to this organization will temporarily lose access.`,
+  LABEL_DEACTIVATE_REASON: "Reason for Deactivation (Remark)",
+  PLACEHOLDER_DEACTIVATE_REASON: "Enter reason for deactivation...",
+  ERR_DEACTIVATE_REASON_REQUIRED: "Reason / Remark is mandatory.",
+  BTN_DEACTIVATE: "Deactivate Organization",
+
+  // Delete Modal
+  DELETE_TITLE: "Delete Organization",
+  DELETE_CONFIRM_QUESTION: (name: string) =>
+    `Are you sure you want to permanently delete ${name}? All users, tasks, and data associated with this tenant will be permanently removed.`,
+  BTN_DELETE: "Delete Organization",
+  BTN_DELETING: "Deleting...",
+
+  // Edit Modal
+  EDIT_TITLE: (name: string) => `Edit ${name}`,
+  LABEL_ORG_NAME: "Organization Name *",
+  PLACEHOLDER_ORG_NAME: "Enter organization name",
+  LABEL_ADMIN_NAME: "Admin Full Name *",
+  PLACEHOLDER_ADMIN_NAME: "Enter administrator name",
+  LABEL_ADMIN_EMAIL: "Admin Email *",
+  PLACEHOLDER_ADMIN_EMAIL: "Enter administrator email",
+  LABEL_INDUSTRY: "Industry / Sector",
+  PLACEHOLDER_INDUSTRY: "e.g. Technology, Finance",
+  LABEL_COMPANY_SIZE: "Company Size",
+  LABEL_WEBSITE: "Website",
+  PLACEHOLDER_WEBSITE: "e.g. https://example.com",
+  LABEL_PHONE: "Contact Phone",
+  PLACEHOLDER_PHONE: "e.g. +1 (555) 000-0000",
+  LABEL_LOCATION: "Location / Region",
+  PLACEHOLDER_LOCATION: "e.g. San Francisco, CA",
+  LABEL_DESCRIPTION: "Description",
+  PLACEHOLDER_DESCRIPTION: "Brief overview of this organization...",
+  BTN_SAVE_CHANGES: "Save Changes",
+  BTN_SAVING: "Saving...",
+
+  // Onboard Modal
+  ONBOARD_TITLE: "Onboard Organization",
+  ONBOARD_COMPLETE_TITLE: "Onboarding Complete!",
+  ONBOARD_COMPLETE_SUBTITLE: (orgName: string) =>
+    `Successfully created tenant workspace for ${orgName}`,
+  LABEL_GENERATED_PASSWORD: "Generated Temporary Password",
+  TOOLTIP_COPY_PASSWORD: "Copy Password",
+  TOOLTIP_PASSWORD_COPIED: "Copied!",
+  BTN_ONBOARD_SUBMIT: "Create Tenant Workspace",
+  BTN_ONBOARDING: "Creating Workspace...",
+
+  // Restore Modal
+  RESTORE_TITLE: "Restore Organization Access",
+  RESTORE_CONFIRM_QUESTION: (name: string) =>
+    `Are you sure you want to restore and activate access for ${name}? Workspace members will be granted full access.`,
+  BTN_RESTORE: "Restore Organization",
+
+  // Common
+  BTN_CANCEL: "Cancel",
+  ARIA_CLOSE: "Close",
 };

@@ -2,6 +2,7 @@ import React from "react";
 import { X } from "lucide-react";
 import { EditOrgModalProps } from "../../../types";
 import { Input, Select } from "../../../components/ui";
+import { ORG_MODALS_TEXTS } from "../../../constants/billingTexts";
 
 const COMPANY_SIZE_OPTIONS = [
   { value: "", label: "Select company size" },
@@ -33,12 +34,12 @@ export const EditOrgModal: React.FC<EditOrgModalProps> = ({
       >
         <div className="flex items-center justify-between border-b border-gray-100 dark:border-gray-800 pb-3.5">
           <h3 className="font-bold text-gray-800 dark:text-gray-100 text-base">
-            Edit {editingOrg.name}
+            {ORG_MODALS_TEXTS.EDIT_TITLE(editingOrg.name)}
           </h3>
           <button
             onClick={onClose}
             className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors cursor-pointer"
-            aria-label="Close"
+            aria-label={ORG_MODALS_TEXTS.ARIA_CLOSE}
           >
             <X className="w-5 h-5" />
           </button>
@@ -47,7 +48,7 @@ export const EditOrgModal: React.FC<EditOrgModalProps> = ({
         <form onSubmit={onUpdateSubmit} className="space-y-3.5 text-xs">
           {/* Organization Name */}
           <Input
-            label="Organization Name *"
+            label={ORG_MODALS_TEXTS.LABEL_ORG_NAME}
             type="text"
             value={editForm.orgName}
             onChange={(e) =>
@@ -56,14 +57,14 @@ export const EditOrgModal: React.FC<EditOrgModalProps> = ({
                 orgName: e.target.value,
               }))
             }
-            placeholder="Enter organization name"
+            placeholder={ORG_MODALS_TEXTS.PLACEHOLDER_ORG_NAME}
             required
           />
 
           {/* Admin Full Name & Email */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <Input
-              label="Admin Full Name *"
+              label={ORG_MODALS_TEXTS.LABEL_ADMIN_NAME}
               type="text"
               value={editForm.adminName}
               onChange={(e) =>
@@ -72,12 +73,12 @@ export const EditOrgModal: React.FC<EditOrgModalProps> = ({
                   adminName: e.target.value,
                 }))
               }
-              placeholder="Enter administrator name"
+              placeholder={ORG_MODALS_TEXTS.PLACEHOLDER_ADMIN_NAME}
               required
             />
 
             <Input
-              label="Admin Email *"
+              label={ORG_MODALS_TEXTS.LABEL_ADMIN_EMAIL}
               type="email"
               value={editForm.adminEmail}
               onChange={(e) =>
@@ -86,7 +87,7 @@ export const EditOrgModal: React.FC<EditOrgModalProps> = ({
                   adminEmail: e.target.value,
                 }))
               }
-              placeholder="Enter administrator email"
+              placeholder={ORG_MODALS_TEXTS.PLACEHOLDER_ADMIN_EMAIL}
               required
             />
           </div>
@@ -94,7 +95,7 @@ export const EditOrgModal: React.FC<EditOrgModalProps> = ({
           {/* Industry & Company Size */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <Input
-              label="Industry / Sector"
+              label={ORG_MODALS_TEXTS.LABEL_INDUSTRY}
               type="text"
               value={editForm.industry || ""}
               onChange={(e) =>
@@ -107,7 +108,7 @@ export const EditOrgModal: React.FC<EditOrgModalProps> = ({
             />
 
             <Select
-              label="Company Size"
+              label={ORG_MODALS_TEXTS.LABEL_COMPANY_SIZE}
               options={COMPANY_SIZE_OPTIONS}
               value={editForm.companySize || ""}
               onChange={(e) =>
@@ -205,14 +206,14 @@ export const EditOrgModal: React.FC<EditOrgModalProps> = ({
               onClick={onClose}
               className="px-4 py-2 border border-slate-200 dark:border-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 font-bold rounded-xl text-xs transition-colors cursor-pointer bg-white dark:bg-gray-900"
             >
-              Cancel
+              {ORG_MODALS_TEXTS.BTN_CANCEL}
             </button>
             <button
               type="submit"
               disabled={updating}
               className="bg-sky-500 hover:bg-sky-600 disabled:opacity-50 text-white font-bold py-2 px-5 rounded-xl transition-colors cursor-pointer text-xs shadow-xs"
             >
-              {updating ? "Saving..." : "Save Changes"}
+              {updating ? ORG_MODALS_TEXTS.BTN_SAVING : ORG_MODALS_TEXTS.BTN_SAVE_CHANGES}
             </button>
           </div>
         </form>

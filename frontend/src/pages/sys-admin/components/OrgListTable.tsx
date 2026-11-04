@@ -1,15 +1,11 @@
-import React, { useState, useMemo, useEffect } from "react";
+import React from "react";
 import {
-  Search,
   Power,
   Edit,
   Trash2,
-  X,
   KeyRound,
   Eye,
   Download,
-  Users,
-  Layers,
 } from "lucide-react";
 import { OrgListTableProps } from "../../../types";
 import { ORG_TABLE_TEXTS } from "../../../constants/billingTexts";
@@ -64,7 +60,7 @@ export const OrgListTable: React.FC<OrgListTableProps> = ({
         <div className="flex flex-wrap items-center gap-2.5">
           {/* Status Dropdown */}
           <FilterSelect
-            label="Status"
+            label={ORG_TABLE_TEXTS.FILTER_STATUS_LABEL}
             value={statusFilter}
             options={[
               { label: ORG_TABLE_TEXTS.FILTER_ALL_STATUS, value: "all" },
@@ -187,14 +183,14 @@ export const OrgListTable: React.FC<OrgListTableProps> = ({
                 {/* Subscription Plan */}
                 <td className="px-3 sm:px-5 py-3 sm:py-3.5">
                   <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-bold bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 border border-sky-100 dark:border-sky-800">
-                    {org.subscription?.planName || "Starter"}
+                    {org.subscription?.planName || ORG_TABLE_TEXTS.DEFAULT_PLAN}
                   </span>
                 </td>
 
                 {/* Plan Type (Billing Cycle: Monthly / Yearly) */}
                 <td className="hidden sm:table-cell px-3 sm:px-5 py-3 sm:py-3.5">
                   <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] sm:text-[11px] font-semibold bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 capitalize border border-gray-200/80 dark:border-gray-700">
-                    {org.subscription?.billingCycle || "Monthly"}
+                    {org.subscription?.billingCycle || ORG_TABLE_TEXTS.DEFAULT_BILLING_CYCLE}
                   </span>
                 </td>
 
@@ -266,8 +262,8 @@ export const OrgListTable: React.FC<OrgListTableProps> = ({
                       onClick={() => onToggleActive(org)}
                       disabled={togglingStatus}
                       className="p-1.5 text-gray-400 dark:text-gray-500 hover:text-sky-600 dark:hover:text-sky-400 hover:bg-sky-50 dark:hover:bg-gray-800 rounded-lg transition-colors cursor-pointer disabled:opacity-50"
-                      title={org.isActive ? "Deactivate Organization" : "Activate Organization"}
-                      aria-label={org.isActive ? "Deactivate Organization" : "Activate Organization"}
+                      title={org.isActive ? ORG_TABLE_TEXTS.TOOLTIP_DEACTIVATE : ORG_TABLE_TEXTS.TOOLTIP_ACTIVATE}
+                      aria-label={org.isActive ? ORG_TABLE_TEXTS.TOOLTIP_DEACTIVATE : ORG_TABLE_TEXTS.TOOLTIP_ACTIVATE}
                     >
                       <Power className="w-4 h-4" />
                     </button>
@@ -276,8 +272,8 @@ export const OrgListTable: React.FC<OrgListTableProps> = ({
                     <button
                       onClick={() => onEditClick(org)}
                       className="p-1.5 text-gray-400 dark:text-gray-500 hover:text-sky-600 dark:hover:text-sky-400 hover:bg-sky-50 dark:hover:bg-gray-800 rounded-lg transition-colors cursor-pointer"
-                      title="Edit Details"
-                      aria-label="Edit Details"
+                      title={ORG_TABLE_TEXTS.TOOLTIP_EDIT}
+                      aria-label={ORG_TABLE_TEXTS.TOOLTIP_EDIT}
                     >
                       <Edit className="w-4 h-4" />
                     </button>
@@ -286,8 +282,8 @@ export const OrgListTable: React.FC<OrgListTableProps> = ({
                     <button
                       onClick={() => onDeleteClick(org)}
                       className="p-1.5 text-gray-400 dark:text-gray-500 hover:text-sky-600 dark:hover:text-sky-400 hover:bg-sky-50 dark:hover:bg-gray-800 rounded-lg transition-colors cursor-pointer"
-                      title="Delete Instance"
-                      aria-label="Delete Instance"
+                      title={ORG_TABLE_TEXTS.TOOLTIP_DELETE}
+                      aria-label={ORG_TABLE_TEXTS.TOOLTIP_DELETE}
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -309,7 +305,7 @@ export const OrgListTable: React.FC<OrgListTableProps> = ({
         totalPages={totalPages}
         totalItems={totalCount}
         pageSize={10}
-        itemLabel="organizations"
+        itemLabel={ORG_TABLE_TEXTS.PAGINATION_ITEM_LABEL}
         onPageChange={onPageChange}
         disabled={tableLoading}
       />

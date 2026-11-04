@@ -28,9 +28,9 @@ import { DeactivateOrgModal } from "./components/DeactivateOrgModal";
 import { DeleteOrgModal } from "./components/DeleteOrgModal";
 import { ResetPasswordModal } from "./components/ResetPasswordModal";
 import { TenantDetailModal } from "./components/TenantDetailModal";
-import { PlanManagementModal } from "./components/PlanManagementModal";
 import { ConfirmationModal } from "../../components/ui/ConfirmationModal";
 import { useSystemAdmin } from "./hooks/useSystemAdmin";
+import { ORG_MODALS_TEXTS } from "../../constants/billingTexts";
 
 const SystemAdminDashboard: React.FC<SystemAdminDashboardProps> = ({ onLogout, user }) => {
   const {
@@ -96,7 +96,6 @@ const SystemAdminDashboard: React.FC<SystemAdminDashboardProps> = ({ onLogout, u
   const [activeTab, setActiveTab] = useState<SysAdminTab>("organizations");
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [showPlansModal, setShowPlansModal] = useState(false);
 
   const stats = useMemo(() => {
     const total = systemMetrics?.totalOrganizations ?? organizations.length;
@@ -345,25 +344,15 @@ const SystemAdminDashboard: React.FC<SystemAdminDashboardProps> = ({ onLogout, u
         isOpen={Boolean(restoringOrg)}
         onClose={() => setRestoringOrg(null)}
         onConfirm={handleRestoreOrgConfirm}
-        title="Restore Organization"
+        title={ORG_MODALS_TEXTS.RESTORE_TITLE}
         message={
           <>
-            Are you sure you want to restore and activate access for{" "}
-            <span className="font-bold text-sky-600 dark:text-sky-400">
-              {restoringOrg?.name}
-            </span>
-            ? Workspace members will be granted full access.
+            {ORG_MODALS_TEXTS.RESTORE_CONFIRM_QUESTION(restoringOrg?.name || "")}
           </>
         }
-        confirmText="Restore Organization"
-        cancelText="Cancel"
+        confirmText={ORG_MODALS_TEXTS.BTN_RESTORE}
+        cancelText={ORG_MODALS_TEXTS.BTN_CANCEL}
         loading={togglingStatus}
-      />
-
-      {/* Plan Management Configuration Modal (shortcut fallback) */}
-      <PlanManagementModal
-        isOpen={showPlansModal}
-        onClose={() => setShowPlansModal(false)}
       />
     </div>
   );

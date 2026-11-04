@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Copy, Check, X, ExternalLink } from "lucide-react";
 import { TenantDetailModalProps } from "../../../types";
+import { TENANT_MODAL_TEXTS } from "../../../constants/billingTexts";
 
 export const TenantDetailModal: React.FC<TenantDetailModalProps> = ({
   org,
@@ -61,16 +62,16 @@ export const TenantDetailModal: React.FC<TenantDetailModalProps> = ({
                 {org.isActive ? (
                   <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 text-xs font-semibold rounded-full bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                    Active
+                    {TENANT_MODAL_TEXTS.TITLE_ACTIVE}
                   </span>
                 ) : (
                   <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 text-xs font-semibold rounded-full bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-300 border border-rose-200 dark:border-rose-800">
                     <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
-                    Deactivated
+                    {TENANT_MODAL_TEXTS.TITLE_DEACTIVATED}
                   </span>
                 )}
                 <span className="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-semibold bg-sky-50 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300 border border-sky-100 dark:border-sky-900">
-                  {org.subscription?.planName || "Starter"}
+                  {org.subscription?.planName || TENANT_MODAL_TEXTS.DEFAULT_PLAN}
                 </span>
               </div>
               {org.slug && (
@@ -84,7 +85,7 @@ export const TenantDetailModal: React.FC<TenantDetailModalProps> = ({
           <button
             onClick={onClose}
             className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 p-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors cursor-pointer shrink-0"
-            aria-label="Close"
+            aria-label={TENANT_MODAL_TEXTS.ARIA_CLOSE}
           >
             <X className="w-5 h-5" />
           </button>
@@ -93,7 +94,7 @@ export const TenantDetailModal: React.FC<TenantDetailModalProps> = ({
         {/* Card 1: Organization & Administrator Details (Top Card) */}
         <div className="space-y-2">
           <span className="block text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500">
-            Organization & Administrator Details
+            {TENANT_MODAL_TEXTS.LABEL_GENERAL_INFO}
           </span>
 
           <div className="p-5 rounded-2xl border border-slate-200 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-950/40 space-y-4">
@@ -101,7 +102,7 @@ export const TenantDetailModal: React.FC<TenantDetailModalProps> = ({
               {/* Organization Name */}
               <div>
                 <span className="block text-gray-400 dark:text-gray-500 font-medium mb-1">
-                  Organization Name
+                  {TENANT_MODAL_TEXTS.MODAL_TITLE}
                 </span>
                 <span className="font-bold text-gray-900 dark:text-gray-100 text-sm">
                   {org.name}
@@ -111,7 +112,7 @@ export const TenantDetailModal: React.FC<TenantDetailModalProps> = ({
               {/* Organization ID */}
               <div>
                 <span className="block text-gray-400 dark:text-gray-500 font-medium mb-1">
-                  Organization ID
+                  {TENANT_MODAL_TEXTS.LABEL_ORG_ID}
                 </span>
                 <div className="flex items-center gap-1.5">
                   <span className="font-mono text-xs font-semibold text-gray-900 dark:text-gray-100 truncate select-all">
@@ -121,7 +122,7 @@ export const TenantDetailModal: React.FC<TenantDetailModalProps> = ({
                     type="button"
                     onClick={() => handleCopy(org._id, "id")}
                     className="p-0.5 rounded text-gray-400 hover:text-sky-600 transition-colors cursor-pointer shrink-0"
-                    title="Copy ID"
+                    title={TENANT_MODAL_TEXTS.TOOLTIP_COPY_ID}
                   >
                     {copiedKey === "id" ? (
                       <Check className="w-3.5 h-3.5 text-emerald-600" />
@@ -131,7 +132,7 @@ export const TenantDetailModal: React.FC<TenantDetailModalProps> = ({
                   </button>
                   {copiedKey === "id" && (
                     <span className="text-[10px] text-emerald-600 font-bold">
-                      Copied!
+                      {TENANT_MODAL_TEXTS.MSG_COPIED}
                     </span>
                   )}
                 </div>
@@ -140,7 +141,7 @@ export const TenantDetailModal: React.FC<TenantDetailModalProps> = ({
               {/* Created Date */}
               <div>
                 <span className="block text-gray-400 dark:text-gray-500 font-medium mb-1">
-                  Created Date
+                  {TENANT_MODAL_TEXTS.LABEL_CREATED_DATE}
                 </span>
                 <span className="font-bold text-gray-900 dark:text-gray-100 text-sm">
                   {formattedCreatedDate}
@@ -150,7 +151,7 @@ export const TenantDetailModal: React.FC<TenantDetailModalProps> = ({
               {/* Industry / Sector */}
               <div>
                 <span className="block text-gray-400 dark:text-gray-500 font-medium mb-1">
-                  Industry / Sector
+                  {TENANT_MODAL_TEXTS.LABEL_INDUSTRY}
                 </span>
                 <span className="font-bold text-gray-900 dark:text-gray-100 text-sm">
                   {org.industry || "—"}
@@ -160,17 +161,17 @@ export const TenantDetailModal: React.FC<TenantDetailModalProps> = ({
               {/* Company Size */}
               <div>
                 <span className="block text-gray-400 dark:text-gray-500 font-medium mb-1">
-                  Company Size
+                  {TENANT_MODAL_TEXTS.LABEL_COMPANY_SIZE}
                 </span>
                 <span className="font-bold text-gray-900 dark:text-gray-100 text-sm">
-                  {org.companySize ? `${org.companySize} employees` : "—"}
+                  {org.companySize ? `${org.companySize} ${TENANT_MODAL_TEXTS.EMPLOYEES_SUFFIX}` : "—"}
                 </span>
               </div>
 
               {/* Website URL */}
               <div>
                 <span className="block text-gray-400 dark:text-gray-500 font-medium mb-1">
-                  Website URL
+                  {TENANT_MODAL_TEXTS.LABEL_WEBSITE}
                 </span>
                 {org.website ? (
                   <a
@@ -194,7 +195,7 @@ export const TenantDetailModal: React.FC<TenantDetailModalProps> = ({
               {/* Location / Region */}
               <div>
                 <span className="block text-gray-400 dark:text-gray-500 font-medium mb-1">
-                  Location / Region
+                  {TENANT_MODAL_TEXTS.LABEL_LOCATION}
                 </span>
                 <span className="font-bold text-gray-900 dark:text-gray-100 text-sm">
                   {org.location || "—"}
@@ -204,28 +205,28 @@ export const TenantDetailModal: React.FC<TenantDetailModalProps> = ({
               {/* Administrator Name */}
               <div>
                 <span className="block text-gray-400 dark:text-gray-500 font-medium mb-1">
-                  Administrator
+                  {TENANT_MODAL_TEXTS.LABEL_ADMIN_REP}
                 </span>
                 <span className="font-bold text-gray-900 dark:text-gray-100 text-sm">
-                  {org.admin?.name || "Unassigned"}
+                  {org.admin?.name || TENANT_MODAL_TEXTS.LABEL_UNASSIGNED}
                 </span>
               </div>
 
               {/* Administrator Email */}
               <div>
                 <span className="block text-gray-400 dark:text-gray-500 font-medium mb-1">
-                  Admin Email
+                  {TENANT_MODAL_TEXTS.LABEL_ADMIN_EMAIL}
                 </span>
                 <div className="flex items-center gap-1.5">
                   <span className="font-mono text-gray-900 dark:text-gray-100 font-bold truncate select-all">
-                    {org.admin?.email || "No email registered"}
+                    {org.admin?.email || TENANT_MODAL_TEXTS.LABEL_NO_EMAIL}
                   </span>
                   {org.admin?.email && (
                     <button
                       type="button"
                       onClick={() => handleCopy(org.admin.email, "email")}
                       className="p-0.5 rounded text-gray-400 hover:text-sky-600 transition-colors cursor-pointer shrink-0"
-                      title="Copy email"
+                      title={TENANT_MODAL_TEXTS.TOOLTIP_COPY_EMAIL}
                     >
                       {copiedKey === "email" ? (
                         <Check className="w-3.5 h-3.5 text-emerald-600" />
@@ -236,7 +237,7 @@ export const TenantDetailModal: React.FC<TenantDetailModalProps> = ({
                   )}
                   {copiedKey === "email" && (
                     <span className="text-[10px] text-emerald-600 font-bold">
-                      Copied!
+                      {TENANT_MODAL_TEXTS.MSG_COPIED}
                     </span>
                   )}
                 </div>
@@ -245,7 +246,7 @@ export const TenantDetailModal: React.FC<TenantDetailModalProps> = ({
               {/* Contact Phone */}
               <div>
                 <span className="block text-gray-400 dark:text-gray-500 font-medium mb-1">
-                  Contact Phone
+                  {TENANT_MODAL_TEXTS.LABEL_CONTACT_PHONE}
                 </span>
                 {org.phone ? (
                   <div className="flex items-center gap-1.5">
@@ -259,7 +260,7 @@ export const TenantDetailModal: React.FC<TenantDetailModalProps> = ({
                       type="button"
                       onClick={() => handleCopy(org.phone, "phone")}
                       className="p-0.5 rounded text-gray-400 hover:text-sky-600 transition-colors cursor-pointer shrink-0"
-                      title="Copy phone"
+                      title={TENANT_MODAL_TEXTS.TOOLTIP_COPY_PHONE}
                     >
                       {copiedKey === "phone" ? (
                         <Check className="w-3.5 h-3.5 text-emerald-600" />
@@ -276,20 +277,20 @@ export const TenantDetailModal: React.FC<TenantDetailModalProps> = ({
               {/* Subscription Plan */}
               <div>
                 <span className="block text-gray-400 dark:text-gray-500 font-medium mb-1">
-                  Subscription Plan
+                  {TENANT_MODAL_TEXTS.LABEL_SUBSCRIPTION}
                 </span>
                 <span className="font-bold text-gray-900 dark:text-gray-100 text-sm">
-                  {org.subscription?.planName || "Starter"}
+                  {org.subscription?.planName || TENANT_MODAL_TEXTS.DEFAULT_PLAN}
                 </span>
               </div>
 
               {/* Billing Cycle */}
               <div>
                 <span className="block text-gray-400 dark:text-gray-500 font-medium mb-1">
-                  Billing Cycle
+                  {TENANT_MODAL_TEXTS.LABEL_BILLING_CYCLE}
                 </span>
                 <span className="font-bold text-gray-900 dark:text-gray-100 text-sm capitalize">
-                  {org.subscription?.billingCycle || "Monthly"}
+                  {org.subscription?.billingCycle || TENANT_MODAL_TEXTS.DEFAULT_BILLING_CYCLE}
                 </span>
               </div>
             </div>
@@ -298,7 +299,7 @@ export const TenantDetailModal: React.FC<TenantDetailModalProps> = ({
             {org.description && (
               <div className="pt-3 border-t border-gray-200/60 dark:border-gray-800 text-xs">
                 <span className="block text-gray-400 dark:text-gray-500 font-medium mb-1">
-                  Description
+                  {TENANT_MODAL_TEXTS.LABEL_DESCRIPTION}
                 </span>
                 <p className="text-gray-700 dark:text-gray-300 leading-relaxed text-xs">
                   {org.description}
@@ -309,7 +310,7 @@ export const TenantDetailModal: React.FC<TenantDetailModalProps> = ({
             {/* Deactivation Remark if inactive */}
             {!org.isActive && org.remark && (
               <div className="p-3 rounded-xl border border-rose-200 dark:border-rose-900/60 bg-rose-50/70 dark:bg-rose-950/30 text-rose-700 dark:text-rose-300 text-xs">
-                <span className="font-bold block mb-0.5">Deactivation Remark:</span>
+                <span className="font-bold block mb-0.5">{TENANT_MODAL_TEXTS.LABEL_DEACTIVATION_NOTE}</span>
                 <p className="italic">{org.remark}</p>
               </div>
             )}
@@ -319,7 +320,7 @@ export const TenantDetailModal: React.FC<TenantDetailModalProps> = ({
         {/* Card 2: Workspace Utilization & Activity (Below Card 1) */}
         <div className="space-y-2">
           <span className="block text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500">
-            Workspace Utilization & Activity
+            {TENANT_MODAL_TEXTS.LABEL_UTILIZATION_TITLE}
           </span>
 
           <div className="p-5 rounded-2xl border border-slate-200 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-950/40 space-y-4">
@@ -329,7 +330,7 @@ export const TenantDetailModal: React.FC<TenantDetailModalProps> = ({
               <div className="space-y-2 p-4 rounded-xl bg-white dark:bg-gray-900 border border-slate-200/80 dark:border-gray-800">
                 <div className="flex items-center justify-between text-xs">
                   <span className="text-gray-500 dark:text-gray-400 font-medium">
-                    Seat Allocation
+                    {TENANT_MODAL_TEXTS.LABEL_SEAT_USAGE}
                   </span>
                   <span className="font-bold text-gray-900 dark:text-gray-100">
                     {seatPercent}%
@@ -343,12 +344,12 @@ export const TenantDetailModal: React.FC<TenantDetailModalProps> = ({
                 </div>
                 <div className="flex items-center justify-between text-xs">
                   <span className="font-bold text-gray-900 dark:text-gray-100">
-                    {memberCount} / {maxSeats} seats
+                    {TENANT_MODAL_TEXTS.SEATS_FRACTION(memberCount, maxSeats)}
                   </span>
                   <span className="text-gray-400 text-[11px]">
                     {maxSeats - memberCount > 0
-                      ? `${maxSeats - memberCount} available`
-                      : "Capacity reached"}
+                      ? TENANT_MODAL_TEXTS.SEATS_AVAILABLE(maxSeats - memberCount)
+                      : TENANT_MODAL_TEXTS.SEATS_CAPACITY_REACHED}
                   </span>
                 </div>
               </div>
@@ -356,13 +357,13 @@ export const TenantDetailModal: React.FC<TenantDetailModalProps> = ({
               {/* Lifetime Tickets */}
               <div className="p-4 rounded-xl bg-white dark:bg-gray-900 border border-slate-200/80 dark:border-gray-800 flex flex-col justify-between">
                 <span className="block text-gray-500 dark:text-gray-400 text-xs font-medium">
-                  Lifetime Tickets
+                  {TENANT_MODAL_TEXTS.LABEL_TOTAL_WORK_ITEMS}
                 </span>
                 <span className="text-2xl font-bold text-gray-900 dark:text-gray-100 my-1">
                   {workItemsCount}
                 </span>
                 <span className="block text-[11px] text-gray-400">
-                  Total tasks logged
+                  {TENANT_MODAL_TEXTS.TOTAL_TASKS_LOGGED}
                 </span>
               </div>
             </div>
@@ -370,7 +371,7 @@ export const TenantDetailModal: React.FC<TenantDetailModalProps> = ({
             {/* Workflow Columns (No count) */}
             <div className="pt-3 border-t border-gray-200/60 dark:border-gray-800 space-y-2">
               <span className="block text-xs text-gray-500 dark:text-gray-400 font-medium">
-                Workflow Columns
+                {TENANT_MODAL_TEXTS.LABEL_WORKFLOW_COLUMNS}
               </span>
               <div className="flex flex-wrap gap-2">
                 {statuses.map((statusName) => (
@@ -393,7 +394,7 @@ export const TenantDetailModal: React.FC<TenantDetailModalProps> = ({
             onClick={onClose}
             className="px-6 py-2.5 bg-sky-500 hover:bg-sky-600 text-white font-bold rounded-xl text-xs transition-colors cursor-pointer shadow-xs"
           >
-            Done
+            {TENANT_MODAL_TEXTS.BTN_DONE}
           </button>
         </div>
       </div>

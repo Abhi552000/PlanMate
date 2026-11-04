@@ -16,6 +16,8 @@ import { orgService } from "../../services/orgService";
 import { taskService } from "../../services/taskService";
 import { toast } from "react-toastify";
 import { getPriorityStyle } from "../../utils";
+import { WORKSPACE_SETTINGS_TEXTS } from "../../constants/uiTexts";
+import { TOAST_MESSAGES } from "../../constants/messages";
 
 interface BoardCustomizationSettingsProps {
   statuses: string[];
@@ -82,11 +84,11 @@ export const BoardCustomizationSettings: React.FC<BoardCustomizationSettingsProp
     try {
       const data = await orgService.updateBoardFeatures(updatedFeatures);
       if (data?.success) {
-        toast.success("Board feature setting updated");
+        toast.success(TOAST_MESSAGES.WORKSPACE_FEATURE_UPDATE_SUCCESS);
       }
     } catch (err: any) {
       console.error(err);
-      toast.error(err?.response?.data?.message || "Failed to update board feature");
+      toast.error(err?.response?.data?.message || TOAST_MESSAGES.WORKSPACE_FEATURE_UPDATE_ERROR);
       // Revert on error
       onFeaturesUpdated(boardFeatures);
     } finally {
@@ -99,11 +101,11 @@ export const BoardCustomizationSettings: React.FC<BoardCustomizationSettingsProp
     e.preventDefault();
     const trimmed = newPriority.trim();
     if (!trimmed) {
-      toast.error("Priority name cannot be empty");
+      toast.error(TOAST_MESSAGES.WORKSPACE_PRIORITY_EMPTY_ERROR);
       return;
     }
     if (priorities.some((p) => p.toLowerCase() === trimmed.toLowerCase())) {
-      toast.error("This priority level already exists");
+      toast.error(TOAST_MESSAGES.WORKSPACE_PRIORITY_EXISTS_ERROR);
       return;
     }
 
@@ -113,11 +115,11 @@ export const BoardCustomizationSettings: React.FC<BoardCustomizationSettingsProp
       if (data?.success) {
         onPrioritiesUpdated(data.priorities);
         setNewPriority("");
-        toast.success("Priority added successfully");
+        toast.success(TOAST_MESSAGES.WORKSPACE_PRIORITY_ADD_SUCCESS);
       }
     } catch (err: any) {
       console.error(err);
-      toast.error(err?.response?.data?.message || "Failed to add priority");
+      toast.error(err?.response?.data?.message || TOAST_MESSAGES.WORKSPACE_PRIORITY_ADD_ERROR);
     } finally {
       setAddingPriority(false);
     }
@@ -151,12 +153,12 @@ export const BoardCustomizationSettings: React.FC<BoardCustomizationSettingsProp
       const data = await orgService.deleteCustomPriority(priority);
       if (data?.success) {
         onPrioritiesUpdated(data.priorities);
-        toast.success("Priority deleted successfully");
+        toast.success(TOAST_MESSAGES.WORKSPACE_PRIORITY_DEL_SUCCESS);
         setPriorityToDelete(null);
       }
     } catch (err: any) {
       console.error(err);
-      toast.error(err?.response?.data?.message || "Failed to delete priority");
+      toast.error(err?.response?.data?.message || TOAST_MESSAGES.WORKSPACE_PRIORITY_DEL_ERROR);
     } finally {
       setDeletingPriority(null);
     }
@@ -167,15 +169,15 @@ export const BoardCustomizationSettings: React.FC<BoardCustomizationSettingsProp
     e.preventDefault();
     const trimmedName = newFieldName.trim();
     if (!trimmedName) {
-      toast.error("Field name is required");
+      toast.error(TOAST_MESSAGES.WORKSPACE_FIELD_NAME_REQUIRED);
       return;
     }
     if (customFields.some((f) => f.name.toLowerCase() === trimmedName.toLowerCase())) {
-      toast.error("A custom field with this name already exists");
+      toast.error(TOAST_MESSAGES.WORKSPACE_FIELD_OPTION_EXISTS);
       return;
     }
     if (newFieldType === "dropdown" && dropdownOptions.length === 0) {
-      toast.error("Please add at least one dropdown option");
+      toast.error(TOAST_MESSAGES.WORKSPACE_FIELD_DROPDOWN_OPTION_REQUIRED);
       return;
     }
 
@@ -196,11 +198,11 @@ export const BoardCustomizationSettings: React.FC<BoardCustomizationSettingsProp
         setDropdownOptions([]);
         setOptionInput("");
         setIsFieldRequired(false);
-        toast.success("Custom field added successfully");
+        toast.success(TOAST_MESSAGES.WORKSPACE_FIELD_ADD_SUCCESS);
       }
     } catch (err: any) {
       console.error(err);
-      toast.error(err?.response?.data?.message || "Failed to add custom field");
+      toast.error(err?.response?.data?.message || TOAST_MESSAGES.WORKSPACE_FIELD_ADD_ERROR);
     } finally {
       setAddingField(false);
     }
@@ -214,12 +216,12 @@ export const BoardCustomizationSettings: React.FC<BoardCustomizationSettingsProp
       const data = await orgService.deleteCustomField(fieldToDelete.id);
       if (data?.success) {
         onCustomFieldsUpdated(data.customFields);
-        toast.success("Custom field removed successfully");
+        toast.success(TOAST_MESSAGES.WORKSPACE_FIELD_DEL_SUCCESS);
         setFieldToDelete(null);
       }
     } catch (err: any) {
       console.error(err);
-      toast.error(err?.response?.data?.message || "Failed to delete custom field");
+      toast.error(err?.response?.data?.message || TOAST_MESSAGES.WORKSPACE_FIELD_DEL_ERROR);
     } finally {
       setDeletingField(false);
     }
@@ -231,19 +233,19 @@ export const BoardCustomizationSettings: React.FC<BoardCustomizationSettingsProp
       <div className="bg-white dark:bg-gray-900 p-5 sm:p-6 rounded-2xl border border-sky-100/50 dark:border-gray-800 shadow-sm space-y-4">
         <div className="border-b border-sky-100 dark:border-gray-800 pb-3">
           <h3 className="text-sm font-bold text-gray-800 dark:text-gray-100">
-            Required Fields
+            {WORKSPACE_SETTINGS_TEXTS.REQUIRED_FIELDS_TITLE}
           </h3>
           <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-            Always active on every task
+            {WORKSPACE_SETTINGS_TEXTS.REQUIRED_FIELDS_DESC}
           </p>
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {[
-            { name: "Title", desc: "Name of the task" },
-            { name: "Status", desc: "Progress state" },
-            { name: "Priority", desc: "Urgency level" },
-            { name: "Assignee", desc: "Assigned member" },
+            { name: WORKSPACE_SETTINGS_TEXTS.FIELD_TITLE_NAME, desc: WORKSPACE_SETTINGS_TEXTS.FIELD_TITLE_DESC },
+            { name: WORKSPACE_SETTINGS_TEXTS.FIELD_STATUS_NAME, desc: WORKSPACE_SETTINGS_TEXTS.FIELD_STATUS_DESC },
+            { name: WORKSPACE_SETTINGS_TEXTS.FIELD_PRIORITY_NAME, desc: WORKSPACE_SETTINGS_TEXTS.FIELD_PRIORITY_DESC },
+            { name: WORKSPACE_SETTINGS_TEXTS.FIELD_ASSIGNEE_NAME, desc: WORKSPACE_SETTINGS_TEXTS.FIELD_ASSIGNEE_DESC },
           ].map((field) => (
             <div
               key={field.name}
@@ -254,7 +256,7 @@ export const BoardCustomizationSettings: React.FC<BoardCustomizationSettingsProp
                   {field.name}
                 </span>
                 <span className="text-[10px] font-semibold text-sky-600 dark:text-sky-400 bg-sky-100/70 dark:bg-sky-950/60 px-1.5 py-0.5 rounded">
-                  Required
+                  {WORKSPACE_SETTINGS_TEXTS.BADGE_REQUIRED}
                 </span>
               </div>
               <p className="text-[11px] text-gray-400 leading-snug">
@@ -269,10 +271,10 @@ export const BoardCustomizationSettings: React.FC<BoardCustomizationSettingsProp
       <div className="bg-white dark:bg-gray-900 p-5 sm:p-6 rounded-2xl border border-sky-100/50 dark:border-gray-800 shadow-sm space-y-6">
         <div className="border-b border-sky-100 dark:border-gray-800 pb-3">
           <h3 className="text-sm font-bold text-gray-800 dark:text-gray-100">
-            Statuses & Priorities
+            {WORKSPACE_SETTINGS_TEXTS.STATUSES_PRIORITIES_TITLE}
           </h3>
           <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-            Manage workflow stages and priority levels
+            {WORKSPACE_SETTINGS_TEXTS.STATUSES_PRIORITIES_DESC}
           </p>
         </div>
 
@@ -280,12 +282,12 @@ export const BoardCustomizationSettings: React.FC<BoardCustomizationSettingsProp
           {/* Statuses Column */}
           <div className="space-y-4">
             <h4 className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">
-              Statuses
+              {WORKSPACE_SETTINGS_TEXTS.STATUSES_SECTION_TITLE}
             </h4>
             <form onSubmit={handleAddStatus} className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
               <Input
                 type="text"
-                placeholder="Add a status (e.g. In Review)"
+                placeholder={WORKSPACE_SETTINGS_TEXTS.STATUS_INPUT_PLACEHOLDER}
                 value={newStatus}
                 onChange={(e) => setNewStatus(e.target.value)}
                 required
@@ -298,13 +300,13 @@ export const BoardCustomizationSettings: React.FC<BoardCustomizationSettingsProp
                 variant="secondary"
                 className="h-[46px] sm:h-[44px] justify-center px-4"
               >
-                Add Status
+                {WORKSPACE_SETTINGS_TEXTS.BTN_ADD_STATUS}
               </Button>
             </form>
 
             <div>
               <label className="block text-[11px] font-bold uppercase tracking-wider text-gray-400 mb-2">
-                Active Statuses
+                {WORKSPACE_SETTINGS_TEXTS.LABEL_ACTIVE_STATUSES}
               </label>
               <div className="flex flex-wrap gap-2">
                 {statuses.map((status) => (
@@ -330,12 +332,12 @@ export const BoardCustomizationSettings: React.FC<BoardCustomizationSettingsProp
           {/* Priorities Column */}
           <div className="space-y-4 lg:border-l lg:border-sky-100/60 dark:lg:border-gray-800 lg:pl-6">
             <h4 className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">
-              Priorities
+              {WORKSPACE_SETTINGS_TEXTS.PRIORITIES_SECTION_TITLE}
             </h4>
             <form onSubmit={handleAddPriority} className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
               <Input
                 type="text"
-                placeholder="Add a priority (e.g. Urgent)"
+                placeholder={WORKSPACE_SETTINGS_TEXTS.PRIORITY_INPUT_PLACEHOLDER}
                 value={newPriority}
                 onChange={(e) => setNewPriority(e.target.value)}
                 wrapperClassName="flex-1"
@@ -347,13 +349,13 @@ export const BoardCustomizationSettings: React.FC<BoardCustomizationSettingsProp
                 variant="secondary"
                 className="h-[46px] sm:h-[44px] justify-center px-4"
               >
-                Add Priority
+                {WORKSPACE_SETTINGS_TEXTS.BTN_ADD_PRIORITY}
               </Button>
             </form>
 
             <div>
               <label className="block text-[11px] font-bold uppercase tracking-wider text-gray-400 mb-2">
-                Active Priorities
+                {WORKSPACE_SETTINGS_TEXTS.LABEL_ACTIVE_PRIORITIES}
               </label>
               <div className="flex flex-wrap gap-2">
                 {priorities.map((p) => (
@@ -386,10 +388,10 @@ export const BoardCustomizationSettings: React.FC<BoardCustomizationSettingsProp
       <div className="bg-white dark:bg-gray-900 p-5 sm:p-6 rounded-2xl border border-sky-100/50 dark:border-gray-800 shadow-sm space-y-4">
         <div className="border-b border-sky-100 dark:border-gray-800 pb-3">
           <h3 className="text-sm font-bold text-gray-800 dark:text-gray-100">
-            Board Features
+            {WORKSPACE_SETTINGS_TEXTS.BOARD_FEATURES_TITLE}
           </h3>
           <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-            Turn extra task tools on or off
+            {WORKSPACE_SETTINGS_TEXTS.BOARD_FEATURES_DESC}
           </p>
         </div>
 
@@ -397,39 +399,39 @@ export const BoardCustomizationSettings: React.FC<BoardCustomizationSettingsProp
           {[
             {
               key: "storyPoints" as keyof IBoardFeatures,
-              label: "Story Points",
+              label: WORKSPACE_SETTINGS_TEXTS.FEATURE_STORY_POINTS_LABEL,
               icon: Layers,
-              desc: "Estimate task effort with points.",
+              desc: WORKSPACE_SETTINGS_TEXTS.FEATURE_STORY_POINTS_DESC,
             },
             {
               key: "timeTracking" as keyof IBoardFeatures,
-              label: "Time Tracking",
+              label: WORKSPACE_SETTINGS_TEXTS.FEATURE_TIME_TRACKING_LABEL,
               icon: Clock,
-              desc: "Log hours and track time spent on tasks.",
+              desc: WORKSPACE_SETTINGS_TEXTS.FEATURE_TIME_TRACKING_DESC,
             },
             {
               key: "dueDates" as keyof IBoardFeatures,
-              label: "Due Dates",
+              label: WORKSPACE_SETTINGS_TEXTS.FEATURE_DUE_DATES_LABEL,
               icon: Calendar,
-              desc: "Set target dates and track deadlines.",
+              desc: WORKSPACE_SETTINGS_TEXTS.FEATURE_DUE_DATES_DESC,
             },
             {
               key: "labels" as keyof IBoardFeatures,
-              label: "Labels",
+              label: WORKSPACE_SETTINGS_TEXTS.FEATURE_LABELS_LABEL,
               icon: Tag,
-              desc: "Tag tasks to organize and filter.",
+              desc: WORKSPACE_SETTINGS_TEXTS.FEATURE_LABELS_DESC,
             },
             {
               key: "subtasks" as keyof IBoardFeatures,
-              label: "Subtasks",
+              label: WORKSPACE_SETTINGS_TEXTS.FEATURE_SUBTASKS_LABEL,
               icon: GitBranch,
-              desc: "Break tasks into smaller checklist items.",
+              desc: WORKSPACE_SETTINGS_TEXTS.FEATURE_SUBTASKS_DESC,
             },
             {
               key: "issueLinking" as keyof IBoardFeatures,
-              label: "Task Linking",
+              label: WORKSPACE_SETTINGS_TEXTS.FEATURE_TASK_LINKING_LABEL,
               icon: Link2,
-              desc: "Link related, blocking, or duplicate tasks.",
+              desc: WORKSPACE_SETTINGS_TEXTS.FEATURE_TASK_LINKING_DESC,
             },
           ].map((item) => {
             const Icon = item.icon;
@@ -480,10 +482,10 @@ export const BoardCustomizationSettings: React.FC<BoardCustomizationSettingsProp
         <div className="flex items-center justify-between border-b border-sky-100 dark:border-gray-800 pb-3">
           <div>
             <h3 className="text-sm font-bold text-gray-800 dark:text-gray-100">
-              Custom Fields
+              {WORKSPACE_SETTINGS_TEXTS.CUSTOM_FIELDS_TITLE}
             </h3>
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-              Add extra details to your tasks
+              {WORKSPACE_SETTINGS_TEXTS.CUSTOM_FIELDS_DESC}
             </p>
           </div>
           <Button
@@ -492,13 +494,13 @@ export const BoardCustomizationSettings: React.FC<BoardCustomizationSettingsProp
             onClick={() => setShowAddFieldModal(true)}
             className="text-xs py-1.5 px-3 flex items-center gap-1.5"
           >
-            <Plus className="w-3.5 h-3.5" /> Add Field
+            <Plus className="w-3.5 h-3.5" /> {WORKSPACE_SETTINGS_TEXTS.BTN_ADD_FIELD}
           </Button>
         </div>
 
         {customFields.length === 0 ? (
           <div className="py-6 text-center text-xs text-gray-400">
-            No custom fields yet. Click "Add Field" to create one.
+            {WORKSPACE_SETTINGS_TEXTS.EMPTY_CUSTOM_FIELDS}
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -517,7 +519,7 @@ export const BoardCustomizationSettings: React.FC<BoardCustomizationSettingsProp
                     </span>
                     {field.required && (
                       <span className="inline-block ml-1.5 text-[10px] font-semibold text-amber-600 dark:text-amber-400 bg-amber-100/60 dark:bg-amber-950/50 px-1.5 py-0.5 rounded">
-                        Required
+                        {WORKSPACE_SETTINGS_TEXTS.BADGE_REQUIRED}
                       </span>
                     )}
                   </div>
@@ -563,13 +565,13 @@ export const BoardCustomizationSettings: React.FC<BoardCustomizationSettingsProp
             onClick={(e) => e.stopPropagation()}
           >
             <h3 className="font-bold text-gray-800 dark:text-gray-200 text-base">
-              Delete Priority
+              {WORKSPACE_SETTINGS_TEXTS.MODAL_DELETE_PRIORITY_TITLE}
             </h3>
 
             {isCheckingTasks ? (
               <div className="flex flex-col items-center justify-center py-4 space-y-2">
                 <div className="w-6 h-6 border-2 border-sky-200 border-t-sky-600 rounded-full animate-spin"></div>
-                <p className="text-xs text-gray-400 font-semibold">Checking workspace tasks...</p>
+                <p className="text-xs text-gray-400 font-semibold">{WORKSPACE_SETTINGS_TEXTS.CHECKING_TASKS}</p>
               </div>
             ) : tasksCountForPriority !== null && tasksCountForPriority > 0 ? (
               <div className="space-y-3">
@@ -592,7 +594,7 @@ export const BoardCustomizationSettings: React.FC<BoardCustomizationSettingsProp
                 }}
                 className="px-4 py-2 border border-slate-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 font-semibold rounded-lg text-xs transition-colors cursor-pointer bg-white dark:bg-gray-900"
               >
-                {tasksCountForPriority !== null && tasksCountForPriority > 0 ? "Close" : "Cancel"}
+                {tasksCountForPriority !== null && tasksCountForPriority > 0 ? WORKSPACE_SETTINGS_TEXTS.BTN_CLOSE : WORKSPACE_SETTINGS_TEXTS.BTN_CANCEL}
               </button>
               {!(tasksCountForPriority !== null && tasksCountForPriority > 0) && (
                 <button
@@ -601,7 +603,7 @@ export const BoardCustomizationSettings: React.FC<BoardCustomizationSettingsProp
                   onClick={() => handleDeletePriority(priorityToDelete)}
                   className="px-4 py-2 bg-sky-500 hover:bg-sky-600 text-white font-bold rounded-lg text-xs transition-all cursor-pointer disabled:opacity-50"
                 >
-                  {deletingPriority ? "Deleting..." : "Delete Priority"}
+                  {deletingPriority ? WORKSPACE_SETTINGS_TEXTS.BTN_DELETING_PRIORITY : WORKSPACE_SETTINGS_TEXTS.BTN_DELETE_PRIORITY}
                 </button>
               )}
             </div>
@@ -620,7 +622,7 @@ export const BoardCustomizationSettings: React.FC<BoardCustomizationSettingsProp
             onClick={(e) => e.stopPropagation()}
           >
             <h3 className="font-bold text-gray-800 dark:text-gray-200 text-base">
-              Remove Custom Field
+              {WORKSPACE_SETTINGS_TEXTS.MODAL_DELETE_FIELD_TITLE}
             </h3>
             <p className="text-xs text-gray-600 dark:text-gray-300 leading-normal">
               Are you sure you want to remove <span className="font-bold text-sky-600 dark:text-sky-400">"{fieldToDelete.name}"</span>? It will no longer appear on new or existing tasks.
@@ -631,7 +633,7 @@ export const BoardCustomizationSettings: React.FC<BoardCustomizationSettingsProp
                 onClick={() => setFieldToDelete(null)}
                 className="px-4 py-2 border border-slate-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 font-semibold rounded-lg text-xs transition-colors cursor-pointer bg-white dark:bg-gray-900"
               >
-                Cancel
+                {WORKSPACE_SETTINGS_TEXTS.BTN_CANCEL}
               </button>
               <button
                 type="button"
@@ -639,7 +641,7 @@ export const BoardCustomizationSettings: React.FC<BoardCustomizationSettingsProp
                 onClick={handleDeleteCustomField}
                 className="px-4 py-2 bg-sky-500 hover:bg-sky-600 text-white font-bold rounded-lg text-xs transition-all cursor-pointer disabled:opacity-50"
               >
-                {deletingField ? "Removing..." : "Remove Field"}
+                {deletingField ? WORKSPACE_SETTINGS_TEXTS.BTN_REMOVING_FIELD : WORKSPACE_SETTINGS_TEXTS.BTN_REMOVE_FIELD}
               </button>
             </div>
           </div>
@@ -658,7 +660,7 @@ export const BoardCustomizationSettings: React.FC<BoardCustomizationSettingsProp
           >
             <div className="flex items-center justify-between border-b border-sky-100 dark:border-gray-800 pb-3">
               <h3 className="font-bold text-gray-800 dark:text-gray-200 text-base">
-                Add Custom Field
+                {WORKSPACE_SETTINGS_TEXTS.MODAL_ADD_FIELD_TITLE}
               </h3>
               <button
                 type="button"
@@ -672,11 +674,11 @@ export const BoardCustomizationSettings: React.FC<BoardCustomizationSettingsProp
             <form onSubmit={handleAddCustomField} className="space-y-4">
               <div>
                 <label className="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-1.5">
-                  Field Name
+                  {WORKSPACE_SETTINGS_TEXTS.LABEL_FIELD_NAME}
                 </label>
                 <Input
                   type="text"
-                  placeholder="e.g. Client Name"
+                  placeholder={WORKSPACE_SETTINGS_TEXTS.PLACEHOLDER_FIELD_NAME}
                   value={newFieldName}
                   onChange={(e) => setNewFieldName(e.target.value)}
                   required
@@ -685,29 +687,29 @@ export const BoardCustomizationSettings: React.FC<BoardCustomizationSettingsProp
 
               <div>
                 <label className="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-1.5">
-                  Field Type
+                  {WORKSPACE_SETTINGS_TEXTS.LABEL_FIELD_TYPE}
                 </label>
                 <select
                   value={newFieldType}
                   onChange={(e) => setNewFieldType(e.target.value as any)}
                   className="w-full h-[40px] px-3 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-medium bg-white dark:bg-gray-800 text-slate-800 dark:text-slate-100 focus:border-sky-500 focus:outline-none cursor-pointer"
                 >
-                  <option value="text">Text</option>
-                  <option value="number">Number</option>
-                  <option value="dropdown">Dropdown</option>
-                  <option value="date">Date</option>
+                  <option value="text">{WORKSPACE_SETTINGS_TEXTS.TYPE_TEXT}</option>
+                  <option value="number">{WORKSPACE_SETTINGS_TEXTS.TYPE_NUMBER}</option>
+                  <option value="dropdown">{WORKSPACE_SETTINGS_TEXTS.TYPE_DROPDOWN}</option>
+                  <option value="date">{WORKSPACE_SETTINGS_TEXTS.TYPE_DATE}</option>
                 </select>
               </div>
 
               {newFieldType === "dropdown" && (
                 <div className="space-y-2">
                   <label className="block text-xs font-bold uppercase tracking-wider text-gray-500">
-                    Dropdown Options
+                    {WORKSPACE_SETTINGS_TEXTS.LABEL_DROPDOWN_OPTIONS}
                   </label>
                   <div className="flex gap-2">
                     <input
                       type="text"
-                      placeholder="Add an option and press Add..."
+                      placeholder={WORKSPACE_SETTINGS_TEXTS.PLACEHOLDER_DROPDOWN_OPTION}
                       value={optionInput}
                       onChange={(e) => setOptionInput(e.target.value)}
                       onKeyDown={(e) => {
@@ -733,7 +735,7 @@ export const BoardCustomizationSettings: React.FC<BoardCustomizationSettingsProp
                       }}
                       className="px-3 h-[36px] bg-sky-50 dark:bg-sky-950/50 text-sky-600 dark:text-sky-400 border border-sky-200 dark:border-sky-850 rounded-lg text-xs font-semibold hover:bg-sky-100 cursor-pointer"
                     >
-                      Add
+                      {WORKSPACE_SETTINGS_TEXTS.BTN_ADD_OPTION}
                     </button>
                   </div>
 
@@ -754,7 +756,7 @@ export const BoardCustomizationSettings: React.FC<BoardCustomizationSettingsProp
                       </span>
                     ))}
                     {dropdownOptions.length === 0 && (
-                      <span className="text-[11px] text-gray-400 italic">No options added yet</span>
+                      <span className="text-[11px] text-gray-400 italic">{WORKSPACE_SETTINGS_TEXTS.NO_OPTIONS_YET}</span>
                     )}
                   </div>
                 </div>
@@ -769,7 +771,7 @@ export const BoardCustomizationSettings: React.FC<BoardCustomizationSettingsProp
                   className="rounded border-gray-300 text-sky-500 focus:ring-sky-500 h-4 w-4 cursor-pointer"
                 />
                 <label htmlFor="field-required" className="text-xs text-gray-700 dark:text-gray-300 cursor-pointer">
-                  Require this field on tasks
+                  {WORKSPACE_SETTINGS_TEXTS.LABEL_REQUIRE_FIELD}
                 </label>
               </div>
 
@@ -779,14 +781,14 @@ export const BoardCustomizationSettings: React.FC<BoardCustomizationSettingsProp
                   onClick={() => setShowAddFieldModal(false)}
                   className="px-4 py-2 border border-slate-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 font-semibold rounded-lg text-xs transition-colors cursor-pointer bg-white dark:bg-gray-900"
                 >
-                  Cancel
+                  {WORKSPACE_SETTINGS_TEXTS.BTN_CANCEL}
                 </button>
                 <button
                   type="submit"
                   disabled={addingField || !newFieldName.trim()}
                   className="px-4 py-2 bg-sky-500 hover:bg-sky-600 text-white font-bold rounded-lg text-xs transition-all cursor-pointer disabled:opacity-50"
                 >
-                  {addingField ? "Saving..." : "Create Field"}
+                  {addingField ? WORKSPACE_SETTINGS_TEXTS.BTN_SAVING_FIELD : WORKSPACE_SETTINGS_TEXTS.BTN_CREATE_FIELD}
                 </button>
               </div>
             </form>

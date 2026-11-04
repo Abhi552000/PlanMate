@@ -53,15 +53,6 @@ export interface WorkspaceBrandingFormProps {
   handleUpdateOrg: (e: React.FormEvent) => Promise<void>;
 }
 
-export interface CustomStatusesSettingsProps {
-  statuses: string[];
-  newStatus: string;
-  setNewStatus: (val: string) => void;
-  addingStatus: boolean;
-  handleAddStatus: (e: React.FormEvent) => Promise<void>;
-  handleOpenDeleteModal: (statusName: string) => void;
-}
-
 export interface ConfirmDeleteStatusModalProps {
   statusToDelete: string | null;
   isCheckingTasks: boolean;

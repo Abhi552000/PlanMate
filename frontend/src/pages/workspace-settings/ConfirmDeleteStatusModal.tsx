@@ -1,5 +1,6 @@
 import React from "react";
 import { ConfirmDeleteStatusModalProps } from "../../types";
+import { WORKSPACE_SETTINGS_TEXTS } from "../../constants/uiTexts";
 
 export const ConfirmDeleteStatusModal: React.FC<ConfirmDeleteStatusModalProps> = ({
   statusToDelete,
@@ -27,13 +28,13 @@ export const ConfirmDeleteStatusModal: React.FC<ConfirmDeleteStatusModalProps> =
         onClick={(e) => e.stopPropagation()}
       >
         <h3 className="font-bold text-gray-800 dark:text-gray-200 text-base">
-          Delete Status
+          {WORKSPACE_SETTINGS_TEXTS.MODAL_DELETE_STATUS_TITLE}
         </h3>
 
         {isCheckingTasks ? (
           <div className="flex flex-col items-center justify-center py-4 space-y-2">
             <div className="w-6 h-6 border-2 border-sky-200 border-t-sky-600 rounded-full animate-spin"></div>
-            <p className="text-xs text-gray-400 font-semibold">Checking workspace tasks...</p>
+            <p className="text-xs text-gray-400 font-semibold">{WORKSPACE_SETTINGS_TEXTS.CHECKING_TASKS}</p>
           </div>
         ) : tasksCountForStatus !== null && tasksCountForStatus > 0 ? (
           <div className="space-y-3">
@@ -53,7 +54,7 @@ export const ConfirmDeleteStatusModal: React.FC<ConfirmDeleteStatusModalProps> =
             onClick={handleClose}
             className="px-4 py-2 border border-slate-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 font-semibold rounded-lg text-xs transition-colors cursor-pointer bg-white dark:bg-gray-900"
           >
-            {tasksCountForStatus !== null && tasksCountForStatus > 0 ? "Close" : "Cancel"}
+            {tasksCountForStatus !== null && tasksCountForStatus > 0 ? WORKSPACE_SETTINGS_TEXTS.BTN_CLOSE : WORKSPACE_SETTINGS_TEXTS.BTN_CANCEL}
           </button>
           {!(tasksCountForStatus !== null && tasksCountForStatus > 0) && (
             <button
@@ -62,7 +63,7 @@ export const ConfirmDeleteStatusModal: React.FC<ConfirmDeleteStatusModalProps> =
               onClick={() => handleDeleteStatus(statusToDelete)}
               className="px-4 py-2 bg-sky-500 hover:bg-sky-600 text-white font-bold rounded-lg text-xs transition-all cursor-pointer disabled:opacity-50"
             >
-              {deletingStatus ? "Deleting..." : "Delete Status"}
+              {deletingStatus ? WORKSPACE_SETTINGS_TEXTS.BTN_DELETING_STATUS : WORKSPACE_SETTINGS_TEXTS.BTN_DELETE_STATUS}
             </button>
           )}
         </div>

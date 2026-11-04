@@ -188,7 +188,7 @@ export const SysAdminSidebar: React.FC<SysAdminSidebarProps> = ({
                 <button
                   className="text-gray-500 hover:text-gray-800 dark:hover:text-gray-200 p-1 rounded-lg transition-colors cursor-pointer"
                   onClick={() => setMobileOpen?.(false)}
-                  aria-label="Close navigation menu"
+                  aria-label={SYSADMIN_SIDEBAR_TEXTS.CLOSE_MENU}
                 >
                   <X className="w-5 h-5" />
                 </button>

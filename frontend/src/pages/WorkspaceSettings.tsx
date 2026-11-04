@@ -5,6 +5,7 @@ import { taskService } from "../services/taskService";
 import { ROUTES } from "../constants/routeConstant";
 import { IUser } from "../types";
 import { TOAST_MESSAGES, CONSOLE_ERRORS } from "../constants/messages";
+import { WORKSPACE_SETTINGS_TEXTS } from "../constants/uiTexts";
 import { toast } from "react-toastify";
 import { WorkspaceBrandingForm } from "./workspace-settings/WorkspaceBrandingForm";
 import { ConfirmDeleteStatusModal } from "./workspace-settings/ConfirmDeleteStatusModal";
@@ -163,7 +164,7 @@ const WorkspaceSettings = () => {
   const handleUpdateOrg = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!orgData.name.trim()) {
-      toast.error("Workspace name cannot be empty");
+      toast.error(TOAST_MESSAGES.WORKSPACE_NAME_REQUIRED);
       return;
     }
     setSavingOrg(true);
@@ -229,10 +230,10 @@ const WorkspaceSettings = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-sky-100/50 dark:border-gray-800 pb-4">
         <div>
           <h1 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-gray-100">
-            Workspace Settings
+            {WORKSPACE_SETTINGS_TEXTS.PAGE_TITLE}
           </h1>
           <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1">
-            Manage your workspace details, workflow, and board settings.
+            {WORKSPACE_SETTINGS_TEXTS.PAGE_SUBTITLE}
           </p>
         </div>
       </div>
