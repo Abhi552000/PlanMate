@@ -166,7 +166,7 @@ export const WorkLogsSection: React.FC<WorkLogsSectionProps> = ({
           {/* Description */}
           <div>
             <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
-              Work Description (Optional)
+              Work Description
             </label>
             <input
               type="text"

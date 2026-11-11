@@ -22,7 +22,16 @@ export const fetchSprints = createAsyncThunk("sprints/fetchSprints", async (para
 
 export const createSprint = createAsyncThunk(
   "sprints/createSprint",
-  async (sprintData: { name: string; startDate?: string; endDate?: string; goal?: string }, { rejectWithValue }) => {
+  async (
+    sprintData: {
+      name: string;
+      startDate?: string;
+      endDate?: string;
+      goal?: string;
+      boardId?: string;
+    },
+    { rejectWithValue }
+  ) => {
     try {
       const sprint = await backlogService.createSprint(sprintData);
       return sprint;

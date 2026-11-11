@@ -9,7 +9,13 @@ export const backlogService = {
     const { data } = await axiosInstance.get(url);
     return data;
   },
-  createSprint: async (sprintData: { name: string; startDate?: string; endDate?: string; goal?: string }): Promise<ISprint> => {
+  createSprint: async (sprintData: {
+    name: string;
+    startDate?: string;
+    endDate?: string;
+    goal?: string;
+    boardId?: string;
+  }): Promise<ISprint> => {
     const { data } = await axiosInstance.post(API_ROUTES.SPRINTS.BASE, sprintData);
     return data.sprint;
   },

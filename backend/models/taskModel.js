@@ -44,6 +44,11 @@ const taskSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "organization",
   },
+  board: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "board",
+    default: null,
+  },
   sprint: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "sprint",
@@ -215,6 +220,9 @@ taskSchema.index({ status: 1 });
 taskSchema.index({ organization: 1, createdAt: -1 });
 taskSchema.index({ organization: 1, key: 1 });
 taskSchema.index({ organization: 1, sprint: 1 });
+taskSchema.index({ board: 1 });
+taskSchema.index({ board: 1, status: 1 });
+taskSchema.index({ board: 1, sprint: 1 });
 
 const Task = mongoose.models.Task || mongoose.model("Task", taskSchema);
 export default Task;

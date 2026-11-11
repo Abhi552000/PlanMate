@@ -1,9 +1,12 @@
 import Task from "../models/taskModel.js";
 import Organization from "../models/organizationModel.js";
+import Board from "../models/boardModel.js";
+import { seedDefaultBoardIfNeeded } from "./boardController.js";
 import mongoose from "mongoose";
 import Notification from "../models/notificationModel.js";
 import { HttpStatus } from "../constants/httpStatus.js";
 import { MESSAGES } from "../constants/messages.js";
+import { generateCompanyKey } from "../utils/keyGenerator.js";
 
 // HELPER TO CONVERT STORED MENTIONS TO READABLE FORMAT
 export const cleanMentions = (text) => {
@@ -81,6 +84,8 @@ export const createTask = async (req, res) => {
       sprint,
       epic,
       customFieldValues,
+      boardId,
+      board,
     } = req.body;
 
     let finalCompleted = completed === "Yes" || completed === true;
@@ -92,24 +97,40 @@ export const createTask = async (req, res) => {
     }
 
     let generatedKey = "";
+    let assignedBoardId = null;
+
     if (req.user.organization) {
-      const org = await Organization.findByIdAndUpdate(
-        req.user.organization,
-        { $inc: { taskCounter: 1 } },
-        { new: true }
-      );
-      if (org) {
-        const words = org.name.split(/\s+/).filter(Boolean);
-        let prefix = "";
-        if (words.length >= 2) {
-          prefix = words
-            .map((w) => w[0])
-            .join("")
-            .toUpperCase();
-        } else if (words.length === 1) {
-          prefix = words[0].slice(0, 3).toUpperCase();
+      const targetBoardReqId = boardId || board || req.headers["x-board-id"];
+      let activeBoard = null;
+
+      if (targetBoardReqId && mongoose.Types.ObjectId.isValid(targetBoardReqId)) {
+        activeBoard = await Board.findOne({
+          _id: targetBoardReqId,
+          organization: req.user.organization,
+        });
+      }
+
+      if (!activeBoard) {
+        // Fallback to default board or auto-seed
+        const boards = await seedDefaultBoardIfNeeded(req.user.organization);
+        activeBoard = boards.find((b) => b.isDefault) || boards[0];
+      }
+
+      if (activeBoard) {
+        assignedBoardId = activeBoard._id;
+        activeBoard.taskCounter = (activeBoard.taskCounter || 0) + 1;
+        await activeBoard.save();
+        generatedKey = `${activeBoard.key}-${activeBoard.taskCounter}`;
+      } else {
+        const org = await Organization.findByIdAndUpdate(
+          req.user.organization,
+          { $inc: { taskCounter: 1 } },
+          { new: true }
+        );
+        if (org) {
+          const prefix = org.key || generateCompanyKey(org.name);
+          generatedKey = `${prefix}-${org.taskCounter}`;
         }
-        generatedKey = `${prefix}-${org.taskCounter}`;
       }
     }
 
@@ -135,6 +156,7 @@ export const createTask = async (req, res) => {
       assignee: assignee || null,
       key: generatedKey || undefined,
       organization: req.user.organization || null,
+      board: assignedBoardId,
       links: links || [],
       sprint: sprint || null,
       epic: epic || null,
@@ -199,11 +221,18 @@ export const getTasks = async (req, res) => {
       epic,
       sprint,
       issueType,
+      boardId,
+      board,
     } = req.query;
 
     let query = req.user.organization
       ? { organization: req.user.organization }
       : { owner: req.user.id };
+
+    const targetBoardId = boardId || board || req.headers["x-board-id"];
+    if (targetBoardId && targetBoardId !== "all") {
+      query.board = targetBoardId;
+    }
 
     // Apply status filter
     if (status && status !== "all") {

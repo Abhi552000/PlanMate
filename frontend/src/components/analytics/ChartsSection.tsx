@@ -66,7 +66,7 @@ export const ChartsSection: React.FC<ChartsSectionProps> = ({
     <div className="space-y-6">
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6">
         {/* Progress Timeline Trend (Burndown) */}
-        <div className="lg:col-span-8 bg-white dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800/80 p-4 sm:p-5 rounded-2xl shadow-2xs space-y-4">
+        <div className="lg:col-span-8 bg-white dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800/80 p-4 sm:p-5 rounded-xl shadow-2xs space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800/70 pb-3.5">
             <div className="flex items-center gap-2">
               <div className="p-1.5 rounded-lg bg-sky-50 dark:bg-sky-950/40 text-sky-600 dark:text-sky-400">
@@ -118,7 +118,7 @@ export const ChartsSection: React.FC<ChartsSectionProps> = ({
         </div>
 
         {/* Priority Breakdown (Pie/Donut Chart) */}
-        <div className="lg:col-span-4 bg-white dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800/80 p-4 sm:p-5 rounded-2xl shadow-2xs flex flex-col justify-between space-y-4">
+        <div className="lg:col-span-4 bg-white dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800/80 p-4 sm:p-5 rounded-xl shadow-2xs flex flex-col justify-between space-y-4">
           <div className="flex items-center gap-2 border-b border-slate-100 dark:border-slate-800/70 pb-3.5">
             <div className="p-1.5 rounded-lg bg-sky-50 dark:bg-sky-950/40 text-sky-600 dark:text-sky-400">
               <PieChartIcon className="w-4 h-4" />
@@ -185,7 +185,7 @@ export const ChartsSection: React.FC<ChartsSectionProps> = ({
       </div>
 
       {/* Cumulative Flow Diagram (CFD) */}
-      <div className="bg-white dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800/80 p-4 sm:p-5 rounded-2xl shadow-2xs space-y-4">
+      <div className="bg-white dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800/80 p-4 sm:p-5 rounded-xl shadow-2xs space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800/70 pb-3.5">
           <div className="flex items-center gap-2">
             <div className="p-1.5 rounded-lg bg-orange-50 dark:bg-orange-950/40 text-orange-600 dark:text-orange-400">
@@ -224,7 +224,7 @@ export const ChartsSection: React.FC<ChartsSectionProps> = ({
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 sm:gap-6">
         {/* Sprint Velocity Chart */}
-        <div className="bg-white dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800/80 p-4 sm:p-5 rounded-2xl shadow-2xs space-y-4">
+        <div className="bg-white dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800/80 p-4 sm:p-5 rounded-xl shadow-2xs space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800/70 pb-3.5">
             <div className="flex items-center gap-2">
               <div className="p-1.5 rounded-lg bg-sky-50 dark:bg-sky-950/40 text-sky-600 dark:text-sky-400">
@@ -264,7 +264,7 @@ export const ChartsSection: React.FC<ChartsSectionProps> = ({
         </div>
 
         {/* Weekly Completion Rate Chart */}
-        <div className="bg-white dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800/80 p-4 sm:p-5 rounded-2xl shadow-2xs space-y-4">
+        <div className="bg-white dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800/80 p-4 sm:p-5 rounded-xl shadow-2xs space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800/70 pb-3.5">
             <div className="flex items-center gap-2">
               <div className="p-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400">

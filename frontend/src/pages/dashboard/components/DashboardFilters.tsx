@@ -66,7 +66,7 @@ export const DashboardFilters: React.FC<DashboardFiltersProps> = React.memo(({
   ], []);
 
   return (
-    <div className="flex flex-col gap-3 bg-white dark:bg-slate-900/90 p-3.5 sm:p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 shadow-2xs">
+    <div className="flex flex-col gap-3 bg-white dark:bg-slate-900/90 p-3.5 sm:p-4 rounded-xl border border-slate-200/80 dark:border-slate-800/80 shadow-2xs">
       {/* Top Row: Search and Filters */}
       <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
         {/* Search Input */}

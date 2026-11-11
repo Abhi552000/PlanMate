@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 import User from "../models/userModel.js";
+import "../models/roleModel.js";
 import { HttpStatus } from "../constants/httpStatus.js";
 import { MESSAGES } from "../constants/messages.js";
 
@@ -20,7 +21,9 @@ export default async function authMiddleware(req, res, next) {
   try {
     const payload = jwt.verify(token, JWT_SECRET);
 
-    const user = await User.findById(payload.id).select("-password");
+    const user = await User.findById(payload.id)
+      .select("-password")
+      .populate("customRole");
 
     if (!user) {
       return res

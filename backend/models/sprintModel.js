@@ -25,9 +25,15 @@ const sprintSchema = new mongoose.Schema({
     ref: "organization",
     required: true,
   },
+  board: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "board",
+    default: null,
+  },
 }, { timestamps: true });
 
 sprintSchema.index({ organization: 1 });
+sprintSchema.index({ board: 1 });
 
 const Sprint = mongoose.models.sprint || mongoose.model("sprint", sprintSchema);
 export default Sprint;

@@ -61,6 +61,21 @@ export const TOAST_MESSAGES = {
   WORKSPACE_FIELD_DEL_SUCCESS: "Custom field removed",
   WORKSPACE_FIELD_DEL_ERROR: "Failed to delete custom field",
 
+  // Environment Boards
+  BOARD_DELETE_DEFAULT_ERROR: "Cannot delete the default workspace board",
+  BOARD_DELETE_HAS_TASKS_ERROR: (name: string, count: number) =>
+    `Cannot delete board "${name}". It contains ${count} tickets. Move or delete them first.`,
+  BOARD_DELETE_CONFIRM: (name: string) =>
+    `Are you sure you want to delete board "${name}"?`,
+  BOARD_DELETE_SUCCESS: (name: string) => `Board "${name}" deleted successfully`,
+  BOARD_DELETE_ERROR: "Failed to delete board",
+  BOARD_NAME_REQUIRED: "Please enter a board name",
+  BOARD_KEY_INVALID:
+    "Board key must be 2-10 alphanumeric uppercase characters (e.g. SIT, UAT)",
+  BOARD_CREATE_ERROR: "Failed to create board",
+  BOARD_UPDATE_SUCCESS: (name: string) => `Board "${name}" updated successfully`,
+  BOARD_UPDATE_ERROR: "Failed to update board",
+
   // Member Onboarding
   MEMBER_FIELDS_REQUIRED: "Please fill all member onboarding fields",
   MEMBER_NAME_REQUIRED: "Please enter the member's full name",

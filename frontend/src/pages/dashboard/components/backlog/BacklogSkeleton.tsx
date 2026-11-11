@@ -13,7 +13,7 @@ export const BacklogSkeleton: React.FC = () => {
       </div>
 
       {/* Unified Filters Skeleton */}
-      <div className="flex items-center justify-between gap-3 bg-white dark:bg-slate-900/90 p-3.5 sm:p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 shadow-2xs mb-6">
+      <div className="flex items-center justify-between gap-3 bg-white dark:bg-slate-900/90 p-3.5 sm:p-4 rounded-xl border border-slate-200/80 dark:border-slate-800/80 shadow-2xs mb-6">
         <div className="flex items-center gap-2.5">
           <div className="h-[38px] w-36 rounded-xl bg-slate-200 dark:bg-slate-800" />
           <div className="h-[38px] w-28 rounded-xl bg-slate-100 dark:bg-slate-800/60" />
@@ -24,7 +24,7 @@ export const BacklogSkeleton: React.FC = () => {
       {/* Sprint Accordions Skeleton */}
       <div className="w-full space-y-5">
         {/* Sprint 1 */}
-        <div className="bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-800 rounded-2xl shadow-xs overflow-hidden">
+        <div className="bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-800 rounded-xl shadow-xs overflow-hidden">
           <div className="p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 dark:border-gray-800/60">
             <div className="flex items-center gap-3">
               <div className="w-6 h-6 rounded-md bg-slate-200 dark:bg-slate-800" />
@@ -59,7 +59,7 @@ export const BacklogSkeleton: React.FC = () => {
         </div>
 
         {/* Backlog Issues Container Skeleton */}
-        <div className="bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-800 rounded-2xl shadow-xs overflow-hidden">
+        <div className="bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-800 rounded-xl shadow-xs overflow-hidden">
           <div className="p-4 sm:p-5 flex items-center justify-between border-b border-slate-100 dark:border-gray-800/60">
             <div className="flex items-center gap-3">
               <div className="w-6 h-6 rounded-md bg-slate-200 dark:bg-slate-800" />

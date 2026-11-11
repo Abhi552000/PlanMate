@@ -26,7 +26,7 @@ export const ActiveSprintBoardColumn: React.FC<
         return (
           <div
             key={colName}
-            className="bg-slate-50/70 dark:bg-slate-900/80 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl p-3 sm:p-3.5 flex flex-col min-h-[220px] max-h-[600px] overflow-y-auto w-[270px] sm:w-[300px] md:w-auto shrink-0 md:shrink snap-center transition-all shadow-2xs"
+            className="bg-slate-50/70 dark:bg-slate-900/80 border border-slate-200/80 dark:border-slate-800/80 rounded-xl p-3 sm:p-3.5 flex flex-col min-h-[220px] max-h-[600px] overflow-y-auto w-[270px] sm:w-[300px] md:w-auto shrink-0 md:shrink snap-center transition-all shadow-2xs"
             onDragOver={(e) => e.preventDefault()}
             onDrop={(e) => {
               const taskId = e.dataTransfer.getData("text/plain");

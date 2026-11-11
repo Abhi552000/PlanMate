@@ -19,12 +19,12 @@ export const InspectingUserModal: React.FC<InspectingUserModalProps> = ({
       onClick={onClose}
     >
       <div 
-        className="bg-white dark:bg-gray-900 rounded-2xl shadow-xl border border-sky-100 dark:border-gray-800 max-w-md w-full p-6 space-y-4 animate-scaleUp animate-duration-150"
+        className="bg-white dark:bg-gray-900 rounded-xl shadow-xl border border-sky-100 dark:border-gray-800 max-w-md w-full p-6 space-y-4 animate-scaleUp animate-duration-150"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
         <div className="flex items-center justify-between border-b border-sky-50 dark:border-gray-800 pb-3">
-          <h3 className="font-bold text-gray-800 dark:text-gray-250 text-base flex items-center gap-1.5">
+          <h3 className="font-bold text-gray-800 dark:text-gray-200 text-base flex items-center gap-1.5">
             <User className="w-5 h-5 text-sky-500" /> Member Workspace Report
           </h3>
           <button

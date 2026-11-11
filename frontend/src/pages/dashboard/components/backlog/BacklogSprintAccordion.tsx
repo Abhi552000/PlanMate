@@ -48,7 +48,7 @@ export const BacklogSprintAccordion: React.FC<BacklogSprintAccordionProps> = ({
 
   return (
     <div
-      className={`bg-white dark:bg-slate-900/90 rounded-2xl shadow-xs transition-all overflow-hidden p-3.5 sm:p-5 border ${
+      className={`bg-white dark:bg-slate-900/90 rounded-xl shadow-xs transition-all overflow-hidden p-3.5 sm:p-5 border ${
         isActive
           ? "border-sky-300 dark:border-sky-500/50 ring-2 ring-sky-500/10 shadow-sm"
           : "border-slate-200/80 dark:border-slate-800/80 hover:border-slate-300 dark:hover:border-slate-700/80"

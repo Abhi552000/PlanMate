@@ -2,7 +2,8 @@ import React, { useEffect, useState, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { orgService } from "../../services/orgService";
-import { IUser } from "../../types";
+import { roleService } from "../../services/roleService";
+import { IUser, IRole } from "../../types";
 import { ROUTES } from "../../constants/routeConstant";
 import { TOAST_MESSAGES, CONSOLE_ERRORS } from "../../constants/messages";
 import { ORG_ACCESS_MODAL_TEXTS } from "../../constants/uiTexts";
@@ -32,6 +33,7 @@ const OrganizationAdmin = () => {
   });
 
   const [teamUsers, setTeamUsers] = useState<any[]>([]);
+  const [availableRoles, setAvailableRoles] = useState<IRole[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
@@ -161,6 +163,16 @@ const OrganizationAdmin = () => {
         await Promise.all([
           fetchOrgDetails(),
           fetchTeamUsers(1, "all", "all", ""),
+          (async () => {
+            try {
+              const res = await roleService.getRoles();
+              if (res.success && Array.isArray(res.roles)) {
+                setAvailableRoles(res.roles);
+              }
+            } catch (err) {
+              console.error("Failed to fetch roles:", err);
+            }
+          })(),
         ]);
       } catch (err) {
         console.error(CONSOLE_ERRORS.LOAD_ROSTER, err);
@@ -199,6 +211,7 @@ const OrganizationAdmin = () => {
         name: trimmedName,
         email: trimmedEmail,
         password,
+        roleId: (newMember as any).roleId || null,
       });
       if (data?.success) {
         toast.success(TOAST_MESSAGES.MEMBER_ONBOARD_SUCCESS(trimmedName));
@@ -213,10 +226,20 @@ const OrganizationAdmin = () => {
     }
   };
 
-  const handleUpdateUserStatus = async (targetUser: any, newStatusVal: string, remark?: string) => {
+  const handleUpdateUserStatus = async (
+    targetUser: any,
+    newStatusVal: string,
+    remark?: string,
+    roleId?: string
+  ) => {
     setTogglingStatus(true);
     try {
-      const data = await orgService.updateUserStatus(targetUser._id, newStatusVal, remark);
+      const data = await orgService.updateUserStatus(
+        targetUser._id,
+        newStatusVal,
+        remark,
+        roleId
+      );
       if (data?.success) {
         toast.success(
           TOAST_MESSAGES.MEMBER_STATUS_GRANT_SUCCESS(targetUser.name, newStatusVal)
@@ -266,7 +289,7 @@ const OrganizationAdmin = () => {
         </div>
 
         {/* Table Skeleton */}
-        <div className="bg-white dark:bg-gray-900 rounded-2xl border border-slate-200 dark:border-gray-800 p-5 space-y-3">
+        <div className="bg-white dark:bg-gray-900 rounded-xl border border-slate-200 dark:border-gray-800 p-5 space-y-3">
           {[1, 2, 3, 4, 5].map((i) => (
             <div key={i} className="h-10 w-full rounded-lg bg-slate-100 dark:bg-slate-800/50" />
           ))}
@@ -274,6 +297,18 @@ const OrganizationAdmin = () => {
       </div>
     );
   }
+
+  const handleAssignRole = async (userId: string, roleId: string | null) => {
+    try {
+      const res = await roleService.assignUserRole(userId, roleId);
+      if (res.success) {
+        toast.success(res.message || "Role updated successfully!");
+        await fetchTeamUsers(currentPage, selectedStatus, selectedRole, debouncedSearch);
+      }
+    } catch (err: any) {
+      toast.error(err.message || "Failed to assign role");
+    }
+  };
 
   return (
     <div className="w-full space-y-6 font-sans">
@@ -303,6 +338,8 @@ const OrganizationAdmin = () => {
         searchQuery={searchQuery}
         onSearchChange={handleSearchChange}
         onResetFilters={handleResetFilters}
+        availableRoles={availableRoles}
+        onAssignRole={handleAssignRole}
       />
 
       <InspectingUserModal
@@ -317,6 +354,7 @@ const OrganizationAdmin = () => {
         setNewMember={setNewMember}
         addingMember={addingMember}
         onAddMember={handleAddMember}
+        availableRoles={availableRoles}
       />
 
       <AccessRemarkModal
@@ -326,11 +364,22 @@ const OrganizationAdmin = () => {
           setSelectedUserForStatusChange(null);
           setPendingNewStatus(null);
         }}
-        onConfirm={(remark) => {
+        onConfirm={(remark, roleId) => {
           if (selectedUserForStatusChange && pendingNewStatus) {
-            handleUpdateUserStatus(selectedUserForStatusChange, pendingNewStatus, remark);
+            handleUpdateUserStatus(
+              selectedUserForStatusChange,
+              pendingNewStatus,
+              remark,
+              roleId
+            );
           }
         }}
+        showRoleSelector={pendingNewStatus === "active"}
+        availableRoles={availableRoles}
+        defaultRoleId={
+          selectedUserForStatusChange?.customRole?._id ||
+          selectedUserForStatusChange?.customRole
+        }
         title={
           pendingNewStatus === "active"
             ? ORG_ACCESS_MODAL_TEXTS.TITLE_GRANT

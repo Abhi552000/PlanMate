@@ -12,6 +12,8 @@ import bcrypt from "bcrypt";
 import validator from "validator";
 import { HttpStatus } from "../constants/httpStatus.js";
 import { MESSAGES } from "../constants/messages.js";
+import { generateCompanyKey } from "../utils/keyGenerator.js";
+import { seedDefaultBoardIfNeeded } from "./boardController.js";
 
 // Onboard a new organization (System Admin or Public Onboarding)
 export const onboardOrganization = async (req, res) => {
@@ -78,6 +80,7 @@ export const onboardOrganization = async (req, res) => {
     // Create Organization
     const organization = new Organization({
       name: orgName,
+      key: generateCompanyKey(orgName),
       description: description?.trim() || "",
       industry: industry?.trim() || "",
       companySize: companySize?.trim() || "",
@@ -92,6 +95,9 @@ export const onboardOrganization = async (req, res) => {
     // Link user to organization
     savedUser.organization = savedOrg._id;
     await savedUser.save();
+
+    // Seed default board (e.g. TCSIT for TCSNET Solution SIT)
+    await seedDefaultBoardIfNeeded(savedOrg._id);
 
     res.status(HttpStatus.CREATED).json({
       success: true,
@@ -192,7 +198,7 @@ export const updateOrganizationInfo = async (req, res) => {
 
 // Add a member to organization (Org Admin only)
 export const addOrganizationMember = async (req, res) => {
-  const { name, email, password } = req.body;
+  const { name, email, password, roleId } = req.body;
 
   if (req.user.role !== "org_admin") {
     return res
@@ -262,6 +268,7 @@ export const addOrganizationMember = async (req, res) => {
       email,
       password: hashedPassword,
       role: "member",
+      customRole: roleId || null,
       organization: req.user.organization,
     });
 
@@ -659,7 +666,8 @@ export const getOrganizationUsers = async (req, res) => {
 
     const totalCount = await User.countDocuments(filter);
     const users = await User.find(filter)
-      .select("name email role status statusRemark createdAt")
+      .select("name email role customRole status statusRemark createdAt")
+      .populate("customRole")
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit);
@@ -729,7 +737,7 @@ export const getOrganizationUsers = async (req, res) => {
 // Update user approval status (Org Admin only)
 export const updateUserStatus = async (req, res) => {
   const { userId } = req.params;
-  const { status, remark } = req.body;
+  const { status, remark, roleId } = req.body;
 
   if (req.user.role !== "org_admin") {
     return res
@@ -778,6 +786,9 @@ export const updateUserStatus = async (req, res) => {
 
     userToUpdate.status = status;
     userToUpdate.statusRemark = remark || "";
+    if (roleId !== undefined) {
+      userToUpdate.customRole = roleId || null;
+    }
     await userToUpdate.save();
 
     res.json({ success: true, message: MESSAGES.ORG.MEMBER_STATUS_UPDATED });

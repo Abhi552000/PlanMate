@@ -21,7 +21,7 @@ export const ResetPasswordModal: React.FC<ResetPasswordModalProps> = ({
       onClick={() => !loading && onClose()}
     >
       <div
-        className="bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-800 rounded-2xl max-w-md w-full shadow-xl p-6 relative overflow-hidden"
+        className="bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-800 rounded-xl max-w-md w-full shadow-xl p-6 relative overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}

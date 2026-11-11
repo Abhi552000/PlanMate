@@ -59,7 +59,7 @@ export const SubtaskListSection: React.FC<SubtaskListSectionProps> = ({
                         setEditingSubtaskIdx(null);
                       }
                     }}
-                    className="flex-1 px-2 py-0.5 border border-sky-100 rounded text-xs focus:ring-1 focus:ring-sky-500 focus:outline-none text-gray-850 bg-white font-medium"
+                    className="flex-1 px-2 py-0.5 border border-sky-100 dark:border-gray-700 rounded text-xs focus:ring-1 focus:ring-sky-500 focus:outline-none text-gray-800 dark:text-gray-100 bg-white dark:bg-gray-800 font-medium"
                     autoFocus
                   />
                 ) : (

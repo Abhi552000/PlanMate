@@ -33,15 +33,10 @@ export const getPriorityStyle = (priority?: string) => {
     case "critical":
     case "urgent":
     case "blocker":
-      return "text-purple-700 dark:text-purple-400 bg-purple-50 dark:bg-purple-950/40 border-purple-200 dark:border-purple-900/50";
     case "high":
-      return "text-rose-700 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 border-rose-200 dark:border-rose-900/50";
-    case "medium":
-      return "text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 border-amber-200 dark:border-amber-900/50";
-    case "low":
-      return "text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-900/50";
+      return "text-rose-700 dark:text-rose-300 bg-rose-50/70 dark:bg-rose-950/40 border-rose-200 dark:border-rose-800/80";
     default:
-      return "text-sky-700 dark:text-sky-400 bg-sky-50 dark:bg-sky-950/40 border-sky-200 dark:border-sky-900/50";
+      return "text-slate-700 dark:text-slate-100 bg-slate-100/70 dark:bg-slate-800 border-slate-200 dark:border-slate-700";
   }
 };
 

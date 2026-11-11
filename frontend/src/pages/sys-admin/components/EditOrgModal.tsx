@@ -29,7 +29,7 @@ export const EditOrgModal: React.FC<EditOrgModalProps> = ({
       onClick={onClose}
     >
       <div
-        className="bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-800 rounded-2xl shadow-xl max-w-lg w-full p-6 sm:p-7 space-y-4 animate-scaleUp max-h-[90vh] overflow-y-auto"
+        className="bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-800 rounded-xl shadow-xl max-w-lg w-full p-6 sm:p-7 space-y-4 animate-scaleUp max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between border-b border-gray-100 dark:border-gray-800 pb-3.5">

@@ -10,10 +10,12 @@ import { isOrgSubscriptionExpired } from "../utils/subscriptionUtils";
 import { SubscriptionExpiredModal } from "./common/SubscriptionExpiredModal";
 import { ROUTES } from "../constants/routeConstant";
 import { useAuth } from "../context/AuthContext";
+import { useBoard } from "../context/BoardContext";
 
 const Layout: React.FC<LayoutProps> = ({ user, onLogout }) => {
   const dispatch = useAppDispatch();
   const { refreshUser } = useAuth();
+  const { currentBoard } = useBoard();
   const tasks = useAppSelector((state) => state.tasks.tasks);
   const loading = useAppSelector((state) => state.tasks.loading);
   const error = useAppSelector((state) => state.tasks.error);
@@ -148,7 +150,7 @@ const Layout: React.FC<LayoutProps> = ({ user, onLogout }) => {
 
   useEffect(() => {
     fetchTasksData(false);
-  }, [fetchTasksData]);
+  }, [fetchTasksData, currentBoard?._id]);
 
   const hasSidebar = Boolean(user && user.role !== "system_admin");
 

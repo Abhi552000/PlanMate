@@ -13,14 +13,24 @@ export const getSprints = async (req, res) => {
         .json({ success: false, message: MESSAGES.ORG.NOT_FOUND });
     }
 
-    const { epic } = req.query;
+    const { epic, boardId } = req.query;
+    const targetBoardId = boardId || req.headers["x-board-id"];
+
     const taskBaseQuery = {};
     if (epic && epic !== "all") {
       taskBaseQuery.epic = epic === "none" ? null : epic;
     }
+    if (targetBoardId && targetBoardId !== "all") {
+      taskBaseQuery.board = targetBoardId;
+    }
+
+    const sprintFilter = { organization: orgId };
+    if (targetBoardId && targetBoardId !== "all") {
+      sprintFilter.board = targetBoardId;
+    }
 
     // 1. Fetch Sprints
-    const sprints = await Sprint.find({ organization: orgId }).sort({ createdAt: -1 }).lean();
+    const sprints = await Sprint.find(sprintFilter).sort({ createdAt: -1 }).lean();
 
     // 2. Fetch Tasks for each sprint
     const sprintsWithTasks = await Promise.all(sprints.map(async (sprint) => {
@@ -36,7 +46,8 @@ export const getSprints = async (req, res) => {
     }));
 
     // 3. Fetch Backlog Tasks (not assigned to any sprint)
-    const backlogTasks = await Task.find({ organization: orgId, sprint: null, ...taskBaseQuery })
+    const backlogFilter = { organization: orgId, sprint: null, ...taskBaseQuery };
+    const backlogTasks = await Task.find(backlogFilter)
       .populate("assignee", "name email")
       .populate("epic")
       .sort({ createdAt: -1 })
@@ -54,8 +65,9 @@ export const getSprints = async (req, res) => {
 // CREATE A SPRINT
 export const createSprint = async (req, res) => {
   try {
-    const { name, startDate, endDate, goal } = req.body;
+    const { name, startDate, endDate, goal, boardId } = req.body;
     const orgId = req.user.organization;
+    const targetBoardId = boardId || req.headers["x-board-id"] || null;
 
     if (!orgId) {
       return res
@@ -74,6 +86,7 @@ export const createSprint = async (req, res) => {
       endDate,
       goal,
       organization: orgId,
+      board: targetBoardId,
     });
 
     await sprint.save();

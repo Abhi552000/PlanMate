@@ -12,4 +12,5 @@ export const ROUTES = {
   CALENDAR: "/calendar",
   REPORTS: "/reports",
   SUBSCRIPTION: "/subscription",
+  ROLES: "/role-management",
 };

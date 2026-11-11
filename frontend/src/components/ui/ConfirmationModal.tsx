@@ -30,7 +30,7 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
       onClick={() => !loading && onClose()}
     >
       <div
-        className="bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-800 rounded-2xl shadow-xl max-w-md w-full p-6 space-y-4 animate-scaleUp"
+        className="bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-800 rounded-xl shadow-xl max-w-md w-full p-6 space-y-4 animate-scaleUp"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}

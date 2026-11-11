@@ -47,7 +47,7 @@ export const UserMenuDropdown: React.FC<UserMenuDropdownProps> = React.memo(({
               }}
               className="w-full px-3 py-2 text-left rounded-lg hover:bg-sky-50 dark:hover:bg-gray-800 text-xs font-bold text-gray-700 dark:text-gray-300 flex items-center gap-2 group cursor-pointer"
             >
-              <Settings className="w-3.5 h-3.5 text-gray-405 group-hover:text-sky-500 transition-colors" />
+              <Settings className="w-3.5 h-3.5 text-gray-400 group-hover:text-sky-500 transition-colors" />
               Profile Setting
             </button>
           </li>

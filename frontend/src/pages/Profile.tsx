@@ -137,7 +137,7 @@ const Profile: React.FC<ProfileProps> = ({ setCurrentUser, onLogout }) => {
           {[1, 2].map((i) => (
             <div
               key={i}
-              className="bg-white dark:bg-gray-900 rounded-2xl border border-slate-200 dark:border-gray-800 p-5 sm:p-6 space-y-5"
+              className="bg-white dark:bg-gray-900 rounded-xl border border-slate-200 dark:border-gray-800 p-5 sm:p-6 space-y-5"
             >
               <div className="flex items-center justify-between border-b border-slate-100 dark:border-gray-800 pb-4">
                 <div className="h-6 w-40 rounded bg-slate-200 dark:bg-slate-800" />
@@ -183,7 +183,7 @@ const Profile: React.FC<ProfileProps> = ({ setCurrentUser, onLogout }) => {
       {/* Profile Cards Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Personal Information */}
-        <section className="bg-white dark:bg-gray-900 rounded-2xl border border-slate-200 dark:border-gray-800 shadow-2xs p-5 sm:p-6 flex flex-col justify-between">
+        <section className="bg-white dark:bg-gray-900 rounded-xl border border-slate-200 dark:border-gray-800 shadow-2xs p-5 sm:p-6 flex flex-col justify-between">
           <form onSubmit={saveProfile} className="space-y-5">
             <div className="flex items-center justify-between border-b border-slate-100 dark:border-gray-800 pb-4">
               <div className="flex items-center gap-3">
@@ -271,7 +271,7 @@ const Profile: React.FC<ProfileProps> = ({ setCurrentUser, onLogout }) => {
         </section>
 
         {/* Security & Password */}
-        <section className="bg-white dark:bg-gray-900 rounded-2xl border border-slate-200 dark:border-gray-800 shadow-2xs p-5 sm:p-6 flex flex-col justify-between">
+        <section className="bg-white dark:bg-gray-900 rounded-xl border border-slate-200 dark:border-gray-800 shadow-2xs p-5 sm:p-6 flex flex-col justify-between">
           <form onSubmit={changePassword} className="space-y-5">
             <div className="flex items-center justify-between border-b border-slate-100 dark:border-gray-800 pb-4">
               <div className="flex items-center gap-3">

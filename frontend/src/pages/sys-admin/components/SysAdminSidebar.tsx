@@ -69,27 +69,27 @@ export const SysAdminSidebar: React.FC<SysAdminSidebarProps> = ({
     <>
       {/* DESKTOP SIDEBAR */}
       <aside
-        className={`hidden lg:flex shrink-0 bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm border-r border-gray-200 dark:border-gray-800 shadow-xs transition-[width] duration-300 ease-in-out flex-col justify-between ${
+        className={`hidden lg:flex shrink-0 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 shadow-xs transition-[width] duration-300 ease-in-out flex-col justify-between ${
           isCollapsed ? "w-16" : "w-60"
         } h-full overflow-hidden`}
       >
         <div className="flex flex-col flex-1 min-h-0">
           {/* Header Row with Collapse Button matching user sidebar */}
           {onToggleCollapse && (
-            <div className="h-12 px-3 flex items-center justify-between border-b border-gray-100 dark:border-gray-800 shrink-0">
+            <div className="h-12 px-3 flex items-center justify-between border-b border-slate-100 dark:border-slate-800 shrink-0">
               <div
                 className={`flex items-center gap-2 overflow-hidden transition-all duration-300 ${
                   isCollapsed ? "max-w-0 opacity-0" : "max-w-[140px] opacity-100"
                 }`}
               >
-                <span className="text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500 truncate">
+                <span className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-400 truncate">
                   {SYSADMIN_SIDEBAR_TEXTS.TITLE_NAVIGATION}
                 </span>
               </div>
 
               <button
                 onClick={onToggleCollapse}
-                className={`p-1.5 rounded-lg text-gray-400 hover:text-sky-600 dark:hover:text-sky-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all cursor-pointer ${
+                className={`p-1.5 rounded-lg text-slate-400 hover:text-sky-600 dark:hover:text-sky-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all cursor-pointer ${
                   isCollapsed ? "mx-auto" : "ml-auto"
                 }`}
                 title={
@@ -124,8 +124,8 @@ export const SysAdminSidebar: React.FC<SysAdminSidebarProps> = ({
                   onClick={() => handleSelectTab(item.id)}
                   className={`w-full group relative flex items-center h-10 px-2.5 rounded-lg transition-colors overflow-hidden cursor-pointer ${
                     isActive
-                      ? "bg-sky-50 dark:bg-sky-950/40 text-sky-600 dark:text-sky-300 font-semibold border-l-[3px] border-sky-500 pl-[7px]"
-                      : "text-gray-600 dark:text-gray-400 hover:text-sky-600 dark:hover:text-sky-300 hover:bg-gray-100/70 dark:hover:bg-gray-800/70"
+                      ? "bg-sky-50 dark:bg-slate-800/80 text-sky-600 dark:text-sky-400 font-semibold border-l-[3px] border-sky-500 pl-[7px]"
+                      : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/70 dark:hover:bg-slate-800/50"
                   }`}
                   title={isCollapsed ? item.label : undefined}
                 >
@@ -142,7 +142,7 @@ export const SysAdminSidebar: React.FC<SysAdminSidebarProps> = ({
                     {item.label}
                   </span>
                   {isCollapsed && (
-                    <div className="pointer-events-none fixed left-[68px] px-2.5 py-1 rounded-md bg-gray-900 dark:bg-gray-800 text-white text-xs font-medium whitespace-nowrap shadow-md opacity-0 group-hover:opacity-100 transition-opacity z-50">
+                    <div className="pointer-events-none fixed left-[68px] px-2.5 py-1 rounded-md bg-slate-900 dark:bg-slate-800 text-white text-xs font-medium whitespace-nowrap shadow-md opacity-0 group-hover:opacity-100 transition-opacity z-50">
                       {item.label}
                     </div>
                   )}
@@ -153,7 +153,7 @@ export const SysAdminSidebar: React.FC<SysAdminSidebarProps> = ({
         </div>
 
         {/* Quick Action Button at Bottom */}
-        <div className="p-2.5 border-t border-gray-100 dark:border-gray-800 shrink-0">
+        <div className="p-2.5 border-t border-slate-100 dark:border-slate-800 shrink-0">
           <button
             onClick={onOnboardClick}
             className={`w-full h-10 rounded-lg bg-sky-500 hover:bg-sky-600 text-white text-xs font-bold transition-all shadow-2xs flex items-center justify-center gap-2 cursor-pointer ${
@@ -173,20 +173,20 @@ export const SysAdminSidebar: React.FC<SysAdminSidebarProps> = ({
       {mobileOpen && (
         <div className="fixed inset-0 z-50 lg:hidden animate-in fade-in duration-200">
           <div
-            className="fixed inset-0 bg-black/40 backdrop-blur-xs"
+            className="fixed inset-0 bg-black/55 backdrop-blur-xs"
             onClick={() => setMobileOpen?.(false)}
           />
           <div
-            className="absolute top-0 left-0 w-64 h-full bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 shadow-xl z-50 p-4 flex flex-col justify-between"
+            className="absolute top-0 left-0 w-64 h-full bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 shadow-xl z-50 p-4 flex flex-col justify-between"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="space-y-4">
-              <div className="flex justify-between items-center pb-3 border-b border-gray-100 dark:border-gray-800">
-                <span className="text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500">
+              <div className="flex justify-between items-center pb-3 border-b border-slate-100 dark:border-slate-800">
+                <span className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-400">
                   {SYSADMIN_SIDEBAR_TEXTS.TITLE_NAVIGATION}
                 </span>
                 <button
-                  className="text-gray-500 hover:text-gray-800 dark:hover:text-gray-200 p-1 rounded-lg transition-colors cursor-pointer"
+                  className="text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 p-1 rounded-lg transition-colors cursor-pointer"
                   onClick={() => setMobileOpen?.(false)}
                   aria-label={SYSADMIN_SIDEBAR_TEXTS.CLOSE_MENU}
                 >
@@ -205,8 +205,8 @@ export const SysAdminSidebar: React.FC<SysAdminSidebarProps> = ({
                       onClick={() => handleSelectTab(item.id)}
                       className={`w-full flex items-center h-10 px-3 rounded-lg transition-colors cursor-pointer ${
                         isActive
-                          ? "bg-sky-50 dark:bg-sky-950/40 text-sky-600 dark:text-sky-300 font-semibold border-l-[3px] border-sky-500 pl-[9px]"
-                          : "text-gray-600 dark:text-gray-400 hover:text-sky-600 dark:hover:text-sky-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+                          ? "bg-sky-50 dark:bg-slate-800/80 text-sky-600 dark:text-sky-400 font-semibold border-l-[3px] border-sky-500 pl-[9px]"
+                          : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/70 dark:hover:bg-slate-800/50"
                       }`}
                     >
                       <Icon className="w-5 h-5 text-sky-500 mr-3 shrink-0" />
@@ -217,7 +217,7 @@ export const SysAdminSidebar: React.FC<SysAdminSidebarProps> = ({
               </nav>
             </div>
 
-            <div className="pt-3 border-t border-gray-100 dark:border-gray-800">
+            <div className="pt-3 border-t border-slate-100 dark:border-slate-800">
               <button
                 onClick={handleMobileOnboard}
                 className="w-full h-10 rounded-lg bg-sky-500 hover:bg-sky-600 text-white text-xs font-bold transition-all shadow-2xs flex items-center justify-center gap-2 cursor-pointer px-3"

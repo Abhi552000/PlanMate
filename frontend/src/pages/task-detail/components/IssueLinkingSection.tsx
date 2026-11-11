@@ -101,7 +101,7 @@ export const IssueLinkingSection: React.FC<IssueLinkingSectionProps> = ({
       {showAddForm && (
         <form
           onSubmit={handleSubmit}
-          className="p-3.5 bg-gray-50/80 dark:bg-gray-850/60 rounded-xl border border-sky-100 dark:border-gray-800 space-y-3"
+          className="p-3.5 bg-gray-50/80 dark:bg-gray-800/60 rounded-xl border border-sky-100 dark:border-gray-800 space-y-3"
         >
           <div className="flex items-center justify-between border-b border-gray-200/60 dark:border-gray-800 pb-2">
             <span className="text-xs font-bold text-gray-700 dark:text-gray-200">

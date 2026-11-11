@@ -37,6 +37,7 @@ const CalendarViewPage = lazy(() =>
   import("../pages/CalendarViewPage").then((m) => ({ default: m.CalendarViewPage }))
 );
 const ReportsPage = lazy(() => import("../pages/reports/ReportsPage"));
+const RoleManagementPage = lazy(() => import("../pages/org-admin/RoleManagementPage"));
 
 import { PublicRoute } from "./PublicRoute";
 import { ProtectedRoute } from "./ProtectedRoute";
@@ -101,6 +102,7 @@ export const AppRoutes: React.FC = () => {
         <Route path={ROUTES.ORGANIZATION} element={<OrganizationAdmin />} />
         <Route path={ROUTES.SUBSCRIPTION} element={<PlansBillingPage />} />
         <Route path={ROUTES.WORKSPACE_SETTINGS} element={<WorkspaceSettings />} />
+        <Route path={ROUTES.ROLES} element={<RoleManagementPage />} />
         <Route path={ROUTES.BACKLOG} element={<Backlog />} />
         <Route path={ROUTES.ACTIVE_SPRINT} element={<ActiveSprint />} />
         <Route path={ROUTES.CALENDAR} element={<CalendarViewPage />} />

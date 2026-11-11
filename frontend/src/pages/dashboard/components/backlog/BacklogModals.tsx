@@ -51,7 +51,7 @@ export const BacklogModals: React.FC<BacklogModalsProps> = ({
           <form
             onSubmit={handleCreateSprint}
             onClick={(e) => e.stopPropagation()}
-            className="bg-white dark:bg-gray-900 border border-sky-100 dark:border-gray-800 rounded-2xl max-w-sm w-full p-6 shadow-2xl animate-fadeIn space-y-4"
+            className="bg-white dark:bg-gray-900 border border-sky-100 dark:border-gray-800 rounded-xl max-w-sm w-full p-6 shadow-2xl animate-fadeIn space-y-4"
           >
             <div className="flex justify-between items-center border-b border-sky-50 pb-2">
               <h3 className="font-extrabold text-gray-900 dark:text-white text-lg">
@@ -60,7 +60,7 @@ export const BacklogModals: React.FC<BacklogModalsProps> = ({
               <button
                 type="button"
                 onClick={() => setShowCreateSprint(false)}
-                className="text-gray-400 hover:text-sky-655 transition-colors p-1"
+                className="text-gray-400 hover:text-sky-600 transition-colors p-1"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -109,7 +109,7 @@ export const BacklogModals: React.FC<BacklogModalsProps> = ({
           <form
             onSubmit={handleStartSprint}
             onClick={(e) => e.stopPropagation()}
-            className="bg-white dark:bg-gray-900 border border-sky-100 dark:border-gray-800 rounded-2xl max-w-sm w-full p-6 shadow-2xl animate-fadeIn space-y-4"
+            className="bg-white dark:bg-gray-900 border border-sky-100 dark:border-gray-800 rounded-xl max-w-sm w-full p-6 shadow-2xl animate-fadeIn space-y-4"
           >
             <div className="flex justify-between items-center border-b border-sky-50 pb-2">
               <h3 className="font-extrabold text-gray-900 dark:text-white text-lg">
@@ -192,7 +192,7 @@ export const BacklogModals: React.FC<BacklogModalsProps> = ({
           <form
             onSubmit={handleCreateEpic}
             onClick={(e) => e.stopPropagation()}
-            className="bg-white dark:bg-gray-900 border border-sky-100 dark:border-gray-800 rounded-2xl max-w-sm w-full p-6 shadow-2xl animate-fadeIn space-y-4"
+            className="bg-white dark:bg-gray-900 border border-sky-100 dark:border-gray-800 rounded-xl max-w-sm w-full p-6 shadow-2xl animate-fadeIn space-y-4"
           >
             <div className="flex justify-between items-center border-b border-sky-50 pb-2">
               <h3 className="font-extrabold text-gray-900 dark:text-white text-lg">
@@ -279,7 +279,7 @@ export const BacklogModals: React.FC<BacklogModalsProps> = ({
           onClick={() => setConfirmCompleteSprintId(null)}
         >
           <div 
-            className="bg-white dark:bg-gray-900 border border-sky-100 dark:border-gray-800 rounded-2xl max-w-sm w-full p-6 shadow-2xl animate-fadeIn space-y-4"
+            className="bg-white dark:bg-gray-900 border border-sky-100 dark:border-gray-800 rounded-xl max-w-sm w-full p-6 shadow-2xl animate-fadeIn space-y-4"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex justify-between items-center border-b border-slate-100 dark:border-slate-800/80 pb-3">
@@ -289,7 +289,7 @@ export const BacklogModals: React.FC<BacklogModalsProps> = ({
               <button
                 type="button"
                 onClick={() => setConfirmCompleteSprintId(null)}
-                className="text-gray-400 hover:text-sky-655 transition-colors p-1"
+                className="text-gray-400 hover:text-sky-600 transition-colors p-1"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -326,7 +326,7 @@ export const BacklogModals: React.FC<BacklogModalsProps> = ({
           onClick={() => setConfirmDeleteSprintId(null)}
         >
           <div 
-            className="bg-white dark:bg-gray-900 border border-sky-100 dark:border-gray-800 rounded-2xl max-w-sm w-full p-6 shadow-2xl animate-fadeIn space-y-4"
+            className="bg-white dark:bg-gray-900 border border-sky-100 dark:border-gray-800 rounded-xl max-w-sm w-full p-6 shadow-2xl animate-fadeIn space-y-4"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex justify-between items-center border-b border-slate-100 dark:border-slate-800/80 pb-3">
@@ -336,7 +336,7 @@ export const BacklogModals: React.FC<BacklogModalsProps> = ({
               <button
                 type="button"
                 onClick={() => setConfirmDeleteSprintId(null)}
-                className="text-gray-400 hover:text-sky-655 transition-colors p-1"
+                className="text-gray-400 hover:text-sky-600 transition-colors p-1"
               >
                 <X className="w-4 h-4" />
               </button>

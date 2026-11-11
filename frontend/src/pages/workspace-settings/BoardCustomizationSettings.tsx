@@ -11,28 +11,17 @@ import {
 } from "lucide-react";
 import { Input } from "../../components/ui/Input";
 import { Button } from "../../components/ui/Button";
-import { IBoardFeatures, ICustomField } from "../../types/organization";
+import { Select } from "../../components/ui/Select";
+import {
+  BoardCustomizationSettingsProps,
+  IBoardFeatures,
+  ICustomField,
+} from "../../types";
 import { orgService } from "../../services/orgService";
 import { taskService } from "../../services/taskService";
 import { toast } from "react-toastify";
-import { getPriorityStyle } from "../../utils";
 import { WORKSPACE_SETTINGS_TEXTS } from "../../constants/uiTexts";
 import { TOAST_MESSAGES } from "../../constants/messages";
-
-interface BoardCustomizationSettingsProps {
-  statuses: string[];
-  newStatus: string;
-  setNewStatus: (value: string) => void;
-  addingStatus: boolean;
-  handleAddStatus: (e: React.FormEvent) => void;
-  handleOpenDeleteStatusModal: (status: string) => void;
-  boardFeatures: IBoardFeatures;
-  priorities: string[];
-  customFields: ICustomField[];
-  onFeaturesUpdated: (features: IBoardFeatures) => void;
-  onPrioritiesUpdated: (priorities: string[]) => void;
-  onCustomFieldsUpdated: (fields: ICustomField[]) => void;
-}
 
 export const BoardCustomizationSettings: React.FC<BoardCustomizationSettingsProps> = ({
   statuses,
@@ -47,6 +36,8 @@ export const BoardCustomizationSettings: React.FC<BoardCustomizationSettingsProp
   onFeaturesUpdated,
   onPrioritiesUpdated,
   onCustomFieldsUpdated,
+  activeSection = "all",
+  dynamicDescriptions,
 }) => {
   // Feature toggle state
   const [savingFeature, setSavingFeature] = useState<string | null>(null);
@@ -227,61 +218,63 @@ export const BoardCustomizationSettings: React.FC<BoardCustomizationSettingsProp
     }
   };
 
+  const showRequired = activeSection === "workflow" || activeSection === "all";
+  const showWorkflow = activeSection === "workflow" || activeSection === "all";
+  const showFeatures = activeSection === "features" || activeSection === "all";
+  const showCustomFields = activeSection === "customFields" || activeSection === "all";
+
   return (
     <div className="space-y-6">
       {/* 2. Required Fields */}
-      <div className="bg-white dark:bg-gray-900 p-5 sm:p-6 rounded-2xl border border-sky-100/50 dark:border-gray-800 shadow-sm space-y-4">
-        <div className="border-b border-sky-100 dark:border-gray-800 pb-3">
-          <h3 className="text-sm font-bold text-gray-800 dark:text-gray-100">
-            {WORKSPACE_SETTINGS_TEXTS.REQUIRED_FIELDS_TITLE}
-          </h3>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-            {WORKSPACE_SETTINGS_TEXTS.REQUIRED_FIELDS_DESC}
-          </p>
-        </div>
+      {showRequired && (
+        <div className="bg-white dark:bg-slate-900 p-5 sm:p-6 rounded-xl border border-sky-100/50 dark:border-slate-800 shadow-sm space-y-4">
+          <div className="border-b border-sky-100/60 dark:border-slate-800 pb-3">
+            <h3 className="text-sm font-bold text-slate-900 dark:text-white">
+              {WORKSPACE_SETTINGS_TEXTS.REQUIRED_FIELDS_TITLE}
+            </h3>
+          </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          {[
-            { name: WORKSPACE_SETTINGS_TEXTS.FIELD_TITLE_NAME, desc: WORKSPACE_SETTINGS_TEXTS.FIELD_TITLE_DESC },
-            { name: WORKSPACE_SETTINGS_TEXTS.FIELD_STATUS_NAME, desc: WORKSPACE_SETTINGS_TEXTS.FIELD_STATUS_DESC },
-            { name: WORKSPACE_SETTINGS_TEXTS.FIELD_PRIORITY_NAME, desc: WORKSPACE_SETTINGS_TEXTS.FIELD_PRIORITY_DESC },
-            { name: WORKSPACE_SETTINGS_TEXTS.FIELD_ASSIGNEE_NAME, desc: WORKSPACE_SETTINGS_TEXTS.FIELD_ASSIGNEE_DESC },
-          ].map((field) => (
-            <div
-              key={field.name}
-              className="p-3 rounded-xl bg-sky-50/50 dark:bg-gray-850 border border-sky-100/60 dark:border-gray-800 flex flex-col justify-between"
-            >
-              <div className="flex items-center justify-between mb-1">
-                <span className="text-xs font-bold text-gray-800 dark:text-gray-200">
-                  {field.name}
-                </span>
-                <span className="text-[10px] font-semibold text-sky-600 dark:text-sky-400 bg-sky-100/70 dark:bg-sky-950/60 px-1.5 py-0.5 rounded">
-                  {WORKSPACE_SETTINGS_TEXTS.BADGE_REQUIRED}
-                </span>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            {[
+              { name: WORKSPACE_SETTINGS_TEXTS.FIELD_TITLE_NAME, desc: WORKSPACE_SETTINGS_TEXTS.FIELD_TITLE_DESC },
+              { name: WORKSPACE_SETTINGS_TEXTS.FIELD_STATUS_NAME, desc: WORKSPACE_SETTINGS_TEXTS.FIELD_STATUS_DESC },
+              { name: WORKSPACE_SETTINGS_TEXTS.FIELD_PRIORITY_NAME, desc: WORKSPACE_SETTINGS_TEXTS.FIELD_PRIORITY_DESC },
+              { name: WORKSPACE_SETTINGS_TEXTS.FIELD_ASSIGNEE_NAME, desc: WORKSPACE_SETTINGS_TEXTS.FIELD_ASSIGNEE_DESC },
+            ].map((field) => (
+              <div
+                key={field.name}
+                className="p-3.5 rounded-lg bg-slate-50/70 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-700/60 flex flex-col justify-between"
+              >
+                <div className="flex items-center justify-between mb-1.5">
+                  <span className="text-xs font-bold text-slate-900 dark:text-white">
+                    {field.name}
+                  </span>
+                  <span className="text-[10px] font-medium text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-1.5 py-0.5 rounded">
+                    {WORKSPACE_SETTINGS_TEXTS.BADGE_REQUIRED}
+                  </span>
+                </div>
+                <p className="text-[11px] text-slate-500 dark:text-slate-300 leading-snug font-normal">
+                  {field.desc}
+                </p>
               </div>
-              <p className="text-[11px] text-gray-400 leading-snug">
-                {field.desc}
-              </p>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* 3. Statuses & Priorities */}
-      <div className="bg-white dark:bg-gray-900 p-5 sm:p-6 rounded-2xl border border-sky-100/50 dark:border-gray-800 shadow-sm space-y-6">
-        <div className="border-b border-sky-100 dark:border-gray-800 pb-3">
-          <h3 className="text-sm font-bold text-gray-800 dark:text-gray-100">
-            {WORKSPACE_SETTINGS_TEXTS.STATUSES_PRIORITIES_TITLE}
-          </h3>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-            {WORKSPACE_SETTINGS_TEXTS.STATUSES_PRIORITIES_DESC}
-          </p>
-        </div>
+      {showWorkflow && (
+        <div className="bg-white dark:bg-slate-900 p-5 sm:p-6 rounded-xl border border-sky-100/50 dark:border-slate-800 shadow-sm space-y-6">
+          <div className="border-b border-sky-100/60 dark:border-slate-800 pb-3">
+            <h3 className="text-sm font-bold text-slate-900 dark:text-white">
+              {WORKSPACE_SETTINGS_TEXTS.STATUSES_PRIORITIES_TITLE}
+            </h3>
+          </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Statuses Column */}
           <div className="space-y-4">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
               {WORKSPACE_SETTINGS_TEXTS.STATUSES_SECTION_TITLE}
             </h4>
             <form onSubmit={handleAddStatus} className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
@@ -298,27 +291,27 @@ export const BoardCustomizationSettings: React.FC<BoardCustomizationSettingsProp
                 disabled={!newStatus.trim()}
                 loading={addingStatus}
                 variant="secondary"
-                className="h-[46px] sm:h-[44px] justify-center px-4"
+                size="md"
               >
                 {WORKSPACE_SETTINGS_TEXTS.BTN_ADD_STATUS}
               </Button>
             </form>
 
             <div>
-              <label className="block text-[11px] font-bold uppercase tracking-wider text-gray-400 mb-2">
+              <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">
                 {WORKSPACE_SETTINGS_TEXTS.LABEL_ACTIVE_STATUSES}
               </label>
               <div className="flex flex-wrap gap-2">
                 {statuses.map((status) => (
                   <div
                     key={status}
-                    className="flex items-center gap-2 px-3 py-1.5 bg-sky-50/50 dark:bg-gray-850 rounded-xl border border-sky-100/55 dark:border-gray-800 text-xs font-bold text-gray-700 dark:text-gray-300 shadow-xs"
+                    className="flex items-center gap-1.5 px-2.5 py-1 bg-gray-100 dark:bg-gray-800 rounded border border-gray-200 dark:border-gray-700 text-xs font-medium text-gray-800 dark:text-gray-200"
                   >
                     <span>{status}</span>
                     <button
                       type="button"
                       onClick={() => handleOpenDeleteStatusModal(status)}
-                      className="opacity-70 hover:opacity-100 hover:text-slate-800 dark:hover:text-white transition-opacity p-0.5 rounded cursor-pointer"
+                      className="text-gray-400 hover:text-rose-500 transition-colors p-0.5 rounded cursor-pointer"
                       title={`Delete status "${status}"`}
                     >
                       <X className="w-3.5 h-3.5" />
@@ -330,8 +323,8 @@ export const BoardCustomizationSettings: React.FC<BoardCustomizationSettingsProp
           </div>
 
           {/* Priorities Column */}
-          <div className="space-y-4 lg:border-l lg:border-sky-100/60 dark:lg:border-gray-800 lg:pl-6">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+          <div className="space-y-4 lg:border-l lg:border-sky-100/60 dark:lg:border-slate-800 lg:pl-6">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
               {WORKSPACE_SETTINGS_TEXTS.PRIORITIES_SECTION_TITLE}
             </h4>
             <form onSubmit={handleAddPriority} className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
@@ -347,30 +340,28 @@ export const BoardCustomizationSettings: React.FC<BoardCustomizationSettingsProp
                 disabled={!newPriority.trim()}
                 loading={addingPriority}
                 variant="secondary"
-                className="h-[46px] sm:h-[44px] justify-center px-4"
+                size="md"
               >
                 {WORKSPACE_SETTINGS_TEXTS.BTN_ADD_PRIORITY}
               </Button>
             </form>
 
             <div>
-              <label className="block text-[11px] font-bold uppercase tracking-wider text-gray-400 mb-2">
+              <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">
                 {WORKSPACE_SETTINGS_TEXTS.LABEL_ACTIVE_PRIORITIES}
               </label>
               <div className="flex flex-wrap gap-2">
                 {priorities.map((p) => (
                   <div
                     key={p}
-                    className={`flex items-center gap-2 px-3 py-1.5 rounded-xl border text-xs font-bold shadow-xs ${getPriorityStyle(
-                      p
-                    )}`}
+                    className="flex items-center gap-1.5 px-2.5 py-1 bg-gray-100 dark:bg-gray-800 rounded border border-gray-200 dark:border-gray-700 text-xs font-medium text-gray-800 dark:text-gray-200"
                   >
                     <span>{p}</span>
                     {priorities.length > 1 && (
                       <button
                         type="button"
                         onClick={() => handleOpenDeletePriorityModal(p)}
-                        className="opacity-70 hover:opacity-100 hover:text-slate-800 dark:hover:text-white transition-opacity p-0.5 rounded cursor-pointer"
+                        className="text-gray-400 hover:text-rose-500 transition-colors p-0.5 rounded cursor-pointer"
                         title={`Delete priority "${p}"`}
                       >
                         <X className="w-3.5 h-3.5" />
@@ -382,196 +373,191 @@ export const BoardCustomizationSettings: React.FC<BoardCustomizationSettingsProp
             </div>
           </div>
         </div>
-      </div>
+        </div>
+      )}
 
       {/* 4. Board Features */}
-      <div className="bg-white dark:bg-gray-900 p-5 sm:p-6 rounded-2xl border border-sky-100/50 dark:border-gray-800 shadow-sm space-y-4">
-        <div className="border-b border-sky-100 dark:border-gray-800 pb-3">
-          <h3 className="text-sm font-bold text-gray-800 dark:text-gray-100">
-            {WORKSPACE_SETTINGS_TEXTS.BOARD_FEATURES_TITLE}
-          </h3>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-            {WORKSPACE_SETTINGS_TEXTS.BOARD_FEATURES_DESC}
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
-          {[
-            {
-              key: "storyPoints" as keyof IBoardFeatures,
-              label: WORKSPACE_SETTINGS_TEXTS.FEATURE_STORY_POINTS_LABEL,
-              icon: Layers,
-              desc: WORKSPACE_SETTINGS_TEXTS.FEATURE_STORY_POINTS_DESC,
-            },
-            {
-              key: "timeTracking" as keyof IBoardFeatures,
-              label: WORKSPACE_SETTINGS_TEXTS.FEATURE_TIME_TRACKING_LABEL,
-              icon: Clock,
-              desc: WORKSPACE_SETTINGS_TEXTS.FEATURE_TIME_TRACKING_DESC,
-            },
-            {
-              key: "dueDates" as keyof IBoardFeatures,
-              label: WORKSPACE_SETTINGS_TEXTS.FEATURE_DUE_DATES_LABEL,
-              icon: Calendar,
-              desc: WORKSPACE_SETTINGS_TEXTS.FEATURE_DUE_DATES_DESC,
-            },
-            {
-              key: "labels" as keyof IBoardFeatures,
-              label: WORKSPACE_SETTINGS_TEXTS.FEATURE_LABELS_LABEL,
-              icon: Tag,
-              desc: WORKSPACE_SETTINGS_TEXTS.FEATURE_LABELS_DESC,
-            },
-            {
-              key: "subtasks" as keyof IBoardFeatures,
-              label: WORKSPACE_SETTINGS_TEXTS.FEATURE_SUBTASKS_LABEL,
-              icon: GitBranch,
-              desc: WORKSPACE_SETTINGS_TEXTS.FEATURE_SUBTASKS_DESC,
-            },
-            {
-              key: "issueLinking" as keyof IBoardFeatures,
-              label: WORKSPACE_SETTINGS_TEXTS.FEATURE_TASK_LINKING_LABEL,
-              icon: Link2,
-              desc: WORKSPACE_SETTINGS_TEXTS.FEATURE_TASK_LINKING_DESC,
-            },
-          ].map((item) => {
-            const Icon = item.icon;
-            const isEnabled = boardFeatures[item.key] !== false;
-            const isSaving = savingFeature === item.key;
-
-            return (
-              <div
-                key={item.key}
-                className="flex items-start justify-between p-3.5 rounded-xl border border-sky-100/60 dark:border-gray-800 bg-slate-50/50 dark:bg-gray-850/50 hover:bg-slate-50 dark:hover:bg-gray-850 transition-colors"
-              >
-                <div className="flex items-start gap-3">
-                  <div className="p-2 rounded-lg bg-sky-50 dark:bg-gray-800 text-sky-600 dark:text-sky-400 mt-0.5 shrink-0">
-                    <Icon className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <h4 className="text-xs font-bold text-gray-800 dark:text-gray-200">
-                      {item.label}
-                    </h4>
-                    <p className="text-[11px] text-gray-400 leading-snug mt-0.5">
-                      {item.desc}
-                    </p>
-                  </div>
-                </div>
-
-                <button
-                  type="button"
-                  disabled={isSaving}
-                  onClick={() => handleToggleFeature(item.key)}
-                  className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-                    isEnabled ? "bg-sky-500" : "bg-gray-200 dark:bg-gray-700"
-                  } ${isSaving ? "opacity-50" : ""}`}
-                >
-                  <span
-                    className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-md ring-0 transition duration-200 ease-in-out ${
-                      isEnabled ? "translate-x-5" : "translate-x-0"
-                    }`}
-                  />
-                </button>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* 5. Custom Fields */}
-      <div className="bg-white dark:bg-gray-900 p-5 sm:p-6 rounded-2xl border border-sky-100/50 dark:border-gray-800 shadow-sm space-y-4">
-        <div className="flex items-center justify-between border-b border-sky-100 dark:border-gray-800 pb-3">
-          <div>
-            <h3 className="text-sm font-bold text-gray-800 dark:text-gray-100">
-              {WORKSPACE_SETTINGS_TEXTS.CUSTOM_FIELDS_TITLE}
+      {showFeatures && (
+        <div className="bg-white dark:bg-slate-900 p-5 sm:p-6 rounded-xl border border-sky-100/50 dark:border-slate-800 shadow-sm space-y-4">
+          <div className="border-b border-sky-100/60 dark:border-slate-800 pb-3">
+            <h3 className="text-sm font-bold text-slate-900 dark:text-white">
+              {WORKSPACE_SETTINGS_TEXTS.BOARD_FEATURES_TITLE}
             </h3>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-              {WORKSPACE_SETTINGS_TEXTS.CUSTOM_FIELDS_DESC}
-            </p>
           </div>
-          <Button
-            type="button"
-            variant="primary"
-            onClick={() => setShowAddFieldModal(true)}
-            className="text-xs py-1.5 px-3 flex items-center gap-1.5"
-          >
-            <Plus className="w-3.5 h-3.5" /> {WORKSPACE_SETTINGS_TEXTS.BTN_ADD_FIELD}
-          </Button>
-        </div>
 
-        {customFields.length === 0 ? (
-          <div className="py-6 text-center text-xs text-gray-400">
-            {WORKSPACE_SETTINGS_TEXTS.EMPTY_CUSTOM_FIELDS}
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-            {customFields.map((field) => (
-              <div
-                key={field.id}
-                className="p-3.5 rounded-xl border border-sky-100/60 dark:border-gray-800 bg-slate-50/50 dark:bg-gray-850/50 flex flex-col justify-between space-y-2"
-              >
-                <div className="flex items-start justify-between">
-                  <div>
-                    <h4 className="text-xs font-bold text-gray-800 dark:text-gray-200">
-                      {field.name}
-                    </h4>
-                    <span className="inline-block mt-0.5 text-[10px] font-semibold uppercase tracking-wider text-sky-600 dark:text-sky-400 bg-sky-100/60 dark:bg-sky-950/50 px-1.5 py-0.5 rounded">
-                      {field.type}
-                    </span>
-                    {field.required && (
-                      <span className="inline-block ml-1.5 text-[10px] font-semibold text-amber-600 dark:text-amber-400 bg-amber-100/60 dark:bg-amber-950/50 px-1.5 py-0.5 rounded">
-                        {WORKSPACE_SETTINGS_TEXTS.BADGE_REQUIRED}
-                      </span>
-                    )}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+            {[
+              {
+                key: "storyPoints" as keyof IBoardFeatures,
+                label: WORKSPACE_SETTINGS_TEXTS.FEATURE_STORY_POINTS_LABEL,
+                icon: Layers,
+                desc: WORKSPACE_SETTINGS_TEXTS.FEATURE_STORY_POINTS_DESC,
+              },
+              {
+                key: "timeTracking" as keyof IBoardFeatures,
+                label: WORKSPACE_SETTINGS_TEXTS.FEATURE_TIME_TRACKING_LABEL,
+                icon: Clock,
+                desc: WORKSPACE_SETTINGS_TEXTS.FEATURE_TIME_TRACKING_DESC,
+              },
+              {
+                key: "dueDates" as keyof IBoardFeatures,
+                label: WORKSPACE_SETTINGS_TEXTS.FEATURE_DUE_DATES_LABEL,
+                icon: Calendar,
+                desc: WORKSPACE_SETTINGS_TEXTS.FEATURE_DUE_DATES_DESC,
+              },
+              {
+                key: "labels" as keyof IBoardFeatures,
+                label: WORKSPACE_SETTINGS_TEXTS.FEATURE_LABELS_LABEL,
+                icon: Tag,
+                desc: WORKSPACE_SETTINGS_TEXTS.FEATURE_LABELS_DESC,
+              },
+              {
+                key: "subtasks" as keyof IBoardFeatures,
+                label: WORKSPACE_SETTINGS_TEXTS.FEATURE_SUBTASKS_LABEL,
+                icon: GitBranch,
+                desc: WORKSPACE_SETTINGS_TEXTS.FEATURE_SUBTASKS_DESC,
+              },
+              {
+                key: "issueLinking" as keyof IBoardFeatures,
+                label: WORKSPACE_SETTINGS_TEXTS.FEATURE_TASK_LINKING_LABEL,
+                icon: Link2,
+                desc: WORKSPACE_SETTINGS_TEXTS.FEATURE_TASK_LINKING_DESC,
+              },
+            ].map((item) => {
+              const Icon = item.icon;
+              const isEnabled = boardFeatures[item.key] !== false;
+              const isSaving = savingFeature === item.key;
+
+              return (
+                <div
+                  key={item.key}
+                  className="flex items-start justify-between p-3.5 rounded-lg border border-slate-200/80 dark:border-slate-700/60 bg-slate-50/70 dark:bg-slate-800/50 transition-colors"
+                >
+                  <div className="flex items-start gap-2.5">
+                    <Icon className="w-4 h-4 text-slate-400 dark:text-slate-500 mt-0.5 shrink-0" />
+                    <div>
+                      <h4 className="text-xs font-bold text-slate-900 dark:text-white">
+                        {item.label}
+                      </h4>
+                      <p className="text-[11px] text-slate-500 dark:text-slate-300 leading-snug mt-0.5 font-normal">
+                        {item.desc}
+                      </p>
+                    </div>
                   </div>
+
                   <button
                     type="button"
-                    onClick={() => setFieldToDelete(field)}
-                    className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors p-1 rounded cursor-pointer"
-                    title={`Delete custom field "${field.name}"`}
+                    disabled={isSaving}
+                    onClick={() => handleToggleFeature(item.key)}
+                    className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                      isEnabled ? "bg-sky-500" : "bg-slate-200 dark:bg-slate-700"
+                    } ${isSaving ? "opacity-50" : ""}`}
                   >
-                    <X className="w-4 h-4" />
+                    <span
+                      className={`toggle-knob pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-md ring-0 transition duration-200 ease-in-out ${
+                        isEnabled ? "translate-x-4" : "translate-x-0"
+                      }`}
+                    />
                   </button>
                 </div>
-
-                {field.type === "dropdown" && field.options && field.options.length > 0 && (
-                  <div className="flex flex-wrap gap-1 pt-1">
-                    {field.options.map((opt) => (
-                      <span
-                        key={opt}
-                        className="text-[10px] bg-white dark:bg-gray-800 border border-slate-200 dark:border-gray-700 px-1.5 py-0.5 rounded text-gray-600 dark:text-gray-300"
-                      >
-                        {opt}
-                      </span>
-                    ))}
-                  </div>
-                )}
-              </div>
-            ))}
+              );
+            })}
           </div>
-        )}
-      </div>
+        </div>
+      )}
+
+      {/* 5. Custom Fields */}
+      {showCustomFields && (
+        <div className="bg-white dark:bg-slate-900 p-5 sm:p-6 rounded-xl border border-sky-100/50 dark:border-slate-800 shadow-sm space-y-4">
+          <div className="flex items-center justify-between border-b border-sky-100/60 dark:border-slate-800 pb-3">
+            <h3 className="text-sm font-bold text-slate-900 dark:text-white">
+              {WORKSPACE_SETTINGS_TEXTS.CUSTOM_FIELDS_TITLE}
+            </h3>
+            <Button
+              type="button"
+              variant="primary"
+              onClick={() => setShowAddFieldModal(true)}
+              className="text-xs py-1.5 px-3 flex items-center gap-1.5"
+            >
+              <Plus className="w-3.5 h-3.5" /> {WORKSPACE_SETTINGS_TEXTS.BTN_ADD_FIELD}
+            </Button>
+          </div>
+
+          {customFields.length === 0 ? (
+            <div className="py-6 text-center text-xs text-slate-400 dark:text-slate-400">
+              {WORKSPACE_SETTINGS_TEXTS.EMPTY_CUSTOM_FIELDS}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {customFields.map((field) => (
+                <div
+                  key={field.id}
+                  className="p-3.5 rounded-lg border border-slate-200/80 dark:border-slate-700/60 bg-slate-50/70 dark:bg-slate-800/50 flex flex-col justify-between space-y-2"
+                >
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <h4 className="text-xs font-bold text-slate-900 dark:text-white">
+                        {field.name}
+                      </h4>
+                      <span className="inline-block mt-0.5 text-[10px] font-medium uppercase tracking-wider text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-1.5 py-0.5 rounded">
+                        {field.type}
+                      </span>
+                      {field.required && (
+                        <span className="inline-block ml-1.5 text-[10px] font-medium text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-1.5 py-0.5 rounded">
+                          {WORKSPACE_SETTINGS_TEXTS.BADGE_REQUIRED}
+                        </span>
+                      )}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setFieldToDelete(field)}
+                      className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors p-1 rounded cursor-pointer"
+                      title={`Delete custom field "${field.name}"`}
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+
+                  {field.type === "dropdown" && field.options && field.options.length > 0 && (
+                    <div className="flex flex-wrap gap-1 pt-1">
+                      {field.options.map((opt) => (
+                        <span
+                          key={opt}
+                          className="text-[10px] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 px-1.5 py-0.5 rounded text-slate-700 dark:text-slate-300"
+                        >
+                          {opt}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Delete Priority Confirmation Modal */}
       {priorityToDelete && (
         <div
-          className="fixed inset-0 bg-black/45 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fadeIn"
+          className="fixed inset-0 bg-black/55 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fadeIn"
           onClick={() => {
             setPriorityToDelete(null);
             setTasksCountForPriority(null);
           }}
         >
           <div
-            className="bg-white dark:bg-gray-900 rounded-2xl shadow-xl border border-slate-200 dark:border-gray-800 max-w-sm w-full p-6 space-y-4 animate-scaleUp"
+            className="bg-white dark:bg-slate-900 rounded-xl shadow-xl border border-slate-200 dark:border-slate-800 max-w-sm w-full p-6 space-y-4 animate-scaleUp"
             onClick={(e) => e.stopPropagation()}
           >
-            <h3 className="font-bold text-gray-800 dark:text-gray-200 text-base">
+            <h3 className="font-bold text-slate-900 dark:text-white text-base">
               {WORKSPACE_SETTINGS_TEXTS.MODAL_DELETE_PRIORITY_TITLE}
             </h3>
 
             {isCheckingTasks ? (
               <div className="flex flex-col items-center justify-center py-4 space-y-2">
                 <div className="w-6 h-6 border-2 border-sky-200 border-t-sky-600 rounded-full animate-spin"></div>
-                <p className="text-xs text-gray-400 font-semibold">{WORKSPACE_SETTINGS_TEXTS.CHECKING_TASKS}</p>
+                <p className="text-xs text-slate-400 font-semibold">{WORKSPACE_SETTINGS_TEXTS.CHECKING_TASKS}</p>
               </div>
             ) : tasksCountForPriority !== null && tasksCountForPriority > 0 ? (
               <div className="space-y-3">
@@ -580,31 +566,34 @@ export const BoardCustomizationSettings: React.FC<BoardCustomizationSettingsProp
                 </div>
               </div>
             ) : (
-              <p className="text-xs text-gray-600 dark:text-gray-300 leading-normal">
+              <p className="text-xs text-slate-600 dark:text-slate-300 leading-normal">
                 Are you sure you want to delete priority <span className="font-bold text-sky-600 dark:text-sky-400">"{priorityToDelete}"</span>? This priority will no longer be selectable.
               </p>
             )}
 
-            <div className="flex justify-end gap-2 pt-2 border-t border-gray-100 dark:border-gray-800">
-              <button
+            <div className="flex justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">
+              <Button
                 type="button"
+                variant="outline"
+                size="md"
                 onClick={() => {
                   setPriorityToDelete(null);
                   setTasksCountForPriority(null);
                 }}
-                className="px-4 py-2 border border-slate-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 font-semibold rounded-lg text-xs transition-colors cursor-pointer bg-white dark:bg-gray-900"
               >
                 {tasksCountForPriority !== null && tasksCountForPriority > 0 ? WORKSPACE_SETTINGS_TEXTS.BTN_CLOSE : WORKSPACE_SETTINGS_TEXTS.BTN_CANCEL}
-              </button>
+              </Button>
               {!(tasksCountForPriority !== null && tasksCountForPriority > 0) && (
-                <button
+                <Button
                   type="button"
-                  disabled={deletingPriority !== null || isCheckingTasks}
+                  variant="primary"
+                  size="md"
+                  disabled={isCheckingTasks}
+                  loading={deletingPriority !== null}
                   onClick={() => handleDeletePriority(priorityToDelete)}
-                  className="px-4 py-2 bg-sky-500 hover:bg-sky-600 text-white font-bold rounded-lg text-xs transition-all cursor-pointer disabled:opacity-50"
                 >
                   {deletingPriority ? WORKSPACE_SETTINGS_TEXTS.BTN_DELETING_PRIORITY : WORKSPACE_SETTINGS_TEXTS.BTN_DELETE_PRIORITY}
-                </button>
+                </Button>
               )}
             </div>
           </div>
@@ -614,35 +603,37 @@ export const BoardCustomizationSettings: React.FC<BoardCustomizationSettingsProp
       {/* Delete Custom Field Confirmation Modal */}
       {fieldToDelete && (
         <div
-          className="fixed inset-0 bg-black/45 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fadeIn"
+          className="fixed inset-0 bg-black/55 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fadeIn"
           onClick={() => setFieldToDelete(null)}
         >
           <div
-            className="bg-white dark:bg-gray-900 rounded-2xl shadow-xl border border-slate-200 dark:border-gray-800 max-w-sm w-full p-6 space-y-4 animate-scaleUp"
+            className="bg-white dark:bg-slate-900 rounded-xl shadow-xl border border-slate-200 dark:border-slate-800 max-w-sm w-full p-6 space-y-4 animate-scaleUp"
             onClick={(e) => e.stopPropagation()}
           >
-            <h3 className="font-bold text-gray-800 dark:text-gray-200 text-base">
+            <h3 className="font-bold text-slate-900 dark:text-white text-base">
               {WORKSPACE_SETTINGS_TEXTS.MODAL_DELETE_FIELD_TITLE}
             </h3>
-            <p className="text-xs text-gray-600 dark:text-gray-300 leading-normal">
+            <p className="text-xs text-slate-600 dark:text-slate-300 leading-normal">
               Are you sure you want to remove <span className="font-bold text-sky-600 dark:text-sky-400">"{fieldToDelete.name}"</span>? It will no longer appear on new or existing tasks.
             </p>
-            <div className="flex justify-end gap-2 pt-2 border-t border-gray-100 dark:border-gray-800">
-              <button
+            <div className="flex justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">
+              <Button
                 type="button"
+                variant="outline"
+                size="md"
                 onClick={() => setFieldToDelete(null)}
-                className="px-4 py-2 border border-slate-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 font-semibold rounded-lg text-xs transition-colors cursor-pointer bg-white dark:bg-gray-900"
               >
                 {WORKSPACE_SETTINGS_TEXTS.BTN_CANCEL}
-              </button>
-              <button
+              </Button>
+              <Button
                 type="button"
-                disabled={deletingField}
+                variant="primary"
+                size="md"
+                loading={deletingField}
                 onClick={handleDeleteCustomField}
-                className="px-4 py-2 bg-sky-500 hover:bg-sky-600 text-white font-bold rounded-lg text-xs transition-all cursor-pointer disabled:opacity-50"
               >
                 {deletingField ? WORKSPACE_SETTINGS_TEXTS.BTN_REMOVING_FIELD : WORKSPACE_SETTINGS_TEXTS.BTN_REMOVE_FIELD}
-              </button>
+              </Button>
             </div>
           </div>
         </div>
@@ -651,21 +642,21 @@ export const BoardCustomizationSettings: React.FC<BoardCustomizationSettingsProp
       {/* Add Custom Field Modal */}
       {showAddFieldModal && (
         <div
-          className="fixed inset-0 bg-black/45 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fadeIn"
+          className="fixed inset-0 bg-black/55 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fadeIn"
           onClick={() => setShowAddFieldModal(false)}
         >
           <div
-            className="bg-white dark:bg-gray-900 rounded-2xl shadow-xl border border-slate-200 dark:border-gray-800 max-w-md w-full p-6 space-y-4 animate-scaleUp"
+            className="bg-white dark:bg-slate-900 rounded-xl shadow-xl border border-slate-200 dark:border-slate-800 max-w-md w-full p-6 space-y-4 animate-scaleUp"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between border-b border-sky-100 dark:border-gray-800 pb-3">
-              <h3 className="font-bold text-gray-800 dark:text-gray-200 text-base">
+            <div className="flex items-center justify-between border-b border-sky-100/60 dark:border-slate-800 pb-3">
+              <h3 className="font-bold text-slate-900 dark:text-white text-base">
                 {WORKSPACE_SETTINGS_TEXTS.MODAL_ADD_FIELD_TITLE}
               </h3>
               <button
                 type="button"
                 onClick={() => setShowAddFieldModal(false)}
-                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-pointer"
+                className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -673,7 +664,7 @@ export const BoardCustomizationSettings: React.FC<BoardCustomizationSettingsProp
 
             <form onSubmit={handleAddCustomField} className="space-y-4">
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-1.5">
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">
                   {WORKSPACE_SETTINGS_TEXTS.LABEL_FIELD_NAME}
                 </label>
                 <Input
@@ -686,28 +677,26 @@ export const BoardCustomizationSettings: React.FC<BoardCustomizationSettingsProp
               </div>
 
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-1.5">
-                  {WORKSPACE_SETTINGS_TEXTS.LABEL_FIELD_TYPE}
-                </label>
-                <select
+                <Select
+                  label={WORKSPACE_SETTINGS_TEXTS.LABEL_FIELD_TYPE}
                   value={newFieldType}
                   onChange={(e) => setNewFieldType(e.target.value as any)}
-                  className="w-full h-[40px] px-3 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-medium bg-white dark:bg-gray-800 text-slate-800 dark:text-slate-100 focus:border-sky-500 focus:outline-none cursor-pointer"
-                >
-                  <option value="text">{WORKSPACE_SETTINGS_TEXTS.TYPE_TEXT}</option>
-                  <option value="number">{WORKSPACE_SETTINGS_TEXTS.TYPE_NUMBER}</option>
-                  <option value="dropdown">{WORKSPACE_SETTINGS_TEXTS.TYPE_DROPDOWN}</option>
-                  <option value="date">{WORKSPACE_SETTINGS_TEXTS.TYPE_DATE}</option>
-                </select>
+                  options={[
+                    { value: "text", label: WORKSPACE_SETTINGS_TEXTS.TYPE_TEXT },
+                    { value: "number", label: WORKSPACE_SETTINGS_TEXTS.TYPE_NUMBER },
+                    { value: "dropdown", label: WORKSPACE_SETTINGS_TEXTS.TYPE_DROPDOWN },
+                    { value: "date", label: WORKSPACE_SETTINGS_TEXTS.TYPE_DATE },
+                  ]}
+                />
               </div>
 
               {newFieldType === "dropdown" && (
                 <div className="space-y-2">
-                  <label className="block text-xs font-bold uppercase tracking-wider text-gray-500">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                     {WORKSPACE_SETTINGS_TEXTS.LABEL_DROPDOWN_OPTIONS}
                   </label>
-                  <div className="flex gap-2">
-                    <input
+                  <div className="flex gap-2 items-start">
+                    <Input
                       type="text"
                       placeholder={WORKSPACE_SETTINGS_TEXTS.PLACEHOLDER_DROPDOWN_OPTION}
                       value={optionInput}
@@ -722,10 +711,12 @@ export const BoardCustomizationSettings: React.FC<BoardCustomizationSettingsProp
                           }
                         }
                       }}
-                      className="flex-1 h-[36px] px-3 border border-slate-200 dark:border-slate-700 rounded-lg text-xs bg-white dark:bg-gray-800 text-slate-800 dark:text-slate-100 focus:border-sky-500 focus:outline-none"
+                      wrapperClassName="flex-1"
                     />
-                    <button
+                    <Button
                       type="button"
+                      variant="secondary"
+                      size="md"
                       onClick={() => {
                         const val = optionInput.trim();
                         if (val && !dropdownOptions.includes(val)) {
@@ -733,17 +724,16 @@ export const BoardCustomizationSettings: React.FC<BoardCustomizationSettingsProp
                           setOptionInput("");
                         }
                       }}
-                      className="px-3 h-[36px] bg-sky-50 dark:bg-sky-950/50 text-sky-600 dark:text-sky-400 border border-sky-200 dark:border-sky-850 rounded-lg text-xs font-semibold hover:bg-sky-100 cursor-pointer"
                     >
                       {WORKSPACE_SETTINGS_TEXTS.BTN_ADD_OPTION}
-                    </button>
+                    </Button>
                   </div>
 
                   <div className="flex flex-wrap gap-1.5 pt-1 min-h-[30px]">
                     {dropdownOptions.map((opt, i) => (
                       <span
                         key={i}
-                        className="inline-flex items-center gap-1 text-xs bg-sky-50 dark:bg-gray-850 border border-sky-100 dark:border-gray-800 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded-md"
+                        className="inline-flex items-center gap-1 text-xs bg-sky-50 dark:bg-slate-800 border border-sky-100 dark:border-slate-700 text-slate-700 dark:text-slate-200 px-2 py-0.5 rounded-md"
                       >
                         {opt}
                         <button
@@ -756,7 +746,7 @@ export const BoardCustomizationSettings: React.FC<BoardCustomizationSettingsProp
                       </span>
                     ))}
                     {dropdownOptions.length === 0 && (
-                      <span className="text-[11px] text-gray-400 italic">{WORKSPACE_SETTINGS_TEXTS.NO_OPTIONS_YET}</span>
+                      <span className="text-[11px] text-slate-400 italic">{WORKSPACE_SETTINGS_TEXTS.NO_OPTIONS_YET}</span>
                     )}
                   </div>
                 </div>
@@ -768,28 +758,31 @@ export const BoardCustomizationSettings: React.FC<BoardCustomizationSettingsProp
                   id="field-required"
                   checked={isFieldRequired}
                   onChange={(e) => setIsFieldRequired(e.target.checked)}
-                  className="rounded border-gray-300 text-sky-500 focus:ring-sky-500 h-4 w-4 cursor-pointer"
+                  className="rounded border-slate-300 text-sky-500 focus:ring-sky-500 h-4 w-4 cursor-pointer"
                 />
-                <label htmlFor="field-required" className="text-xs text-gray-700 dark:text-gray-300 cursor-pointer">
+                <label htmlFor="field-required" className="text-xs text-slate-700 dark:text-slate-300 cursor-pointer">
                   {WORKSPACE_SETTINGS_TEXTS.LABEL_REQUIRE_FIELD}
                 </label>
               </div>
 
-              <div className="flex justify-end gap-2 pt-3 border-t border-gray-100 dark:border-gray-800">
-                <button
+              <div className="flex justify-end gap-2 pt-3 border-t border-slate-100 dark:border-slate-800">
+                <Button
                   type="button"
+                  variant="outline"
+                  size="md"
                   onClick={() => setShowAddFieldModal(false)}
-                  className="px-4 py-2 border border-slate-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 font-semibold rounded-lg text-xs transition-colors cursor-pointer bg-white dark:bg-gray-900"
                 >
                   {WORKSPACE_SETTINGS_TEXTS.BTN_CANCEL}
-                </button>
-                <button
+                </Button>
+                <Button
                   type="submit"
-                  disabled={addingField || !newFieldName.trim()}
-                  className="px-4 py-2 bg-sky-500 hover:bg-sky-600 text-white font-bold rounded-lg text-xs transition-all cursor-pointer disabled:opacity-50"
+                  variant="primary"
+                  size="md"
+                  disabled={!newFieldName.trim()}
+                  loading={addingField}
                 >
                   {addingField ? WORKSPACE_SETTINGS_TEXTS.BTN_SAVING_FIELD : WORKSPACE_SETTINGS_TEXTS.BTN_CREATE_FIELD}
-                </button>
+                </Button>
               </div>
             </form>
           </div>

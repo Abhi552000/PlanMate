@@ -115,8 +115,8 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
 
   if (tasks.length === 0) {
     return (
-      <div className="text-center p-12 bg-white dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl space-y-3 shadow-2xs">
-        <div className="w-12 h-12 rounded-2xl bg-sky-50 dark:bg-sky-950/40 text-sky-500 flex items-center justify-center mx-auto">
+      <div className="text-center p-12 bg-white dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800/80 rounded-xl space-y-3 shadow-2xs">
+        <div className="w-12 h-12 rounded-xl bg-sky-50 dark:bg-sky-950/40 text-sky-500 flex items-center justify-center mx-auto">
           <BarChart2 className="w-6 h-6" />
         </div>
         <p className="text-slate-800 dark:text-slate-200 font-bold text-sm">
@@ -151,7 +151,7 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
       <MetricCards metrics={metrics} />
 
       {/* Dynamic Smart Observations */}
-      <div className="bg-white dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800/80 p-4 sm:p-5 rounded-2xl space-y-3 shadow-2xs">
+      <div className="bg-white dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800/80 p-4 sm:p-5 rounded-xl space-y-3 shadow-2xs">
         <div className="flex items-center gap-2 border-b border-slate-100 dark:border-slate-800/70 pb-3">
           <div className="p-1.5 rounded-lg bg-sky-50 dark:bg-sky-950/40 text-sky-600 dark:text-sky-400">
             <Info className="w-4 h-4" />

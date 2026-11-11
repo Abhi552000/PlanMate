@@ -4,7 +4,7 @@ export const ActiveSprintSkeleton: React.FC = () => {
   return (
     <div className="w-full space-y-6 font-sans animate-pulse select-none">
       {/* Active Sprint Header Info Skeleton */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-800 p-4 sm:p-5 rounded-2xl shadow-xs">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-800 p-4 sm:p-5 rounded-xl shadow-xs">
         <div className="space-y-2">
           <div className="flex items-center gap-2">
             <div className="w-7 h-7 rounded-lg bg-slate-200 dark:bg-slate-800" />
@@ -17,7 +17,7 @@ export const ActiveSprintSkeleton: React.FC = () => {
       </div>
 
       {/* Unified Filters Skeleton */}
-      <div className="flex items-center gap-2.5 bg-white dark:bg-slate-900/90 p-3.5 sm:p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 shadow-2xs mb-6">
+      <div className="flex items-center gap-2.5 bg-white dark:bg-slate-900/90 p-3.5 sm:p-4 rounded-xl border border-slate-200/80 dark:border-slate-800/80 shadow-2xs mb-6">
         <div className="h-[38px] w-32 rounded-xl bg-slate-200 dark:bg-slate-800" />
         <div className="h-[38px] w-32 rounded-xl bg-slate-100 dark:bg-slate-800/60" />
         <div className="h-[38px] w-36 rounded-xl bg-slate-100 dark:bg-slate-800/60" />
@@ -28,7 +28,7 @@ export const ActiveSprintSkeleton: React.FC = () => {
         {[1, 2, 3].map((col) => (
           <div
             key={col}
-            className="flex flex-col bg-slate-50 dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-3.5 space-y-3 w-[270px] sm:w-[300px] md:w-auto shrink-0 md:shrink"
+            className="flex flex-col bg-slate-50 dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-800 rounded-xl p-3.5 space-y-3 w-[270px] sm:w-[300px] md:w-auto shrink-0 md:shrink"
           >
             {/* Column Header */}
             <div className="flex items-center justify-between px-1">

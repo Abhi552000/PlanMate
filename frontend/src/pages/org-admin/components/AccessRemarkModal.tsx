@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { X, MessageSquare } from "lucide-react";
+import { X, MessageSquare, ShieldCheck } from "lucide-react";
 import { AccessRemarkModalProps } from "../../../types";
 
 export const AccessRemarkModal: React.FC<AccessRemarkModalProps> = ({
@@ -9,16 +9,21 @@ export const AccessRemarkModal: React.FC<AccessRemarkModalProps> = ({
   title,
   description,
   loading = false,
+  showRoleSelector = false,
+  availableRoles = [],
+  defaultRoleId = "",
 }) => {
   const [remark, setRemark] = useState("");
+  const [selectedRoleId, setSelectedRoleId] = useState(defaultRoleId);
   const [error, setError] = useState("");
 
   useEffect(() => {
     if (isOpen) {
       setRemark("");
       setError("");
+      setSelectedRoleId(defaultRoleId || (availableRoles[0]?._id || ""));
     }
-  }, [isOpen]);
+  }, [isOpen, defaultRoleId, availableRoles]);
 
   if (!isOpen) return null;
 
@@ -28,16 +33,16 @@ export const AccessRemarkModal: React.FC<AccessRemarkModalProps> = ({
       setError("Reason / Remark is mandatory.");
       return;
     }
-    onConfirm(remark.trim());
+    onConfirm(remark.trim(), showRoleSelector ? selectedRoleId : undefined);
   };
 
   return (
-    <div 
+    <div
       className="fixed inset-0 bg-black/45 backdrop-blur-sm z-50 flex items-center justify-center p-4"
       onClick={onClose}
     >
-      <div 
-        className="bg-white dark:bg-gray-900 rounded-2xl shadow-xl border border-sky-100 dark:border-gray-800 max-w-md w-full p-6 space-y-4 animate-scaleUp animate-duration-150"
+      <div
+        className="bg-white dark:bg-gray-900 rounded-xl shadow-xl border border-sky-100 dark:border-gray-800 max-w-md w-full p-6 space-y-4 animate-scaleUp animate-duration-150"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between border-b border-sky-50 dark:border-gray-800 pb-3">
@@ -53,9 +58,32 @@ export const AccessRemarkModal: React.FC<AccessRemarkModalProps> = ({
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <p className="text-xs text-gray-550 dark:text-gray-400 leading-normal">
+          <div className="text-xs text-gray-550 dark:text-gray-400 leading-normal">
             {description}
-          </p>
+          </div>
+
+          {showRoleSelector && availableRoles.length > 0 && (
+            <div>
+              <label className="block text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5 flex items-center gap-1">
+                <ShieldCheck className="w-3.5 h-3.5 text-sky-500" />
+                <span>Assign Workspace Role</span>
+              </label>
+              <select
+                value={selectedRoleId}
+                onChange={(e) => setSelectedRoleId(e.target.value)}
+                className="w-full px-3 py-2 text-xs border border-sky-100 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-sky-500 text-gray-800 dark:text-gray-200 font-medium"
+              >
+                {availableRoles.map((r) => (
+                  <option key={r._id} value={r._id}>
+                    {r.name} {r.isSystemDefault ? "(Default)" : "(Custom)"}
+                  </option>
+                ))}
+              </select>
+              <p className="text-[11px] text-gray-400 dark:text-gray-500 mt-1">
+                This determines what resources and actions the user can perform.
+              </p>
+            </div>
+          )}
 
           <div>
             <label className="block text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5 flex items-center gap-1">
@@ -72,7 +100,7 @@ export const AccessRemarkModal: React.FC<AccessRemarkModalProps> = ({
               onBlur={() => {
                 if (!remark.trim()) setError("Reason / Remark is mandatory.");
               }}
-              placeholder="e.g. Contract ended, temporary leave, role reassignment..."
+              placeholder="e.g. Approved team member, onboarding contract developer..."
               className={`w-full px-3 py-2 text-xs border rounded-lg bg-white dark:bg-gray-800 focus:outline-none transition-all text-gray-750 dark:text-gray-300 font-medium ${
                 error
                   ? "border-amber-400 focus:ring-2 focus:ring-amber-400/50"
