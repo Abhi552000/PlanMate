@@ -149,7 +149,7 @@ export const MentionInput: React.FC<MentionInputProps> = ({
       {/* Autocomplete Dropdown */}
       {showDropdown && filteredMembers.length > 0 && (
         <div className="absolute left-0 bottom-full mb-1.5 md:bottom-auto md:top-full md:mt-1.5 z-50 w-64 bg-white dark:bg-gray-900 border border-sky-100 dark:border-gray-800 rounded-xl shadow-xl py-1 max-h-48 overflow-y-auto animate-fadeIn scrollbar-thin">
-          <div className="px-2.5 py-1 text-[9px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider border-b border-sky-50 dark:border-gray-850">
+          <div className="px-2.5 py-1 text-[9px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider border-b border-sky-50 dark:border-gray-800">
             Mention Member
           </div>
           {filteredMembers.map((member, index) => (

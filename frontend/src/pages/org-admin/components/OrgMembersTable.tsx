@@ -46,6 +46,8 @@ export const OrgMembersTable: React.FC<OrgMembersTableProps> = ({
   searchQuery,
   onSearchChange,
   onResetFilters,
+  availableRoles = [],
+  onAssignRole,
 }) => {
   const [activeMenuUserId, setActiveMenuUserId] = useState<string | null>(null);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
@@ -185,11 +187,30 @@ export const OrgMembersTable: React.FC<OrgMembersTableProps> = ({
                 </td>
                 <td className="px-3 sm:px-6 py-3 sm:py-4">
                   {member.role === "org_admin" ? (
-                    <span className="text-[9px] font-bold bg-amber-50 text-amber-700 px-2 py-0.5 rounded border border-amber-200 uppercase tracking-wide">
+                    <span className="text-[9px] font-bold bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 px-2 py-0.5 rounded border border-amber-200 dark:border-amber-500/20 uppercase tracking-wide">
                       Org Admin
                     </span>
+                  ) : onAssignRole && availableRoles && availableRoles.length > 0 ? (
+                    <select
+                      value={member.customRole?._id || member.customRole || ""}
+                      onChange={(e) => onAssignRole(member._id, e.target.value || null)}
+                      className="text-[10px] font-bold bg-purple-50 dark:bg-purple-950/40 text-purple-700 dark:text-purple-300 px-2 py-1 rounded-lg border border-purple-200 dark:border-purple-800 focus:outline-none focus:ring-1 focus:ring-purple-500 cursor-pointer"
+                    >
+                      <option value="">Member (Default)</option>
+                      {availableRoles.map((r: any) => (
+                        <option key={r._id} value={r._id}>
+                          {r.name}
+                        </option>
+                      ))}
+                    </select>
+                  ) : member.customRole ? (
+                    <span className="text-[9px] font-bold bg-purple-500/10 text-purple-600 dark:text-purple-400 px-2 py-0.5 rounded border border-purple-500/20 uppercase tracking-wide">
+                      {typeof member.customRole === "object"
+                        ? member.customRole.name
+                        : "Custom Role"}
+                    </span>
                   ) : (
-                    <span className="text-[9px] font-bold bg-sky-50 text-sky-700 px-2 py-0.5 rounded border border-sky-200 uppercase tracking-wide">
+                    <span className="text-[9px] font-bold bg-sky-50 dark:bg-sky-500/10 text-sky-700 dark:text-sky-400 px-2 py-0.5 rounded border border-sky-200 dark:border-sky-500/20 uppercase tracking-wide">
                       Member
                     </span>
                   )}

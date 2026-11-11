@@ -9,3 +9,5 @@ export * from "./components";
 export * from "./payment";
 export * from "./sysAdmin";
 export * from "./report";
+export * from "./board";
+export * from "./role";

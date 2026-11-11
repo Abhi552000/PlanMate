@@ -5,6 +5,12 @@ const organizationSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  key: {
+    type: String,
+    uppercase: true,
+    trim: true,
+    default: "",
+  },
   description: {
     type: String,
     default: "",

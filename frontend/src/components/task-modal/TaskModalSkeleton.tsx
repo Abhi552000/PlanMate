@@ -20,7 +20,7 @@ export const TaskModalSkeleton: React.FC = () => {
         {/* Subtasks Checklist Skeleton */}
         <div className="space-y-2 pt-1">
           <div className="h-3.5 w-36 bg-slate-200 dark:bg-gray-700 rounded" />
-          <div className="h-8 w-full bg-slate-50 dark:bg-gray-850 rounded-lg border border-slate-200/40 dark:border-gray-800" />
+          <div className="h-8 w-full bg-slate-50 dark:bg-gray-800 rounded-lg border border-slate-200/40 dark:border-gray-800" />
           <div className="flex gap-2 mt-2">
             <div className="flex-1 h-[38px] bg-slate-100 dark:bg-gray-800 rounded-lg border border-slate-200/60 dark:border-gray-700/60" />
             <div className="w-16 h-[38px] bg-slate-200 dark:bg-gray-700 rounded-lg" />

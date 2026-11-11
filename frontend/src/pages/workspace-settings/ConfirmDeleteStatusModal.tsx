@@ -1,6 +1,7 @@
 import React from "react";
 import { ConfirmDeleteStatusModalProps } from "../../types";
 import { WORKSPACE_SETTINGS_TEXTS } from "../../constants/uiTexts";
+import { Button } from "../../components/ui/Button";
 
 export const ConfirmDeleteStatusModal: React.FC<ConfirmDeleteStatusModalProps> = ({
   statusToDelete,
@@ -20,21 +21,21 @@ export const ConfirmDeleteStatusModal: React.FC<ConfirmDeleteStatusModalProps> =
 
   return (
     <div 
-      className="fixed inset-0 bg-black/45 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fadeIn"
+      className="fixed inset-0 bg-black/55 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fadeIn"
       onClick={handleClose}
     >
       <div 
-        className="bg-white dark:bg-gray-900 rounded-2xl shadow-xl border border-slate-200 dark:border-gray-800 max-w-sm w-full p-6 space-y-4 animate-scaleUp"
+        className="bg-white dark:bg-slate-900 rounded-xl shadow-xl border border-slate-200 dark:border-slate-800 max-w-sm w-full p-6 space-y-4 animate-scaleUp"
         onClick={(e) => e.stopPropagation()}
       >
-        <h3 className="font-bold text-gray-800 dark:text-gray-200 text-base">
+        <h3 className="font-bold text-slate-900 dark:text-white text-base">
           {WORKSPACE_SETTINGS_TEXTS.MODAL_DELETE_STATUS_TITLE}
         </h3>
 
         {isCheckingTasks ? (
           <div className="flex flex-col items-center justify-center py-4 space-y-2">
             <div className="w-6 h-6 border-2 border-sky-200 border-t-sky-600 rounded-full animate-spin"></div>
-            <p className="text-xs text-gray-400 font-semibold">{WORKSPACE_SETTINGS_TEXTS.CHECKING_TASKS}</p>
+            <p className="text-xs text-slate-400 font-semibold">{WORKSPACE_SETTINGS_TEXTS.CHECKING_TASKS}</p>
           </div>
         ) : tasksCountForStatus !== null && tasksCountForStatus > 0 ? (
           <div className="space-y-3">
@@ -43,28 +44,31 @@ export const ConfirmDeleteStatusModal: React.FC<ConfirmDeleteStatusModalProps> =
             </div>
           </div>
         ) : (
-          <p className="text-xs text-gray-600 dark:text-gray-300 leading-normal">
+          <p className="text-xs text-slate-600 dark:text-slate-300 leading-normal">
             Are you sure you want to delete status <span className="font-bold text-sky-600 dark:text-sky-400">"{statusToDelete}"</span>? Tasks currently in this status will fall back to their default workflow. This action cannot be undone.
           </p>
         )}
 
-        <div className="flex justify-end gap-2 pt-2 border-t border-gray-100 dark:border-gray-800">
-          <button
+        <div className="flex justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">
+          <Button
             type="button"
+            variant="outline"
+            size="md"
             onClick={handleClose}
-            className="px-4 py-2 border border-slate-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 font-semibold rounded-lg text-xs transition-colors cursor-pointer bg-white dark:bg-gray-900"
           >
             {tasksCountForStatus !== null && tasksCountForStatus > 0 ? WORKSPACE_SETTINGS_TEXTS.BTN_CLOSE : WORKSPACE_SETTINGS_TEXTS.BTN_CANCEL}
-          </button>
+          </Button>
           {!(tasksCountForStatus !== null && tasksCountForStatus > 0) && (
-            <button
+            <Button
               type="button"
-              disabled={deletingStatus !== null || isCheckingTasks}
+              variant="primary"
+              size="md"
+              disabled={isCheckingTasks}
+              loading={deletingStatus !== null}
               onClick={() => handleDeleteStatus(statusToDelete)}
-              className="px-4 py-2 bg-sky-500 hover:bg-sky-600 text-white font-bold rounded-lg text-xs transition-all cursor-pointer disabled:opacity-50"
             >
               {deletingStatus ? WORKSPACE_SETTINGS_TEXTS.BTN_DELETING_STATUS : WORKSPACE_SETTINGS_TEXTS.BTN_DELETE_STATUS}
-            </button>
+            </Button>
           )}
         </div>
       </div>

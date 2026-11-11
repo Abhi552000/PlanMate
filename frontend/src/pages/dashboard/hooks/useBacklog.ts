@@ -10,9 +10,11 @@ import { fetchEpics, createEpic } from "../../../store/slices/epicSlice";
 import { createTask, updateTask } from "../../../store/slices/taskSlice";
 import { ITask } from "../../../types";
 import { TOAST_MESSAGES } from "../../../constants/messages";
+import { useBoard } from "../../../context/BoardContext";
 
 export const useBacklog = () => {
   const dispatch = useAppDispatch();
+  const { currentBoard } = useBoard();
   const sprints = useAppSelector((state) => state.sprints.sprints);
   const backlogTasks = useAppSelector((state) => state.sprints.backlogTasks);
   const epics = useAppSelector((state) => state.epics.epics);
@@ -82,6 +84,9 @@ export const useBacklog = () => {
       if (selectedEpicFilter) {
         params.append("epic", selectedEpicFilter);
       }
+      if (currentBoard?._id) {
+        params.append("boardId", currentBoard._id);
+      }
       await Promise.all([
         dispatch(fetchSprints(params.toString() ? params : undefined)).unwrap(),
         dispatch(fetchEpics()).unwrap(),
@@ -92,7 +97,7 @@ export const useBacklog = () => {
     } finally {
       setHasInitialLoaded(true);
     }
-  }, [dispatch, selectedEpicFilter]);
+  }, [dispatch, selectedEpicFilter, currentBoard?._id]);
 
   useEffect(() => {
     loadData();
@@ -104,7 +109,12 @@ export const useBacklog = () => {
     if (!newSprintName.trim()) return;
     setCreatingSprint(true);
     try {
-      await dispatch(createSprint({ name: newSprintName.trim() })).unwrap();
+      await dispatch(
+        createSprint({
+          name: newSprintName.trim(),
+          boardId: currentBoard?._id,
+        })
+      ).unwrap();
       toast.success(TOAST_MESSAGES.SPRINT_CREATE_SUCCESS);
       setNewSprintName("");
       setShowCreateSprint(false);
@@ -240,6 +250,7 @@ export const useBacklog = () => {
         createTask({
           title: inlineTitle.trim(),
           sprint: sprintId,
+          boardId: currentBoard?._id,
           issueType: inlineIssueType,
           owner: currentUserId,
           priority: "Medium",

@@ -11,7 +11,7 @@ export const TableCard: React.FC<TableCardProps> = ({
   ...props
 }) => (
   <div
-    className={`bg-white dark:bg-gray-900 border border-slate-200/80 dark:border-gray-800 rounded-2xl shadow-2xs overflow-hidden ${className}`}
+    className={`bg-white dark:bg-gray-900 border border-slate-200/80 dark:border-gray-800 rounded-xl shadow-2xs overflow-hidden ${className}`}
     {...props}
   >
     {children}

@@ -190,7 +190,7 @@ export const SysAdminPlansView: React.FC<SysAdminPlansViewProps> = () => {
           {[1, 2, 3].map((i) => (
             <div
               key={i}
-              className="p-5 rounded-2xl border border-slate-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-2xs space-y-4"
+              className="p-5 rounded-xl border border-slate-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-2xs space-y-4"
             >
               <div className="flex justify-between items-center">
                 <div className="h-5 w-28 rounded-lg bg-slate-200 dark:bg-slate-800" />
@@ -256,7 +256,7 @@ export const SysAdminPlansView: React.FC<SysAdminPlansViewProps> = () => {
       {(isCreatingNew || editingPlan) && (
         <form
           onSubmit={handleSave}
-          className="p-6 rounded-2xl border border-sky-300 dark:border-sky-900 bg-sky-50/20 dark:bg-sky-950/20 shadow-sm space-y-4 animate-in fade-in"
+          className="p-6 rounded-xl border border-sky-300 dark:border-sky-900 bg-sky-50/20 dark:bg-sky-950/20 shadow-sm space-y-4 animate-in fade-in"
         >
           <div className="flex items-center justify-between border-b border-sky-100 dark:border-gray-800 pb-3">
             <h4 className="font-black text-sm text-gray-900 dark:text-white">
@@ -407,7 +407,7 @@ export const SysAdminPlansView: React.FC<SysAdminPlansViewProps> = () => {
             {plans.map((p) => (
               <div
                 key={p.planId}
-                className="p-5 rounded-2xl border border-slate-200/90 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-2xs flex flex-col justify-between space-y-4"
+                className="p-5 rounded-xl border border-slate-200/90 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-2xs flex flex-col justify-between space-y-4"
               >
                 <div>
                   <div className="flex items-center justify-between">
@@ -475,7 +475,7 @@ export const SysAdminPlansView: React.FC<SysAdminPlansViewProps> = () => {
           onClick={() => !deleting && setPlanToDelete(null)}
         >
           <div
-            className="bg-white dark:bg-gray-900 rounded-2xl shadow-xl border border-sky-100 dark:border-gray-800 max-w-sm w-full p-6 space-y-4 animate-in fade-in"
+            className="bg-white dark:bg-gray-900 rounded-xl shadow-xl border border-sky-100 dark:border-gray-800 max-w-sm w-full p-6 space-y-4 animate-in fade-in"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center gap-3">

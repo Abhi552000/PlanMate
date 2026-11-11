@@ -21,7 +21,7 @@ export const SubscriptionExpiredModal: React.FC<SubscriptionExpiredModalProps> =
       aria-labelledby="subscription-expired-title"
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/75 backdrop-blur-xs animate-in fade-in duration-200"
     >
-      <div className="w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl p-6 sm:p-7 text-center">
+      <div className="w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-2xl p-6 sm:p-7 text-center">
         {/* Subtle Icon Badge */}
         <div className="w-12 h-12 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900/60 text-amber-600 dark:text-amber-400 mx-auto flex items-center justify-center mb-4">
           <CreditCard className="w-6 h-6" />

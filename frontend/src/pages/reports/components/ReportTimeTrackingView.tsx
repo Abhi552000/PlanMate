@@ -359,7 +359,7 @@ export const ReportTimeTrackingView: React.FC<ReportTimeTrackingViewProps> = ({
     <div className="space-y-6">
       {/* 3 Executive High-Impact Summary Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-gray-900 border border-slate-200/80 dark:border-gray-800 shadow-2xs">
+        <div className="p-4 sm:p-5 rounded-xl bg-white dark:bg-gray-900 border border-slate-200/80 dark:border-gray-800 shadow-2xs">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-gray-500 dark:text-gray-400">
               Total Hours Logged
@@ -376,7 +376,7 @@ export const ReportTimeTrackingView: React.FC<ReportTimeTrackingViewProps> = ({
           </div>
         </div>
 
-        <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-gray-900 border border-slate-200/80 dark:border-gray-800 shadow-2xs">
+        <div className="p-4 sm:p-5 rounded-xl bg-white dark:bg-gray-900 border border-slate-200/80 dark:border-gray-800 shadow-2xs">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-gray-500 dark:text-gray-400">
               Active Contributors
@@ -393,7 +393,7 @@ export const ReportTimeTrackingView: React.FC<ReportTimeTrackingViewProps> = ({
           </div>
         </div>
 
-        <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-gray-900 border border-slate-200/80 dark:border-gray-800 shadow-2xs">
+        <div className="p-4 sm:p-5 rounded-xl bg-white dark:bg-gray-900 border border-slate-200/80 dark:border-gray-800 shadow-2xs">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-gray-500 dark:text-gray-400">
               Issues Tracked

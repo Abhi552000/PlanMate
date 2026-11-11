@@ -359,7 +359,38 @@ export const WORKSPACE_SETTINGS_TEXTS = {
   MODAL_DELETE_STATUS_TITLE: "Delete Status",
   BTN_DELETE_STATUS: "Delete Status",
   BTN_DELETING_STATUS: "Deleting...",
+
+  // Environment Boards & Workflows Panel
+  BOARDS_PANEL_TITLE: "Environment Boards & Workflows",
+  SEARCH_BOARDS_PLACEHOLDER: "Search boards...",
+  BTN_ADD_BOARD: "Add Board",
+  TOOLTIP_MODIFY_BOARD: (name: string) => `Modify "${name}" details`,
+  TOOLTIP_DELETE_BOARD: (name: string) => `Delete board "${name}"`,
+  ARIA_MODIFY_BOARD: "Modify Board Details",
+  ARIA_DELETE_BOARD: "Delete Board",
+
+  // Create Board Modal
+  MODAL_CREATE_BOARD_TITLE: "Create New Board",
+  LABEL_BOARD_NAME: "Board Name",
+  PLACEHOLDER_BOARD_NAME: "Enter board name",
+  LABEL_BOARD_KEY: "Board Key",
+  PLACEHOLDER_BOARD_KEY: "Enter board key",
+  BTN_CREATE_BOARD: "Create Board",
+
+  // Modify Board Modal
+  MODAL_MODIFY_BOARD_TITLE: "Modify Board",
+  LABEL_ENVIRONMENT: "Environment",
+  BTN_SAVE_BOARD_CHANGES: "Save Changes",
 };
+
+export const BOARD_ENVIRONMENTS = [
+  { value: "sit", label: "SIT", desc: "System Integration Testing" },
+  { value: "uat", label: "UAT", desc: "User Acceptance Testing" },
+  { value: "development", label: "DEV", desc: "Development & Engineering" },
+  { value: "staging", label: "STAGING", desc: "Pre-production Mirror" },
+  { value: "production", label: "PROD", desc: "Live Customer Environment" },
+  { value: "other", label: "OTHER", desc: "Custom Environment" },
+] as const;
 
 export const COMMON_UI_TEXTS = {
   SEARCH_PLACEHOLDER: "Search...",

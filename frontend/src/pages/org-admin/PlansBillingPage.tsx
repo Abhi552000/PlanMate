@@ -147,7 +147,7 @@ export const PlansBillingPage: React.FC = () => {
         </div>
 
         {/* Current Plan Card Skeleton */}
-        <div className="p-5 sm:p-6 rounded-2xl bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-800 shadow-2xs space-y-4">
+        <div className="p-5 sm:p-6 rounded-xl bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-800 shadow-2xs space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-gray-100 dark:border-gray-800 pb-4">
             <div className="space-y-2">
               <div className="h-3 w-20 rounded bg-slate-100 dark:bg-slate-800" />
@@ -185,7 +185,7 @@ export const PlansBillingPage: React.FC = () => {
             {[1, 2, 3].map((i) => (
               <div
                 key={i}
-                className="p-6 rounded-2xl border border-slate-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-2xs space-y-4 flex flex-col justify-between"
+                className="p-6 rounded-xl border border-slate-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-2xs space-y-4 flex flex-col justify-between"
               >
                 <div className="space-y-3">
                   <div className="flex justify-between items-center">
@@ -213,7 +213,7 @@ export const PlansBillingPage: React.FC = () => {
         </div>
 
         {/* Billing History Skeleton */}
-        <div className="bg-white dark:bg-gray-900 rounded-2xl border border-slate-200 dark:border-gray-800 shadow-2xs overflow-hidden p-5 space-y-4">
+        <div className="bg-white dark:bg-gray-900 rounded-xl border border-slate-200 dark:border-gray-800 shadow-2xs overflow-hidden p-5 space-y-4">
           <div className="space-y-1.5">
             <div className="h-4 w-32 rounded-lg bg-slate-200 dark:bg-slate-800" />
             <div className="h-3 w-52 rounded bg-slate-100 dark:bg-slate-800/60" />
@@ -253,7 +253,7 @@ export const PlansBillingPage: React.FC = () => {
 
       {/* EXPIRED PLAN BANNER */}
       {isExpired && (
-        <div className="p-4 sm:p-5 rounded-2xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/50 flex items-start gap-3.5 shadow-2xs animate-in fade-in">
+        <div className="p-4 sm:p-5 rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/50 flex items-start gap-3.5 shadow-2xs animate-in fade-in">
           <div className="w-9 h-9 rounded-xl bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-800/60 flex items-center justify-center shrink-0 mt-0.5">
             <AlertCircle className="w-5 h-5" />
           </div>
@@ -269,7 +269,7 @@ export const PlansBillingPage: React.FC = () => {
       )}
 
       {/* CURRENT ACTIVE PLAN SUMMARY */}
-      <div className="p-5 sm:p-6 rounded-2xl bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-800 shadow-2xs space-y-4">
+      <div className="p-5 sm:p-6 rounded-xl bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-800 shadow-2xs space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-gray-100 dark:border-gray-800 pb-4">
           <div>
             <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">
@@ -398,7 +398,7 @@ export const PlansBillingPage: React.FC = () => {
             return (
               <div
                 key={plan.planId}
-                className={`p-6 rounded-2xl border transition-all flex flex-col justify-between bg-white dark:bg-gray-900 shadow-2xs ${
+                className={`p-6 rounded-xl border transition-all flex flex-col justify-between bg-white dark:bg-gray-900 shadow-2xs ${
                   isCurrent
                     ? isExpired
                       ? "border-amber-400 dark:border-amber-600 ring-2 ring-amber-500/20"

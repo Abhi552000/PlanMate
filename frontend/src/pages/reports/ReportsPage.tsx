@@ -200,7 +200,7 @@ export const ReportsPage: React.FC = () => {
           {[1, 2, 3].map((i) => (
             <div
               key={i}
-              className="p-5 rounded-2xl border border-slate-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-2xs space-y-4"
+              className="p-5 rounded-xl border border-slate-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-2xs space-y-4"
             >
               <div className="h-5 w-32 rounded bg-slate-200 dark:bg-slate-800" />
               <div className="w-36 h-36 rounded-full bg-slate-100 dark:bg-slate-800 mx-auto" />

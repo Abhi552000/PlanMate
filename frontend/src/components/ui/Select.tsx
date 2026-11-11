@@ -40,7 +40,7 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
           </label>
         )}
         <div
-          className={`relative flex items-center border border-slate-200/90 dark:border-slate-800 rounded-xl px-3 py-2.5 bg-white dark:bg-slate-900 transition-all duration-200 shadow-2xs hover:border-slate-300 dark:hover:border-slate-700 ${
+          className={`relative flex items-center h-[38px] border border-slate-200/90 dark:border-slate-800 rounded-lg px-3 bg-white dark:bg-slate-900 transition-all duration-200 shadow-2xs hover:border-slate-300 dark:hover:border-slate-700 ${
             error
               ? "border-rose-500 focus-within:ring-2 focus-within:ring-rose-500/20"
               : "focus-within:ring-2 focus-within:ring-sky-500/20 focus-within:border-sky-500"
@@ -54,7 +54,7 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
           <select
             id={selectId}
             ref={ref}
-            className={`w-full focus:outline-none text-sm text-slate-800 dark:text-slate-200 bg-transparent font-medium cursor-pointer pr-6 appearance-none ${className}`}
+            className={`w-full focus:outline-none text-xs sm:text-sm text-slate-800 dark:text-slate-200 bg-transparent font-medium cursor-pointer pr-6 appearance-none ${className}`}
             {...props}
           >
             {options.map((opt) => (

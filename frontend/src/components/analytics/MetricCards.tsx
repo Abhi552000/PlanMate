@@ -6,10 +6,10 @@ export const MetricCards: React.FC<MetricCardsProps> = ({ metrics }) => {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-5">
       {/* To Do (Remaining Points Card) */}
-      <div className="bg-white dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800/80 p-5 rounded-2xl shadow-2xs hover:shadow-sm transition-all duration-200 group">
+      <div className="bg-white dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800/80 p-5 rounded-xl shadow-2xs hover:shadow-sm transition-all duration-200 group">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="p-3 bg-rose-50 dark:bg-rose-950/30 text-rose-600 dark:text-rose-400 border border-rose-100/80 dark:border-rose-900/40 rounded-xl shrink-0">
+            <div className="p-3 bg-rose-50 dark:bg-rose-950/30 text-rose-600 dark:text-rose-400 border border-rose-100/80 dark:border-rose-900/40 rounded-lg shrink-0">
               <Calendar className="w-5 h-5" />
             </div>
             <div>
@@ -34,10 +34,10 @@ export const MetricCards: React.FC<MetricCardsProps> = ({ metrics }) => {
       </div>
 
       {/* Done Card */}
-      <div className="bg-white dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800/80 p-5 rounded-2xl shadow-2xs hover:shadow-sm transition-all duration-200 group">
+      <div className="bg-white dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800/80 p-5 rounded-xl shadow-2xs hover:shadow-sm transition-all duration-200 group">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="p-3 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400 border border-emerald-100/80 dark:border-emerald-900/40 rounded-xl shrink-0">
+            <div className="p-3 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400 border border-emerald-100/80 dark:border-emerald-900/40 rounded-lg shrink-0">
               <CheckCircle2 className="w-5 h-5" />
             </div>
             <div>
@@ -62,10 +62,10 @@ export const MetricCards: React.FC<MetricCardsProps> = ({ metrics }) => {
       </div>
 
       {/* Progress Card */}
-      <div className="bg-white dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800/80 p-5 rounded-2xl shadow-2xs hover:shadow-sm transition-all duration-200 group">
+      <div className="bg-white dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800/80 p-5 rounded-xl shadow-2xs hover:shadow-sm transition-all duration-200 group">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="p-3 bg-sky-50 dark:bg-sky-950/30 text-sky-600 dark:text-sky-400 border border-sky-100/80 dark:border-sky-900/40 rounded-xl shrink-0">
+            <div className="p-3 bg-sky-50 dark:bg-sky-950/30 text-sky-600 dark:text-sky-400 border border-sky-100/80 dark:border-sky-900/40 rounded-lg shrink-0">
               <Award className="w-5 h-5" />
             </div>
             <div>

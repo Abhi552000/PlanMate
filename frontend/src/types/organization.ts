@@ -168,10 +168,13 @@ export interface DeleteOrgModalProps {
 export interface AccessRemarkModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onConfirm: (remark: string) => void;
+  onConfirm: (remark: string, roleId?: string) => void;
   title: string;
   description: React.ReactNode;
   loading?: boolean;
+  showRoleSelector?: boolean;
+  availableRoles?: any[];
+  defaultRoleId?: string;
 }
 
 export interface OrgMembersTableProps {
@@ -192,6 +195,8 @@ export interface OrgMembersTableProps {
   searchQuery: string;
   onSearchChange: (search: string) => void;
   onResetFilters: () => void;
+  availableRoles?: any[];
+  onAssignRole?: (userId: string, roleId: string | null) => void;
 }
 
 export interface OrgAdminHeaderProps {
@@ -206,6 +211,7 @@ export interface OnboardMemberModalProps {
   setNewMember: React.Dispatch<React.SetStateAction<any>>;
   addingMember: boolean;
   onAddMember: (e: React.FormEvent) => void;
+  availableRoles?: any[];
 }
 
 export interface InspectingUserModalProps {

@@ -9,6 +9,7 @@ import { CONSOLE_ERRORS } from "../constants/messages";
 import { NotificationDropdown } from "./navbar/NotificationDropdown";
 import { UserMenuDropdown } from "./navbar/UserMenuDropdown";
 import { PlanMateLogo } from "./common/PlanMateLogo";
+import { BoardSwitcher } from "./board/BoardSwitcher";
 
 const Navbar: React.FC<NavbarProps> = ({
   user = {},
@@ -156,10 +157,12 @@ const Navbar: React.FC<NavbarProps> = ({
           </div>
 
           {orgName && (
-            <span className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-0.5 text-[11px] font-bold uppercase bg-sky-50 dark:bg-gray-800 text-sky-600 dark:text-sky-400 rounded-full border border-sky-100 dark:border-gray-700 tracking-wider shadow-2xs">
+            <span className="hidden md:inline-flex items-center gap-1.5 px-2.5 py-0.5 text-[11px] font-bold uppercase bg-sky-50 dark:bg-gray-800 text-sky-600 dark:text-sky-400 rounded-full border border-sky-100 dark:border-gray-700 tracking-wider shadow-2xs">
               {orgName} Workspace
             </span>
           )}
+
+          {user?.role !== "system_admin" && <BoardSwitcher />}
         </div>
 
         {/* RIGHT SIDE */}

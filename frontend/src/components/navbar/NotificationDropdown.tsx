@@ -28,9 +28,9 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = React.m
       </button>
 
       {notiOpen && (
-        <div className="absolute right-0 mt-2 w-80 bg-white dark:bg-gray-900 border border-sky-100 dark:border-gray-800 rounded-2xl shadow-xl z-50 overflow-hidden">
+        <div className="absolute right-0 mt-2 w-80 bg-white dark:bg-gray-900 border border-sky-100 dark:border-gray-800 rounded-xl shadow-xl z-50 overflow-hidden">
           <div className="p-3.5 border-b border-sky-50 dark:border-gray-800 flex justify-between items-center bg-gray-50/50 dark:bg-gray-900/50">
-            <span className="font-bold text-xs text-gray-800 dark:text-gray-250">
+            <span className="font-bold text-xs text-gray-800 dark:text-gray-200">
               Notifications
             </span>
             {unreadCount > 0 && (

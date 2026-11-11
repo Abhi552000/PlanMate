@@ -20,7 +20,7 @@ export const ActiveSprintFilters: React.FC<ActiveSprintFiltersProps> = ({
   };
 
   return (
-    <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-white dark:bg-slate-900/90 p-3.5 sm:p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 shadow-2xs mb-6">
+    <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-white dark:bg-slate-900/90 p-3.5 sm:p-4 rounded-xl border border-slate-200/80 dark:border-slate-800/80 shadow-2xs mb-6">
       {/* Filter Dropdowns Matching Dashboard */}
       <div className="flex flex-wrap items-center gap-2.5">
         <FilterSelect

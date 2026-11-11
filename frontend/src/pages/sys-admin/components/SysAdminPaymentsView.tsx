@@ -134,7 +134,7 @@ export const SysAdminPaymentsView: React.FC = () => {
 
         <div className="h-[38px] w-72 rounded-lg bg-slate-100 dark:bg-slate-800" />
 
-        <div className="bg-white dark:bg-gray-900 rounded-2xl border border-slate-200 dark:border-gray-800 shadow-2xs p-5 space-y-3">
+        <div className="bg-white dark:bg-gray-900 rounded-xl border border-slate-200 dark:border-gray-800 shadow-2xs p-5 space-y-3">
           {[1, 2, 3, 4, 5].map((i) => (
             <div key={i} className="h-10 w-full rounded-lg bg-slate-100 dark:bg-slate-800/50" />
           ))}
@@ -169,7 +169,7 @@ export const SysAdminPaymentsView: React.FC = () => {
       </div>
 
       {/* FILTER & SEARCH (Placed above Hero Stats so filters control the stats & table) */}
-      <div className="p-3 bg-white dark:bg-gray-900 border border-slate-200/80 dark:border-gray-800 rounded-2xl shadow-2xs flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+      <div className="p-3 bg-white dark:bg-gray-900 border border-slate-200/80 dark:border-gray-800 rounded-xl shadow-2xs flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
         <div className="flex flex-wrap items-center gap-2.5 flex-1">
           {/* Billing Cycle Filter Dropdown */}
           <FilterSelect

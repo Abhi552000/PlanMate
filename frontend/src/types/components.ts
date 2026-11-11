@@ -1,5 +1,7 @@
 import React from "react";
 import { ITask } from "./task";
+import { IBoard } from "./board";
+import { IBoardFeatures, ICustomField } from "./organization";
 
 export interface TaskModalHeaderProps {
   parentTask: any;
@@ -277,3 +279,71 @@ export interface PlanMateLogoProps {
   showText?: boolean;
   textClassName?: string;
 }
+
+export interface CreateBoardModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onCreated?: (boardId: string) => void;
+}
+
+export interface EditBoardModalProps {
+  board: IBoard | null;
+  isOpen: boolean;
+  onClose: () => void;
+  onUpdated?: (updated: IBoard) => void;
+}
+
+export interface BoardManagementPanelProps {
+  selectedBoard: IBoard | null;
+  onSelectBoard: (board: IBoard) => void;
+  dynamicDescription?: string;
+  statuses: string[];
+  newStatus: string;
+  setNewStatus: (value: string) => void;
+  addingStatus: boolean;
+  handleAddStatus: (e: React.FormEvent) => void;
+  handleOpenDeleteModal: (status: string) => void;
+  boardFeatures: IBoardFeatures;
+  priorities: string[];
+  customFields: ICustomField[];
+  onFeaturesUpdated: (features: IBoardFeatures) => void;
+  onPrioritiesUpdated: (priorities: string[]) => void;
+  onCustomFieldsUpdated: (fields: ICustomField[]) => void;
+  dynamicDescriptions?: {
+    requiredFields?: string;
+    workflow?: string;
+    features?: string;
+    customFields?: string;
+    boards?: string;
+    general?: string;
+  };
+}
+
+export interface BoardCustomizationSettingsProps {
+  statuses: string[];
+  newStatus: string;
+  setNewStatus: (value: string) => void;
+  addingStatus: boolean;
+  handleAddStatus: (e: React.FormEvent) => void;
+  handleOpenDeleteStatusModal: (status: string) => void;
+  boardFeatures: IBoardFeatures;
+  priorities: string[];
+  customFields: ICustomField[];
+  onFeaturesUpdated: (features: IBoardFeatures) => void;
+  onPrioritiesUpdated: (priorities: string[]) => void;
+  onCustomFieldsUpdated: (fields: ICustomField[]) => void;
+  activeSection?: "workflow" | "features" | "customFields" | "all";
+  dynamicDescriptions?: {
+    requiredFields?: string;
+    workflow?: string;
+    features?: string;
+    customFields?: string;
+    boards?: string;
+    general?: string;
+  };
+}
+
+export interface WorkspaceBrandingFormExtendedProps extends WorkspaceBrandingFormProps {
+  dynamicDescription?: string;
+}
+

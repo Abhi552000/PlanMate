@@ -19,8 +19,16 @@ export const orgService = {
     const { data } = await axiosInstance.get(url);
     return data;
   },
-  updateUserStatus: async (userId: string, status: string, remark?: string) => {
-    const { data } = await axiosInstance.put(API_ROUTES.ORGANIZATION.USER_STATUS_UPDATE(userId), { status, remark });
+  updateUserStatus: async (
+    userId: string,
+    status: string,
+    remark?: string,
+    roleId?: string | null
+  ) => {
+    const { data } = await axiosInstance.put(
+      API_ROUTES.ORGANIZATION.USER_STATUS_UPDATE(userId),
+      { status, remark, roleId }
+    );
     return data;
   },
   addOrgMember: async (memberData: any) => {

@@ -134,7 +134,7 @@ export const CalendarViewPage: React.FC = () => {
   if (loading && (!tasks || tasks.length === 0)) {
     return (
       <div className="w-full flex flex-col xl:flex-row gap-6 font-sans select-none animate-pulse">
-        <div className="flex-1 bg-white dark:bg-gray-900 border border-sky-100 dark:border-gray-800 rounded-2xl shadow-sm p-4 md:p-6 space-y-6">
+        <div className="flex-1 bg-white dark:bg-gray-900 border border-sky-100 dark:border-gray-800 rounded-xl shadow-sm p-4 md:p-6 space-y-6">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div className="flex items-center gap-3">
               <div className="w-11 h-11 rounded-xl bg-slate-200 dark:bg-slate-800 shrink-0" />
@@ -161,7 +161,7 @@ export const CalendarViewPage: React.FC = () => {
         </div>
 
         {/* Sidebar Skeleton */}
-        <div className="w-full xl:w-80 bg-white dark:bg-gray-900 border border-sky-100 dark:border-gray-800 rounded-2xl p-4 md:p-5 shadow-sm space-y-4">
+        <div className="w-full xl:w-80 bg-white dark:bg-gray-900 border border-sky-100 dark:border-gray-800 rounded-xl p-4 md:p-5 shadow-sm space-y-4">
           <div className="h-5 w-32 rounded bg-slate-200 dark:bg-slate-800" />
           <div className="space-y-2.5">
             {[1, 2, 3, 4].map((i) => (
@@ -176,7 +176,7 @@ export const CalendarViewPage: React.FC = () => {
   return (
     <div className="flex flex-col xl:flex-row gap-6 w-full min-h-[calc(100vh-8rem)]">
       {/* Calendar Grid Container */}
-      <div className="flex-1 bg-white dark:bg-gray-900 border border-sky-100 dark:border-gray-800 rounded-2xl shadow-sm p-4 md:p-6 transition-all duration-300">
+      <div className="flex-1 bg-white dark:bg-gray-900 border border-sky-100 dark:border-gray-800 rounded-xl shadow-sm p-4 md:p-6 transition-all duration-300">
         {/* Calendar Header Controls */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
           <div>
@@ -239,7 +239,7 @@ export const CalendarViewPage: React.FC = () => {
               <div
                 key={idx}
                 onClick={() => handleDayClick(dayCell.date)}
-                className={`bg-white dark:bg-gray-900 min-h-[4.5rem] md:min-h-[8rem] p-1.5 md:p-2 flex flex-col group relative border-t border-sky-50 dark:border-gray-850 transition hover:bg-sky-50/10 dark:hover:bg-gray-850/10 cursor-pointer ${
+                className={`bg-white dark:bg-gray-900 min-h-[4.5rem] md:min-h-[8rem] p-1.5 md:p-2 flex flex-col group relative border-t border-sky-50 dark:border-gray-800 transition hover:bg-sky-50/10 dark:hover:bg-gray-800/20 cursor-pointer ${
                   isSelected
                     ? "ring-2 ring-sky-500 dark:ring-sky-400 z-10"
                     : ""
@@ -368,7 +368,7 @@ export const CalendarViewPage: React.FC = () => {
       {/* Side Panels - Unscheduled & Daily Agenda */}
       <div className="w-full xl:w-80 flex flex-col gap-6 shrink-0">
         {/* Daily Agenda Panel (ClickUp style) */}
-        <div className="w-full bg-white dark:bg-gray-900 border border-sky-100 dark:border-gray-800 rounded-2xl shadow-sm p-4 flex flex-col transition-all duration-300">
+        <div className="w-full bg-white dark:bg-gray-900 border border-sky-100 dark:border-gray-800 rounded-xl shadow-sm p-4 flex flex-col transition-all duration-300">
           <div className="flex items-center justify-between border-b border-sky-50 dark:border-gray-800 pb-3 mb-4">
             <div className="flex items-center gap-2">
               <div className="p-1.5 bg-sky-100 dark:bg-sky-900/50 rounded-lg text-sky-600 dark:text-sky-400">
@@ -455,7 +455,7 @@ export const CalendarViewPage: React.FC = () => {
         </div>
 
         {/* Unscheduled Tasks Panel */}
-        <div className="w-full bg-white dark:bg-gray-900 border border-sky-100 dark:border-gray-800 rounded-2xl shadow-sm p-4 flex flex-col transition-all duration-300">
+        <div className="w-full bg-white dark:bg-gray-900 border border-sky-100 dark:border-gray-800 rounded-xl shadow-sm p-4 flex flex-col transition-all duration-300">
           <div className="flex items-center gap-2 border-b border-sky-50 dark:border-gray-800 pb-3 mb-4">
             <div className="p-1.5 bg-yellow-100 dark:bg-yellow-900/50 rounded-lg text-yellow-600 dark:bg-yellow-400">
               <Inbox className="w-4 h-4" />
@@ -464,7 +464,7 @@ export const CalendarViewPage: React.FC = () => {
               <h2 className="text-sm font-bold text-gray-800 dark:text-gray-200">
                 {CALENDAR_UI_TEXTS.INBOX_TITLE}
               </h2>
-              <p className="text-[10px] text-gray-550">
+              <p className="text-[10px] text-gray-500 dark:text-gray-400">
                 {CALENDAR_UI_TEXTS.INBOX_SUBTITLE} ({unscheduledTasks.length})
               </p>
             </div>
@@ -486,7 +486,7 @@ export const CalendarViewPage: React.FC = () => {
                 <div
                   key={task._id}
                   onClick={() => handleOpenTask(task)}
-                  className="p-2.5 border border-sky-50 dark:border-gray-800/80 rounded-xl bg-sky-50/10 hover:bg-sky-50/30 dark:bg-gray-850 dark:hover:bg-gray-800 cursor-pointer transition-all duration-200 flex flex-col gap-1.5 shadow-sm group"
+                  className="p-2.5 border border-sky-50 dark:border-gray-800/80 rounded-xl bg-sky-50/10 hover:bg-sky-50/30 dark:bg-gray-800/60 dark:hover:bg-gray-800 cursor-pointer transition-all duration-200 flex flex-col gap-1.5 shadow-sm group"
                 >
                   <div className="flex items-center justify-between">
                     <span className="text-[10px] font-bold text-sky-600 dark:text-sky-400">
@@ -517,7 +517,7 @@ export const CalendarViewPage: React.FC = () => {
           onClick={() => setShowDayFocusModal(false)}
         >
           <div 
-            className="bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-800 rounded-2xl shadow-2xl p-5 sm:p-6 w-full max-w-lg md:max-w-xl h-[85vh] max-h-[650px] flex flex-col animate-scaleUp overflow-hidden"
+            className="bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-800 rounded-xl shadow-2xl p-5 sm:p-6 w-full max-w-lg md:max-w-xl h-[85vh] max-h-[650px] flex flex-col animate-scaleUp overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header */}
@@ -615,7 +615,7 @@ export const CalendarViewPage: React.FC = () => {
                         setShowDayFocusModal(false);
                         handleOpenTask(task);
                       }}
-                      className="p-3.5 border border-slate-200 dark:border-gray-800 hover:border-sky-300 dark:hover:border-sky-700 rounded-xl cursor-pointer transition-all duration-150 flex flex-col gap-2 bg-white dark:bg-gray-850 hover:shadow-md group"
+                      className="p-3.5 border border-slate-200 dark:border-gray-800 hover:border-sky-300 dark:hover:border-sky-700 rounded-xl cursor-pointer transition-all duration-150 flex flex-col gap-2 bg-white dark:bg-gray-800/60 hover:shadow-md group"
                     >
                       <div className="flex items-center justify-between gap-2">
                         <div className="flex items-center gap-2">
@@ -644,7 +644,7 @@ export const CalendarViewPage: React.FC = () => {
                       </div>
 
                       <h3
-                        className={`text-sm font-semibold text-gray-850 dark:text-gray-100 group-hover:text-sky-600 dark:group-hover:text-sky-400 transition ${
+                        className={`text-sm font-semibold text-gray-900 dark:text-gray-100 group-hover:text-sky-600 dark:group-hover:text-sky-400 transition ${
                           isCompleted ? "line-through text-gray-400 dark:text-gray-500" : ""
                         }`}
                       >

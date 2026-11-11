@@ -22,7 +22,7 @@ export const ListModeView: React.FC<ListModeViewProps> = ({
         {[1, 2, 3, 4].map((i) => (
           <div
             key={i}
-            className="flex items-center justify-between p-4 bg-white dark:bg-gray-900 border border-slate-100 dark:border-gray-800 rounded-2xl shadow-xs"
+            className="flex items-center justify-between p-4 bg-white dark:bg-gray-900 border border-slate-100 dark:border-gray-800 rounded-xl shadow-xs"
           >
             <div className="flex items-center gap-3">
               <div className="w-5 h-5 rounded-md bg-slate-200 dark:bg-slate-800" />

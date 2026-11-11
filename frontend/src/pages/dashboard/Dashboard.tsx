@@ -13,6 +13,7 @@ import { ITask, IUser, DashboardContext } from "../../types";
 import { CONSOLE_ERRORS } from "../../constants/messages";
 import { KANBAN_TEXTS } from "../../constants/uiTexts";
 import { getCachedStatuses, setCachedStatuses } from "../../utils/statusUtils";
+import { useBoard } from "../../context/BoardContext";
 
 const AnalyticsDashboard = React.lazy(() =>
   import("../../components/AnalyticsDashboard").then((m) => ({
@@ -22,6 +23,7 @@ const AnalyticsDashboard = React.lazy(() =>
 
 const Dashboard = () => {
   const { tasks, refreshTasks, viewMode, setViewMode, loading } = useOutletContext<DashboardContext>();
+  const { currentBoard } = useBoard();
   const [searchParams] = useSearchParams();
   const [showModal, setShowModal] = useState(false);
   const [selectedTask, setSelectedTask] = useState<ITask | null>(null);
@@ -72,6 +74,9 @@ const Dashboard = () => {
         status: selectedStatus,
         timeframe: selectedTimeframe
       });
+      if (currentBoard?._id) {
+        params.append("boardId", currentBoard._id);
+      }
       const data = await taskService.getTasks(params);
       if (data?.success && data?.tasks) {
         if (append) {
@@ -88,7 +93,7 @@ const Dashboard = () => {
     } finally {
       setLoadingList(false);
     }
-  }, [debouncedSearch, selectedAssignee, selectedPriority, selectedStatus, selectedTimeframe]);
+  }, [debouncedSearch, selectedAssignee, selectedPriority, selectedStatus, selectedTimeframe, currentBoard?._id]);
 
   useEffect(() => {
     if (viewMode === "list") {
@@ -146,6 +151,7 @@ const Dashboard = () => {
       if (selectedPriority && selectedPriority !== "all") params.append("priority", selectedPriority);
       if (selectedStatus && selectedStatus !== "all") params.append("status", selectedStatus);
       if (selectedTimeframe && selectedTimeframe !== "all") params.append("timeframe", selectedTimeframe);
+      if (currentBoard?._id) params.append("boardId", currentBoard._id);
 
       const data = await taskService.getTasks(params);
       if (data?.success && Array.isArray(data?.tasks)) {
@@ -158,7 +164,14 @@ const Dashboard = () => {
     } finally {
       setLoadingBoard(false);
     }
-  }, [debouncedSearch, selectedAssignee, selectedPriority, selectedStatus, selectedTimeframe]);
+  }, [debouncedSearch, selectedAssignee, selectedPriority, selectedStatus, selectedTimeframe, currentBoard?._id]);
+
+  // Sync board-specific statuses when currentBoard changes
+  useEffect(() => {
+    if (currentBoard?.statuses && Array.isArray(currentBoard.statuses) && currentBoard.statuses.length > 0) {
+      setStatuses(currentBoard.statuses);
+    }
+  }, [currentBoard]);
 
   useEffect(() => {
     fetchBackendBoardTasks();
@@ -260,7 +273,7 @@ const Dashboard = () => {
           ) : viewMode === "analytics" ? (
             <React.Suspense
               fallback={
-                <div className="flex flex-col items-center justify-center p-12 bg-white dark:bg-gray-900 rounded-2xl border border-sky-100 dark:border-gray-800">
+                <div className="flex flex-col items-center justify-center p-12 bg-white dark:bg-gray-900 rounded-xl border border-sky-100 dark:border-gray-800">
                   <div className="w-8 h-8 border-3 border-sky-200 border-t-sky-500 rounded-full animate-spin" />
                   <span className="text-xs text-gray-400 mt-2 font-medium">{KANBAN_TEXTS.LOADING_ANALYTICS}</span>
                 </div>

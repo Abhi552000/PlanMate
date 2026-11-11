@@ -18,6 +18,7 @@ import { TaskModalHeader } from "./task-modal/TaskModalHeader";
 import { TaskModalFooter } from "./task-modal/TaskModalFooter";
 import { TaskModalSkeleton } from "./task-modal/TaskModalSkeleton";
 import { DEFAULT_STATUSES } from "../utils/statusUtils";
+import { useBoard } from "../context/BoardContext";
 
 const TaskModal: React.FC<TaskModalProps> = ({
   isOpen,
@@ -27,6 +28,8 @@ const TaskModal: React.FC<TaskModalProps> = ({
   onLogout,
   statuses = ["To Do", "In Progress", "Done", "Closed"],
 }) => {
+  const { currentBoard } = useBoard();
+  const effectiveStatuses = currentBoard?.statuses || statuses;
   const [taskData, setTaskData] = useState<any>({
     ...DEFAULT_TASK,
     subtasks: [] as ISubtask[],
@@ -83,12 +86,25 @@ const TaskModal: React.FC<TaskModalProps> = ({
           setCustomFields(org.customFields);
         }
       }
+
+      // If current board has its own configuration, override with board-specific settings
+      if (currentBoard) {
+        if (Array.isArray(currentBoard.priorities) && currentBoard.priorities.length > 0) {
+          setPriorities(currentBoard.priorities);
+        }
+        if (currentBoard.boardFeatures) {
+          setBoardFeatures(currentBoard.boardFeatures);
+        }
+        if (Array.isArray(currentBoard.customFields)) {
+          setCustomFields(currentBoard.customFields);
+        }
+      }
     } catch (err) {
       console.error(CONSOLE_ERRORS.FETCH_DEPENDENCIES_MODAL, err);
     } finally {
       setLoadingDependencies(false);
     }
-  }, []);
+  }, [currentBoard]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -213,6 +229,9 @@ const TaskModal: React.FC<TaskModalProps> = ({
 
       try {
         const isEdit = Boolean(finalTaskData.id);
+        if (!isEdit && currentBoard?._id) {
+          finalTaskData.boardId = currentBoard._id;
+        }
         const saved = isEdit
           ? await taskService.updateTask(finalTaskData.id, finalTaskData)
           : await taskService.createTask(finalTaskData);
@@ -246,7 +265,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
       onClick={onClose}
     >
       <div 
-        className="bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-800 rounded-2xl max-w-2xl sm:max-w-3xl lg:max-w-4xl w-full shadow-2xl relative flex flex-col h-[90vh] sm:h-[84vh] max-h-[780px] overflow-hidden animate-fadeIn"
+        className="bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-800 rounded-xl max-w-2xl sm:max-w-3xl lg:max-w-4xl w-full shadow-2xl relative flex flex-col h-[90vh] sm:h-[84vh] max-h-[780px] overflow-hidden animate-fadeIn"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Pinned Modal Header */}
@@ -287,7 +306,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
                       setEditingSubtaskIdx={setEditingSubtaskIdx}
                       editingSubtaskVal={editingSubtaskVal}
                       setEditingSubtaskVal={setEditingSubtaskVal}
-                      statuses={Array.isArray(statuses) && statuses.length > 0 ? statuses : DEFAULT_STATUSES}
+                      statuses={Array.isArray(effectiveStatuses) && effectiveStatuses.length > 0 ? effectiveStatuses : DEFAULT_STATUSES}
                       onOpenSubtaskDetail={handleOpenSubtaskDetail}
                       onAddSubtask={handleAddSubtask}
                     />
@@ -297,7 +316,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
                 <TaskFormMeta
                   taskData={taskData || {}}
                   setTaskData={setTaskData}
-                  statuses={Array.isArray(statuses) && statuses.length > 0 ? statuses : DEFAULT_STATUSES}
+                  statuses={Array.isArray(effectiveStatuses) && effectiveStatuses.length > 0 ? effectiveStatuses : DEFAULT_STATUSES}
                   members={Array.isArray(members) ? members : []}
                   sprints={Array.isArray(sprints) ? sprints : []}
                   epics={Array.isArray(epics) ? epics : []}
@@ -314,7 +333,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
           </div>
 
           {/* Pinned Modal Footer */}
-          <div className="px-5 sm:px-6 py-3.5 border-t border-slate-100 dark:border-gray-800 bg-slate-50/70 dark:bg-gray-850/60 shrink-0 mt-auto">
+          <div className="px-5 sm:px-6 py-3.5 border-t border-slate-100 dark:border-gray-800 bg-slate-50/70 dark:bg-gray-800/60 shrink-0 mt-auto">
             <TaskModalFooter
               loading={loading}
               parentTask={parentTask}

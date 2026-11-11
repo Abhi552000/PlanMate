@@ -1,5 +1,5 @@
 @import "tailwindcss";
-@custom-variant dark (&:where(.dark, .dark *));
+@custom-variant dark (&:is(.dark, .dark *));
 
 /* Design tokens */
 :root {
@@ -32,35 +32,41 @@ html.dark {
 }
 
 /* Global Dark Mode Overrides to ensure high contrast and readability */
-html.dark .text-gray-800,
 html.dark .text-gray-900,
-html.dark .text-slate-800,
-html.dark .text-slate-900 {
-  color: hsl(210, 10%, 95%) !important;
+html.dark .text-gray-800,
+html.dark .text-slate-900,
+html.dark .text-slate-800 {
+  color: #f8fafc !important;
 }
 
 html.dark .text-gray-700,
 html.dark .text-slate-700 {
-  color: hsl(210, 10%, 85%) !important;
+  color: #e2e8f0 !important;
 }
 
 html.dark .text-gray-600,
 html.dark .text-slate-600 {
-  color: hsl(210, 10%, 75%) !important;
+  color: #cbd5e1 !important;
 }
 
 html.dark .text-gray-500,
 html.dark .text-slate-500 {
-  color: hsl(210, 10%, 65%) !important;
+  color: #94a3b8 !important;
 }
 
 html.dark .text-gray-400,
 html.dark .text-slate-400 {
-  color: hsl(210, 10%, 50%) !important;
+  color: #94a3b8 !important;
 }
 
-html.dark .bg-white {
+html.dark .bg-white:not(.toggle-knob):not([role="switch"] span) {
   background-color: hsl(210, 30%, 12%) !important;
+}
+
+/* Ensure toggle switches have pure white sliding knobs */
+html.dark button .rounded-full.bg-white,
+html.dark .toggle-knob {
+  background-color: #ffffff !important;
 }
 
 html.dark .border-sky-50,
@@ -70,6 +76,33 @@ html.dark .border-gray-50,
 html.dark .border-gray-100,
 html.dark .border-gray-200 {
   border-color: hsl(210, 20%, 20%) !important;
+}
+
+/* Sidebar and Navigation Item Styles in Dark Mode */
+html.dark aside,
+html.dark nav {
+  background-color: #0f172a;
+}
+
+html.dark aside span,
+html.dark nav span {
+  background-color: transparent !important;
+}
+
+html.dark aside a.active,
+html.dark aside [aria-current="page"],
+html.dark nav a.active,
+html.dark nav [aria-current="page"] {
+  background-color: rgba(30, 41, 59, 0.85) !important;
+  color: #38bdf8 !important;
+}
+
+html.dark aside a:not(.active):not([aria-current="page"]):hover,
+html.dark aside button:not(.active):hover,
+html.dark nav a:not(.active):not([aria-current="page"]):hover,
+html.dark nav button:not(.active):hover {
+  background-color: rgba(30, 41, 59, 0.5) !important;
+  color: #f8fafc !important;
 }
 
 /* ==========================================================================

@@ -17,7 +17,7 @@ export const DeleteOrgModal: React.FC<DeleteOrgModalProps> = ({
       onClick={() => !deleting && onClose()}
     >
       <div
-        className="bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-800 rounded-2xl shadow-xl max-w-md w-full p-6 space-y-4 animate-scaleUp"
+        className="bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-800 rounded-xl shadow-xl max-w-md w-full p-6 space-y-4 animate-scaleUp"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}

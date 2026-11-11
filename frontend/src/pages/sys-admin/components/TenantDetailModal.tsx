@@ -45,13 +45,13 @@ export const TenantDetailModal: React.FC<TenantDetailModalProps> = ({
       onClick={onClose}
     >
       <div
-        className="bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-800 rounded-2xl shadow-2xl max-w-4xl w-full p-6 sm:p-7 space-y-5 animate-scaleUp max-h-[92vh] overflow-y-auto"
+        className="bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-800 rounded-xl shadow-2xl max-w-4xl w-full p-6 sm:p-7 space-y-5 animate-scaleUp max-h-[92vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Top Header: Organization Name, Status & Plan */}
         <div className="flex items-center justify-between border-b border-gray-100 dark:border-gray-800 pb-4">
           <div className="flex items-center gap-3.5 min-w-0">
-            <div className="w-12 h-12 rounded-2xl bg-sky-500 text-white flex items-center justify-center font-bold text-lg shadow-xs shrink-0">
+            <div className="w-12 h-12 rounded-xl bg-sky-500 text-white flex items-center justify-center font-bold text-lg shadow-xs shrink-0">
               {org.name?.[0]?.toUpperCase() || "O"}
             </div>
             <div className="min-w-0">
@@ -97,7 +97,7 @@ export const TenantDetailModal: React.FC<TenantDetailModalProps> = ({
             {TENANT_MODAL_TEXTS.LABEL_GENERAL_INFO}
           </span>
 
-          <div className="p-5 rounded-2xl border border-slate-200 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-950/40 space-y-4">
+          <div className="p-5 rounded-xl border border-slate-200 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-950/40 space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 text-xs">
               {/* Organization Name */}
               <div>
@@ -323,7 +323,7 @@ export const TenantDetailModal: React.FC<TenantDetailModalProps> = ({
             {TENANT_MODAL_TEXTS.LABEL_UTILIZATION_TITLE}
           </span>
 
-          <div className="p-5 rounded-2xl border border-slate-200 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-950/40 space-y-4">
+          <div className="p-5 rounded-xl border border-slate-200 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-950/40 space-y-4">
             {/* Utilization Metrics: Seats & Tickets */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {/* Seat Utilization */}

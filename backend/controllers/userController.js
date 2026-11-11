@@ -115,10 +115,12 @@ export async function loginUser(req, res) {
   }
 
   try {
-    const user = await User.findOne({ email }).populate({
-      path: "organization",
-      populate: { path: "admin", select: "name email" },
-    });
+    const user = await User.findOne({ email })
+      .populate({
+        path: "organization",
+        populate: { path: "admin", select: "name email" },
+      })
+      .populate("customRole");
     if (!user) {
       return res
         .status(HttpStatus.UNAUTHORIZED)
@@ -179,6 +181,7 @@ export async function loginUser(req, res) {
         name: user.name, 
         email: user.email, 
         role: user.role || "member",
+        customRole: user.customRole || null,
         organization: user.organization || null,
         isSubscriptionExpired: isExpired,
       },
@@ -195,7 +198,8 @@ export async function loginUser(req, res) {
 export async function getCurrentUser(req, res) {
   try {
     const user = await User.findById(req.user.id)
-      .select("name email role organization")
+      .select("name email role customRole organization")
+      .populate("customRole")
       .populate({
         path: "organization",
         populate: { path: "admin", select: "name email" },

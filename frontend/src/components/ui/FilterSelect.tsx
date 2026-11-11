@@ -70,7 +70,7 @@ export const FilterSelect: React.FC<FilterSelectProps> = React.memo(
           type="button"
           disabled={disabled}
           onClick={() => setIsOpen((prev) => !prev)}
-          className={`h-[38px] px-3 bg-slate-50/70 dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 text-slate-700 dark:text-slate-300 rounded-xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500 flex items-center justify-between gap-2 cursor-pointer transition-all duration-150 shadow-2xs hover:border-slate-300 dark:hover:border-slate-700 disabled:opacity-50 disabled:cursor-not-allowed ${buttonClassName}`}
+          className={`h-[38px] px-3 bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 text-slate-700 dark:text-slate-300 rounded-lg text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500 flex items-center justify-between gap-2 cursor-pointer transition-all duration-150 shadow-2xs hover:border-slate-300 dark:hover:border-slate-700 disabled:opacity-50 disabled:cursor-not-allowed ${buttonClassName}`}
         >
           <span className="truncate max-w-[200px]">
             {label ? (

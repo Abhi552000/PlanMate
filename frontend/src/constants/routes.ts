@@ -70,4 +70,13 @@ export const API_ROUTES = {
     READ_ALL: "/api/notifications/read-all",
     READ_BY_ID: (id: string) => `/api/notifications/${id}/read`,
   },
+  BOARDS: {
+    BASE: "/api/boards",
+    BY_ID: (id: string) => `/api/boards/${id}`,
+  },
+  ROLES: {
+    BASE: "/api/roles",
+    BY_ID: (id: string) => `/api/roles/${id}`,
+    ASSIGN: (userId: string) => `/api/roles/assign/${userId}`,
+  },
 };

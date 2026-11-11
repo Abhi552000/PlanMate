@@ -76,21 +76,21 @@ export const Signup: React.FC<SignupProps> = ({ onSwitchMode }) => {
   };
 
   return (
-    <div className="max-w-md w-full bg-white dark:bg-gray-900 shadow-2xl shadow-slate-950/40 border border-slate-100 dark:border-slate-800 rounded-2xl p-6 sm:p-8 space-y-5 my-auto">
+    <div className="max-w-md w-full bg-white dark:bg-gray-900 shadow-2xl shadow-slate-950/40 border border-slate-100 dark:border-slate-800 rounded-xl p-6 sm:p-8 space-y-5 my-auto">
       <div className="text-center">
         <div className="flex justify-center mb-3">
           <PlanMateLogo size={56} />
         </div>
-        <h2 className=" text-2xl font-bold text-gray-800">
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
           {AUTH_TEXTS.SIGNUP_TITLE}
         </h2>
-        <p className=" text-gray-400 text-xs mt-1">
+        <p className="text-gray-500 dark:text-gray-400 text-xs mt-1">
           {AUTH_TEXTS.SIGNUP_SUBTITLE}
         </p>
       </div>
 
       {error && (
-        <div className="text-xs text-red-655 bg-red-50 p-3 rounded-lg border border-red-100 font-medium animate-fadeIn">
+        <div className="text-xs text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 p-3 rounded-lg border border-rose-200 dark:border-rose-900/50 font-medium animate-fadeIn">
           {error}
         </div>
       )}

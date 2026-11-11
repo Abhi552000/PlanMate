@@ -147,7 +147,7 @@ export const PlanManagementModal: React.FC<PlanManagementModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs animate-in fade-in duration-200">
-      <div className="bg-white dark:bg-gray-900 rounded-2xl max-w-3xl w-full shadow-2xl border border-sky-100 dark:border-gray-800 overflow-hidden flex flex-col max-h-[90vh]">
+      <div className="bg-white dark:bg-gray-900 rounded-xl max-w-3xl w-full shadow-2xl border border-sky-100 dark:border-gray-800 overflow-hidden flex flex-col max-h-[90vh]">
         {/* Header */}
         <div className="flex items-center justify-between p-5 border-b border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-950/40">
           <div>
@@ -172,7 +172,7 @@ export const PlanManagementModal: React.FC<PlanManagementModalProps> = ({
           {(isCreatingNew || editingPlan) && (
             <form
               onSubmit={handleSave}
-              className="p-5 rounded-2xl border border-sky-200 dark:border-sky-900/60 bg-sky-50/20 dark:bg-sky-950/20 space-y-4 animate-in fade-in"
+              className="p-5 rounded-xl border border-sky-200 dark:border-sky-900/60 bg-sky-50/20 dark:bg-sky-950/20 space-y-4 animate-in fade-in"
             >
               <div className="flex items-center justify-between border-b border-sky-100 dark:border-gray-800 pb-3">
                 <h4 className="font-extrabold text-sm text-gray-900 dark:text-white">

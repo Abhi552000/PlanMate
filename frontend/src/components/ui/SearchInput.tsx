@@ -42,7 +42,7 @@ export const SearchInput: React.FC<SearchInputProps> = React.memo(
           autoFocus={autoFocus}
           placeholder={placeholder}
           onChange={(e) => onChange(e.target.value)}
-          className="w-full h-[38px] pl-9 pr-8 bg-slate-50/70 dark:bg-slate-950 border border-slate-200/90 dark:border-slate-800 text-slate-800 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 rounded-xl text-xs font-medium shadow-2xs focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 hover:border-slate-300 dark:hover:border-slate-700 transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full h-[38px] pl-9 pr-8 bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 text-slate-800 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 rounded-lg text-xs font-medium shadow-2xs focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 hover:border-slate-300 dark:hover:border-slate-700 transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
         />
         {value && !disabled && (
           <button

@@ -18,6 +18,10 @@ axiosInstance.interceptors.request.use(
     if (token) {
       config.headers["Authorization"] = `Bearer ${token}`;
     }
+    const currentBoardId = localStorage.getItem("planmate_current_board_id");
+    if (currentBoardId) {
+      config.headers["x-board-id"] = currentBoardId;
+    }
     return config;
   },
   (error: any) => Promise.reject(error)

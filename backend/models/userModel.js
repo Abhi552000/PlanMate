@@ -28,6 +28,11 @@ const userSchema = new mongoose.Schema({
     enum: ["active", "pending", "rejected"],
     default: "active",
   },
+  customRole: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "role",
+    default: null,
+  },
 }, { timestamps: true });
 
 userSchema.index({ organization: 1 });

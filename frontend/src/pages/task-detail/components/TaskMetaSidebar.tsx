@@ -32,7 +32,7 @@ export const TaskMetaSidebar: React.FC<TaskMetaSidebarProps> = ({
 }) => {
   const [labelInput, setLabelInput] = useState("");
   return (
-    <div className="lg:col-span-4 space-y-4 bg-white dark:bg-gray-900 p-5 sm:p-6 rounded-2xl border border-sky-100/50 dark:border-gray-800 shadow-sm self-start">
+    <div className="lg:col-span-4 space-y-4 bg-white dark:bg-gray-900 p-5 sm:p-6 rounded-xl border border-sky-100/50 dark:border-gray-800 shadow-sm self-start">
       <h3 className="text-xs font-bold uppercase tracking-wider text-gray-400 border-b border-sky-100/50 dark:border-gray-800 pb-2">
         Details
       </h3>

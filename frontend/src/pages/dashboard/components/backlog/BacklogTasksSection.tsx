@@ -43,7 +43,7 @@ export const BacklogTasksSection: React.FC<BacklogTasksSectionProps> = ({
 
   return (
     <div
-      className="bg-white dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl shadow-xs transition-all overflow-hidden p-3.5 sm:p-5 hover:border-slate-300 dark:hover:border-slate-700/80"
+      className="bg-white dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800/80 rounded-xl shadow-xs transition-all overflow-hidden p-3.5 sm:p-5 hover:border-slate-300 dark:hover:border-slate-700/80"
       onDragOver={(e) => e.preventDefault()}
       onDrop={(e) => {
         const taskId = e.dataTransfer.getData("text/plain");

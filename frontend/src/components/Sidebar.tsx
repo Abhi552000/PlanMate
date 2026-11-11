@@ -13,6 +13,7 @@ import {
   Sun,
   Moon,
   Lock,
+  ShieldCheck,
 } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { SidebarProps } from "../types";
@@ -71,8 +72,8 @@ const Sidebar: React.FC<SidebarProps> = ({
                 [
                   "group relative flex items-center h-10 px-2.5 rounded-lg transition-colors overflow-hidden",
                   isActive
-                    ? "bg-sky-50 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300 font-semibold border-l-[3px] border-sky-500 pl-[7px]"
-                    : "text-gray-600 dark:text-gray-400 hover:text-sky-600 dark:hover:text-sky-300 hover:bg-gray-100/70 dark:hover:bg-gray-800/70",
+                    ? "bg-sky-50 dark:bg-slate-800/80 text-sky-700 dark:text-sky-400 font-semibold border-l-[3px] border-sky-500 pl-[7px]"
+                    : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/70 dark:hover:bg-slate-800/50",
                 ].join(" ")
               }
               onClick={() => isMobile && setMobileOpen(false)}
@@ -90,7 +91,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                 System Admin Panel
               </span>
               {collapsedMode && (
-                <div className="pointer-events-none fixed left-[68px] px-2.5 py-1 rounded-md bg-gray-900 dark:bg-gray-800 text-white text-xs font-medium whitespace-nowrap shadow-md opacity-0 group-hover:opacity-100 transition-opacity z-50">
+                <div className="pointer-events-none fixed left-[68px] px-2.5 py-1 rounded-md bg-slate-900 dark:bg-slate-800 text-white text-xs font-medium whitespace-nowrap shadow-md opacity-0 group-hover:opacity-100 transition-opacity z-50">
                   System Admin Panel
                 </div>
               )}
@@ -113,8 +114,8 @@ const Sidebar: React.FC<SidebarProps> = ({
                   "group relative flex items-center h-10 px-2.5 rounded-lg transition-colors overflow-hidden",
                   isExpired ? "opacity-60 hover:opacity-80" : "",
                   isActive
-                    ? "bg-sky-50 dark:bg-sky-950/40 text-sky-600 dark:text-sky-300 font-semibold border-l-[3px] border-sky-500 pl-[7px]"
-                    : "text-gray-600 dark:text-gray-400 hover:text-sky-600 dark:hover:text-sky-300 hover:bg-gray-100/70 dark:hover:bg-gray-800/70",
+                    ? "bg-sky-50 dark:bg-slate-800/80 text-sky-600 dark:text-sky-400 font-semibold border-l-[3px] border-sky-500 pl-[7px]"
+                    : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/70 dark:hover:bg-slate-800/50",
                 ].join(" ")
               }
               onClick={() => isMobile && setMobileOpen(false)}
@@ -132,10 +133,10 @@ const Sidebar: React.FC<SidebarProps> = ({
                 {text}
               </span>
               {isExpired && !collapsedMode && (
-                <Lock className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500 ml-auto shrink-0" />
+                <Lock className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500 ml-auto shrink-0" />
               )}
               {collapsedMode && (
-                <div className="pointer-events-none fixed left-[68px] px-2.5 py-1 rounded-md bg-gray-900 dark:bg-gray-800 text-white text-xs font-medium whitespace-nowrap shadow-md opacity-0 group-hover:opacity-100 transition-opacity z-50 flex items-center gap-1.5">
+                <div className="pointer-events-none fixed left-[68px] px-2.5 py-1 rounded-md bg-slate-900 dark:bg-slate-800 text-white text-xs font-medium whitespace-nowrap shadow-md opacity-0 group-hover:opacity-100 transition-opacity z-50 flex items-center gap-1.5">
                   <span>{text}</span>
                   {isExpired && <Lock className="w-3 h-3 text-amber-400" />}
                 </div>
@@ -147,7 +148,7 @@ const Sidebar: React.FC<SidebarProps> = ({
         {user?.role === "org_admin" && (
           <>
             <li className="pt-2">
-              <div className="border-t border-gray-100 dark:border-gray-800 my-1 mx-1" />
+              <div className="border-t border-slate-100 dark:border-slate-800 my-1 mx-1" />
             </li>
             <li>
               <NavLink
@@ -157,8 +158,8 @@ const Sidebar: React.FC<SidebarProps> = ({
                     "group relative flex items-center h-10 px-2.5 rounded-lg transition-colors overflow-hidden",
                     isExpired ? "opacity-60 hover:opacity-80" : "",
                     isActive
-                      ? "bg-sky-50 dark:bg-sky-950/40 text-sky-600 dark:text-sky-300 font-semibold border-l-[3px] border-sky-500 pl-[7px]"
-                      : "text-gray-600 dark:text-gray-400 hover:text-sky-600 dark:hover:text-sky-300 hover:bg-gray-100/70 dark:hover:bg-gray-800/70",
+                      ? "bg-sky-50 dark:bg-slate-800/80 text-sky-600 dark:text-sky-400 font-semibold border-l-[3px] border-sky-500 pl-[7px]"
+                      : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/70 dark:hover:bg-slate-800/50",
                   ].join(" ")
                 }
                 onClick={() => isMobile && setMobileOpen(false)}
@@ -170,16 +171,16 @@ const Sidebar: React.FC<SidebarProps> = ({
                   className={`text-sm font-medium whitespace-nowrap overflow-hidden transition-all duration-300 ease-in-out ${
                     collapsedMode
                       ? "max-w-0 opacity-0 -translate-x-2 pointer-events-none"
-                      : "max-w-[150px] opacity-100 translate-x-0 ml-3"
+                    : "max-w-[150px] opacity-100 translate-x-0 ml-3"
                   }`}
                 >
                   Manage Team
                 </span>
                 {isExpired && !collapsedMode && (
-                  <Lock className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500 ml-auto shrink-0" />
+                  <Lock className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500 ml-auto shrink-0" />
                 )}
                 {collapsedMode && (
-                  <div className="pointer-events-none fixed left-[68px] px-2.5 py-1 rounded-md bg-gray-900 dark:bg-gray-800 text-white text-xs font-medium whitespace-nowrap shadow-md opacity-0 group-hover:opacity-100 transition-opacity z-50 flex items-center gap-1.5">
+                  <div className="pointer-events-none fixed left-[68px] px-2.5 py-1 rounded-md bg-slate-900 dark:bg-slate-800 text-white text-xs font-medium whitespace-nowrap shadow-md opacity-0 group-hover:opacity-100 transition-opacity z-50 flex items-center gap-1.5">
                     <span>Manage Team</span>
                     {isExpired && <Lock className="w-3 h-3 text-amber-400" />}
                   </div>
@@ -195,8 +196,8 @@ const Sidebar: React.FC<SidebarProps> = ({
                     isExpired
                       ? "bg-amber-500/10 text-amber-700 dark:text-amber-300 font-medium border border-amber-500/30"
                       : isActive
-                      ? "bg-sky-50 dark:bg-sky-950/40 text-sky-600 dark:text-sky-300 font-semibold border-l-[3px] border-sky-500 pl-[7px]"
-                      : "text-gray-600 dark:text-gray-400 hover:text-sky-600 dark:hover:text-sky-300 hover:bg-gray-100/70 dark:hover:bg-gray-800/70",
+                      ? "bg-sky-50 dark:bg-slate-800/80 text-sky-600 dark:text-sky-400 font-semibold border-l-[3px] border-sky-500 pl-[7px]"
+                      : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/70 dark:hover:bg-slate-800/50",
                   ].join(" ")
                 }
                 onClick={() => isMobile && setMobileOpen(false)}
@@ -219,7 +220,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                   </span>
                 )}
                 {collapsedMode && (
-                  <div className="pointer-events-none fixed left-[68px] px-2.5 py-1 rounded-md bg-gray-900 dark:bg-gray-800 text-white text-xs font-medium whitespace-nowrap shadow-md opacity-0 group-hover:opacity-100 transition-opacity z-50 flex items-center gap-1.5">
+                  <div className="pointer-events-none fixed left-[68px] px-2.5 py-1 rounded-md bg-slate-900 dark:bg-slate-800 text-white text-xs font-medium whitespace-nowrap shadow-md opacity-0 group-hover:opacity-100 transition-opacity z-50 flex items-center gap-1.5">
                     <span>Plans & Billing</span>
                     {isExpired && (
                       <span className="text-[10px] text-amber-400 font-bold">
@@ -238,8 +239,8 @@ const Sidebar: React.FC<SidebarProps> = ({
                     "group relative flex items-center h-10 px-2.5 rounded-lg transition-colors overflow-hidden",
                     isExpired ? "opacity-60 hover:opacity-80" : "",
                     isActive
-                      ? "bg-sky-50 dark:bg-sky-950/40 text-sky-600 dark:text-sky-300 font-semibold border-l-[3px] border-sky-500 pl-[7px]"
-                      : "text-gray-600 dark:text-gray-400 hover:text-sky-600 dark:hover:text-sky-300 hover:bg-gray-100/70 dark:hover:bg-gray-800/70",
+                      ? "bg-sky-50 dark:bg-slate-800/80 text-sky-600 dark:text-sky-400 font-semibold border-l-[3px] border-sky-500 pl-[7px]"
+                      : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/70 dark:hover:bg-slate-800/50",
                   ].join(" ")
                 }
                 onClick={() => isMobile && setMobileOpen(false)}
@@ -257,11 +258,48 @@ const Sidebar: React.FC<SidebarProps> = ({
                   Workspace Settings
                 </span>
                 {isExpired && !collapsedMode && (
-                  <Lock className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500 ml-auto shrink-0" />
+                  <Lock className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500 ml-auto shrink-0" />
                 )}
                 {collapsedMode && (
-                  <div className="pointer-events-none fixed left-[68px] px-2.5 py-1 rounded-md bg-gray-900 dark:bg-gray-800 text-white text-xs font-medium whitespace-nowrap shadow-md opacity-0 group-hover:opacity-100 transition-opacity z-50 flex items-center gap-1.5">
+                  <div className="pointer-events-none fixed left-[68px] px-2.5 py-1 rounded-md bg-slate-900 dark:bg-slate-800 text-white text-xs font-medium whitespace-nowrap shadow-md opacity-0 group-hover:opacity-100 transition-opacity z-50 flex items-center gap-1.5">
                     <span>Workspace Settings</span>
+                    {isExpired && <Lock className="w-3 h-3 text-amber-400" />}
+                  </div>
+                )}
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to="/role-management"
+                className={({ isActive }) =>
+                  [
+                    "group relative flex items-center h-10 px-2.5 rounded-lg transition-colors overflow-hidden",
+                    isExpired ? "opacity-60 hover:opacity-80" : "",
+                    isActive
+                      ? "bg-sky-50 dark:bg-slate-800/80 text-sky-600 dark:text-sky-400 font-semibold border-l-[3px] border-sky-500 pl-[7px]"
+                      : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/70 dark:hover:bg-slate-800/50",
+                  ].join(" ")
+                }
+                onClick={() => isMobile && setMobileOpen(false)}
+              >
+                <div className="w-6 h-6 shrink-0 flex items-center justify-center text-sky-500 transition-transform duration-200 group-hover:scale-110">
+                  <ShieldCheck className="w-5 h-5" />
+                </div>
+                <span
+                  className={`text-sm font-medium whitespace-nowrap overflow-hidden transition-all duration-300 ease-in-out ${
+                    collapsedMode
+                      ? "max-w-0 opacity-0 -translate-x-2 pointer-events-none"
+                      : "max-w-[150px] opacity-100 translate-x-0 ml-3"
+                  }`}
+                >
+                  Roles & Permissions
+                </span>
+                {isExpired && !collapsedMode && (
+                  <Lock className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500 ml-auto shrink-0" />
+                )}
+                {collapsedMode && (
+                  <div className="pointer-events-none fixed left-[68px] px-2.5 py-1 rounded-md bg-slate-900 dark:bg-slate-800 text-white text-xs font-medium whitespace-nowrap shadow-md opacity-0 group-hover:opacity-100 transition-opacity z-50 flex items-center gap-1.5">
+                    <span>Roles & Permissions</span>
                     {isExpired && <Lock className="w-3 h-3 text-amber-400" />}
                   </div>
                 )}
@@ -279,24 +317,24 @@ const Sidebar: React.FC<SidebarProps> = ({
       <aside
         className={`hidden lg:flex flex-col fixed top-[52px] left-0 h-[calc(100vh-52px)] ${
           isCollapsed ? "w-16" : "w-60"
-        } bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm border-r border-gray-200 dark:border-gray-800 shadow-xs z-30 transition-[width] duration-300 ease-in-out overflow-hidden`}
+        } bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 shadow-xs z-30 transition-[width] duration-300 ease-in-out overflow-hidden`}
       >
         {/* Industry standard Header Row with Inside Collapse Button (Figma / Jira / Linear style) */}
         {onToggleCollapse && (
-          <div className="h-12 px-3 flex items-center justify-between border-b border-gray-100 dark:border-gray-800 shrink-0">
+          <div className="h-12 px-3 flex items-center justify-between border-b border-slate-100 dark:border-slate-800 shrink-0">
             <div
               className={`flex items-center gap-2 overflow-hidden transition-all duration-300 ${
                 isCollapsed ? "max-w-0 opacity-0" : "max-w-[140px] opacity-100"
               }`}
             >
-              <span className="text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500 truncate">
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-400 truncate">
                 Navigation
               </span>
             </div>
 
             <button
               onClick={onToggleCollapse}
-              className={`p-1.5 rounded-lg text-gray-400 hover:text-sky-600 dark:hover:text-sky-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all cursor-pointer ${
+              className={`p-1.5 rounded-lg text-slate-400 hover:text-sky-600 dark:hover:text-sky-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all cursor-pointer ${
                 isCollapsed ? "mx-auto" : "ml-auto"
               }`}
               title={isCollapsed ? "Expand sidebar ( [ )" : "Collapse sidebar ( [ )"}
@@ -332,19 +370,19 @@ const Sidebar: React.FC<SidebarProps> = ({
       {mobileOpen && (
         <div className="fixed inset-0 z-50 lg:hidden animate-in fade-in duration-200">
           <div
-            className="fixed inset-0 bg-black/50 backdrop-blur-xs"
+            className="fixed inset-0 bg-black/55 backdrop-blur-xs"
             onClick={() => setMobileOpen(false)}
           />
           <div
-            className="absolute top-0 left-0 w-72 max-w-[85vw] h-full bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 shadow-2xl z-50 p-4 flex flex-col justify-between"
+            className="absolute top-0 left-0 w-72 max-w-[85vw] h-full bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 shadow-2xl z-50 p-4 flex flex-col justify-between"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex flex-col flex-1 min-h-0 space-y-3">
               {/* Drawer Brand Header */}
-              <div className="flex justify-between items-center pb-3 border-b border-gray-100 dark:border-gray-800 shrink-0">
+              <div className="flex justify-between items-center pb-3 border-b border-slate-100 dark:border-slate-800 shrink-0">
                 <PlanMateLogo size={26} showText textClassName="text-base font-bold text-sky-500" />
                 <button
-                  className="text-gray-500 hover:text-gray-800 dark:hover:text-gray-200 p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors cursor-pointer"
+                  className="text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
                   onClick={() => setMobileOpen(false)}
                   aria-label="Close navigation menu"
                 >
@@ -359,9 +397,9 @@ const Sidebar: React.FC<SidebarProps> = ({
             </div>
 
             {/* Bottom Section: User Info, Theme Toggle, Settings & Logout */}
-            <div className="pt-3 border-t border-gray-100 dark:border-gray-800 shrink-0 space-y-2.5">
+            <div className="pt-3 border-t border-slate-100 dark:border-slate-800 shrink-0 space-y-2.5">
               {user && (
-                <div className="flex items-center gap-2.5 px-2 py-1.5 rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-100 dark:border-gray-700/60">
+                <div className="flex items-center gap-2.5 px-2 py-1.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-700/60">
                   {user.avatar ? (
                     <img src={user.avatar} alt="Avatar" className="w-8 h-8 rounded-full shadow-2xs" />
                   ) : (
@@ -370,10 +408,10 @@ const Sidebar: React.FC<SidebarProps> = ({
                     </div>
                   )}
                   <div className="min-w-0 flex-1">
-                    <p className="text-xs font-bold text-gray-800 dark:text-gray-200 truncate leading-tight">
+                    <p className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate leading-tight">
                       {user.name}
                     </p>
-                    <p className="text-[10px] text-gray-400 dark:text-gray-500 truncate leading-tight">
+                    <p className="text-[10px] text-slate-400 dark:text-slate-500 truncate leading-tight">
                       {user.email}
                     </p>
                   </div>
@@ -388,7 +426,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                 <button
                   type="button"
                   onClick={toggleDarkMode}
-                  className="h-9 px-2.5 rounded-lg border border-gray-200 dark:border-gray-750 bg-gray-50 dark:bg-gray-800/50 hover:bg-gray-100 dark:hover:bg-gray-750 text-gray-700 dark:text-gray-300 text-xs font-semibold flex items-center justify-center gap-1.5 cursor-pointer transition-colors"
+                  className="h-9 px-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-semibold flex items-center justify-center gap-1.5 cursor-pointer transition-colors"
                 >
                   {isDark ? (
                     <>
@@ -409,7 +447,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                     setMobileOpen(false);
                     navigate(ROUTES.PROFILE);
                   }}
-                  className="h-9 px-2.5 rounded-lg border border-gray-200 dark:border-gray-750 bg-gray-50 dark:bg-gray-800/50 hover:bg-gray-100 dark:hover:bg-gray-750 text-gray-700 dark:text-gray-300 text-xs font-semibold flex items-center justify-center gap-1.5 cursor-pointer transition-colors"
+                  className="h-9 px-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-semibold flex items-center justify-center gap-1.5 cursor-pointer transition-colors"
                 >
                   <Settings className="w-3.5 h-3.5 text-sky-500" />
                   <span>Settings</span>

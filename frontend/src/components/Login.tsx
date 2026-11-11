@@ -102,16 +102,15 @@ export const Login: React.FC<LoginProps> = ({ onSubmit, onSwitchMode }) => {
   };
 
   return (
-    <div className="max-w-md w-full bg-white dark:bg-gray-900 shadow-2xl shadow-slate-950/40 border border-slate-100 dark:border-slate-800 rounded-2xl p-6 sm:p-8 my-auto">
+    <div className="max-w-md w-full bg-white dark:bg-gray-900 shadow-2xl shadow-slate-950/40 border border-slate-100 dark:border-slate-800 rounded-xl p-6 sm:p-8 my-auto">
       <div className="mb-6 text-center">
         <div className="flex justify-center mb-4">
           <PlanMateLogo size={56} />
         </div>
-        <h2 className=" text-2xl font-bold text-gray-800">
-          {" "}
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
           {AUTH_TEXTS.LOGIN_WELCOME}
         </h2>
-        <p className=" text-gray-500 text-sm mt-1">
+        <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">
           {AUTH_TEXTS.LOGIN_SUBTITLE}
         </p>
       </div>

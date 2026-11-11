@@ -90,11 +90,11 @@ const TaskDetailPage = () => {
 
         {/* 2-Column Detail Skeleton */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start mt-5">
-          <div className="lg:col-span-8 space-y-6 bg-white dark:bg-gray-900 p-5 sm:p-6 rounded-2xl border border-slate-200/80 dark:border-gray-800 shadow-xs">
+          <div className="lg:col-span-8 space-y-6 bg-white dark:bg-gray-900 p-5 sm:p-6 rounded-xl border border-slate-200/80 dark:border-gray-800 shadow-xs">
             {/* Description Skeleton */}
             <div className="space-y-2">
               <div className="h-3.5 w-24 bg-slate-200 dark:bg-gray-700 rounded" />
-              <div className="h-32 w-full bg-slate-100 dark:bg-gray-800 rounded-xl" />
+              <div className="h-32 w-full bg-slate-100 dark:bg-gray-800 rounded-lg" />
             </div>
             {/* Subtasks Skeleton */}
             <div className="space-y-2 pt-2">
@@ -105,7 +105,7 @@ const TaskDetailPage = () => {
           </div>
 
           {/* Right Sidebar Skeleton */}
-          <div className="lg:col-span-4 space-y-4 bg-white dark:bg-gray-900 p-5 sm:p-6 rounded-2xl border border-slate-200/80 dark:border-gray-800 shadow-xs">
+          <div className="lg:col-span-4 space-y-4 bg-white dark:bg-gray-900 p-5 sm:p-6 rounded-xl border border-slate-200/80 dark:border-gray-800 shadow-xs">
             <div className="h-3.5 w-20 bg-slate-200 dark:bg-gray-700 rounded mb-3" />
             <div className="space-y-3">
               <div className="h-[38px] bg-slate-100 dark:bg-gray-800 rounded-lg" />
@@ -122,7 +122,7 @@ const TaskDetailPage = () => {
   if (error || !parentTaskData) {
     return (
       <div className={WRAPPER}>
-        <div className="text-sm text-red-650 bg-red-50 p-4 rounded-xl border border-red-100">
+        <div className="text-sm text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 p-4 rounded-xl border border-rose-200 dark:border-rose-900/50">
           {error || "Task not found"}
         </div>
       </div>
@@ -159,7 +159,7 @@ const TaskDetailPage = () => {
       />
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start mt-5">
-        <div className="lg:col-span-8 space-y-6 bg-white dark:bg-gray-900 p-5 sm:p-6 rounded-2xl border border-sky-100/50 dark:border-gray-800 shadow-xs">
+        <div className="lg:col-span-8 space-y-6 bg-white dark:bg-gray-900 p-5 sm:p-6 rounded-xl border border-sky-100/50 dark:border-gray-800 shadow-xs">
           <TaskDescriptionSection
             title={taskData.title}
             description={taskData.description}
