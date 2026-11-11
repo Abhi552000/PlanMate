@@ -104,7 +104,7 @@ export const BoardManagementPanel: React.FC<BoardManagementPanelProps> = ({
   return (
     <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm overflow-hidden space-y-0">
       {/* Panel Header with Title, Search Input, and Add Board */}
-      <div className="p-4 sm:p-5 border-b border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-850/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="p-4 sm:p-5 border-b border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h2 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white">
             {WORKSPACE_SETTINGS_TEXTS.BOARDS_PANEL_TITLE}
